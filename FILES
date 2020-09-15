@@ -1,0 +1,9 @@
+ebuilds.list.txt
+FILES
+install-amd64-minimal-20200909T214504Z.iso
+LICENSE
+mkgentoo.sh
+mkisofs.cli
+mkvm.sh
+README.md
+VBoxGuestAdditions.iso

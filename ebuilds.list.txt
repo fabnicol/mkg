@@ -1,0 +1,38 @@
+ app-admin/sysklogd
+ sys-process/cronie
+ sys-apps/mlocate
+ sys-fs/e2fsprogs
+ sys-fs/dosfstools
+ net-misc/dhcpcd
+ net-wireless/iw net-wireless/wpa_supplicant
+ app-portage/eix
+ dev-libs/re2
+ gentoolkit
+ sys-boot/grub:2
+ git
+ ## Qt5 and pandoc
+
+ ant
+ ACCEPT_KEYWORDS="~amd64" qtcore qtwidgets qtgui qtxml qtchannel qtwebengine qtpositioning qtopengl
+
+ -uDN sddm sddm-kcm
+
+ dev-lang/R-4.0.2
+
+ app-emulation/virtualbox
+ app-emulation/virtualbox-guest-additions
+ 
+ #USE="-kde -wxwidgets" p7zip
+ #USE="caps"  util-linux
+
+## KDE
+
+ plasma-meta
+ app-office/libreoffice
+ kate konsole dolphin konqueror
+
+## R libs and texlive
+
+ # USE xetex  texlive =dev-texlive/texlive-latex-2020
+ 
+ okular

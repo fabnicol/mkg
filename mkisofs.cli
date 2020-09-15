@@ -1,0 +1,1 @@
+mkisofs -J -R -o  /c/Users/fabrn/Downloads/install-amd64-minimal-20200909T214504Z.iso -b isolinux/isolinux.bin  -c isolinux/boot.cat  -no-emul-boot -boot-load-size 4  -boot-info-table  ISO
