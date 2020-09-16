@@ -50,11 +50,15 @@ function adjust_environment {
 	# Use and keywords
 
 	mkdir /etc/portage/package.accept_keywords
+	
+        echo '>=dev-libs/libpcre2-10.35 pcre16'        > /etc/portage/package.use/pcre2
+        echo '>=x11-libs/libxkbcommon-0.10.0-r1 X'     > /etc/portage/package.use/libxkb
+        echo '>=media-libs/libglvnd-1.3.2 X'           > /etc/portage/package.use/libglvnd  
 	echo '=dev-texlive/texlive-latex-2020 "xetex"' > /etc/portage/package.use/texlive
-	echo 'util-linux "caps"'                 > /etc/portage/package.use/util-linux
-	echo 'app-arch/p7zip "-kde -wxwidgets"'  > /etc/portage/package.use/p7zip
-	echo '=dev-lang/R-4.0.2 "~${PROCESSOR}"' > /etc/portage/package.accept_keywords/R
-	echo 'app-text/pandoc "~${PROCESSOR}"'   > /etc/portage/package.accept_keywords/pandoc
+	echo 'util-linux "caps"'                       > /etc/portage/package.use/util-linux
+	echo 'app-arch/p7zip "-kde -wxwidgets"'        > /etc/portage/package.use/p7zip
+	echo '=dev-lang/R-4.0.2 "~${PROCESSOR}"'       > /etc/portage/package.accept_keywords/R
+	echo 'app-text/pandoc "~${PROCESSOR}"'         > /etc/portage/package.accept_keywords/pandoc
 	
 	USE='-qt5' emerge -1 cmake
 	
@@ -125,7 +129,7 @@ function build_kernel {
 
 	# kernel config issue here
 
-	make synccconfig  # replaces silentoldconfig as of 4.19
+	make syncconfig  # replaces silentoldconfig as of 4.19
 	make -s -j${NCPUS} 2>/dev/null && make modules_install && make install
 	
 	if test $? != 0; then
@@ -245,5 +249,5 @@ function finalize {
 adjust_environment
 build_kernel
 install_software
-#global_config
-#finalize
+global_config
+finalize
