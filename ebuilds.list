@@ -1,0 +1,40 @@
+# System and management
+
+ app-admin/sysklogd
+ sys-process/cronie
+ sys-apps/mlocate
+ sys-fs/e2fsprogs
+ sys-fs/dosfstools
+ net-misc/dhcpcd
+ net-wireless/iw 
+ net-wireless/wpa_supplicant
+ app-portage/eix
+ dev-libs/re2
+ gentoolkit
+ sys-boot/grub:2
+ git
+ ant
+ sddm 
+ sddm-kcm
+ 
+# Data science
+
+ =dev-lang/R-4.0.2
+ 
+## KDE
+
+ qtcore
+ qtwidgets
+ qtxml
+ qtgui
+ plasma-meta
+ app-office/libreoffice
+ kate
+ konsole
+ dolphin
+ konqueror
+
+## PDF-related
+ 
+ okular
+ texlive

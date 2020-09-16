@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public
 # License along with FFmpeg; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 
 ##
 
 #!/bin/bash
@@ -51,11 +51,16 @@ ARR=("vm"          "Virtual Machine name"                                       
      "githubpath"  "RStudio Github path to zip: path right before version.zip"           "https://github.com/rstudio/rstudio/archive/v"
      "cflags"      "GCC CFLAGS options for ebuilds"                                      "-march=core-avx2 -O2" 
      "nonroot_user" "Non-root user"                                                       "fab"
-     "passwd"  "User password"                                                       "dev20"
+     "passwd"  "User password"                                                           "dev20"
      "rootpasswd"  "Root password"                                                       "dev20" 
-     "download"    "Download install ISO image from Gentoo mirror"                       "TRUE" 
+     "download"    "Download install ISO image from Gentoo mirror"                       "TRUE"
+     "download_stage3" "Download and install stage3 tarball to virtual disk"             "TRUE"
+     "download_rstudio"  "Download and build RStudio"                                    "TRUE"
+     "stage3"      "Path to stage3 archive"                                              "stage3.tar.xz"     
      "create_squashfs"  "(Re)create the squashfs filesystem"                             "TRUE"
-     "vmtype"      "gui or headless (silent)"                                            "headless")
+     "vmtype"      "gui or headless (silent)"                                            "headless"
+     "kernel_config"  "Use a custom kernel config file"                              ".config"
+    )
      
 ARRAY_LENGTH=$((${#ARR[*]}/3))
 
@@ -73,7 +78,7 @@ function test_cli {
 local sw=${ARR[$(($1 * 3))]}
 local desc=${ARR[$(($1 * 3 + 1))]}
 local default=${ARR[$(($1 * 3 + 2))]}
-local vm_arg=$(echo ${CLI} | sed -E "s/.*${sw}=([^ ]+).*/\1/")
+local vm_arg=$(echo ${CLI} | sed -E "s/(^${sw}|.* ${sw})=([^ ]+).*/\2/")
 
 VAR=$(echo $sw | tr [a-z] [A-Z])
 
@@ -108,9 +113,18 @@ echo "Argument: path to ISO file to be created [default gentoo.iso]"
 
 function fetch_livecd {
 
+        local CACHED_ISO="install-${PROCESSOR}-minimal.iso"
+        ISO="downloaded.iso"
+        
 	if test "${DOWNLOAD}" != "TRUE"; then
-	   LIVECD=install*.iso
-	   return;
+           if test -f ${CACHED_ISO}; then   
+             cp -vf ${CACHED_ISO} ${ISO}
+             LIVECD=${ISO}
+             return
+           else
+             echo "No ISO file was found, please rerun with download=TRUE"
+             exit -1  
+           fi  
 	fi   
 	
 	rm install-${PROCESSOR}-minimal*\.iso*
@@ -129,29 +143,91 @@ function fetch_livecd {
 	
 	echo "Downloading $current..."
 	
-
 	wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
-		if test $? != 0; then
+	
+        if test $? != 0; then
+        
 	   echo "Could not download live CD"
 	   exit -1
+	   
 	else
-	  downloaded=$(basename ${current})	
-	   if test -f ${downloaded}; then
-	     LIVECD=${downloaded}
+	
+           local downloaded=$(basename ${current})	
+ 	   if test -f ${downloaded}; then
+	     
+             cp -vf ${downloaded} ${CACHED_ISO}
+             mv ${downloaded} ${ISO}
+             if test -f ${ISO}; then
+                LIVECD=${ISO}
+             else
+                echo "No active ISO (downloaded.iso) file!"
+                exit -1   
+             fi   
+               
 	   else
-  	     echo "Could not find downloaded live CD"
+	   
+  	     echo "Could not find downloaded live CD ${downloaded}"
 	     exit -1
+	     
 	   fi
 	fi
-        
 }
 
+function fetch_stage3 {
 
+        # Fetching stage3 tarball
+
+	local CACHED_STAGE3="stage3-${PROCESSOR}.tar.xz"
+
+	echo "download_stage3=${DOWNLOAD_STAGE3}"
+	if test "${DOWNLOAD_STAGE3}" = "TRUE"; then
+	    echo "Cleaning up stage3 data..."
+            rm -vf lastest-stage3*.txt*
+	    echo "Downloading stage3 data..."
+            wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt
+            if test $? != 0; then
+	      echo "Could not download stage3 from mirrors: ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
+	      exit -1
+	    fi
+	else
+	    if ! test -f latest-stage3-${PROCESSOR}.txt; then
+		echo "No stage 3 download information available!"
+		echo "Rerun with download_stage3=TRUE"
+		exit -1
+	    fi
+	fi
+		
+	local current=$(cat latest-stage3-${PROCESSOR}.txt | grep "stage3-${PROCESSOR}.*.tar.xz" | cut -f 1 -d' ')
+
+	if test "${DOWNLOAD_STAGE3}" = "TRUE"; then
+	  echo "Cleaning up stage3 archives(s)..."  
+          rm -vf stage3-${PROCESSOR}-*tar.xz*
+	  rm  ${STAGE3} 
+          echo "Downloading ${current}..."
+	  wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
+	
+	  if test $? != 0; then
+	    echo "Could not download stage3 tarball from mirror: ${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
+	    exit -1
+	  fi
+
+          cp -vf $(echo ${current} | sed 's/.*stage3/stage3/')  ${CACHED_STAGE3}
+
+	fi
+
+	if ! test -f "${CACHED_STAGE3}"; then
+            echo "No stage3 tarball!"
+	    echo "Rerun with download_stage3=TRUE"
+            exit -1
+	fi
+
+	cp -vf ${CACHED_STAGE3} ${STAGE3}
+}
 
 function make_boot_from_livecd {
 
-  if ! test -f install*.iso; then
-    "No ISO file in current directory"
+  if ! test -f ${ISO}; then
+    echo "No active ISO file in current directory!"
     exit -1
   fi
 
@@ -167,7 +243,7 @@ function make_boot_from_livecd {
   
   mkdir mnt
   
-  mount -oloop install*.iso mnt/
+  mount -oloop ${ISO} mnt/
   
   ! mountpoint -q mnt && echo "ISO not mounted!" && exit -1
   
@@ -178,6 +254,7 @@ function make_boot_from_livecd {
   mkdir mnt2
   
   rsync -av mnt/ mnt2
+  
   cd mnt2/isolinux
   
   sed -i 's/timeout.*/timeout 1/' isolinux.cfg
@@ -186,49 +263,64 @@ function make_boot_from_livecd {
   cd ..
   
   unsquashfs image.squashfs
+
+  cd ..
   
   if test $? != 0; then
     echo "unsquashfs failed !"
     exit -1
   fi  
   
-  cd squashfs-root
-  
-  if ! test -f ../../mkvm.sh; then
+  if ! test -f mkvm.sh; then
       echo "No mkvm.sh script!"
       exit -1
   fi
-  if ! test -f ../../mkvm_chroot.sh; then
+  if ! test -f mkvm_chroot.sh; then
       echo "No mkvm_chroot.sh script!"
       exit -1
   fi
-  if ! test -f ../../${ELIST}; then
+  if ! test -f ${ELIST}; then
       echo "No ebuild list!"
       exit -1
   fi
-  
-  cp -vf ../../mkvm.sh root
-  chmod +x root/mkvm.sh
-  cp -vf ../../mkvm_chroot.sh root
-  chmod +x root/mkvm_chroot.sh
+  if ! test -f ${STAGE3}; then
+      echo "No stage3 archive!"
+      exit -1
+  fi
+  if ! test -f ${KERNEL_CONFIG}; then
+      echo "No kernel configuration file!"
+      exit -1
+  fi
 
-  cp -vf ../../${ELIST} root
+  local sqrt="mnt2/squashfs-root/root/"
   
-  rc="root/.bashrc"
+  mv -vf ${STAGE3} ${sqrt}
+  
+  cp -vf mkvm.sh ${sqrt}
+  chmod +x ${sqrt}mkvm.sh
+  
+  cp -vf mkvm_chroot.sh ${sqrt}
+  chmod +x ${sqrt}mkvm_chroot.sh
+
+  cp -vf ${ELIST} ${sqrt}
+
+  cp -vf ${KERNEL_CONFIG} ${sqrt}
+
+  cd ${sqrt}
+    
+  rc=".bashrc"
   cp -vf /etc/bash.bashrc ${rc}
-  echo  "export MIRROR='${MIRROR}'"          >> ${rc}                   
-  echo  "export EMIRRORS='${EMIRRORS}'"      >> ${rc}        
-  echo  "export ELIST='${ELIST}'"            >> ${rc}        
-  echo  "export RSTUDIO='${RSTUDIO}'"        >> ${rc}                 
-  echo  "export CFLAGS='${CFLAGS}'"          >> ${rc}        
-  echo  "export NONROOT_USER='${NONROOT_USER}'"      >> ${rc}        
-  echo  "export ROOTPASSWD='${ROOTPASSWD}'"  >> ${rc}        
-  echo  "export USERPASSWD='${USERPASSWD}'"  >> ${rc}        
-  echo  "export GITHUBPATH='${GITHUBPATH}'"  >> ${rc}        
-  echo  "export PROCESSOR='${PROCESSOR}'"    >> ${rc}        
-  echo  "/bin/bash mkvm.sh"                  >> ${rc}
+  
+  for ((i=0; i<ARRAY_LENGTH; i++)); do
+     local  capname=${ARR[$((i * 3))]^^}
+     local  expstring="export ${capname}=\"${!capname}\""
+      echo "${expstring}"
+      echo "${expstring}" >> ${rc}
+  done    
+    
+  echo  "/bin/bash mkvm.sh"  >> ${rc}
 
-  cd  ..
+  cd ../..
   
   rm  image.squashfs
   mksquashfs squashfs-root/ image.squashfs
@@ -236,7 +328,7 @@ function make_boot_from_livecd {
   
   cd ..
   
-  mkisofs -J -R -o  install*.iso -b isolinux/isolinux.bin  -c isolinux/boot.cat  -no-emul-boot -boot-load-size 4  -boot-info-table  mnt2
+  mkisofs -J -R -o  ${ISO} -b isolinux/isolinux.bin  -c isolinux/boot.cat  -no-emul-boot -boot-load-size 4  -boot-info-table  mnt2
   
   umount -l mnt
   rm -rf mnt
@@ -251,19 +343,19 @@ function create_vm {
 
 	export PATH=${PATH}:${VBPATH}
 	if test "$(VBoxManage list vms | grep ${VM})" != ""; then
-        	if test "$(VBoxManage list runningvms | grep ${VM})" != ""; then
-        	   VBoxManage controlvm ${VM} poweroff
-        	fi
-        	VBoxManage unregistervm Gentoo --delete
+          if test "$(VBoxManage list runningvms | grep ${VM})" != ""; then
+             VBoxManage controlvm ${VM} poweroff
+          fi
+          VBoxManage unregistervm Gentoo --delete
         fi	
 	VBoxManage createvm --name ${VM} --ostype gentoo_64  --register
-	VBoxManage modifyvm ${VM} --cpus ${NCPUS} --memory ${MEM} --vram 256
+	VBoxManage modifyvm ${VM} --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
 	VBoxManage createhd --filename ~/${VM}.vdi --size ${SIZE} --variant Standard
 	VBoxManage storagectl ${VM} --name "SATA Controller" --add sata --bootable on
 	VBoxManage storageattach ${VM} --storagectl "SATA Controller"  --medium ~/${VM}.vdi --port 0 --device 0 --type hdd
 	VBoxManage storagectl ${VM} --name "IDE Controller" --add ide 
         VBoxManage storageattach ${VM} --storagectl "IDE Controller"  --port 0  --device 0   --type dvddrive --medium ${LIVECD}  --tempeject on
-	VBoxManage storageattach ${VM} --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium VBoxGuestAdditions.iso 
+	VBoxManage storageattach ${VM} --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium emptydrive 
         VBoxManage startvm ${VM} --type ${VMTYPE}
 	
 #	sleep 30
@@ -288,9 +380,25 @@ if test "$(echo ${CLI} | sed 's/help//' )" != "${CLI}"; then
   help
   exit 0
 fi
-
+echo "PARAMETERS"
+echo
 for ((i=0; i<ARRAY_LENGTH; i++)) ; do test_cli $i; done
-
+echo
+echo "Fetching live CD..."
+echo  
 fetch_livecd
+echo
+echo "Fetching stage3 tarball..."
+echo
+fetch_stage3
+echo
+echo "Tweaking live CD..."
+echo
 make_boot_from_livecd
+echo 
+echo "Creating VM"
+echo
 create_vm
+echo
+
+

@@ -55,33 +55,31 @@ PARTITION="DONE"
 
 function install_stage3 {
 
-if test "${INSTALL_STAGE3}" = "DONE"; then
-   return
-fi
+        if test "${INSTALL_STAGE3}" = "DONE"; then
+          return
+        fi
+	
+        mv -vf ${STAGE3} ${ELIST}  mkvm_chroot.sh ${KERNEL_CONFIG} /mnt/gentoo/
+        cp -vf .bashrc /mnt/gentoo/bashrc_temp
+	cd /mnt/gentoo
 
+	head -n -1 -q bashrc_temp > temp_bashrc && rm bashrc_temp 
 
 	# Time
 
 	ntpd -q -g
 
-	# Fetching stage3 tarball
+	tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
 
-	cd /mnt/gentoo
+	if test $? != 0; then
+            echo "stage3 tarball could not be extracted"
+	    exit -1
+	fi
+
+	cat temp_bashrc >> .bashrc
 	
-	wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt
-	if test $? != 0; then
-	  echo "Could not download stage3 from mirrors: ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
-	  exit -1
-	fi
-	local current=$(cat latest-stage3-${PROCESSOR}.txt | grep "stage3-${PROCESSOR}.*.tar.xz" | cut -f 1 -d' ')  
-	echo "Downloading $current..."
-	wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
-	if test $? != 0; then
-	  echo "Could not download stage3 tarball from mirror: ${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
-	  exit -1
-	fi
-	tar xpJf $(ls stage3*) --xattrs-include='*.*' --numeric-owner 
-
+	rm -vf ${STAGE3}
+	
 	# Ajusting portage
 	
 	local m_conf="etc/portage/make.conf"
@@ -93,7 +91,7 @@ fi
 	sed  -i 's/USE=".*"//g'    ${m_conf}
 	echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist virtualbox networkmanager"' >>  ${m_conf}
 	echo "GENTOO_MIRRORS=${EMIRRORS}"  >> ${m_conf}
-	echo ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code" >> ${m_conf}
+	echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code"' >> ${m_conf}
 	echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
 	echo 'VIDEO_CARDS="nouveau"'   >> ${m_conf}
 	echo 'INPUT_DEVICES="evdev synaptics"' >> ${m_conf}
@@ -103,14 +101,14 @@ fi
 	cp --dereference /etc/resolv.conf etc/
 
 	# Chrooting the new environment
-
+	
 	mount --types proc /proc proc
 	mount --rbind /sys  sys
 	mount --make-rslave sys
 	mount --rbind /dev  dev
 	mount --make-rslave dev
-
-	chroot . /bin/bash ./mkvh_chroot.sh
+        cd ~
+	chroot /mnt/gentoo ./mkvm_chroot.sh
 			
 	INSTALL_STAGE3="DONE"
 }
@@ -119,9 +117,5 @@ fi
 setup_network
 partition
 install_stage3
-adjust_environment
-#build_kernel
-#install_software
-#global_config
-#finalize
+
 
