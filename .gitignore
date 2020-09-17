@@ -8,3 +8,6 @@ mkisofs.cli
 "install-amd64-minimal.iso"
 FILES
 .bashrc
+Gentoo
+*.vid
+#*

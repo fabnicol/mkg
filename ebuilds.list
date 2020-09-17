@@ -12,9 +12,9 @@
  gentoolkit
  sys-boot/grub:2
  dev-vcs/git
- ant
- sddm 
- sddm-kcm
+ dev-java/ant
+ x11-misc/sddm 
+ kde-plasma/sddm-kcm
  
 # Data science
  emacs
@@ -36,5 +36,5 @@
 ## PDF-related
  
  okular
- texlive-latex-2020
+ =dev-texlive/texlive-latex-2020
  texlive

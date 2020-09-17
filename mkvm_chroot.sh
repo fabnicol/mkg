@@ -80,7 +80,8 @@ function adjust_environment {
         echo '>=app-text/ghostscript-gpl-9.52-r1 cups'  > /etc/portage/package.use/ghostscript
         echo '>=dev-qt/qtprintsupport-5.14.2 cups'      > /etc/portage/package.use/qtprintsupport
         echo '>=kde-frameworks/kdelibs4support-5.70.0 X'  > /etc/portage/package.use/kdelibs4support
-
+        echo 'app-text/xmlto text' > /etc/portage/package.use/xmlto
+        
         # One needs to build cmake without the qt5 USE value first, otherwise dependencies cannot be resolved.
         
 	USE='-qt5' emerge -1 cmake
@@ -168,7 +169,7 @@ function build_kernel {
 
 	if test -f /boot/vmlinu*; then
 	   echo "Kernel was built"
-	elseo
+	else
 	   echo "Kernel compilation failed!"
 	   exit -1  
 	fi
@@ -189,8 +190,12 @@ function install_software {
 
         # TODO: develop several options wrt to package set.
         
-        local packages=`grep -E -v '(^\s+$|^\s*#.*$)' ${ELIST} | sed "s/dev-lang\/R-.*$/dev-lang\/R-{R_VERSION}/"`
+        local packages=`grep -E -v '(^\s*$|^\s*#.*$)' ${ELIST} | sed "s/dev-lang\/R-.*$/dev-lang\/R-${R_VERSION}/"`
 
+        # Trace for debugging
+        
+        echo ${packages} > package_list
+        
         # do not quote!
         
 	emerge -uDN ${packages}
@@ -199,8 +204,23 @@ function install_software {
             echo "Main package build step failed!"
             exit -1
         fi
+
+        # cleaning up a bit aggressively before cloning...
         
-	eix-update
+        eclean -d packages
+        
+        rm -rf /var/tmp/*
+        rm -rf /var/log/*
+        rm -rf /var/cache/distfiles/*
+
+        # kernel sources will have to be reinstalled by user if necessary
+
+        emerge --unmerge gentoo-sources
+        emerge --depclean
+        
+        rm -rf /usr/src/linux/*
+        
+        eix-update
 
 	# RStudio
 	

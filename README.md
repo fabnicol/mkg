@@ -138,7 +138,7 @@ directory or in vmpath if specified.*
       mem              VM RAM memory in MiB                                 [default 8000]   
       ncpus            Number of VM CPUs                                    [default 4]   
       processor        Processor type                                       [default amd64]   
-      size             Dynamic disc size in MiB                             [default 45000]   
+      size             Dynamic disc size in MiB                             [default 50000]   
       livecd           Path to the live CD that will start the VM           [default gentoo.iso]   
       mirror           Mirror site for downloading of stage3 tarball        [default http://gentoo.mirrors.ovh.net/gentoo-distfiles/]  
       emirrors         Mirror sites for downloading ebuilds                 [default http://gentoo.mirrors.ovh.net/gentoo-distfiles/]   

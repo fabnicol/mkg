@@ -43,7 +43,7 @@ ARR=("vm"          "Virtual Machine name"                                       
      "mem"         "\t VM RAM memory in MiB"                                             "8000"
      "ncpus"       "Number of VM CPUs"                                                   "4"
      "processor"   "Processor type"                                                      "amd64"
-     "size"        "\t Dynamic disc size"                                                "45000"
+     "size"        "\t Dynamic disc size"                                                "55000"
      "livecd"      "Path to the live CD that will start the VM"                          "gentoo.iso"
      "mirror"      "Mirror site for downloading of stage3 tarball"                       "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
      "emirrors"    "Mirror sites for downloading ebuilds"                                "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
@@ -52,7 +52,7 @@ ARR=("vm"          "Virtual Machine name"                                       
      "r_version"   "R version"                                                           "4.0.2"  
      "githubpath"  "RStudio Github path to zip: path right before version.zip"           "https://github.com/rstudio/rstudio/archive/v"
      "cflags"      "GCC CFLAGS options for ebuilds"                                      "-march=core-avx2 -O2" 
-     "nonroot_user" "Non-root user"                                                       "fab"
+     "nonroot_user" "Non-root user"                                                      "fab"
      "passwd"      "User password"                                                       "dev20"
      "rootpasswd"  "Root password"                                                       "dev20" 
      "download"    "Download install ISO image from Gentoo mirror"                       "TRUE"
@@ -82,7 +82,8 @@ local desc=${ARR[$(($1 * 3 + 1))]}
 local default=${ARR[$(($1 * 3 + 2))]}
 local vm_arg=$(echo ${CLI} | sed -E "s/(^${sw}|.* ${sw})=([^ ]+).*/\2/")
 
-ISO_OUTPUT=$(echo ${CLI} | sed 's/.*((^\w+|\s+\w+)\.(iso|ISO))/\1/')
+ISO_OUTPUT=$(echo ${CLI} | sed -E 's/.*(\b\w+)\.(iso|ISO)/\1\.iso/')
+
 if test "${ISO_OUTPUT}" != "" -a "${ISO_OUTPUT}" != "${CLI}"; then
     echo "Build Gentoo distribution to bootable ISO output ${ISO_OUTPUT}"
     CREATE_ISO=1
@@ -110,7 +111,7 @@ echo "mkgentoo  [[switch=argument]...]  filename.iso  [1]"
 echo "mkgentoo  [[switch=argument]...]                [2]" 
 echo
 echo "Usage [1] creates a bootable ISO output file with a current Gentoo distribution."
-echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo under /root"
+echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo."
 echo "Warning: you should have at least 50 GB of free disk space in the current directory or in vmpath if specified."
 echo "Switches:"
 
@@ -358,46 +359,51 @@ function make_boot_from_livecd {
 function create_vm {
 
 	export PATH=${PATH}:${VBPATH}
-	if test "$(VBoxManage list vms | grep ${VM})" != ""; then
-          if test "$(VBoxManage list runningvms | grep ${VM})" != ""; then
-             VBoxManage controlvm ${VM} poweroff
+	if test "$(VBoxManage list vms | grep '${VM}')" != ""; then
+          if test "$(VBoxManage list runningvms | grep '${VM}')" != ""; then
+             VBoxManage controlvm "${VM}" poweroff
           fi
           VBoxManage unregistervm Gentoo --delete
         fi	
-	VBoxManage createvm --name ${VM} --ostype gentoo_64  --register  --basefolder ${VMPATH}
-	VBoxManage modifyvm ${VM} --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
-	VBoxManage createhd --filename ~/${VM}.vdi --size ${SIZE} --variant Standard
-	VBoxManage storagectl ${VM} --name "SATA Controller" --add sata --bootable on
-	VBoxManage storageattach ${VM} --storagectl "SATA Controller"  --medium ~/${VM}.vdi --port 0 --device 0 --type hdd
-	VBoxManage storagectl ${VM} --name "IDE Controller" --add ide 
-        VBoxManage storageattach ${VM} --storagectl "IDE Controller"  --port 0  --device 0   --type dvddrive --medium ${LIVECD}  --tempeject on
-	VBoxManage storageattach ${VM} --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium emptydrive 
-        VBoxManage startvm ${VM} --type ${VMTYPE}
+	VBoxManage createvm --name "${VM}" --ostype gentoo_64  --register  --basefolder "${VMPATH}"
+	VBoxManage modifyvm "${VM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
+	VBoxManage createhd --filename "${VMPATH}/${VM}.vdi" --size ${SIZE} --variant Standard
+	VBoxManage storagectl "${VM}" --name "SATA Controller" --add sata --bootable on
+	VBoxManage storageattach "${VM}" --storagectl "SATA Controller"  --medium "${VMPATH}/${VM}.vdi" --port 0 --device 0 --type hdd
+	VBoxManage storagectl "${VM}" --name "IDE Controller" --add ide 
+        VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 0   --type dvddrive --medium ${LIVECD}  --tempeject on
+	VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium emptydrive 
+        VBoxManage startvm "${VM}" --type ${VMTYPE}
 	
-#	sleep 30
-#       local dest='"/root"'
-# VBox bug : no copyto,  	
-#	VBoxManage guestcontrol ${VM} --verbose  run --exe "'/root/mkvm.sh'" \
-#	  --putenv   "MIRROR='${MIRROR}'"                     \
-#	  --putenv   "EMIRRORS='${EMIRRORS}'"                 \
-#          --putenv	  "ELIST='${ELIST}'"                  \
-#          --putenv	  "RSTUDIO='${RSTUDIO}'"              \
-#          --putenv	  "CFLAGS='${CFLAGS}'"                \
-#          --putenv	  "NONROOT_USER='${NONROT_USER}'"                    \
-#          --putenv	  "ROOTPASSWD='${ROOTPASSWD}'"        \
-#          --putenv	  "USERPASSWD='${USERPASSWD}'"        \
-#	  --putenv	  "GITHUBPATH='${GITHUBPATH}'"        \
-#  	  --putenv	  "PROCESSOR='${PROCESSOR}'"          \
-#	  --wait-stdout --wait-stderr 
+
 }
 
 function clone_vm_to_raw {
 
+ VBoxManage clonemedium "${VMPATH}/${VM}.vdi" "${VMPATH}/tmpdisk.raw" --format RAW   
 }
 
 
-function 
+function dd_to_USB {
 
+    "Bare metal copy of RAW disk to USB device..."
+    
+    dd if="${VMPATH}/tmpdisk.raw" of=${USB_DEVICE} bs=4M status=progress
+    
+    if test $? = 0; then
+        echo "Removing temporary RAW disk..."
+        rm -f ${VMPATH}/tmpdisk.raw
+    fi    
+    return 0    
+}
+
+function clonezilla_to_image {
+    return 0
+}
+
+function clonezilla_to_iso {
+    retrun 0
+}
 
 
 if test "$(echo ${CLI} | sed 's/help//' )" != "${CLI}"; then
