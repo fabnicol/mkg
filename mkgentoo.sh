@@ -38,7 +38,8 @@
 CLI="$*"
 
 ARR=("vm"          "Virtual Machine name"                                                "Gentoo"
-     "vbpath"      "Path to VirtualBox directory"                                        "/usr/bin"   
+     "vbpath"      "Path to VirtualBox directory"                                        "/usr/bin"
+     "vmpath"      "Path to VM base directory"                                           "$PWD"  
      "mem"         "\t VM RAM memory in MiB"                                             "8000"
      "ncpus"       "Number of VM CPUs"                                                   "4"
      "processor"   "Processor type"                                                      "amd64"
@@ -81,6 +82,16 @@ local desc=${ARR[$(($1 * 3 + 1))]}
 local default=${ARR[$(($1 * 3 + 2))]}
 local vm_arg=$(echo ${CLI} | sed -E "s/(^${sw}|.* ${sw})=([^ ]+).*/\2/")
 
+ISO_OUTPUT=$(echo ${CLI} | sed 's/.*((^\w+|\s+\w+)\.(iso|ISO))/\1/')
+if test "${ISO_OUTPUT}" != "" -a "${ISO_OUTPUT}" != "${CLI}"; then
+    echo "Build Gentoo distribution to bootable ISO output ${ISO_OUTPUT}"
+    CREATE_ISO=1
+else
+    echo "You did not indicate an ISO output file."
+    echo "A Virtual machine will be created with name Gentoo under /root"
+    CREATE_ISO=0
+fi
+
 VAR=$(echo $sw | tr [a-z] [A-Z])
 
 if test "${vm_arg}" != "" -a "${vm_arg}" != "${CLI}" ; then  # No args or no option
@@ -94,9 +105,13 @@ fi
 }
 
 function help {
-echo "USAGE"
-echo "mkgentoo  [[switch=argument]...] gentoo.iso"
-echo 
+echo "USAGE:"
+echo "mkgentoo  [[switch=argument]...]  filename.iso  [1]"
+echo "mkgentoo  [[switch=argument]...]                [2]" 
+echo
+echo "Usage [1] creates a bootable ISO output file with a current Gentoo distribution."
+echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo under /root"
+echo "Warning: you should have at least 50 GB of free disk space in the current directory or in vmpath if specified."
 echo "Switches:"
 
 for ((i=1; i<${ARRAY_LENGTH}; i++)); do 
@@ -109,7 +124,7 @@ echo -e "  ${ARR[$sw]} \t ${ARR[$desc]} \t [default ${ARR[$def]}]"
 done
 
 echo 
-echo "Argument: path to ISO file to be created [default gentoo.iso]"
+
 }
 
 function fetch_livecd {
@@ -349,7 +364,7 @@ function create_vm {
           fi
           VBoxManage unregistervm Gentoo --delete
         fi	
-	VBoxManage createvm --name ${VM} --ostype gentoo_64  --register
+	VBoxManage createvm --name ${VM} --ostype gentoo_64  --register  --basefolder ${VMPATH}
 	VBoxManage modifyvm ${VM} --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
 	VBoxManage createhd --filename ~/${VM}.vdi --size ${SIZE} --variant Standard
 	VBoxManage storagectl ${VM} --name "SATA Controller" --add sata --bootable on
@@ -376,6 +391,14 @@ function create_vm {
 #	  --wait-stdout --wait-stderr 
 }
 
+function clone_vm_to_raw {
+
+}
+
+
+function 
+
+
 
 if test "$(echo ${CLI} | sed 's/help//' )" != "${CLI}"; then
   help
@@ -400,6 +423,68 @@ echo
 echo "Creating VM"
 echo
 create_vm
+
+if test $? != 0; then
+    echo "VM failed to be created!"
+    exit -1
+fi
+
 echo
+if test ${CREATE_ISO} != 1; then
+    exit 0
+fi
+
+echo "Cloning virtual disk to raw..."
+
+clone_vm_to_raw
+
+if test $? != 0; then
+    echo "Cloning VDI disk to RAW failed !"
+    exit -1
+fi
+
+echo
+echo "Copying to USB stick..."
+echo
+
+dd_to_USB
+
+echo
+if test $? != 0; then
+    echo "Copying raw file to USB device failed!"
+    echo "Check that your USB device has at least 50 GiB of reachable space"
+    exit -1
+fi
+
+echo "Launching Clonezilla to create compressed image..."
+echo
+
+clonezilla_to_image
+
+echo
+
+if test $? != 0; then
+    echo "Clonezilla image failed to be created out of USB stick!"
+    exit -1
+fi
+
+echo "Launching Clonezilla to create ISO install medium..."
+
+clonezilla_to_iso
+
+echo
+if test $? = 0; then
+    echo "Success."
+    if test -f "${ISO_OUTPUT}"; then
+        echo "ISO install medium was created here: ${ISO_OUTPUT}"
+    else
+        echo "ISO install medium failed to be created."
+    fi
+else
+    echo "ISO install medium failed to be created!"
+    exit -1
+fi
+
+
 
 

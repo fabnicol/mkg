@@ -48,6 +48,7 @@ function adjust_environment {
 	eselect profile set ${profile}
 
 	# Use and keywords
+        # Currently hard-coded but should be exported to text file later on
 
 	mkdir /etc/portage/package.accept_keywords
 	
@@ -79,13 +80,17 @@ function adjust_environment {
         echo '>=app-text/ghostscript-gpl-9.52-r1 cups'  > /etc/portage/package.use/ghostscript
         echo '>=dev-qt/qtprintsupport-5.14.2 cups'      > /etc/portage/package.use/qtprintsupport
         echo '>=kde-frameworks/kdelibs4support-5.70.0 X'  > /etc/portage/package.use/kdelibs4support
+
+        # One needs to build cmake without the qt5 USE value first, otherwise dependencies cannot be resolved.
         
 	USE='-qt5' emerge -1 cmake
 	
 	if test $? != 0; then
 	  echo "emerge cmake failed!"
 	fi
-	
+
+        # LZ4 is a kernel dependency for newer linux kernels.
+        
         emerge app-arch/lz4
 	
 	emerge -uDN @world
@@ -120,7 +125,7 @@ function adjust_environment {
 	echo 'keymap="fr"' > /etc/conf.d/keymaps
 	sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
 
-	# Localization
+	# Localization. TODO: possibly enlarge by parametrization of commandline
 
 	echo "fr_FR.UTF-8 UTF-8" > /etc/locale.gen
 	echo "fr_FR ISO-8859-15" >> /etc/locale.gen
@@ -181,6 +186,8 @@ function install_software {
      
         emerge dos2unix
         dos2unix ${ELIST}
+
+        # TODO: develop several options wrt to package set.
         
         local packages=`grep -E -v '(^\s+$|^\s*#.*$)' ${ELIST} | sed "s/dev-lang\/R-.*$/dev-lang\/R-{R_VERSION}/"`
 
@@ -188,6 +195,11 @@ function install_software {
         
 	emerge -uDN ${packages}
 
+        if test $? != 0; then
+            echo "Main package build step failed!"
+            exit -1
+        fi
+        
 	eix-update
 
 	# RStudio
@@ -208,7 +220,7 @@ function install_software {
         fi
 	
 	unzip *.zip
-	cd "rstudio*"
+	cd rstudio*
 	mkdir build
 	cd dependencies/common
 	./install-mathjax
@@ -219,6 +231,7 @@ function install_software {
 	cmake .. -DRSTUDIO_TARGET=Desktop -DCMAKE_BUILD_TYPE=Release -DRSTUDIO_USE_SYSTEM_BOOST=1 -DQT_QMAKE_EXECUTABLE=1 
 	make -j4
 	make -k install
+        cd /
 }
 
 function global_config {
