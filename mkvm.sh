@@ -89,11 +89,11 @@ function install_stage3 {
 	echo 'L10N="fr en"'    >> ${m_conf}
 	echo 'LINGUAS="fr en"' >> ${m_conf}
 	sed  -i 's/USE=".*"//g'    ${m_conf}
-	echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist virtualbox networkmanager"' >>  ${m_conf}
+	echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist virtualbox networkmanager elogind"' >>  ${m_conf}
 	echo "GENTOO_MIRRORS=${EMIRRORS}"  >> ${m_conf}
 	echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code"' >> ${m_conf}
 	echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
-	echo 'VIDEO_CARDS="nouveau"'   >> ${m_conf}
+	echo 'VIDEO_CARDS="nouveau intel"'   >> ${m_conf}
 	echo 'INPUT_DEVICES="evdev synaptics"' >> ${m_conf}
 
 	mkdir --parents etc/portage/repos.conf

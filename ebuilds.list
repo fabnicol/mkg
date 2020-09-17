@@ -1,6 +1,5 @@
 # System and management
 
- app-admin/sysklogd
  sys-process/cronie
  sys-apps/mlocate
  sys-fs/e2fsprogs
@@ -12,7 +11,7 @@
  dev-libs/re2
  gentoolkit
  sys-boot/grub:2
- git
+ dev-vcs/git
  ant
  sddm 
  sddm-kcm
@@ -31,10 +30,11 @@
  app-office/libreoffice
  kate
  konsole
- dolphin
+ kde-apps/dolphin
  konqueror
 
 ## PDF-related
  
  okular
+ texlive-latex-2020
  texlive

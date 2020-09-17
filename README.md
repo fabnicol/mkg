@@ -5,7 +5,7 @@
 
 This software is a set of simple scripts to automate the installation of
 Gentoo GNU/Linux. It follows the official AMD64 install handbook, with a
-limited number of configuration options. It creates a platform
+limited number of configuration options. It creates a KDE Plasma platform
 compiled out of the latest available sources in the stable branch,
 with only a handful of packages belonging to the testing branch.
 

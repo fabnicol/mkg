@@ -54,12 +54,32 @@ function adjust_environment {
         echo '>=dev-libs/libpcre2-10.35 pcre16'        > /etc/portage/package.use/pcre2
         echo '>=x11-libs/libxkbcommon-0.10.0-r1 X'     > /etc/portage/package.use/libxkb
         echo '>=media-libs/libglvnd-1.3.2 X'           > /etc/portage/package.use/libglvnd  
-	echo '=dev-texlive/texlive-latex-2020 "xetex"' > /etc/portage/package.use/texlive
-	echo 'sys-apps/util-linux "caps"'              > /etc/portage/package.use/util-linux
-	echo 'app-arch/p7zip "-kde -wxwidgets"'        > /etc/portage/package.use/p7zip
-	echo '=dev-lang/R-4.0.2 "~${PROCESSOR}"'       > /etc/portage/package.accept_keywords/R
-	echo 'app-text/pandoc "~${PROCESSOR}"'         > /etc/portage/package.accept_keywords/pandoc
-	
+	echo '>=dev-texlive/texlive-latex-2020 xetex' > /etc/portage/package.use/texlive
+	echo 'sys-apps/util-linux caps'              > /etc/portage/package.use/util-linux
+	echo 'app-arch/p7zip -kde -wxwidgets'        > /etc/portage/package.use/p7zip
+	echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}"  > /etc/portage/package.accept_keywords/R
+	echo "app-text/pandoc ~${PROCESSOR}"           > /etc/portage/package.accept_keywords/pandoc
+	echo 'sys-auth/polkit  introspection kde nls pam elogind'  > /etc/portage/package.use/polkit
+        echo ">=net-wireless/wpa_supplicant-2.9-r2 dbus"  > /etc/portage/package.use/wpa_supplicant
+        echo '>=dev-qt/qtcore-5.14.2 icu'  > /etc/portage/package.use/qtcore
+        echo '>=dev-lang/python-2.7.18-r1:2.7 sqlite'  > /etc/portage/package.use/python-2.7
+        echo '>=media-libs/harfbuzz-2.6.7 icu'  > /etc/portage/package.use/harfbuzz
+        echo '>=media-libs/gd-2.3.0 png'  > /etc/portage/package.use/gd
+        echo '>=dev-qt/qtgui-5.14.2-r1 jpeg egl dbus'  > /etc/portage/package.use/qtgui
+        echo '>=media-video/vlc-3.0.11.1 vorbis ogg dbus'  > /etc/portage/package.use/vlc
+        echo '>=sys-libs/zlib-1.2.11-r2 minizip'  > /etc/portage/package.use/zlib
+        echo '>=x11-libs/cairo-1.16.0-r4 X'  > /etc/portage/package.use/cairo
+        echo '>=kde-frameworks/kwindowsystem-5.70.0 X'  > /etc/portage/package.use/kwindowsystem
+        echo '>=dev-qt/qtwebengine-5.14.2 widgets'  > /etc/portage/package.use/qtwebengine
+        echo '>=media-libs/mesa-20.0.8 wayland'  > /etc/portage/package.use/mesa
+        echo '>=dev-qt/qtwebchannel-5.14.2 qml'  > /etc/portage/package.use/qtwebchannel
+        echo '>=dev-libs/libxml2-2.9.10-r1 icu'  > /etc/portage/package.use/libxml2
+        echo '>=media-libs/libvpx-1.7.0-r1 svc'  > /etc/portage/package.use/libvpx
+        echo '>=dev-libs/xmlsec-1.2.30 nss'      > /etc/portage/package.use/xmlsec
+        echo '>=app-text/ghostscript-gpl-9.52-r1 cups'  > /etc/portage/package.use/ghostscript
+        echo '>=dev-qt/qtprintsupport-5.14.2 cups'      > /etc/portage/package.use/qtprintsupport
+        echo '>=kde-frameworks/kdelibs4support-5.70.0 X'  > /etc/portage/package.use/kdelibs4support
+        
 	USE='-qt5' emerge -1 cmake
 	
 	if test $? != 0; then
@@ -139,14 +159,15 @@ function build_kernel {
 	
 	genkernel --install initramfs
 	emerge sys-kernel/linux-firmware
+	make clean
 
 	if test -f /boot/vmlinu*; then
 	   echo "Kernel was built"
-	else
+	elseo
 	   echo "Kernel compilation failed!"
 	   exit -1  
 	fi
-  	if test -f /boot/initrd*.img; then
+  	if test -f /boot/initr*.img; then
 	   echo "initramfs was built"
 	else
 	   echo "initramfs compilation failed!"
@@ -156,9 +177,16 @@ function build_kernel {
 
 function install_software {
 
-        local EBUILDS_LIST="$(cat ${ELIST} | grep -E -v '\s*($|#.*)')"
-	
-	emerge -uDN ${EBUILDS_LIST}
+        # to eschew corruption cases
+     
+        emerge dos2unix
+        dos2unix ${ELIST}
+        
+        local packages=`grep -E -v '(^\s+$|^\s*#.*$)' ${ELIST} | sed "s/dev-lang\/R-.*$/dev-lang\/R-{R_VERSION}/"`
+
+        # do not quote!
+        
+	emerge -uDN ${packages}
 
 	eix-update
 
@@ -170,8 +198,8 @@ function install_software {
 
 	#	RScript Rdeps.R  # see ad-hoc script
 
-	mkdir /home/${USER}/Build
-	cd /home/${USER}/Build
+	mkdir Build
+	cd Build
 	wget ${GITHUBPATH}${RSTUDIO}.zip
 	
 	if test $? != 0; then
