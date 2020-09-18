@@ -14,9 +14,10 @@ with only a handful of packages belonging to the testing branch.
 The output is an ISO installation file that can be used to burn a DVD
 or create a bootable USB stick.   
 **WARNING**: The install media will wipe out all data on the Desktop
-main disk (/dev/sda). Use it with care and only if you want to do a
-fresh install of your PC. No responsability for lost data will be
-accepted.   
+main disc (/dev/sda). It leaves no choice of the tardet disk and runs
+**non-interactively** from beginning to end.   
+Use it with care and only if you want to do a fresh install of your PC main disk.
+No responsability for lost data will be accepted.   
 You have been warned.   
 
 ### Target
@@ -102,10 +103,14 @@ following features:
 
 ## Warning
 PROJECT CURRENTLY IN ITS FINAL STEPS. DO NOT USE FOR NOW.   
-Building the platforms comes in with four dedicated cores as a default.
+Building the platforms comes in with four dedicated cores as a default.   
 If resources are strained, rerun with N cores by adding `ncpus=N`
-to commandline.
-
+to commandline.    
+The `ncpus` number of jobs is used to implement the portage **make.conf**` CFLAGS`
+parameter, so that the building process is in line with ressources granted to
+the virtual machine. User should review this parameter later on according to
+the characteristics of the target platform.    
+  
 ## Limitations
 
 Currently video card support is limited to Intel and Nvidia.
@@ -138,14 +143,14 @@ directory or in vmpath if specified.*
       mem              VM RAM memory in MiB                                 [default 8000]   
       ncpus            Number of VM CPUs                                    [default 4]   
       processor        Processor type                                       [default amd64]   
-      size             Dynamic disc size in MiB                             [default 50000]   
+      size             Dynamic disc size in MiB                             [default 55000]   
       livecd           Path to the live CD that will start the VM           [default gentoo.iso]   
       mirror           Mirror site for downloading of stage3 tarball        [default http://gentoo.mirrors.ovh.net/gentoo-distfiles/]  
       emirrors         Mirror sites for downloading ebuilds                 [default http://gentoo.mirrors.ovh.net/gentoo-distfiles/]   
       elist            File containing a list of ebuilds to add to the VM
                        on top of stage3                                     [default ebuilds.list]   
       rstudio          RStudio version to be downloaded and built from github
-                       source  [default 1.3.1073]   
+                       source                                               [default 1.3.1073]   
       r_version        R version                                            [default 4.0.2]   
       githubpath       RStudio Github path to zip: path right
                        before version.zip                                   [default https://github.com/rstudio/rstudio/archive/v]   
