@@ -63,8 +63,10 @@ ARR=("vm"          "Virtual Machine name"                                       
      "vmtype"      "gui or headless (silent)"                                            "headless"
      "kernel_config"  "Use a custom kernel config file"                                  ".config"
      "language"    "Set default login keyboard layout"                                   "us"
-     "burn"        "Burn to optical disc. Argument is either a device or a mountpoint."  "FALSE"
-     "stick"       "Create installation stick.\nArgument is either a device or a mountpoint."    ""
+     "burn"        "Burn to optical disc. Argument is either a device label (e.g. cdrom, sr0) or a mountpoint directory."  "FALSE"
+     "scsi_address" "In case of several optical disc burners, specify the SCSI address as x,y,z"  "0,0,0"
+     "usb_device"  "Create Gentoo OS on external device.\n\t\tArgument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory."    ""
+     "usb_installer" "Create Gentoo clone installer on external device.\n\t\tArgument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory.\n\t\tIf unspecified, usb_device value will be used. OS Gentoo will be replaced by Clonezilla installer."  ""
      
     )
      
@@ -93,7 +95,7 @@ if test "${ISO_OUTPUT}" != "" -a "${ISO_OUTPUT}" != "${CLI}"; then
     CREATE_ISO=1
 else
     echo "You did not indicate an ISO output file."
-    echo "A Virtual machine will be created with name Gentoo under /root"
+!    echo "A Virtual machine will be created with name Gentoo under /root"
     CREATE_ISO=0
 fi
 
@@ -386,11 +388,77 @@ function create_vm {
 
 }
 
-function clone_vm_to_USB {
+# Gives device from mount folder input
 
+function get_device {
+
+  local device=""
+    
+  if test -d "$1"; then
+      device=$(findmnt --raw --first -a -n -c $1 | cut -f2 -d' ')
+  else
+      if test $(is_block_device "$1"); then
+          return "$1"
+      else
+          echo "$1 is neither a mountpoint nor a block device"
+          exit -1
+      fi
+  fi
+
+return ${device}
+    
+}
+
+
+function list_block_devices {
+
+  return  "$(lsblk -a -n -o KNAME | grep -v loop)"
+}
+
+# Returns 1 if input is a block device otherwise 0
+
+function is_block_device {
+
+    local devices=$(list_block_devices)
+
+    grep -q "$1" <<< "${devices}" && return 1
+   
+    return 0
+}
+
+# Gives mount folder from device label input
+
+function get_mountpoint {
+
+    if ! test $(is_block_device "$1"); then
+        
+        echo "$1  is not a block device!"
+        echo "Device labels should be in the following list:"
+        echo $(list_block_devices)
+        
+        exit -1
+    fi
+
+    return "$(findmnt --raw --first -a -n -c "$1" | cut -f1 -d' ')"
+}
+
+
+function clone_vm_to_usb {
+
+    # Test whether USB_DEVICE is a mountpoint or a block device label
+
+    USB_DEVICE=$(get_device ${USB_DEVICE})  
+
+    # Should not occur, only for paranoia
+    
+    if test "${USB_DEVICE}" = ""; then
+        echo "Could not set USB device ${USB_DEVICE}"
+        exit -1
+    fi
+    
     # Using the custom-patched version of the vbox-img utility:
 
-    bin/vbox-img convert srcfilename="${VMPATH}/${VM}.vdi" --stdout --dstformat RAW | dd of=${USB_DEVICE} bs=4M status=progress
+    bin/vbox-img convert srcfilename="${VMPATH}/${VM}.vdi" --stdout --dstformat RAW | dd of=/dev/${USB_DEVICE} bs=4M status=progress
     
     if test $? = 0; then
         sync
@@ -399,18 +467,28 @@ function clone_vm_to_USB {
         echo "Could not convert dynamic virtual disk to raw USB device!"
         exit -1
     fi
-    
 }
 
 function clone_vm_to_raw {
 
- VBoxManage clonemedium "${VMPATH}/${VM}.vdi" "${VMPATH}/tmpdisk.raw" --format RAW   
+    VBoxManage clonemedium "${VMPATH}/${VM}.vdi" "${VMPATH}/tmpdisk.raw" --format RAW   
 }
 
 
-function dd_to_USB {
+function dd_to_usb {
 
     "Bare metal copy of RAW disk to USB device..."
+
+    # Test whether USB_DEVICE is a mountpoint or a block device label
+
+    USB_DEVICE=$(get_device ${USB_DEVICE})  
+
+    # Should not occur, only for paranoia
+    
+    if test "${USB_DEVICE}" = ""; then
+        echo "Could not set USB device ${USB_DEVICE}"
+        exit -1
+    fi
     
     dd if="${VMPATH}/tmpdisk.raw" of=/dev/${USB_DEVICE} bs=4M status=progress
     
@@ -431,7 +509,10 @@ function clonezilla_to_image {
         exit -1
     fi
 
+    # At this stage USB_DEVICE can no longer be a mountpoint as it has been previously converted to device label
+    
     findmnt /dev/${USB_DEVICE} \
+        && echo "Device ${USB_DEVICE} is mounted to:" $(get_mountpoint /dev/${USB_DEVICE}) \    
         && echo "The external USB device should not be mounted" \
         && echo "Trying to unmount..." \
         && sudo umount -l /dev/${USB_DEVICE}
@@ -447,21 +528,47 @@ function clonezilla_to_image {
     # double check
 
     if  test `findmnt /dev/${USB_DEVICE}`; then
-        echo "Impossible to unmount device ${USB_DEViCE}"
+        echo "Impossible to unmount device ${USB_DEVICE}"
         exit -1
     fi
 
-      /usr/sbin/ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5 \
+    if test -d /home/partimag; then
+        echo "/home/partimag needs to be wiped out..."
+        echo "Trying with user rights..."
+        rm -rf /home/partimag
+        if test $? != 0; then
+            echo "Directory /home/partimag needs elevated rights..."
+            echo "Waiting for sudo passwd..."
+            sudo  rm -rf /home/partimag
+            echo
+            if test $? != 0; then
+                echo "Could not fix /home/partimag issue."
+                exit -1;
+            fi
+        fi   
+    fi
+
+    if test "${MINIMIZE_DISK_SPACE}" = "TRUE"; then
+
+        echo "Erasing virtual disk and virtual machine to save disk space..."
+        rm -f "${VMPATH}/${VM}.vdi"
+        rm -rf "${VMPATH}/${VM}"
+    fi
+        
+    sudo mkdir /home/partimag
+    sudo chown -R fab /home/partimag
+    
+    /usr/sbin/ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5 \
                      -i 40960000000 -fsck -senc -p poweroff savedisk gentoo.img ${USB_DEVICE}
    
-      if test $? = 0 -a -f /home/partimag/gentoo.img; then
-          echo "Cloning succeeded!"
-      else
-          echo "Cloning failed!"
-          exit -1
-      fi
+    if test $? = 0 -a -f /home/partimag/gentoo.img; then
+        echo "Cloning succeeded!"
+    else
+        echo "Cloning failed!"
+        exit -1
+    fi
 
-     return 0
+    return 0
 }
 
 function clonezilla_to_iso {
@@ -470,20 +577,34 @@ function clonezilla_to_iso {
     #    ocs-live-dev -c -g en_US.UTF-8 -t -k NONE -e "-g auto -e1 auto -e2 -nogui -batch -r -icds -j2 -cm -cmf -k1 -scr -p poweroff restoredisk gentoo.img sda" gentoo.img
     #    Ubuntu commands are bugged, comming down to more basic one.
     
-    rsync -av /home/partimag/gentoo.img/ ISOFILES/home/partimag/image
+    rm -rf ISOFILES/home/partimag/image
+
+    mv -f /home/partimag/gentoo.img  ISOFILES/home/partimag/
+
+    mv ISOFILES/home/partimag/gentoo.img ISOFILES/home/partimag/image
+
+    if test $? != 0; then
+        echo "Could not move Clonezilla image to standard ISO package creation directory"
+        exit -1
+    fi
     
     xorriso -as mkisofs   -isohybrid-mbr ISOFILES/syslinux/isohdpfx.bin  \
             -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
             -boot-load-size 4   -boot-info-table   -eltorito-alt-boot   -e boot/grub/efiboot.img \
             -no-emul-boot   -isohybrid-gpt-basdat   -o "${LIVECD}"  ISOFILES
+
     
+    if test $? != 0; then
+        echo "Could not create ISO image from ISO package creation directory"
+        exit -1
+    fi
 }
 
 function burn_iso {
 
     res=0
     
-    if test "${BURN_ISO}" = "TRUE"; then
+    if test "${BURN}" = "TRUE"; then
         echo "Burning installation medium to optical disc..."
         if test "${SCSI_ADDRESS}" = ""; then
             cdrecord "${LIVECD}"
@@ -497,13 +618,13 @@ function burn_iso {
 }
 
 
-function create_install_stick {
+function create_install_usb_device {
 
     res=0
     
-    if test "${BURN_USB}" = "TRUE"; then
+    if test "${USB_INSTALLER}" = "TRUE"; then
         echo "Creating installation stick..."
-        dd if=${LIVECD} of=/dev/${USB_STICK} bs=4M status=progress
+        dd if=${LIVECD} of=/dev/${USB_DEVICE} bs=4M status=progress
         res=$?
         sync
         res=$? | res
@@ -516,24 +637,32 @@ if test "$(echo ${CLI} | sed 's/help//' )" != "${CLI}"; then
   help
   exit 0
 fi
+
 echo "PARAMETERS"
 echo
 for ((i=0; i<ARRAY_LENGTH; i++)) ; do test_cli $i; done
 echo
 echo "Fetching live CD..."
-echo  
+echo
+
 fetch_livecd
+
 echo
 echo "Fetching stage3 tarball..."
 echo
+
 fetch_stage3
+
 echo
 echo "Tweaking live CD..."
 echo
+
 make_boot_from_livecd
+
 echo 
 echo "Creating VM"
 echo
+
 create_vm
 
 if test $? != 0; then
@@ -546,49 +675,58 @@ if test ${CREATE_ISO} != 1; then
     exit 0
 fi
 
-if test *{no_working_wbox_img} {
-        echo "Cloning virtual disk to raw..."
-}
+if test $VBOX_IMG_WORKS; then 
 
-clone_vm_to_raw
+     echo "Cloning virtual disk to USB device ${USB_DEVICE} ..."
+    
+     clone_vm_to_usb
+     
+     if test $? != 0; then
+        echo "Cloning VDI disk to USB deice failed !"
+        exit -1
+     fi
+     
+else
+     echo "Cloning virtual disk to raw..."
 
-if test $? != 0; then
-    echo "Cloning VDI disk to RAW failed !"
-    exit -1
-fi
+     clone_vm_to_raw
 
-echo
-echo "Copying to USB stick..."
-echo
+     if test $? != 0; then
+        echo "Cloning VDI disk to RAW failed !"
+        exit -1
+     fi
 
-dd_to_USB
+     echo
+     echo "Copying to USB stick..."
+     echo
 
-echo
-if test $? != 0; then
-    echo "Copying raw file to USB device failed!"
-    echo "Check that your USB device has at least 50 GiB of reachable space"
-    exit -1
-fi
+     dd_to_usb
+
+     echo
+     if test $? != 0; then
+       echo "Copying raw file to USB device failed!"
+       echo "Check that your USB device has at least 50 GiB of reachable space"
+       exit -1
+     fi
+fi     
 
 echo "Launching Clonezilla to create compressed image..."
 echo
+
+# Succeeds or exits
 
 clonezilla_to_image
 
 echo
 
-if test $? != 0; then
-    echo "Clonezilla image failed to be created out of USB stick!"
-    exit -1
-fi
-
 echo "Launching Clonezilla to create ISO install medium..."
+echo
 
 clonezilla_to_iso
 
 echo
 if test $? = 0; then
-    echo "Success."
+    echo "Done."
     if test -f "${ISO_OUTPUT}"; then
         echo "ISO install medium was created here: ${ISO_OUTPUT}"
     else
