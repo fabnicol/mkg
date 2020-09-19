@@ -75,7 +75,6 @@ function install_stage3 {
             echo "stage3 tarball could not be extracted"
 	    exit -1
 	fi
-
 	cat temp_bashrc >> .bashrc
 	
 	rm -vf ${STAGE3}
@@ -85,11 +84,11 @@ function install_stage3 {
 	local m_conf="etc/portage/make.conf"
 
 	sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS='${CFLAGS} -pipe'/g"  ${m_conf}
-	echo 'MAKEOPTS="-j${NCPUS}"'  >> ${m_conf}
+	echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
 	echo 'L10N="fr en"'    >> ${m_conf}
 	echo 'LINGUAS="fr en"' >> ${m_conf}
 	sed  -i 's/USE=".*"//g'    ${m_conf}
-	echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist virtualbox networkmanager elogind"' >>  ${m_conf}
+	echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager elogind -consolekit -systemd dbus"' >>  ${m_conf}
 	echo "GENTOO_MIRRORS=${EMIRRORS}"  >> ${m_conf}
 	echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code"' >> ${m_conf}
 	echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}

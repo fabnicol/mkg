@@ -102,7 +102,7 @@ function adjust_environment {
 	
 	# Networking in the new environment
 
-	echo "hostname='${USER}pc'" > /etc/conf.d/hostname
+	echo hostname=${NONROOT_USER}pc > /etc/conf.d/hostname
 	
 	emerge --verbose net-misc/netifrc
 	emerge --verbose sys-apps/pcmciautils
@@ -111,7 +111,7 @@ function adjust_environment {
 	  echo "emerge netifrs/pcmiautils failed!"
 	fi
 	
-	echo 'config_${eth}="dhcpcd"' >> /etc/conf.d/net
+	echo "config_${eth}=dhcpcd" >> /etc/conf.d/net
 	
 	cd /etc/init.d
 	
@@ -122,8 +122,14 @@ function adjust_environment {
 	cd -
 	
 	rc-update add net.${eth} default
-	
-	echo 'keymap="fr"' > /etc/conf.d/keymaps
+
+        if test ${LANGUAGE} == "fr"; then 
+        	echo 'keymap="fr"' > /etc/conf.d/keymaps
+                echo 'keymap="us"' >> /etc/conf.d/keymaps
+        else
+                echo 'keymap="us"' > /etc/conf.d/keymaps
+        fi
+            
 	sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
 
 	# Localization. TODO: possibly enlarge by parametrization of commandline
@@ -205,7 +211,37 @@ function install_software {
             exit -1
         fi
 
-        # cleaning up a bit aggressively before cloning...
+        if test "${DOWNLOAD_RSTUDIO}" != "TRUE"; then
+           return
+        fi
+
+	# TODO: RScript Rdeps.R  # see ad-hoc script
+	# RStudio
+	
+	mkdir Build
+	cd Build
+	wget ${GITHUBPATH}${RSTUDIO}.zip
+	
+	if test $? != 0; then
+	    echo "RStudio download faild!"
+            exit -1
+        fi
+	
+	unzip *.zip
+	cd rstudio*
+	mkdir build
+	cd dependencies/common
+	./install-mathjax
+	./install-dictionaries
+        ./install-pandoc
+	cd -
+	cd build
+
+	cmake .. -DRSTUDIO_TARGET=Desktop -DCMAKE_BUILD_TYPE=Release -DRSTUDIO_USE_SYSTEM_BOOST=1 -DQT_QMAKE_EXECUTABLE=1 
+	make -j${NCPUS}
+	make -k install
+
+                # cleaning up a bit aggressively before cloning...
         
         eclean -d packages
         
@@ -222,35 +258,6 @@ function install_software {
         
         eix-update
 
-	# RStudio
-	
-        if test "${DOWNLOAD_RSTUDIO}" != "TRUE"; then
-           return
-        fi
-
-	#	RScript Rdeps.R  # see ad-hoc script
-
-	mkdir Build
-	cd Build
-	wget ${GITHUBPATH}${RSTUDIO}.zip
-	
-	if test $? != 0; then
-	    echo "RStudio download faild!"
-            exit -1
-        fi
-	
-	unzip *.zip
-	cd rstudio*
-	mkdir build
-	cd dependencies/common
-	./install-mathjax
-	./install-dictionaries
-	cd -
-	cd build
-
-	cmake .. -DRSTUDIO_TARGET=Desktop -DCMAKE_BUILD_TYPE=Release -DRSTUDIO_USE_SYSTEM_BOOST=1 -DQT_QMAKE_EXECUTABLE=1 
-	make -j4
-	make -k install
         cd /
 }
 
@@ -260,7 +267,7 @@ function global_config {
 
 	## sddm 
 
-	echo "setxkbmap fr" > /usr/share/sddm/scripts/Xsetup
+	echo "setxkbmap ${LANGUAGE}" > /usr/share/sddm/scripts/Xsetup
 
 	sed -i 's/DISPLAYMANAGER=""/DISPLAYMANAGER="sddm"/' /etc/conf.d/xdm
 
@@ -269,8 +276,8 @@ function global_config {
 	rc-update add sysklogd default
 	rc-update add cronie default
 	rc-update add xdm default
-	rc-update add virtualbox-guest-additions default
 	rc-update add dbus default
+        rc-update add elogind boot
 
 	## Networkmanager
 
@@ -280,22 +287,24 @@ function global_config {
 	rc-update add NetworkManager default
 
 	# groups
+        # user not exported
+        # useradd -m fab
 
-	gpasswd -a ${USER}  video
+      	useradd -m -G users,wheel,audio -s /bin/bash ${NONROOT_USER}
+
+	gpasswd -a ${NONROOT_USER}  video
 	gpasswd -a sddm video
-	gpasswd -a ${USER}  vboxguest
-	gpasswd -a ${USER}  plugdev
+	gpasswd -a ${NONROOT_USER}  plugdev
 
 	# Creating the bootloader
 
 	grub-install --target=x86_64-efi --efi-directory=/boot --removable
 	grub-mkconfig -o /boot/grub/grub.cfg
-	useradd -m -G users,wheel,audio -s /bin/bash ${USER}
 
 	# Passwords
 
-	chpasswd ${USER}:${USERPASSWD}
-	chpasswd root:${ROOTPASSWD}
+	echo ${NONROOT_USER}:${PASSWD}  | chpasswd
+	echo root:${ROOTPASSWD} | chpasswd
 }
 
 function finalize {
@@ -303,7 +312,7 @@ function finalize {
 	# Final steps
     exit	
 	umount -l /mnt/gentoo/dev{/shm,/pts,}
-	umount -R /mnt/gentoo
+	umount -R -l  /mnt/gentoo
 	shutdown -h now
 }
 
@@ -312,3 +321,5 @@ build_kernel
 install_software
 global_config
 finalize
+
+## Issues with: dbus connecting to plasma session

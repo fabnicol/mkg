@@ -62,6 +62,7 @@ ARR=("vm"          "Virtual Machine name"                                       
      "create_squashfs"  "(Re)create the squashfs filesystem"                             "TRUE"
      "vmtype"      "gui or headless (silent)"                                            "headless"
      "kernel_config"  "Use a custom kernel config file"                                  ".config"
+     "language"    "Set default login keyboard layout"                  "us"
     )
      
 ARRAY_LENGTH=$((${#ARR[*]}/3))
@@ -255,17 +256,17 @@ function make_boot_from_livecd {
   mountpoint -q mnt && umount -l mnt 
   
   if test -d mnt; then
-    rm -rf mnt 
+   sudo rm -rf mnt 
   fi
   
   mkdir mnt
   
-  mount -oloop ${ISO} mnt/
+  sudo mount -oloop ${ISO} mnt/
   
   ! mountpoint -q mnt && echo "ISO not mounted!" && exit -1
   
   if test -d mnt2; then  
-    rm -rf mnt2
+    sudo rm -rf mnt2
   fi
   
   mkdir mnt2
@@ -279,7 +280,7 @@ function make_boot_from_livecd {
   
   cd ..
   
-  unsquashfs image.squashfs
+  sudo unsquashfs image.squashfs
 
   cd ..
   
@@ -310,7 +311,7 @@ function make_boot_from_livecd {
   fi
 
   local sqrt="mnt2/squashfs-root/root/"
-  
+  sudo chown fab ${sqrt}
   mv -vf ${STAGE3} ${sqrt}
   
   cp -vf mkvm.sh ${sqrt}
@@ -340,14 +341,14 @@ function make_boot_from_livecd {
   cd ../..
   
   rm  image.squashfs
-  mksquashfs squashfs-root/ image.squashfs
-  rm -rf squashfs-root/
+  sudo mksquashfs squashfs-root/ image.squashfs
+  sudo rm -rf squashfs-root/
   
   cd ..
   
   mkisofs -J -R -o  ${ISO} -b isolinux/isolinux.bin  -c isolinux/boot.cat  -no-emul-boot -boot-load-size 4  -boot-info-table  mnt2
-  
-  umount -l mnt
+  sudo chown -R fab .
+  sudo umount -l mnt
   rm -rf mnt
   rm -rf mnt2
   
@@ -358,7 +359,9 @@ function make_boot_from_livecd {
 
 function create_vm {
 
-	export PATH=${PATH}:${VBPATH}
+        sudo rm -rf "${VM}"
+    
+        export PATH=${PATH}:${VBPATH}
 	if test "$(VBoxManage list vms | grep '${VM}')" != ""; then
           if test "$(VBoxManage list runningvms | grep '${VM}')" != ""; then
              VBoxManage controlvm "${VM}" poweroff

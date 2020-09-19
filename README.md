@@ -131,13 +131,14 @@ GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
 **mkgentoo**  [[switch=argument]...]                [2]   
     
 Usage [1] creates a bootable ISO output file with a current Gentoo distribution.   
-Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo
+Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name
+*Gentoo* unless the name is given as the argument to command `vm`.
     
 *Warning: you should have at least 50 GB of free disk space in the current
 directory or in vmpath if specified.*   
     
 **Switches:**    
-      
+      vm               Virtual Machine name                                 [default "Gentoo"]     
       vbpath           Path to VirtualBox directory                         [default /usr/bin]   
       vmpath           Path to VM base directory                            [default /home/fab/Dev/mkgentoo]   
       mem              VM RAM memory in MiB                                 [default 8000]   
@@ -164,8 +165,9 @@ directory or in vmpath if specified.*
       stage3           Path to stage3 archive                               [default stage3.tar.xz]  
       create_squashfs  (Re)create the squashfs filesystem                   [default TRUE]   
       vmtype           gui or headless (silent)                             [default headless]   
-      kernel_config    Use a custom kernel config file                      [default .config]
-         
+      kernel_config    Use a custom kernel config file                      [default .config]    
+      language         Set default login keyboard layout                    [default "us"]   
+   
 
 
 
