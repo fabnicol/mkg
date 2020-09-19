@@ -1,0 +1,2 @@
+syslinux/isolinux.bin	2
+syslinux/boot.cat	1

@@ -62,7 +62,10 @@ ARR=("vm"          "Virtual Machine name"                                       
      "create_squashfs"  "(Re)create the squashfs filesystem"                             "TRUE"
      "vmtype"      "gui or headless (silent)"                                            "headless"
      "kernel_config"  "Use a custom kernel config file"                                  ".config"
-     "language"    "Set default login keyboard layout"                  "us"
+     "language"    "Set default login keyboard layout"                                   "us"
+     "burn"        "Burn to optical disc. Argument is either a device or a mountpoint."  "FALSE"
+     "stick"       "Create installation stick.\nArgument is either a device or a mountpoint."    ""
+     
     )
      
 ARRAY_LENGTH=$((${#ARR[*]}/3))
@@ -200,7 +203,7 @@ function fetch_stage3 {
 	echo "download_stage3=${DOWNLOAD_STAGE3}"
 	if test "${DOWNLOAD_STAGE3}" = "TRUE"; then
 	    echo "Cleaning up stage3 data..."
-            rm -vf lastest-stage3*.txt*
+            rm -vf latest-stage3*.txt*
 	    echo "Downloading stage3 data..."
             wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt
             if test $? != 0; then
@@ -347,10 +350,11 @@ function make_boot_from_livecd {
   cd ..
   
   mkisofs -J -R -o  ${ISO} -b isolinux/isolinux.bin  -c isolinux/boot.cat  -no-emul-boot -boot-load-size 4  -boot-info-table  mnt2
-  sudo chown -R fab .
+
   sudo umount -l mnt
-  rm -rf mnt
-  rm -rf mnt2
+  sudo chown -R fab .
+  rm -rvf mnt
+  rm -rvf mnt2
   
 }
 
@@ -359,7 +363,8 @@ function make_boot_from_livecd {
 
 function create_vm {
 
-        sudo rm -rf "${VM}"
+        sudo rm -rvf  "${VMPATH}/${VM}"
+        sudo rm -vf   "${VMPATH}/${VM}.vdi"
     
         export PATH=${PATH}:${VBPATH}
 	if test "$(VBoxManage list vms | grep '${VM}')" != ""; then
@@ -381,6 +386,22 @@ function create_vm {
 
 }
 
+function clone_vm_to_USB {
+
+    # Using the custom-patched version of the vbox-img utility:
+
+    bin/vbox-img convert srcfilename="${VMPATH}/${VM}.vdi" --stdout --dstformat RAW | dd of=${USB_DEVICE} bs=4M status=progress
+    
+    if test $? = 0; then
+        sync
+        return $?
+    else
+        echo "Could not convert dynamic virtual disk to raw USB device!"
+        exit -1
+    fi
+    
+}
+
 function clone_vm_to_raw {
 
  VBoxManage clonemedium "${VMPATH}/${VM}.vdi" "${VMPATH}/tmpdisk.raw" --format RAW   
@@ -391,23 +412,105 @@ function dd_to_USB {
 
     "Bare metal copy of RAW disk to USB device..."
     
-    dd if="${VMPATH}/tmpdisk.raw" of=${USB_DEVICE} bs=4M status=progress
+    dd if="${VMPATH}/tmpdisk.raw" of=/dev/${USB_DEVICE} bs=4M status=progress
     
     if test $? = 0; then
         echo "Removing temporary RAW disk..."
         rm -f ${VMPATH}/tmpdisk.raw
     fi    
-    return 0    
+    return $?  
 }
 
 function clonezilla_to_image {
-    return 0
+
+    find_ocs_sr=`which ocs-sr`
+    if test "$find_ocs_sr" = ""; then
+        echo "Could not find ocs_sr !"
+        echo "Install Clonezilla in a standard path or rerun after adding its parth to the PATH environment variable"
+        echo "Note: Debian-based distributions provide a handy `clonezilla` package."
+        exit -1
+    fi
+
+    findmnt /dev/${USB_DEVICE} \
+        && echo "The external USB device should not be mounted" \
+        && echo "Trying to unmount..." \
+        && sudo umount -l /dev/${USB_DEVICE}
+
+    if test $? =0; then 
+        echo "Managed to unmount /dev/${USB_DEVICE}"
+    else
+        echo "Could not manage to unmount external USB device"
+        echo "Unmount it manually and rerun."
+        exit -1
+    fi
+    
+    # double check
+
+    if  test `findmnt /dev/${USB_DEVICE}`; then
+        echo "Impossible to unmount device ${USB_DEViCE}"
+        exit -1
+    fi
+
+      /usr/sbin/ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5 \
+                     -i 40960000000 -fsck -senc -p poweroff savedisk gentoo.img ${USB_DEVICE}
+   
+      if test $? = 0 -a -f /home/partimag/gentoo.img; then
+          echo "Cloning succeeded!"
+      else
+          echo "Cloning failed!"
+          exit -1
+      fi
+
+     return 0
 }
 
 function clonezilla_to_iso {
-    retrun 0
+
+    #    ocs-iso -g en_US.UTF-8 -t -k NONE -e "-g auto -e1 auto -e2 -nogui -batch -r -icds -j2 -cm -cmf -k1 -scr -p poweroff restoredisk gentoo.img sda" gentoo.img
+    #    ocs-live-dev -c -g en_US.UTF-8 -t -k NONE -e "-g auto -e1 auto -e2 -nogui -batch -r -icds -j2 -cm -cmf -k1 -scr -p poweroff restoredisk gentoo.img sda" gentoo.img
+    #    Ubuntu commands are bugged, comming down to more basic one.
+    
+    rsync -av /home/partimag/gentoo.img/ ISOFILES/home/partimag/image
+    
+    xorriso -as mkisofs   -isohybrid-mbr ISOFILES/syslinux/isohdpfx.bin  \
+            -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
+            -boot-load-size 4   -boot-info-table   -eltorito-alt-boot   -e boot/grub/efiboot.img \
+            -no-emul-boot   -isohybrid-gpt-basdat   -o "${LIVECD}"  ISOFILES
+    
 }
 
+function burn_iso {
+
+    res=0
+    
+    if test "${BURN_ISO}" = "TRUE"; then
+        echo "Burning installation medium to optical disc..."
+        if test "${SCSI_ADDRESS}" = ""; then
+            cdrecord "${LIVECD}"
+        else
+            cdrecord "${LIVECD}" dev=${SCSI_ADDRESS}
+        fi
+        res=$?
+    fi
+
+    return res
+}
+
+
+function create_install_stick {
+
+    res=0
+    
+    if test "${BURN_USB}" = "TRUE"; then
+        echo "Creating installation stick..."
+        dd if=${LIVECD} of=/dev/${USB_STICK} bs=4M status=progress
+        res=$?
+        sync
+        res=$? | res
+    fi
+
+    return res
+}
 
 if test "$(echo ${CLI} | sed 's/help//' )" != "${CLI}"; then
   help
@@ -443,7 +546,9 @@ if test ${CREATE_ISO} != 1; then
     exit 0
 fi
 
-echo "Cloning virtual disk to raw..."
+if test *{no_working_wbox_img} {
+        echo "Cloning virtual disk to raw..."
+}
 
 clone_vm_to_raw
 

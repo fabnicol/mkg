@@ -15,7 +15,9 @@ The output is an ISO installation file that can be used to burn a DVD
 or create a bootable USB stick.   
 **WARNING**: The install media will wipe out all data on the Desktop
 main disc (/dev/sda). It leaves no choice of the tardet disk and runs
-**non-interactively** from beginning to end.   
+**non-interactively** from beginning to end, once the user has entered
+its *sudo* password and replied to a handful of automated questions in the first
+two minutes of the session.   
 Use it with care and only if you want to do a fresh install of your PC main disk.
 No responsability for lost data will be accepted.   
 You have been warned.   
