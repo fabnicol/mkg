@@ -12,14 +12,14 @@ with only a handful of packages belonging to the testing branch.
 ### Output
 
 The output is an ISO installation file that can be used to burn a DVD
-or create a bootable USB stick.   
+or create a bootable USB stick using dd under *nix platforms of [Rufus](https://rufus.ie/)
+on Windows.     
 **WARNING**: The install media will wipe out all data on the Desktop
-main disc (/dev/sda). It leaves no choice of the tardet disk and runs
+main disc (/dev/sda). It leaves no choice of the target disk and runs
 **non-interactively** from beginning to end, once the user has entered
 its *sudo* password and replied to a handful of automated questions in the first
 two minutes of the session.   
-Use it with care and only if you want to do a fresh install of your PC main disk.
-No responsability for lost data will be accepted.   
+Use it with care and only if you want to do a fresh install of your main PC disk.
 You have been warned.   
 
 ### Target
@@ -60,9 +60,11 @@ following features:
   - rsync.
 * A working, preferably wired, direct internet connection (firewalls
   are not supported).  
-* At least 100 GB of spare disk space.
+* At least 50 GB of spare disk space if the custom-made `vbox-img` tool patched
+  from VirtualBox sources work on your platform. Otherwise, 100 GB of spare
+  disk space.
 * A removable USB storage device (USB stick or external USB drive) with at least
-  50 GB of reachable space.
+  50 GB of reachable space. 
 
 ## Installation guidelines
 
