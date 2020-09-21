@@ -278,7 +278,7 @@ function global_config {
 	rc-update add xdm default
 	rc-update add dbus default
         rc-update add elogind boot
-
+ 
 	## Networkmanager
 
 	for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done
@@ -295,7 +295,7 @@ function global_config {
 	gpasswd -a ${NONROOT_USER}  video
 	gpasswd -a sddm video
 	gpasswd -a ${NONROOT_USER}  plugdev
-
+	
 	# Creating the bootloader
 
 	grub-install --target=x86_64-efi --efi-directory=/boot --removable
@@ -310,6 +310,9 @@ function global_config {
 function finalize {
 
 	# Final steps
+	# prepare to compact
+	cat /dev/zero > zeros ; sync ; rm zeros
+	
     exit	
 	umount -l /mnt/gentoo/dev{/shm,/pts,}
 	umount -R -l  /mnt/gentoo

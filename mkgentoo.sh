@@ -361,31 +361,80 @@ function make_boot_from_livecd {
 }
 
 
+function test_vm_running {
+
+if test "$(VBoxManage list vms | grep "$1")" != ""; then
+          if test "$(VBoxManage list runningvms | grep "$1")" != ""; then
+             return 1
+          fi   
+return 0
+}
+
+
+function delete_vm  {
+          
+        if $(test_vm_running "$1"); then 
+            VBoxManage controlvm "$1" poweroff
+        fi
+          
+        if test "$(VBoxManage list vms | grep "$1")" != ""; then
+            VBoxManage unregistervm "$1" --delete
+	fi
+	
+	if test -d "${VMPATH}/$1"; then
+            sudo rm -rvf  "${VMPATH}/$1"
+        fi
+        
+        if test "$2" != "" -a -f "${VMPATH}/$1.$2"; then
+            sudo rm -f   "${VMPATH}/$1.$2"
+        fi  
+}
+
 # mkvm.sh should be adjacent to mkgentoo.sh
 
 function create_vm {
 
-        sudo rm -rvf  "${VMPATH}/${VM}"
-        sudo rm -vf   "${VMPATH}/${VM}.vdi"
-    
         export PATH=${PATH}:${VBPATH}
-	if test "$(VBoxManage list vms | grep '${VM}')" != ""; then
-          if test "$(VBoxManage list runningvms | grep '${VM}')" != ""; then
-             VBoxManage controlvm "${VM}" poweroff
-          fi
-          VBoxManage unregistervm Gentoo --delete
-        fi	
+	cd ${VMPATH}
+        delete_vm ${VM} "vdi"
+        
 	VBoxManage createvm --name "${VM}" --ostype gentoo_64  --register  --basefolder "${VMPATH}"
 	VBoxManage modifyvm "${VM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
-	VBoxManage createhd --filename "${VMPATH}/${VM}.vdi" --size ${SIZE} --variant Standard
+	VBoxManage createhd --filename "${VM}.vdi" --size ${SIZE} --variant Standard
 	VBoxManage storagectl "${VM}" --name "SATA Controller" --add sata --bootable on
-	VBoxManage storageattach "${VM}" --storagectl "SATA Controller"  --medium "${VMPATH}/${VM}.vdi" --port 0 --device 0 --type hdd
+	VBoxManage storageattach "${VM}" --storagectl "SATA Controller"  --medium "${VM}.vdi" --port 0 --device 0 --type hdd
 	VBoxManage storagectl "${VM}" --name "IDE Controller" --add ide 
         VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 0   --type dvddrive --medium ${LIVECD}  --tempeject on
 	VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium emptydrive 
         VBoxManage startvm "${VM}" --type ${VMTYPE}
-	
+        
+        # VM is created in a separate process
+        # Wait for it to come to end 
+        # Test if still running every minute
 
+        while $(test_vm ${VM}); do
+            echo "${VM} running..."
+            sleep 60
+        done
+ 
+        VBoxManage modifyhd "${VM}.vdi" --compact  
+	
+}
+
+function create_iso_vm {
+        cd ${VMPATH}
+        gpasswd -a ${USER} -g vboxusers
+        chgrp vboxusers "ISOFILES/home/partimag/image"
+	delete_vm ${ISOVM}        
+	VBoxManage createvm --name "${ISOVM}" --ostype gentoo_64  --register  --basefolder "${VMPATH}"
+	VBoxManage sharedfolder add "${ISOVM}" --name shared --hostpath "${VMPATH}/ISOFILES/home/partimag/image" --transient --automount --automount-point=/home/partimag
+	VBoxManage modifyvm "${ISOVM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
+	VBoxManage storagectl "${ISOVM}" --name "SATA Controller" --add sata --bootable on
+	VBoxManage storageattach "${ISOVM}" --storagectl "SATA Controller"  --medium "${VMPATH}/${ISOVM}.vdi" --port 0 --device 0 --type hdd
+	VBoxManage storagectl "${ISOVM}" --name "IDE Controller" --add ide 
+        VBoxManage storageattach "${ISOVM}" --storagectl "IDE Controller"  --port 0  --device 0   --type dvddrive --medium ${CLONEZILLACD}  --tempeject on
+	VBoxManage storageattach "${ISOVM}" --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium emptydrive 
+        VBoxManage startvm "${ISOVM}" --type ${VMTYPE}
 }
 
 # Gives device from mount folder input
@@ -499,7 +548,7 @@ function dd_to_usb {
     return $?  
 }
 
-function clonezilla_to_image {
+function clonezilla_usb_to_image {
 
     find_ocs_sr=`which ocs-sr`
     if test "$find_ocs_sr" = ""; then
@@ -554,9 +603,15 @@ function clonezilla_to_image {
         rm -f "${VMPATH}/${VM}.vdi"
         rm -rf "${VMPATH}/${VM}"
     fi
-        
-    sudo mkdir /home/partimag
-    sudo chown -R fab /home/partimag
+
+    rm -rf ISOFILES/home/partimag/image/*
+
+    if test $? != 0; then
+        echo "Could not remove old Clonezilla image"
+        exit -1
+    fi
+            
+    sudo ln -s  ${VMPATH}/ISOFILES/home/partimag/image  /home/partimag
     
     /usr/sbin/ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5 \
                      -i 40960000000 -fsck -senc -p poweroff savedisk gentoo.img ${USB_DEVICE}
@@ -573,27 +628,11 @@ function clonezilla_to_image {
 
 function clonezilla_to_iso {
 
-    #    ocs-iso -g en_US.UTF-8 -t -k NONE -e "-g auto -e1 auto -e2 -nogui -batch -r -icds -j2 -cm -cmf -k1 -scr -p poweroff restoredisk gentoo.img sda" gentoo.img
-    #    ocs-live-dev -c -g en_US.UTF-8 -t -k NONE -e "-g auto -e1 auto -e2 -nogui -batch -r -icds -j2 -cm -cmf -k1 -scr -p poweroff restoredisk gentoo.img sda" gentoo.img
-    #    Ubuntu commands are bugged, comming down to more basic one.
-    
-    rm -rf ISOFILES/home/partimag/image
-
-    mv -f /home/partimag/gentoo.img  ISOFILES/home/partimag/
-
-    mv ISOFILES/home/partimag/gentoo.img ISOFILES/home/partimag/image
-
-    if test $? != 0; then
-        echo "Could not move Clonezilla image to standard ISO package creation directory"
-        exit -1
-    fi
-    
     xorriso -as mkisofs   -isohybrid-mbr ISOFILES/syslinux/isohdpfx.bin  \
             -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
             -boot-load-size 4   -boot-info-table   -eltorito-alt-boot   -e boot/grub/efiboot.img \
             -no-emul-boot   -isohybrid-gpt-basdat   -o "${LIVECD}"  ISOFILES
 
-    
     if test $? != 0; then
         echo "Could not create ISO image from ISO package creation directory"
         exit -1
@@ -665,6 +704,7 @@ echo
 
 create_vm
 
+
 if test $? != 0; then
     echo "VM failed to be created!"
     exit -1
@@ -715,7 +755,7 @@ echo
 
 # Succeeds or exits
 
-clonezilla_to_image
+clonezilla_usb_to_image
 
 echo
 
