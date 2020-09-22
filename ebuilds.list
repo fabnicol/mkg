@@ -27,14 +27,22 @@
  qtwidgets
  qtxml
  qtgui
-
+ 
 ## these 3 deps only for RStudio, you may withdraw otherwise
+
  qtwebengine
  qtpositioning
  qtopengl
-## 
  plasma-meta
- app-office/libreoffice
+
+# X
+
+ x11-base/xorg-x11
+ x11-base/xorg-drivers
+ 
+# Other desktop
+
+app-office/libreoffice
  kate
  konsole
  kde-apps/dolphin

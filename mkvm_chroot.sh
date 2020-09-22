@@ -190,8 +190,12 @@ function build_kernel {
 function install_software {
 
         # to eschew corruption cases
-     
+        cd /
+    
         emerge dos2unix
+    
+        chown root ${ELIST}
+        chmod +rw ${ELIST}
         dos2unix ${ELIST}
 
         # TODO: develop several options wrt to package set.
@@ -205,6 +209,9 @@ function install_software {
         # do not quote!
         
 	emerge -uDN ${packages}
+
+        env-update
+        source /etc/profile
 
         if test $? != 0; then
             echo "Main package build step failed!"
@@ -267,9 +274,10 @@ function global_config {
 
 	## sddm 
 
-	echo "setxkbmap ${LANGUAGE}" > /usr/share/sddm/scripts/Xsetup
+        echo "#!/bin/sh\nsetxkbmap ${LANGUAGE},us" > /usr/share/sddm/scripts/Xsetup
+        chmod +x /usr/share/sddm/scripts/Xsetup
 
-	sed -i 's/DISPLAYMANAGER=""/DISPLAYMANAGER="sddm"/' /etc/conf.d/xdm
+	sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' /etc/conf.d/xdm
 
 	# Services
 
@@ -311,12 +319,7 @@ function finalize {
 
 	# Final steps
 	# prepare to compact
-	cat /dev/zero > zeros ; sync ; rm zeros
-	
-    exit	
-	umount -l /mnt/gentoo/dev{/shm,/pts,}
-	umount -R -l  /mnt/gentoo
-	shutdown -h now
+ 	cat /dev/zero > zeros ; sync ; rm zeros
 }
 
 adjust_environment
@@ -324,5 +327,5 @@ build_kernel
 install_software
 global_config
 finalize
-
+exit 0
 ## Issues with: dbus connecting to plasma session

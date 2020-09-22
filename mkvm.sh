@@ -88,7 +88,7 @@ function install_stage3 {
 	echo 'L10N="fr en"'    >> ${m_conf}
 	echo 'LINGUAS="fr en"' >> ${m_conf}
 	sed  -i 's/USE=".*"//g'    ${m_conf}
-	echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager elogind -consolekit -systemd dbus"' >>  ${m_conf}
+	echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager elogind -consolekit -systemd dbus X"' >>  ${m_conf}
 	echo "GENTOO_MIRRORS=${EMIRRORS}"  >> ${m_conf}
 	echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code"' >> ${m_conf}
 	echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
@@ -108,13 +108,24 @@ function install_stage3 {
 	mount --make-rslave dev
         cd ~
 	chroot /mnt/gentoo ./mkvm_chroot.sh
-			
-	INSTALL_STAGE3="DONE"
+}
+
+function finalize {
+
+  umount -l /mnt/gentoo/dev{/shm,/pts,}
+  umount /mnt/gentoo/run
+  umount /mnt/gentoo/proc
+  umount /mnt/gentoo/sys
+  umount -R -l  /mnt/gentoo
+  # normally no-op but cautionary
+  
+  chown -R fab:fab /home/fab
+  shutdown -h now
 }
 
 
 setup_network
 partition
 install_stage3
-
+finalize
 
