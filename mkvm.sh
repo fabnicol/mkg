@@ -23,7 +23,7 @@
 
 function setup_network {
 
-if test "${SETUP_NETWORK}" = "DONE"; then
+if test -f setup_network; then
    return
 fi
 
@@ -31,14 +31,14 @@ local	eth=$(ifconfig | cut -f1 -d' ' | line | cut -f1 -d':')
 	    net-setup  $eth #enp0s3
 	    dhcpcd -HD $eth #enp0s3
 
-SETUP_NETWORK=DONE
+touch setup_network
 }
 
 # Partitioning
 
 function partition {
 
-if test "${PARTITION}" = "DONE"; then
+if test -f partition; then
    return
 fi
 
@@ -50,12 +50,12 @@ fi
 	
 	mount  /dev/sda4 /mnt/gentoo
 
-PARTITION="DONE"
+touch partition
 }
 
 function install_stage3 {
 
-        if test "${INSTALL_STAGE3}" = "DONE"; then
+        if test -f install_stage3; then
           return
         fi
 	
@@ -76,6 +76,7 @@ function install_stage3 {
 	    exit -1
 	fi
 	cat temp_bashrc >> .bashrc
+        rm temp_bashrc
 	
 	rm -vf ${STAGE3}
 	
@@ -90,7 +91,9 @@ function install_stage3 {
 	sed  -i 's/USE=".*"//g'    ${m_conf}
 	echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager elogind -consolekit -systemd dbus X"' >>  ${m_conf}
 	echo "GENTOO_MIRRORS=${EMIRRORS}"  >> ${m_conf}
-	echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code"' >> ${m_conf}
+        # note linux-fw-redistributable no-source-code for genkernel
+        # note bh-luxi for font-bh-* requested by xorg-x11
+	echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code bh-luxi"' >> ${m_conf}
 	echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
 	echo 'VIDEO_CARDS="nouveau intel"'   >> ${m_conf}
 	echo 'INPUT_DEVICES="evdev synaptics"' >> ${m_conf}
@@ -107,6 +110,7 @@ function install_stage3 {
 	mount --rbind /dev  dev
 	mount --make-rslave dev
         cd ~
+        touch install_stage3
 	chroot /mnt/gentoo ./mkvm_chroot.sh
 }
 
@@ -117,8 +121,6 @@ function finalize {
   umount /mnt/gentoo/proc
   umount /mnt/gentoo/sys
   umount -R -l  /mnt/gentoo
-  # normally no-op but cautionary
-  
   chown -R fab:fab /home/fab
   shutdown -h now
 }

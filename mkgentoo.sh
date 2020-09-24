@@ -40,17 +40,18 @@
 
 CLI="$*"
 
-ARR=("vm"          "Virtual Machine name"                                                "Gentoo"
+ARR=("minimal"     "Remove *libreoffice* and *data science tools* from default list of installed software"                          "false"
+     "elist"       "\t File containing a list of Gentoo ebuilds to add to the VM on top of stage3" "ebuilds.list"
+     "vm"          "\t Virtual Machine name"                                                "Gentoo"
      "vbpath"      "Path to VirtualBox directory"                                        "/usr/bin"
      "vmpath"      "Path to VM base directory"                                           "$PWD"  
      "mem"         "\t VM RAM memory in MiB"                                             "8000"
-     "ncpus"       "Number of VM CPUs"                                                   "4"
+     "ncpus"       "\t Number of VM CPUs"                                                   "4"
      "processor"   "Processor type"                                                      "amd64"
      "size"        "\t Dynamic disc size"                                                "55000"
      "livecd"      "Path to the live CD that will start the VM"                          "gentoo.iso"
      "mirror"      "Mirror site for downloading of stage3 tarball"                       "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
      "emirrors"    "Mirror sites for downloading ebuilds"                                "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
-     "elist"       "File containing a list of ebuilds to add to the VM on top of stage3" "ebuilds.list"
      "rstudio"     "RStudio version to be downloaded and built from github source"       "1.3.1073"
      "r_version"   "R version"                                                           "4.0.2"  
      "githubpath"  "RStudio Github path to zip: path right before version.zip"           "https://github.com/rstudio/rstudio/archive/v"
@@ -70,10 +71,12 @@ ARR=("vm"          "Virtual Machine name"                                       
      "language"    "Set default login keyboard layout"                                   "us"
      "burn"        "Burn to optical disc. Argument is either a device label (e.g. cdrom, sr0) or a mountpoint directory."  "false"
      "scsi_address" "In case of several optical disc burners, specify the SCSI address as x,y,z"  "0,0,0"
-     "usb_device"  "Create Gentoo OS on external device.\n\t\tArgument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory."    ""
-     "usb_installer" "Create Gentoo clone installer on external device.\n\t\tArgument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory.\n\t\tIf unspecified, usb_device value will be used. OS Gentoo will be replaced by Clonezilla installer."  ""
+     "usb_device"  "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory."    ""
+     "usb_installer" "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory. If unspecified, usb_device value will be used. OS Gentoo will be replaced by Clonezilla installer."  ""
      "disable_md5_check" "Disable MD5 checkums verification after downloads"             "true"
-     
+     "cleanup"       "Cleanup archives, images and virtual machine after successful completion"  "true"
+     "help"          "\t This help"                                                         ""
+ 
     )
      
 ARRAY_LENGTH=$((${#ARR[*]}/3))
@@ -156,27 +159,44 @@ function check_md5sum {
 #
 # Prints usage
 
-function help {
-echo "USAGE:"
-echo "mkgentoo  [[switch=argument]...]  filename.iso  [1]"
-echo "mkgentoo  [[switch=argument]...]                [2]" 
-echo
-echo "Usage [1] creates a bootable ISO output file with a current Gentoo distribution."
-echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo."
-echo "Warning: you should have at least 50 GB of free disk space in the current directory or in vmpath if specified."
-echo "Switches:"
-
-for ((i=1; i<${ARRAY_LENGTH}; i++)); do 
+function help_md {
+echo "**USAGE:**  "
+echo "**mkgentoo**  [[switch=argument]...]  filename.iso  [1]  "
+echo "**mkgentoo**  [[switch=argument]...]                [2]  "
+echo "**mkgentoo**  help[=md]                             [3]  "
+echo "  "
+echo "Usage [1] creates a bootable ISO output file with a current Gentoo distribution.  "
+echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo.  "
+echo "Usage [3] prints this help, in markdown form if argument 'md' is specified.  "
+echo "Warning: you should have at least 55 GB of free disk space in the current directory or in vmpath if specified.  "
+echo "  "
+echo "**Switches:**  "
+echo "  "
+echo "Boolean values are either 'true' or 'false'. For example, to build a minimal distribution, specify:  "
+echo ">  minimal=true  "
+echo "  "
+echo "on command line.  "
+echo "  "
+echo " | switch | description | default value |  "
+echo " |:-----:|:--------:|:-----:|  "
+for ((i=0; i<${ARRAY_LENGTH}; i++)); do 
 
 local sw=$(($i*3))
 local desc=$(($i*3+1))
 local def=$(($i*3+2))
 
-echo -e "  ${ARR[$sw]} \t ${ARR[$desc]} \t [default ${ARR[$def]}]"   
+
+echo -e "| ${ARR[$sw]} \t| ${ARR[$desc]} \t| [${ARR[$def]}] |  "   
 done
 
 echo 
 
+}
+
+function help {
+
+help_md | sed 's/[\*\|\>]//g' 
+    
 }
 
 
@@ -378,6 +398,13 @@ function make_boot_from_livecd {
       echo "No mkvm_chroot.sh script!"
       exit -1
   fi
+
+  if test "${MINIMAL}" = "true" -a "${ELIST}" = "ebuilds.list"; then
+      cp -vf ${ELIST}.minimal ${ELIST}
+  else
+      cp -vf ${ELIST}.complete ${ELIST}
+  fi
+  
   if ! test -f ${ELIST}; then
       echo "No ebuild list!"
       exit -1
@@ -871,6 +898,31 @@ function create_install_usb_device {
     return ${res}
 }
 
+function cleanup {
+
+    if test "${CLEANUP}" != "true"; then
+        return 0
+    fi
+        cd ${VMPATH}
+        rm *.xz
+        rm *.iso
+        rm -rf ISOFILES
+        if test -d mnt; then
+            sudo umount -l mnt
+            rmdir mnt
+        fi
+        if test -d mnt2; then
+            sudo rm -rf mnt2
+        fi
+        rm -rvf ${VM}
+        rm -vf ${VM}.vdi
+        exit 0
+}
+
+if test "$(echo ${CLI} | sed 's/help_md//' )" != "${CLI}"; then
+  help_md
+  exit 0
+fi
 if test "$(echo ${CLI} | sed 's/help//' )" != "${CLI}"; then
   help
   exit 0
@@ -910,7 +962,7 @@ fi
 
 echo
 if test ${CREATE_ISO} != "true"; then
-    exit 0
+    cleanup
 fi
 
 if test $VBOX_IMG_WORKS; then 
@@ -975,6 +1027,6 @@ else
     exit -1
 fi
 
-
+cleanup
 
 

@@ -214,11 +214,12 @@ function install_software {
         source /etc/profile
 
         if test $? != 0; then
-            echo "Main package build step failed!"
+            echo "Main package build step failed!" | tee log_install_software
             exit -1
         fi
 
         if test "${DOWNLOAD_RSTUDIO}" != "TRUE"; then
+           echo "No RStudio build" | tee log_install_software 
            return
         fi
 
@@ -230,10 +231,10 @@ function install_software {
 	wget ${GITHUBPATH}${RSTUDIO}.zip
 	
 	if test $? != 0; then
-	    echo "RStudio download faild!"
+	    echo "RStudio download failed!"  | tee log_install_software
             exit -1
         fi
-	
+	echo "Building RStudio" | tee log_install_software
 	unzip *.zip
 	cd rstudio*
 	mkdir build
@@ -245,10 +246,10 @@ function install_software {
 	cd build
 
 	cmake .. -DRSTUDIO_TARGET=Desktop -DCMAKE_BUILD_TYPE=Release -DRSTUDIO_USE_SYSTEM_BOOST=1 -DQT_QMAKE_EXECUTABLE=1 
-	make -j${NCPUS}
+	make -j${NCPUS} | tee log_install_software
 	make -k install
 
-                # cleaning up a bit aggressively before cloning...
+        echo "Cleaning up a bit aggressively before cloning..." | tee log_install_software
         
         eclean -d packages
         
@@ -258,8 +259,8 @@ function install_software {
 
         # kernel sources will have to be reinstalled by user if necessary
 
-        emerge --unmerge gentoo-sources
-        emerge --depclean
+        emerge --unmerge gentoo-sources  2>&1 | tee log_install_software
+        emerge --depclean   2>&1 | tee log_install_software
         
         rm -rf /usr/src/linux/*
         
@@ -317,8 +318,12 @@ function global_config {
 
 function finalize {
 
-	# Final steps
-	# prepare to compact
+        # Final steps: cleaning up
+
+        sed -i 's/^export .*$//g' .bashrc
+        rm -f mkvm_chroot.sh package_list ${ELIST}
+
+	# prepare to compact with vbox-img compact --filename ${VMPATH}/${VM}.vdi
  	cat /dev/zero > zeros ; sync ; rm zeros
 }
 

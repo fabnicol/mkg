@@ -128,52 +128,59 @@ This software is licenced under the terms of the [GNU
 GPLv3](https://www.gnu.org/licenses/gpl-3.0.html).
 
 -------------------------------------------------------------------
-
-**USAGE:**    
-   
-**mkgentoo**  [[switch=argument]...]  filename.iso  [1]   
-**mkgentoo**  [[switch=argument]...]                [2]   
-    
-Usage [1] creates a bootable ISO output file with a current Gentoo distribution.   
-Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name
-*Gentoo* unless the name is given as the argument to command `vm`.
-    
-*Warning: you should have at least 50 GB of free disk space in the current
-directory or in vmpath if specified.*   
-    
-**Switches:**    
-      vm               Virtual Machine name                                 [default "Gentoo"]     
-      vbpath           Path to VirtualBox directory                         [default /usr/bin]   
-      vmpath           Path to VM base directory                            [default /home/fab/Dev/mkgentoo]   
-      mem              VM RAM memory in MiB                                 [default 8000]   
-      ncpus            Number of VM CPUs                                    [default 4]   
-      processor        Processor type                                       [default amd64]   
-      size             Dynamic disc size in MiB                             [default 55000]   
-      livecd           Path to the live CD that will start the VM           [default gentoo.iso]   
-      mirror           Mirror site for downloading of stage3 tarball        [default http://gentoo.mirrors.ovh.net/gentoo-distfiles/]  
-      emirrors         Mirror sites for downloading ebuilds                 [default http://gentoo.mirrors.ovh.net/gentoo-distfiles/]   
-      elist            File containing a list of ebuilds to add to the VM
-                       on top of stage3                                     [default ebuilds.list]   
-      rstudio          RStudio version to be downloaded and built from github
-                       source                                               [default 1.3.1073]   
-      r_version        R version                                            [default 4.0.2]   
-      githubpath       RStudio Github path to zip: path right
-                       before version.zip                                   [default https://github.com/rstudio/rstudio/archive/v]   
-      cflags           GCC CFLAGS options for ebuilds                       [default -march=core-avx2 -O2]  
-      nonroot_user     Non-root user                                        [default fab]   
-      passwd           User password                                        [default dev20]   
-      rootpasswd       Root password                                        [default dev20]   
-      download         Download install ISO image from Gentoo mirror        [default TRUE]   
-      download_stage3  Download and install stage3 tarball to virtual disk  [default TRUE]   
-      download_rstudio Download and build RStudio                           [default TRUE]   
-      stage3           Path to stage3 archive                               [default stage3.tar.xz]  
-      create_squashfs  (Re)create the squashfs filesystem                   [default TRUE]   
-      vmtype           gui or headless (silent)                             [default headless]   
-      kernel_config    Use a custom kernel config file                      [default .config]    
-      language         Set default login keyboard layout                    [default "us"]   
-   
-
-
-
-
+**USAGE:**  
+**mkgentoo**  [[switch=argument]...]  filename.iso  [1]  
+**mkgentoo**  [[switch=argument]...]                [2]  
+**mkgentoo**  help[=md]                             [3]  
+  
+Usage [1] creates a bootable ISO output file with a current Gentoo distribution.  
+Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo.  
+Usage [3] prints this help, in markdown form if argument 'md' is specified.  
+Warning: you should have at least 55 GB of free disk space in the current directory or in vmpath if specified.  
+  
+**Switches:**  
+  
+Boolean values are either 'true' or 'false'. For example, to build a minimal distribution, specify:  
+>  minimal=true  
+  
+on command line.  
+  
+ | switch | description | default value |  
+ |:-----:|:--------:|:-----:|  
+| minimal 	| Remove *libreoffice* and *data science tools* from default list of installed software 	| [false] |  
+| elist 	| 	 File containing a list of Gentoo ebuilds to add to the VM on top of stage3 	| [ebuilds.list] |  
+| vm 	| 	 Virtual Machine name 	| [Gentoo] |  
+| vbpath 	| Path to VirtualBox directory 	| [/usr/bin] |  
+| vmpath 	| Path to VM base directory 	| [/home/fab/Dev/mkgentoo] |  
+| mem 	| 	 VM RAM memory in MiB 	| [8000] |  
+| ncpus 	| 	 Number of VM CPUs 	| [4] |  
+| processor 	| Processor type 	| [amd64] |  
+| size 	| 	 Dynamic disc size 	| [55000] |  
+| livecd 	| Path to the live CD that will start the VM 	| [gentoo.iso] |  
+| mirror 	| Mirror site for downloading of stage3 tarball 	| [http://gentoo.mirrors.ovh.net/gentoo-distfiles/] |  
+| emirrors 	| Mirror sites for downloading ebuilds 	| [http://gentoo.mirrors.ovh.net/gentoo-distfiles/] |  
+| rstudio 	| RStudio version to be downloaded and built from github source 	| [1.3.1073] |  
+| r_version 	| R version 	| [4.0.2] |  
+| githubpath 	| RStudio Github path to zip: path right before version.zip 	| [https://github.com/rstudio/rstudio/archive/v] |  
+| cflags 	| GCC CFLAGS options for ebuilds 	| [-march=core-avx2 -O2] |  
+| nonroot_user 	| Non-root user 	| [fab] |  
+| passwd 	| User password 	| [dev20] |  
+| rootpasswd 	| Root password 	| [dev20] |  
+| download 	| Download install ISO image from Gentoo mirror 	| [true] |  
+| download_stage3 	| Download and install stage3 tarball to virtual disk 	| [true] |  
+| download_rstudio 	| Download and build RStudio 	| [true] |  
+| download_clonezilla 	| Refresh CloneZilla ISO download 	| [false] |  
+| donwload_clonezilla_path 	| Use the following CloneZilla ISO 	| [https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download] |  
+| stage3 	| Path to stage3 archive 	| [stage3.tar.xz] |  
+| create_squashfs 	| (Re)create the squashfs filesystem 	| [true] |  
+| vmtype 	| gui or headless (silent) 	| [headless] |  
+| kernel_config 	| Use a custom kernel config file 	| [.config] |  
+| language 	| Set default login keyboard layout 	| [us] |  
+| burn 	| Burn to optical disc. Argument is either a device label (e.g. cdrom, sr0) or a mountpoint directory. 	| [false] |  
+| scsi_address 	| In case of several optical disc burners, specify the SCSI address as x,y,z 	| [0,0,0] |  
+| usb_device 	| Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory. 	| [] |  
+| usb_installer 	| Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory. If unspecified, usb_device value will be used. OS Gentoo will be replaced by Clonezilla installer. 	| [] |  
+| disable_md5_check 	| Disable MD5 checkums verification after downloads 	| [true] |  
+| cleanup 	| Cleanup archives, images and virtual machine after successful completion 	| [true] |  
+| help 	| 	 This help 	| [] |  
 
