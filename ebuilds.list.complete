@@ -1,0 +1,55 @@
+# System and management
+ app-admin/sysklogd
+ sys-process/cronie
+ sys-apps/mlocate
+ sys-fs/e2fsprogs
+ sys-fs/dosfstools
+ net-misc/dhcpcd
+ net-wireless/iw 
+ net-wireless/wpa_supplicant
+ app-portage/eix
+ dev-libs/re2
+ gentoolkit
+ sys-boot/grub:2
+ dev-vcs/git
+ dev-java/ant
+ x11-apps/xdm
+ x11-misc/sddm 
+ kde-plasma/sddm-kcm
+ 
+# Data science
+
+ =dev-lang/R-4.0.2
+ 
+## KDE
+
+ qtcore
+ qtwidgets
+ qtxml
+ qtgui
+ 
+## these 3 deps only for RStudio, you may withdraw otherwise
+
+ qtwebengine
+ qtpositioning
+ qtopengl
+ plasma-meta
+
+# X
+
+ x11-base/xorg-x11
+ x11-base/xorg-drivers
+ 
+# Other desktop
+
+app-office/libreoffice
+ kate
+ konsole
+ kde-apps/dolphin
+ konqueror
+
+## PDF-related
+ 
+ okular
+ =dev-texlive/texlive-latex-2020
+ texlive
