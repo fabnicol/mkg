@@ -252,6 +252,9 @@ function install_software {
         cd /
 }
 
+
+
+
 function global_config {
 
         echo "Cleaning up a bit aggressively before cloning..." | tee log_install_software

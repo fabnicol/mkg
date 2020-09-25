@@ -64,7 +64,7 @@ ARR=("minimal"     "Remove *libreoffice* and *data science tools* from default l
      "download"    "Download install ISO image from Gentoo mirror"                       "true"
      "download_stage3" "Download and install stage3 tarball to virtual disk"             "true"
      "download_rstudio"  "Download and build RStudio"                                    "true"
-     "download_clonezilla" "Refresh CloneZilla ISO download"                             "false"
+     "download_zclonezilla" "Refresh CloneZilla ISO download"                             "false"
      "download_clonezilla_path" "Use the following CloneZilla ISO"                       "https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download"
      "build_virtualbox"   "Download code source and automatically build virtualbox and tools" "false"
      "vbox_version"  "Virtualbox version"                                                "6.1.14"
@@ -655,8 +655,6 @@ function create_iso_vm {
 
 function get_device {
 
-  local device=""
-    
   if test -d "$1"; then
       device=$(findmnt --raw --first -a -n -c $1 | cut -f2 -d' ')
   else
@@ -731,6 +729,7 @@ function clone_vm_to_usb {
         exit -1
     fi
 }
+
 
 function clone_vm_to_raw {
 
