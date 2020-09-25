@@ -38,6 +38,8 @@
 
 # GLOBAL VARIABLES:
 
+cd ..
+
 CLI="$*"
 
 ARR=("minimal"     "Remove *libreoffice* and *data science tools* from default list of installed software"                          "false"
@@ -46,7 +48,7 @@ ARR=("minimal"     "Remove *libreoffice* and *data science tools* from default l
      "vbpath"      "Path to VirtualBox directory"                                        "/usr/bin"
      "vmpath"      "Path to VM base directory"                                           "$PWD"  
      "mem"         "\t VM RAM memory in MiB"                                             "8000"
-     "ncpus"       "\t Number of VM CPUs"                                                   "4"
+     "ncpus"       "\t Number of VM CPUs. By default the third of available threads."                                                   "$(($(nproc --all)/3))"
      "processor"   "Processor type"                                                      "amd64"
      "size"        "\t Dynamic disc size"                                                "55000"
      "livecd"      "Path to the live CD that will start the VM"                          "gentoo.iso"
@@ -63,7 +65,11 @@ ARR=("minimal"     "Remove *libreoffice* and *data science tools* from default l
      "download_stage3" "Download and install stage3 tarball to virtual disk"             "true"
      "download_rstudio"  "Download and build RStudio"                                    "true"
      "download_clonezilla" "Refresh CloneZilla ISO download"                             "false"
-     "donwload_clonezilla_path" "Use the following CloneZilla ISO"                       "https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download"
+     "download_clonezilla_path" "Use the following CloneZilla ISO"                       "https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download"
+     "build_virtualbox"   "Download code source and automatically build virtualbox and tools" "false"
+     "vbox_version"  "Virtualbox version"                                                "6.1.14"
+     "vbox_version_full" "Virtualbox full version"                                       "6.1.14a"
+     "lineno_patch" "Line patched against vbox-img.cpp in virtualbox source code"        "797"
      "stage3"      "Path to stage3 archive"                                              "stage3.tar.xz"     
      "create_squashfs"  "(Re)create the squashfs filesystem"                             "true"
      "vmtype"      "gui or headless (silent)"                                            "headless"
@@ -71,8 +77,8 @@ ARR=("minimal"     "Remove *libreoffice* and *data science tools* from default l
      "language"    "Set default login keyboard layout"                                   "us"
      "burn"        "Burn to optical disc. Argument is either a device label (e.g. cdrom, sr0) or a mountpoint directory."  "false"
      "scsi_address" "In case of several optical disc burners, specify the SCSI address as x,y,z"  "0,0,0"
-     "usb_device"  "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory."    ""
-     "usb_installer" "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory. If unspecified, usb_device value will be used. OS Gentoo will be replaced by Clonezilla installer."  ""
+     "usb_device"  "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory (if mounted), or a few consecutive letters of the model (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such."    ""
+     "usb_installer" "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer."  ""
      "disable_md5_check" "Disable MD5 checkums verification after downloads"             "true"
      "cleanup"       "Cleanup archives, images and virtual machine after successful completion"  "true"
      "help"          "\t This help"                                                         ""
@@ -210,7 +216,7 @@ function fetch_livecd {
 
         local CACHED_ISO="install-${PROCESSOR}-minimal.iso"        
 	if test ${DOWNLOAD} = "false"; then
-           if test -f ${CACHED_ISO}; then   
+           if test -f ${CACHED_ISO}; then 
              cp -vf ${CACHED_ISO} ${ISO}
              LIVECD=${ISO}
              return 0
@@ -390,11 +396,11 @@ function make_boot_from_livecd {
 
   cd ..
   
-  if ! test -f mkvm.sh; then
+  if ! test -f scripts/mkvm.sh; then
       echo "No mkvm.sh script!"
       exit -1
   fi
-  if ! test -f mkvm_chroot.sh; then
+  if ! test -f scripts/mkvm_chroot.sh; then
       echo "No mkvm_chroot.sh script!"
       exit -1
   fi
@@ -422,10 +428,10 @@ function make_boot_from_livecd {
   sudo chown fab ${sqrt}
   mv -vf ${STAGE3} ${sqrt}
   
-  cp -vf mkvm.sh ${sqrt}
+  cp -vf scripts/mkvm.sh ${sqrt}
   chmod +x ${sqrt}mkvm.sh
   
-  cp -vf mkvm_chroot.sh ${sqrt}
+  cp -vf scripts/mkvm_chroot.sh ${sqrt}
   chmod +x ${sqrt}mkvm_chroot.sh
 
   cp -vf ${ELIST} ${sqrt}
@@ -563,68 +569,24 @@ function clonezilla_to_iso {
 }
 
 
-# download_clonezilla_iso
-#
-# Performs a fresh download of clonezilla ISO to create the ISOVM machine
-# Returns 0 on success and -1 on exit
-
-function download_clonezilla_iso {
-
-    local clonezilla_file=$(echo ${DOWNLOAD_CLONEZILLA_PATH} | sed -E 's/.*\/(.*)\/download/\1/')
-    wget ${DOWNLOAD_CLONEZILLA_PATH} -O ${clonezilla_file}
-    
-    if test $? != 0; then
-        echo "Could not download CloneZilla iso"
-        exit -1
-    fi
-    local clonezilla_iso=$(ls clonezilla-live*amd64.iso)
-
-    if test ${DISABLE_MD5_CHECK} = "false"; then
-        check_md5sum  ${clonezilla_iso}
-    fi
-    CLONEZILLACD=${clonezilla_iso}
-    return 0
-}
-
-
 
 function process_clonezilla_iso {
 
-    # first cache it
+    fetch_clonezilla_iso
     
-    if test -f "${CLONEZILLACD}" -a "${CLONEZILLACD}" != "clonezilla.iso"; then
-       cp -vf ${CLONEZILLACD} clonezilla.iso
-    fi
-
-    # now mount and unsquashfs
-       
-    if ! test -d mnt; then sudo rm -rf mnt; mkdir mnt; fi
-    if ! test -d mnt2; then sudo rm -rf mnt2; mkdir mnt2; fi
-
-    sudo mount -oloop ${CLONEZILLACD} ./mnt
-    rsync -av ./mnt/ mnt2
-    cd mnt2/live
-    sudo unsquashfs filesystem.squashfs
-    cp ${VMPATH}
-    rm -rf ISOFILES/*
-    rsync mnt2/ ISOFILES
-    cp -vf clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux/
-    cd -
-    sudo cp -vf /etc/resolv.conf squashfs-root/etc
     for i in proc sys dev run; do sudo mount -B /$i squashfs-root/$i; done
     sudo chroot squashfs-root
     sudo mkdir /boot
-    sudo apt update -y -q
-    sudo apt upgrade -y -q
-    local kernel=$(apt-cache search ^linux-image.*oem | tail -n1 | cut -f1 -d' ')
-    sudo apt install -y -q ${kernel}
-    local headers=$(apt-cache search ^linux-headers.*oem | tail -n1 | cut -f1 -d' ')
-    sudo apt install --reinstall -y -q ${headers}
-    sudo apt install -y -q build-essential gcc 
-    sudo apt install -y -q virtualbox-dkms
-    sudo apt install -y -q virtualbox-guest-additions-iso
+    sudo apt update -yq  
+    sudo apt upgrade -yq <<< $(echo N)
+    local headers=$(apt-cache search ^linux-headers | tail -n1 | cut -f 1 -d' ')
+    local kernel=$(apt-cache search ^linux-image | grep -v unsigned | tail -n1 | cut -f 1 -d' ')
+    sudo apt install -qy ${headers}
+    sudo apt install -qy ${kernel}
+    sudo apt install -qy build-essential gcc <<< $(echo N)
+    sudo apt install -qy virtualbox-dkms
+    sudo apt install -qy virtualbox-guest-additions-iso
     sudo mount -oloop /usr/share/virtualbox/VBoxGuestAdditions.iso /mnt
-    
     cd /mnt
     /sbin/rcvboxadd quicksetup all
     sudo /bin/bash VBoxLinuxAdditions.run
@@ -649,13 +611,21 @@ function process_clonezilla_iso {
     sudo rm -rf mnt2
 }
 
+
+function build_virtualbox {
+
+    cd ${VMPATH}
+    cp -vf clonezilla/build/* ${CLONEZILLACD}/live
+    cd ${CLONEZILLACD}/live
+    ./build_clonezilla.sh
+    cd ${VMPATH}
+}
+
+
 function create_iso_vm {
         cd ${VMPATH}
 
-        if test ${DOWNLOAD_CLONEZILLA} = "true"; then
-            download_clonezilla_iso
-            process_clonezilla_iso
-        fi
+        process_clonezilla_iso
     
         gpasswd -a ${USER} -g vboxusers
         chgrp vboxusers "ISOFILES/home/partimag/image"
@@ -836,7 +806,7 @@ function clonezilla_usb_to_image {
         fi   
     fi
 
-    if test ${MINIMIZE_DISK_SPACE} = "true"; then
+    if test ${CLEANUP} = "true"; then
 
         echo "Erasing virtual disk and virtual machine to save disk space..."
         rm -f "${VMPATH}/${VM}.vdi"
@@ -898,7 +868,66 @@ function create_install_usb_device {
     return ${res}
 }
 
-function cleanup {
+function vbox_img_works {
+
+    cd ${VMPATH}
+    if test "$(bin/vbox-img --version)" != ""; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+function create_usb_system {
+
+  if ! vbox_img_works -o ${BUILD_VIRTUALBOX} = "true"; then  
+      build_virtualbox
+  fi
+
+  if  vbox_img_works; then 
+  
+       echo "Cloning virtual disk to USB device ${USB_DEVICE} ..."
+     
+       clone_vm_to_usb
+     
+       if test $? != 0; then
+          echo "Cloning VDI disk to USB deice failed !"
+          exit -1
+       fi
+  else
+       echo "Cloning virtual disk to raw..."
+
+       clone_vm_to_raw
+
+       if test $? != 0; then
+          echo "Cloning VDI disk to RAW failed !"
+          exit -1
+       fi
+
+       echo
+       echo "Copying to USB stick..."
+       echo
+
+       dd_to_usb
+
+       echo
+       if test $? != 0; then
+       echo "Copying raw file to USB device failed!"
+       echo "Check that your USB device has at least 50 GiB of reachable space"
+       exit -1
+     fi
+  fi     
+
+  echo "Launching Clonezilla to create compressed image..."
+  echo
+
+  # Succeeds or exits
+
+  clonezilla_usb_to_image
+}
+
+function cleanup  {
 
     if test "${CLEANUP}" != "true"; then
         return 0
@@ -931,6 +960,15 @@ fi
 echo "PARAMETERS"
 echo
 for ((i=0; i<ARRAY_LENGTH; i++)) ; do test_cli $i; done
+
+export VERSION
+export VERSION_FULL
+export VMPATH
+export LINENO_PATCH
+export DOWNLOAD_CLONEZILLA_PATH
+
+/bin/bash fetch_clonezilla_iso.sh
+
 echo
 echo "Fetching live CD..."
 echo
@@ -949,6 +987,7 @@ echo
 
 make_boot_from_livecd
 
+
 echo 
 echo "Creating VM"
 echo
@@ -965,68 +1004,37 @@ if test ${CREATE_ISO} != "true"; then
     cleanup
 fi
 
-if test $VBOX_IMG_WORKS; then 
+if test "${USB_DEVICE}" != ""; then
+    echo
+    echo "Building VirtualBox..."
+    echo
 
-     echo "Cloning virtual disk to USB device ${USB_DEVICE} ..."
-    
-     clone_vm_to_usb
-     
-     if test $? != 0; then
-        echo "Cloning VDI disk to USB deice failed !"
-        exit -1
-     fi
-     
+    create_usb_system
 else
-     echo "Cloning virtual disk to raw..."
-
-     clone_vm_to_raw
-
-     if test $? != 0; then
-        echo "Cloning VDI disk to RAW failed !"
-        exit -1
-     fi
-
-     echo
-     echo "Copying to USB stick..."
-     echo
-
-     dd_to_usb
-
-     echo
-     if test $? != 0; then
-       echo "Copying raw file to USB device failed!"
-       echo "Check that your USB device has at least 50 GiB of reachable space"
-       exit -1
-     fi
-fi     
-
-echo "Launching Clonezilla to create compressed image..."
-echo
-
-# Succeeds or exits
-
-clonezilla_usb_to_image
-
-echo
-
-echo "Launching Clonezilla to create ISO install medium..."
-echo
-
-clonezilla_to_iso ${LIVECD} ISOFILES
-
-echo
-if test $? = 0; then
-    echo "Done."
-    if test -f "${ISO_OUTPUT}"; then
-        echo "ISO install medium was created here: ${ISO_OUTPUT}"
-    else
-        echo "ISO install medium failed to be created."
-    fi
-else
-    echo "ISO install medium failed to be created!"
-    exit -1
+    process_clonezilla_iso
+    create_iso_vm
+    echo
+    echo "Launching Clonezilla to create ISO install medium..."
+    echo
 fi
 
+  echo
+  echo "Launching Clonezilla to create ISO install medium..."
+  echo
+
+  clonezilla_to_iso ${LIVECD} ISOFILES
+
+  echo
+  if test $? = 0; then
+      echo "Done."
+      if test -f "${ISO_OUTPUT}"; then
+          echo "ISO install medium was created here: ${ISO_OUTPUT}"
+      else
+          echo "ISO install medium failed to be created."
+      fi
+  else
+      echo "ISO install medium failed to be created!"
+      exit -1
+  fi
+
 cleanup
-
-

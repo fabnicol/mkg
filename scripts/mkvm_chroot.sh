@@ -22,17 +22,17 @@ function adjust_environment {
 
        # Adjusting /etc/fstab
 
-        export  uuid2=$(blkid | grep sda2 | cut -f2 -d' ')
-	export  uuid3=$(blkid | grep sda3 | cut -f2 -d' ')
-	export  uuid4=$(blkid | grep sda4 | cut -f2 -d' ')
+        local  uuid2=$(blkid | grep sda2 | cut -f2 -d' ')
+	local  uuid3=$(blkid | grep sda3 | cut -f2 -d' ')
+	local  uuid4=$(blkid | grep sda4 | cut -f2 -d' ')
 
-        echo "Partition /dev/sda2 with ${uuid2}"
-        echo "Partition /dev/sda2 with ${uuid3}"
-        echo "Partition /dev/sda2 with ${uuid4}"
+        echo "Partition /dev/sda2 with ${uuid2}" | tee partition_log
+        echo "Partition /dev/sda3 with ${uuid3}" | tee partition_log
+        echo "Partition /dev/sda4 with ${uuid4}" | tee partition_log
 
 	echo "${uuid2} /boot           vfat defaults            0 2"    >  /etc/fstab
 	echo "${uuid3} none            swap sw                  0 0"    >> /etc/fstab
-	echo "${uuid4} /               vfat defaults            0 1"    >> /etc/fstab
+	echo "${uuid4} /               ext4 defaults            0 1"    >> /etc/fstab
 	echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"      >> /etc/fstab
 	
 	source /etc/profile
@@ -218,7 +218,7 @@ function install_software {
             exit -1
         fi
 
-        if test "${DOWNLOAD_RSTUDIO}" != "TRUE"; then
+        if test "${DOWNLOAD_RSTUDIO}" != "true"; then
            echo "No RStudio build" | tee log_install_software 
            return
         fi
@@ -248,9 +248,14 @@ function install_software {
 	cmake .. -DRSTUDIO_TARGET=Desktop -DCMAKE_BUILD_TYPE=Release -DRSTUDIO_USE_SYSTEM_BOOST=1 -DQT_QMAKE_EXECUTABLE=1 
 	make -j${NCPUS} | tee log_install_software
 	make -k install
+       
+        cd /
+}
+
+function global_config {
 
         echo "Cleaning up a bit aggressively before cloning..." | tee log_install_software
-        
+       
         eclean -d packages
         
         rm -rf /var/tmp/*
@@ -266,12 +271,7 @@ function install_software {
         
         eix-update
 
-        cd /
-}
-
-function global_config {
-
-	# Configuration
+        # Configuration
 
 	## sddm 
 
