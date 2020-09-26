@@ -1,4 +1,5 @@
 # System and management
+ app-admin/sudo
  app-admin/sysklogd
  sys-process/cronie
  sys-apps/mlocate
