@@ -1,0 +1,68 @@
+.TH "utils.sh" 3 "Mon Sep 28 2020" "Version 1.0" "mkgentoo" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+utils.sh \- Auxiliary functions\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBcheck_md5sum\fP (filename)"
+.br
+.RI "Check md5sums in file MD5SUMS\&. "
+.ti -1c
+.RI "\fBlist_block_devices\fP ()"
+.br
+.RI "List all non-loop block devices\&. "
+.ti -1c
+.RI "\fBis_block_device\fP (label)"
+.br
+.RI "Test if argument is non-loop block device\&. "
+.ti -1c
+.RI "\fBget_mountpoint\fP ()"
+.br
+.RI "Gives mount folder from device label input\&. "
+.ti -1c
+.RI "\fBget_device\fP ()"
+.br
+.RI "Give device from mount folder input\&. "
+.ti -1c
+.RI "\fBtest_cdrecord\fP ()"
+.br
+.RI "Test whether \fBcdrecord\fP is functional\&. "
+.ti -1c
+.RI "\fBburn_iso\fP ()"
+.br
+.RI "Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+Auxiliary functions\&. 
+
+
+.PP
+\fBAuthor\fP
+.RS 4
+Fabrice Nicol fabrnicol@gmail.com 
+.RE
+.PP
+\fBCopyright\fP
+.RS 4
+GPL v\&.3 
+.RE
+.PP
+\fBNote\fP
+.RS 4
+This file is not included into the clonezilla ISO liveCD\&. 
+.RE
+.PP
+
+.PP
+Definition in file \fButils\&.sh\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for mkgentoo from the source code\&.

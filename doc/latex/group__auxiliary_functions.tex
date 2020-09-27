@@ -1,0 +1,164 @@
+\hypertarget{group__auxiliary_functions}{}\doxysection{Auxiliary functions to check files, devices and burn disk.}
+\label{group__auxiliary_functions}\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}{check\+\_\+md5sum}} (filename)
+\begin{DoxyCompactList}\small\item\em Check md5sums in file M\+D5\+S\+U\+MS. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga25a80837ae3373590d59e5d558c1ab83}{list\+\_\+block\+\_\+devices}} ()
+\begin{DoxyCompactList}\small\item\em List all non-\/loop block devices. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga3684c6e188b7eb9eec7fbe851ab7e660}{is\+\_\+block\+\_\+device}} (label)
+\begin{DoxyCompactList}\small\item\em Test if argument is non-\/loop block device. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_gaa35d741a19132f1ec7a0a699640e6b5a}{get\+\_\+mountpoint}} ()
+\begin{DoxyCompactList}\small\item\em Gives mount folder from device label input. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_gab53bde930eb12adf7c84b549b7a4e241}{get\+\_\+device}} ()
+\begin{DoxyCompactList}\small\item\em Give device from mount folder input. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga08542b578002f8342cd3e0a5252b5543}{test\+\_\+cdrecord}} ()
+\begin{DoxyCompactList}\small\item\em Test whether {\bfseries{cdrecord}} is functional. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}{burn\+\_\+iso}} ()
+\begin{DoxyCompactList}\small\item\em Burn Gentoo clonezilla installer to D\+VD using {\bfseries{cdrecord}}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}\label{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}} 
+\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!burn\_iso@{burn\_iso}}
+\index{burn\_iso@{burn\_iso}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\doxysubsubsection{\texorpdfstring{burn\_iso()}{burn\_iso()}}
+{\footnotesize\ttfamily burn\+\_\+iso (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Burn Gentoo clonezilla installer to D\+VD using {\bfseries{cdrecord}}. 
+
+\begin{DoxyNote}{Note}
+{\bfseries{cdrecord}} should have been installed beforehand 
+\end{DoxyNote}
+
+\begin{DoxyRetVals}{Return values}
+{\em Return} & {\bfseries{cdrecord}} return code \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line 127 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}\label{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}} 
+\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!check\_md5sum@{check\_md5sum}}
+\index{check\_md5sum@{check\_md5sum}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\doxysubsubsection{\texorpdfstring{check\_md5sum()}{check\_md5sum()}}
+{\footnotesize\ttfamily check\+\_\+md5sum (\begin{DoxyParamCaption}\item[{filename}]{ }\end{DoxyParamCaption})}
+
+
+
+Check md5sums in file M\+D5\+S\+U\+MS. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & Local name of file to be checked for md5sum. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Return} & 0 on success otherwise -\/1 on exit \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line 35 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_gab53bde930eb12adf7c84b549b7a4e241}\label{group__auxiliary_functions_gab53bde930eb12adf7c84b549b7a4e241}} 
+\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!get\_device@{get\_device}}
+\index{get\_device@{get\_device}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\doxysubsubsection{\texorpdfstring{get\_device()}{get\_device()}}
+{\footnotesize\ttfamily get\+\_\+device (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Give device from mount folder input. 
+
+
+
+Definition at line 84 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_gaa35d741a19132f1ec7a0a699640e6b5a}\label{group__auxiliary_functions_gaa35d741a19132f1ec7a0a699640e6b5a}} 
+\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!get\_mountpoint@{get\_mountpoint}}
+\index{get\_mountpoint@{get\_mountpoint}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\doxysubsubsection{\texorpdfstring{get\_mountpoint()}{get\_mountpoint()}}
+{\footnotesize\ttfamily get\+\_\+mountpoint (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Gives mount folder from device label input. 
+
+
+
+Definition at line 70 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_ga3684c6e188b7eb9eec7fbe851ab7e660}\label{group__auxiliary_functions_ga3684c6e188b7eb9eec7fbe851ab7e660}} 
+\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!is\_block\_device@{is\_block\_device}}
+\index{is\_block\_device@{is\_block\_device}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\doxysubsubsection{\texorpdfstring{is\_block\_device()}{is\_block\_device()}}
+{\footnotesize\ttfamily is\+\_\+block\+\_\+device (\begin{DoxyParamCaption}\item[{label}]{ }\end{DoxyParamCaption})}
+
+
+
+Test if argument is non-\/loop block device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em label} & Label of potential block device (e.\+g. {\bfseries{sdc}}) to be tested. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em Return} & 0 (true) if input is a block device otherwise 1. \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line 60 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_ga25a80837ae3373590d59e5d558c1ab83}\label{group__auxiliary_functions_ga25a80837ae3373590d59e5d558c1ab83}} 
+\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!list\_block\_devices@{list\_block\_devices}}
+\index{list\_block\_devices@{list\_block\_devices}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\doxysubsubsection{\texorpdfstring{list\_block\_devices()}{list\_block\_devices()}}
+{\footnotesize\ttfamily list\+\_\+block\+\_\+devices (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+List all non-\/loop block devices. 
+
+
+
+Definition at line 50 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_ga08542b578002f8342cd3e0a5252b5543}\label{group__auxiliary_functions_ga08542b578002f8342cd3e0a5252b5543}} 
+\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!test\_cdrecord@{test\_cdrecord}}
+\index{test\_cdrecord@{test\_cdrecord}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\doxysubsubsection{\texorpdfstring{test\_cdrecord()}{test\_cdrecord()}}
+{\footnotesize\ttfamily test\+\_\+cdrecord (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Test whether {\bfseries{cdrecord}} is functional. 
+
+Try to scan the S\+C\+SI bus and exit on error \begin{DoxyWarning}{Warning}
+There may be a rights issue with versions of {\bfseries{cdrecord}} built from original source as they sometimes request elevated rights to perform burning with some hardware configurations. ~\newline
+In such an event, either run script with elevated rights or modify {\bfseries{cdrecord}} rights using\+:
+\begin{DoxyCode}{0}
+\DoxyCodeLine{chown root cdrecord \&\& chgrp bin cdrecord \&\& chmod 04755 cdrecord }
+\end{DoxyCode}
+ 
+\end{DoxyWarning}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & on success otherwise exits -\/1 on failure. \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line 110 of file utils.\+sh.
+

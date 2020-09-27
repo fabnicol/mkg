@@ -1,2 +1,8 @@
-2#!/bin/bash
-LD_LIBRARY_PATH="$PWD/../virtualbox/VirtualBox-6.1.14/out/linux.amd64/release/bin/:$PWD/../virtualbox/lib:$PWD/../virtualbox/lib32:$PWD/../virtualbox/lib64" ./vbox-img.bin
+#!/bin/bash
+if ! test -d "${VMPATH}"; then
+	echo "VMPATH= ${VMPATH} is not a directory. Export this variable first"
+	exit -1
+fi
+cd ${VMPATH}/bin
+LD_LIBRARY_PATH="$PWD/../virtualbox/VirtualBox-${VBOX_VERSION}/out/linux.amd64/release/bin/:$PWD/../virtualbox/lib:$PWD/../virtualbox/lib32:$PWD/../virtualbox/lib64" ./vbox-img.bin $*
+cd - >/dev/null

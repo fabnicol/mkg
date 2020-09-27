@@ -1,0 +1,163 @@
+\hypertarget{group__mk_file_system}{}\doxysection{Create Gentoo linux filesystem on VM disk and emerge software.}
+\label{group__mk_file_system}\index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{group__mk_file_system_ga4315b3877c965059c7db8593870066ba}{setup\+\_\+network}} ()
+\begin{DoxyCompactList}\small\item\em Call net-\/setup and dhcpcd to enable networking. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__mk_file_system_gaa9952b2711fe0413d7a0bc6639c7f5a5}{partition}} ()
+\begin{DoxyCompactList}\small\item\em Create partition table, {\bfseries{/dev/sda1}} (bios\+\_\+grub), {\bfseries{/dev/sda2}} (boot), {\bfseries{dev/sda3}} (swap) and {\bfseries{/dev/sda4}} (system) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__mk_file_system_ga57eb97a585b6daafed0d93e57b96cca3}{install\+\_\+stage3}} ()
+\item 
+\mbox{\hyperlink{group__mk_file_system_ga9caaa1f5ea6177e55f13ebe7dec2bd60}{finalize}} ()
+\begin{DoxyCompactList}\small\item\em Unmount chrooted system, restore user rights and shutdown VM. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__mk_file_system_gaa8c398850ee5921a441408b92f32d477}{adjust\+\_\+environment}} ()
+\item 
+\mbox{\hyperlink{group__mk_file_system_ga0a168c36e3839b754f641e6639ff2472}{build\+\_\+kernel}} ()
+\item 
+\mbox{\hyperlink{group__mk_file_system_gab693423f511d21225dbc60b2782190c3}{install\+\_\+software}} ()
+\item 
+\mbox{\hyperlink{group__mk_file_system_ga30f3fc39fcff53af9710fea740f38109}{global\+\_\+config}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{group__mk_file_system_gaa8c398850ee5921a441408b92f32d477}\label{group__mk_file_system_gaa8c398850ee5921a441408b92f32d477}} 
+\index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!adjust\_environment@{adjust\_environment}}
+\index{adjust\_environment@{adjust\_environment}!Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}}
+\doxysubsubsection{\texorpdfstring{adjust\_environment()}{adjust\_environment()}}
+{\footnotesize\ttfamily adjust\+\_\+environment (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyItemize}
+\item Set {\bfseries{/etc/fstab}}, sync portage tree, select desktop profile ~\newline
+\item Set a set of per-\/package use files and keywords ~\newline
+\item Oneshot emerge of {\bfseries{cmake}} and {\bfseries{lz4}}, prerequisites to {\ttfamily  world } update. \item Update {\ttfamily  world }. Log into emerge.\+build. Exit on error. ~\newline
+\item Set keymaps, localization and time \begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000002}{Todo}}]Add more regional options by parametrization of commandline \end{DoxyRefDesc}
+
+\begin{DoxyRetVals}{Return values}
+{\em Exit} & -\/1 on error at {\ttfamily emerge} stage. \\
+\hline
+\end{DoxyRetVals}
+\end{DoxyItemize}
+
+
+Definition at line 41 of file mkvm\+\_\+chroot.\+sh.
+
+\mbox{\Hypertarget{group__mk_file_system_ga0a168c36e3839b754f641e6639ff2472}\label{group__mk_file_system_ga0a168c36e3839b754f641e6639ff2472}} 
+\index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!build\_kernel@{build\_kernel}}
+\index{build\_kernel@{build\_kernel}!Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}}
+\doxysubsubsection{\texorpdfstring{build\_kernel()}{build\_kernel()}}
+{\footnotesize\ttfamily build\+\_\+kernel (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyItemize}
+\item Emerge {\bfseries{gentoo-\/sources}}, {\bfseries{genkernel}}, {\bfseries{pciutils}} and {\bfseries{linux-\/firmware}} \item Mount /dev/sda2 to /boot/ \item Build kernel and initramfs. Log into kernel.\+log. 
+\begin{DoxyRetVals}{Return values}
+{\em Exit} & -\/1 on error. \\
+\hline
+\end{DoxyRetVals}
+\end{DoxyItemize}
+
+
+Definition at line 157 of file mkvm\+\_\+chroot.\+sh.
+
+\mbox{\Hypertarget{group__mk_file_system_ga9caaa1f5ea6177e55f13ebe7dec2bd60}\label{group__mk_file_system_ga9caaa1f5ea6177e55f13ebe7dec2bd60}} 
+\index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!finalize@{finalize}}
+\index{finalize@{finalize}!Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}}
+\doxysubsubsection{\texorpdfstring{finalize()}{finalize()}}
+{\footnotesize\ttfamily finalize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Unmount chrooted system, restore user rights and shutdown VM. 
+
+\begin{DoxyItemize}
+\item Cleanup {\bfseries{}}.bashrc \item Cleanup other files except for logs if debug mode is on. \item Write zeros as much as possible to prepare for compacting. \end{DoxyItemize}
+
+
+Definition at line 162 of file mkvm.\+sh.
+
+\mbox{\Hypertarget{group__mk_file_system_ga30f3fc39fcff53af9710fea740f38109}\label{group__mk_file_system_ga30f3fc39fcff53af9710fea740f38109}} 
+\index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!global\_config@{global\_config}}
+\index{global\_config@{global\_config}!Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}}
+\doxysubsubsection{\texorpdfstring{global\_config()}{global\_config()}}
+{\footnotesize\ttfamily global\+\_\+config (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyItemize}
+\item Cleanup log, distfiles (for deployment), kernel build sources and objects \item Log this into {\bfseries{log\+\_\+uninstall\+\_\+software}} \item Update {\bfseries{eix}} cache. Sets displaymanager for {\bfseries{xdm}}. \item Add services\+: {\bfseries{sysklog, cronie, xdm, dbus, elogind}} \item Substitute {\bfseries{Network\+Manager}} to temporary networking setup. \item Adjust group and {\bfseries{sudo}} settings for non-\/root user and {\bfseries{sddm}} \item Install {\bfseries{grub}} in E\+FI mode. \item Set passwords for root and non-\/root user. \begin{DoxyWarning}{Warning}
+Fix {\bfseries{sddm}} startup keyboard issue using {\ttfamily  setxkbmap} 
+\end{DoxyWarning}
+\end{DoxyItemize}
+
+
+Definition at line 279 of file mkvm\+\_\+chroot.\+sh.
+
+\mbox{\Hypertarget{group__mk_file_system_gab693423f511d21225dbc60b2782190c3}\label{group__mk_file_system_gab693423f511d21225dbc60b2782190c3}} 
+\index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!install\_software@{install\_software}}
+\index{install\_software@{install\_software}!Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}}
+\doxysubsubsection{\texorpdfstring{install\_software()}{install\_software()}}
+{\footnotesize\ttfamily install\+\_\+software (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyItemize}
+\item Emerge list of ebuilds on top of stage3 and system utils already merged. \item Optionaly download and build R\+Studio 
+\begin{DoxyRetVals}{Return values}
+{\em Exit} & -\/1 on building errors \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000003}{Todo}}]Add a script to build R dependencies \end{DoxyRefDesc}
+\end{DoxyItemize}
+
+
+Definition at line 204 of file mkvm\+\_\+chroot.\+sh.
+
+\mbox{\Hypertarget{group__mk_file_system_ga57eb97a585b6daafed0d93e57b96cca3}\label{group__mk_file_system_ga57eb97a585b6daafed0d93e57b96cca3}} 
+\index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!install\_stage3@{install\_stage3}}
+\index{install\_stage3@{install\_stage3}!Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}}
+\doxysubsubsection{\texorpdfstring{install\_stage3()}{install\_stage3()}}
+{\footnotesize\ttfamily install\+\_\+stage3 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyItemize}
+\item Copy stage3 archive, ebuild list, kernel config and \mbox{\hyperlink{mkvm__chroot_8sh}{mkvm\+\_\+chroot.\+sh}} to /mnt/gentoo \item Extract it, fix basic make.\+conf options \item Install repos.\+conf from live\+CD (networking parameters) \item Mount live\+CD proc/sys/dev files into new filesystem \item On failure, print error codes into file {\bfseries{partition}} \item On success, create empty file {\bfseries{partition}} \item {\ttfamily  chroot } into new system \end{DoxyItemize}
+
+
+Definition at line 88 of file mkvm.\+sh.
+
+\mbox{\Hypertarget{group__mk_file_system_gaa9952b2711fe0413d7a0bc6639c7f5a5}\label{group__mk_file_system_gaa9952b2711fe0413d7a0bc6639c7f5a5}} 
+\index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!partition@{partition}}
+\index{partition@{partition}!Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}}
+\doxysubsubsection{\texorpdfstring{partition()}{partition()}}
+{\footnotesize\ttfamily partition (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Create partition table, {\bfseries{/dev/sda1}} (bios\+\_\+grub), {\bfseries{/dev/sda2}} (boot), {\bfseries{dev/sda3}} (swap) and {\bfseries{/dev/sda4}} (system) 
+
+Create file {\bfseries{partition}}. ~\newline
+ On error, fill this file with successive exit codes of commands and exit.~\newline
+ On success, just create empty file. 
+
+Definition at line 48 of file mkvm.\+sh.
+
+\mbox{\Hypertarget{group__mk_file_system_ga4315b3877c965059c7db8593870066ba}\label{group__mk_file_system_ga4315b3877c965059c7db8593870066ba}} 
+\index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!setup\_network@{setup\_network}}
+\index{setup\_network@{setup\_network}!Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}}
+\doxysubsubsection{\texorpdfstring{setup\_network()}{setup\_network()}}
+{\footnotesize\ttfamily setup\+\_\+network (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Call net-\/setup and dhcpcd to enable networking. 
+
+Create file {\bfseries{setup\+\_\+network}} on success for debugging purposes 
+\begin{DoxyRetVals}{Return values}
+{\em Otherwise} & exit -\/1 on failure \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line 27 of file mkvm.\+sh.
+

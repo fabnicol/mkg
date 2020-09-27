@@ -1,0 +1,220 @@
+.TH "mkFileSystem" 3 "Mon Sep 28 2020" "Version 1.0" "mkgentoo" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+mkFileSystem
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBsetup_network\fP ()"
+.br
+.RI "Call net-setup and dhcpcd to enable networking\&. "
+.ti -1c
+.RI "\fBpartition\fP ()"
+.br
+.RI "Create partition table, \fB/dev/sda1\fP (bios_grub), \fB/dev/sda2\fP (boot), \fBdev/sda3\fP (swap) and \fB/dev/sda4\fP (system) "
+.ti -1c
+.RI "\fBinstall_stage3\fP ()"
+.br
+.ti -1c
+.RI "\fBfinalize\fP ()"
+.br
+.RI "Unmount chrooted system, restore user rights and shutdown VM\&. "
+.ti -1c
+.RI "\fBadjust_environment\fP ()"
+.br
+.ti -1c
+.RI "\fBbuild_kernel\fP ()"
+.br
+.ti -1c
+.RI "\fBinstall_software\fP ()"
+.br
+.ti -1c
+.RI "\fBglobal_config\fP ()"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SH "Function Documentation"
+.PP 
+.SS "adjust_environment ()"
+
+.PD 0
+
+.IP "\(bu" 2
+Set \fB/etc/fstab\fP, sync portage tree, select desktop profile 
+.br
+
+.IP "\(bu" 2
+Set a set of per-package use files and keywords 
+.br
+
+.IP "\(bu" 2
+Oneshot emerge of \fBcmake\fP and \fBlz4\fP, prerequisites to \fC world \fP update\&. 
+.IP "\(bu" 2
+Update \fC world \fP\&. Log into emerge\&.build\&. Exit on error\&. 
+.br
+
+.IP "\(bu" 2
+Set keymaps, localization and time 
+.PP
+\fBTodo\fP
+.RS 4
+Add more regional options by parametrization of commandline 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIExit\fP -1 on error at \fCemerge\fP stage\&. 
+.RE
+.PP
+
+.PP
+
+.PP
+Definition at line 41 of file mkvm_chroot\&.sh\&.
+.SS "build_kernel ()"
+
+.PD 0
+
+.IP "\(bu" 2
+Emerge \fBgentoo-sources\fP, \fBgenkernel\fP, \fBpciutils\fP and \fBlinux-firmware\fP 
+.IP "\(bu" 2
+Mount /dev/sda2 to /boot/ 
+.IP "\(bu" 2
+Build kernel and initramfs\&. Log into kernel\&.log\&. 
+.PP
+\fBReturn values\fP
+.RS 4
+\fIExit\fP -1 on error\&. 
+.RE
+.PP
+
+.PP
+
+.PP
+Definition at line 157 of file mkvm_chroot\&.sh\&.
+.SS "finalize ()"
+
+.PP
+Unmount chrooted system, restore user rights and shutdown VM\&. 
+.PD 0
+
+.IP "\(bu" 2
+Cleanup \fB\fP\&.bashrc 
+.IP "\(bu" 2
+Cleanup other files except for logs if debug mode is on\&. 
+.IP "\(bu" 2
+Write zeros as much as possible to prepare for compacting\&. 
+.PP
+
+.PP
+Definition at line 162 of file mkvm\&.sh\&.
+.SS "global_config ()"
+
+.PD 0
+
+.IP "\(bu" 2
+Cleanup log, distfiles (for deployment), kernel build sources and objects 
+.IP "\(bu" 2
+Log this into \fBlog_uninstall_software\fP 
+.IP "\(bu" 2
+Update \fBeix\fP cache\&. Sets displaymanager for \fBxdm\fP\&. 
+.IP "\(bu" 2
+Add services: \fBsysklog, cronie, xdm, dbus, elogind\fP 
+.IP "\(bu" 2
+Substitute \fBNetworkManager\fP to temporary networking setup\&. 
+.IP "\(bu" 2
+Adjust group and \fBsudo\fP settings for non-root user and \fBsddm\fP 
+.IP "\(bu" 2
+Install \fBgrub\fP in EFI mode\&. 
+.IP "\(bu" 2
+Set passwords for root and non-root user\&. 
+.PP
+\fBWarning\fP
+.RS 4
+Fix \fBsddm\fP startup keyboard issue using \fC setxkbmap\fP 
+.RE
+.PP
+
+.PP
+
+.PP
+Definition at line 279 of file mkvm_chroot\&.sh\&.
+.SS "install_software ()"
+
+.PD 0
+
+.IP "\(bu" 2
+Emerge list of ebuilds on top of stage3 and system utils already merged\&. 
+.IP "\(bu" 2
+Optionaly download and build RStudio 
+.PP
+\fBReturn values\fP
+.RS 4
+\fIExit\fP -1 on building errors 
+.RE
+.PP
+\fBTodo\fP
+.RS 4
+Add a script to build R dependencies 
+.RE
+.PP
+
+.PP
+
+.PP
+Definition at line 204 of file mkvm_chroot\&.sh\&.
+.SS "install_stage3 ()"
+
+.PD 0
+
+.IP "\(bu" 2
+Copy stage3 archive, ebuild list, kernel config and \fBmkvm_chroot\&.sh\fP to /mnt/gentoo 
+.IP "\(bu" 2
+Extract it, fix basic make\&.conf options 
+.IP "\(bu" 2
+Install repos\&.conf from liveCD (networking parameters) 
+.IP "\(bu" 2
+Mount liveCD proc/sys/dev files into new filesystem 
+.IP "\(bu" 2
+On failure, print error codes into file \fBpartition\fP 
+.IP "\(bu" 2
+On success, create empty file \fBpartition\fP 
+.IP "\(bu" 2
+\fC chroot \fP into new system 
+.PP
+
+.PP
+Definition at line 88 of file mkvm\&.sh\&.
+.SS "partition ()"
+
+.PP
+Create partition table, \fB/dev/sda1\fP (bios_grub), \fB/dev/sda2\fP (boot), \fBdev/sda3\fP (swap) and \fB/dev/sda4\fP (system) Create file \fBpartition\fP\&. 
+.br
+ On error, fill this file with successive exit codes of commands and exit\&.
+.br
+ On success, just create empty file\&. 
+.PP
+Definition at line 48 of file mkvm\&.sh\&.
+.SS "setup_network ()"
+
+.PP
+Call net-setup and dhcpcd to enable networking\&. Create file \fBsetup_network\fP on success for debugging purposes 
+.PP
+\fBReturn values\fP
+.RS 4
+\fIOtherwise\fP exit -1 on failure 
+.RE
+.PP
+
+.PP
+Definition at line 27 of file mkvm\&.sh\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for mkgentoo from the source code\&.

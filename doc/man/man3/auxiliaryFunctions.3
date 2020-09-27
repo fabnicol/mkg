@@ -1,0 +1,147 @@
+.TH "auxiliaryFunctions" 3 "Mon Sep 28 2020" "Version 1.0" "mkgentoo" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+auxiliaryFunctions
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBcheck_md5sum\fP (filename)"
+.br
+.RI "Check md5sums in file MD5SUMS\&. "
+.ti -1c
+.RI "\fBlist_block_devices\fP ()"
+.br
+.RI "List all non-loop block devices\&. "
+.ti -1c
+.RI "\fBis_block_device\fP (label)"
+.br
+.RI "Test if argument is non-loop block device\&. "
+.ti -1c
+.RI "\fBget_mountpoint\fP ()"
+.br
+.RI "Gives mount folder from device label input\&. "
+.ti -1c
+.RI "\fBget_device\fP ()"
+.br
+.RI "Give device from mount folder input\&. "
+.ti -1c
+.RI "\fBtest_cdrecord\fP ()"
+.br
+.RI "Test whether \fBcdrecord\fP is functional\&. "
+.ti -1c
+.RI "\fBburn_iso\fP ()"
+.br
+.RI "Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SH "Function Documentation"
+.PP 
+.SS "burn_iso ()"
+
+.PP
+Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&. 
+.PP
+\fBNote\fP
+.RS 4
+\fBcdrecord\fP should have been installed beforehand 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIReturn\fP \fBcdrecord\fP return code 
+.RE
+.PP
+
+.PP
+Definition at line 127 of file utils\&.sh\&.
+.SS "check_md5sum (filename)"
+
+.PP
+Check md5sums in file MD5SUMS\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIfilename\fP Local name of file to be checked for md5sum\&. 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIReturn\fP 0 on success otherwise -1 on exit 
+.RE
+.PP
+
+.PP
+Definition at line 35 of file utils\&.sh\&.
+.SS "get_device ()"
+
+.PP
+Give device from mount folder input\&. 
+.PP
+Definition at line 84 of file utils\&.sh\&.
+.SS "get_mountpoint ()"
+
+.PP
+Gives mount folder from device label input\&. 
+.PP
+Definition at line 70 of file utils\&.sh\&.
+.SS "is_block_device (label)"
+
+.PP
+Test if argument is non-loop block device\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIlabel\fP Label of potential block device (e\&.g\&. \fBsdc\fP) to be tested\&. 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIReturn\fP 0 (true) if input is a block device otherwise 1\&. 
+.RE
+.PP
+
+.PP
+Definition at line 60 of file utils\&.sh\&.
+.SS "list_block_devices ()"
+
+.PP
+List all non-loop block devices\&. 
+.PP
+Definition at line 50 of file utils\&.sh\&.
+.SS "test_cdrecord ()"
+
+.PP
+Test whether \fBcdrecord\fP is functional\&. Try to scan the SCSI bus and exit on error 
+.PP
+\fBWarning\fP
+.RS 4
+There may be a rights issue with versions of \fBcdrecord\fP built from original source as they sometimes request elevated rights to perform burning with some hardware configurations\&. 
+.br
+In such an event, either run script with elevated rights or modify \fBcdrecord\fP rights using:
+.PP
+.nf
+chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord 
+
+.fi
+.PP
+ 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fI0\fP on success otherwise exits -1 on failure\&. 
+.RE
+.PP
+
+.PP
+Definition at line 110 of file utils\&.sh\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for mkgentoo from the source code\&.

@@ -18,13 +18,12 @@
 # * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 # *
 
+## @fn setup_network()
+## @brief Call net-setup and dhcpcd to enable networking
+## @details Create file \b setup_network on success for debugging purposes
+## @retval Otherwise exit -1 on failure
+## @ingroup mkFileSystem
 
-## setup_network
-##
-## Call net-setup and dhcpcd to enable networking
-## Create file \b setup_network on success for debugging purposes
-## Otherwise exit
-## @fn
 setup_network() {
     if test -f setup_network; then
         return
@@ -39,13 +38,13 @@ setup_network() {
     fi
 }
 
-## partition
-##
-## Create partition table, \b /dev/sda1 (bios_grub), \b /dev/sda2 (boot), \b dev/sda3 (swap) and \b /dev/sda4 (system)
-## Create file \b partition.
-## On error, fill this file with successive exit codes of commands and exit.
-## On success, just create empty file.
-## @fn
+## @fn partition()
+## @brief Create partition table, \b /dev/sda1 (bios_grub), \b /dev/sda2 (boot), \b dev/sda3 (swap) and \b /dev/sda4 (system)
+## @details Create file \b partition. @n
+##  On error, fill this file with successive exit codes of commands and exit.@n
+##  On success, just create empty file.
+## @ingroup mkFileSystem
+
 partition() {
     if test -f partition; then
         return
@@ -76,18 +75,18 @@ partition() {
     fi
 }
 
-## install_stage3
-##
-## Copy stage3 archive, ebuild list, kernel config and mkvm_chroot.sh to /mnt/gentoo
-## Extract it, fix basic make.conf options
-## Install repos.conf from liveCD (networking parameters)
-## Mount liveCD proc/sys/dev files into new filesystem
-## On failure, print error codes into file \b partition
-## On success, create empty file \b partition
-## \code chroot \endcode into new system
-## @fn
-install_stage3 {
-    if test -f install_stage3; then
+## @fn install_stage3()
+## @details @li Copy stage3 archive, ebuild list, kernel config and mkvm_chroot.sh to /mnt/gentoo
+## @li Extract it, fix basic make.conf options
+## @li Install repos.conf from liveCD (networking parameters)
+## @li Mount liveCD proc/sys/dev files into new filesystem
+## @li On failure, print error codes into file \b partition
+## @li On success, create empty file \b partition
+## @li <tt> chroot </tt> into new system
+## @ingroup mkFileSystem
+
+install_stage3() {
+    if test -f stage3; then
         return
     fi
     mv -vf ${STAGE3} ${ELIST}  mkvm_chroot.sh ${KERNEL_CONFIG} /mnt/gentoo/
@@ -143,23 +142,23 @@ install_stage3 {
     res4=$?
     res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4}))
     if test ${res} = 0; then
-        touch partition
+        touch stage3
     else
-        echo "parted exit code: ${res0}"    > partition
-        echo "mkfs.fat exit code: ${res1}"  >> partition
-        echo "mkfs.ext4 exit code: ${res2}" >> partition
-        echo "mkswap exit code: ${res3}"    >> partition
-        echo "swapon exit code: ${res4}"    >> partition
+        echo "mounting proc exit code: ${res0}"    > stage3
+        echo "mounting sys exit code: ${res1}"     >> stage3
+        echo "rslave sys exit code: ${res2}"       >> stage3
+        echo "mounting dev dev exit code: ${res3}" >> stage3
+        echo "rslave dev exit code exit code: ${res4}"    >> stage3
         exit -1
     fi
     cd ~
     chroot /mnt/gentoo ./mkvm_chroot.sh
 }
 
-## finalize
-##
-## Unmount chrooted system, restore user rights and shutdown VM
-## @fn
+## @fn finalize()
+## @brief Unmount chrooted system, restore user rights and shutdown VM
+## @ingroup mkFileSystem
+
 finalize() {
     umount -l /mnt/gentoo/dev{/shm,/pts,}
     umount /mnt/gentoo/run

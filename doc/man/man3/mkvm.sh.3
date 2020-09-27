@@ -1,0 +1,30 @@
+.TH "mkvm.sh" 3 "Mon Sep 28 2020" "Version 1.0" "mkgentoo" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+mkvm.sh
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBsetup_network\fP ()"
+.br
+.RI "Call net-setup and dhcpcd to enable networking\&. "
+.ti -1c
+.RI "\fBpartition\fP ()"
+.br
+.RI "Create partition table, \fB/dev/sda1\fP (bios_grub), \fB/dev/sda2\fP (boot), \fBdev/sda3\fP (swap) and \fB/dev/sda4\fP (system) "
+.ti -1c
+.RI "\fBinstall_stage3\fP ()"
+.br
+.ti -1c
+.RI "\fBfinalize\fP ()"
+.br
+.RI "Unmount chrooted system, restore user rights and shutdown VM\&. "
+.in -1c
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for mkgentoo from the source code\&.

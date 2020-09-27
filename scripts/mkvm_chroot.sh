@@ -24,15 +24,15 @@
 ## @brief Creating Gentoo filesystem in virtual disk
 ## @note This file is included into the clonezilla ISO liveCD,
 ## then copied to the root of the virtual disk.
-## @defgroup mkFileSystem Create Gentoo linux filesystem and emerge software.
+## @defgroup mkFileSystem Create Gentoo linux filesystem on VM disk and emerge software.
 
 ## @fn adjust_environment()
 ## @details
 ## @li Set @b /etc/fstab, sync portage tree, select desktop profile @n
 ## @li Set a set of per-package use files and keywords @n
 ## @li Oneshot emerge of @b cmake and @b lz4, prerequisites to
-## <tt> @world </tt> update.
-## @li Update <tt> @world </tt>. Log into emerge.build. Exit on error. @n
+## <tt> world </tt> update.
+## @li Update <tt> world </tt>. Log into emerge.build. Exit on error. @n
 ## @li Set keymaps, localization and time
 ## @todo Add more regional options by parametrization of commandline
 ## @retval Exit -1 on error at <tt>emerge</tt> stage.
