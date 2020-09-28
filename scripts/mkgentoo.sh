@@ -51,8 +51,6 @@
 ## @code mkgento burn usb_device="PNY" usb_installer="Sams" my_gentoo_image.iso @endcode
 ## @defgroup createInstaller Create Gentoo linux image and installer.
 
-cd ..
-
 ## @var CLI
 ## @brief Command line
 ## @ingroup createInstaller
@@ -258,6 +256,7 @@ help() {
 ## @ingroup createInstaller
 
 fetch_livecd() {
+    cd "${VMPATH}"
     local CACHED_ISO="install-${PROCESSOR}-minimal.iso"
     if test ${DOWNLOAD} = "false"; then
         if test -f ${CACHED_ISO}; then
@@ -373,15 +372,15 @@ make_boot_from_livecd() {
     if test ${CREATE_SQUASHFS} = "false"; then
         return 0;
     fi
-    mountpoint -q mnt && sudo umount -l mnt
+    mountpoint -q mnt && umount -l mnt
     if test -d mnt; then
-        sudo rm -rf mnt
+        rm -rf mnt
     fi
     mkdir mnt
-    sudo mount -oloop ${ISO} mnt/
+    mount -oloop ${ISO} mnt/
     ! mountpoint -q mnt && echo "ISO not mounted!" && exit -1
     if test -d mnt2; then
-        sudo rm -rf mnt2
+        rm -rf mnt2
     fi
     mkdir mnt2
     rsync -av mnt/ mnt2
@@ -389,12 +388,14 @@ make_boot_from_livecd() {
     sed -i 's/timeout.*/timeout 1/' isolinux.cfg
     sed -i 's/ontimeout.*/ontimeout gentoo/' isolinux.cfg
     cd ..
-    sudo unsquashfs image.squashfs
+    echo "unsquashfs"
+    unsquashfs image.squashfs
     if test $? != 0; then
         echo "unsquashfs failed !"
         exit -1
     fi
     cd ..
+
     if ! test -f scripts/mkvm.sh; then
         echo "No mkvm.sh script!"
         exit -1
@@ -421,7 +422,6 @@ make_boot_from_livecd() {
         exit -1
     fi
     local sqrt="mnt2/squashfs-root/root/"
-    sudo chown fab ${sqrt}
     mv -vf ${STAGE3} ${sqrt}
     cp -vf scripts/mkvm.sh ${sqrt}
     chmod +x ${sqrt}mkvm.sh
@@ -442,16 +442,15 @@ make_boot_from_livecd() {
     echo  "/bin/bash mkvm.sh"  >> ${rc}
     cd ../..
     rm  image.squashfs
-    sudo mksquashfs squashfs-root/ image.squashfs
-    sudo rm -rf squashfs-root/
+    mksquashfs squashfs-root/ image.squashfs
+    rm -rf squashfs-root/
     cd ..
     mkisofs -J -R -o  ${ISO} -b isolinux/isolinux.bin  -c isolinux/boot.cat  -no-emul-boot -boot-load-size 4  -boot-info-table  mnt2
     if test $? != 0; then
         echo "mkisofs could not recreate the ISO file to boot virtual machine ${VM}"
         exit -1
     fi
-    sudo umount -l mnt
-    sudo chown -R fab .
+    umount -l mnt
     rm -rvf mnt
     rm -rvf mnt2
     return 0
@@ -490,13 +489,18 @@ delete_vm() {
     if test "$(VBoxManage list vms | grep "$1")" != ""; then
         VBoxManage unregistervm "$1" --delete
     fi
+
+    # The following should be unnecessary except for issues with VBoxManage unregistervm
+    # I stubled into such situations a few times
+
     if test -d "${VMPATH}/$1"; then
-        sudo rm -rvf  "${VMPATH}/$1"
+         rm -rvf  "${VMPATH}/$1"
     fi
     res=$?
     if test "$2" != "" -a -f "${VMPATH}/$1.$2"; then
-        sudo rm -f   "${VMPATH}/$1.$2"
+         rm -f   "${VMPATH}/$1.$2"
     fi
+    sed -i -E "s/^.*${VM}.*$//g" er/root/.config/VirtualBox/VirtualBox.xml
     res=$(($? | ${res}))
     return ${res}
 }
@@ -533,6 +537,8 @@ create_vm() {
         echo "${VM} running..."
         sleep 60
     done
+    echo "${VM} has stopped"
+    echo "Compacting VM..."
     VBoxManage modifyhd "${VM}.vdi" --compact
 }
 
@@ -547,7 +553,7 @@ create_vm() {
 
 clonezilla_to_iso() {
     if ! test -f "${VMPATH}/$2"/syslinux/isohdpfx.bin; then
-        sudo cp -vf ${VMPATH}/clonezilla/syslinux/isohdpfx.bin "${VMPATH}/$2"/syslinux
+         cp -vf ${VMPATH}/clonezilla/syslinux/isohdpfx.bin "${VMPATH}/$2"/syslinux
     fi
     xorriso -as mkisofs   -isohybrid-mbr "$2"/syslinux/isohdpfx.bin  \
             -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
@@ -578,41 +584,41 @@ clonezilla_to_iso() {
 
 process_clonezilla_iso() {
     fetch_clonezilla_iso
-    for i in proc sys dev run; do sudo mount -B /$i squashfs-root/$i; done
-    sudo chroot squashfs-root
-    sudo mkdir /boot
-    sudo apt update -yq
-    sudo apt upgrade -yq <<< $(echo N)
+    for i in proc sys dev run; do mount -B /$i squashfs-root/$i; done
+    chroot squashfs-root
+    mkdir /boot
+    apt update -yq
+    apt upgrade -yq <<< $(echo N)
     local headers=$(apt-cache search ^linux-headers | tail -n1 | cut -f 1 -d' ')
     local kernel=$(apt-cache search ^linux-image | grep -v unsigned | tail -n1 | cut -f 1 -d' ')
-    sudo apt install -qy ${headers}
-    sudo apt install -qy ${kernel}
-    sudo apt install -qy build-essential gcc <<< $(echo N)
-    sudo apt install -qy virtualbox-dkms
-    sudo apt install -qy virtualbox-guest-additions-iso
-    sudo mount -oloop /usr/share/virtualbox/VBoxGuestAdditions.iso /mnt
+    apt install -qy ${headers}
+    apt install -qy ${kernel}
+    apt install -qy build-essential gcc <<< $(echo N)
+    apt install -qy virtualbox-dkms
+    apt install -qy virtualbox-guest-additions-iso
+    mount -oloop /usr/share/virtualbox/VBoxGuestAdditions.iso /mnt
     cd /mnt
     /sbin/rcvboxadd quicksetup all
-    sudo /bin/bash VBoxLinuxAdditions.run
+    /bin/bash VBoxLinuxAdditions.run
     cd /
-    sudo umount /mnt
-    sudo apt remove -y -q ${headers} build-essential gcc  virtualbox-guest-additions-iso
-    sudo apt autoremove -y -q
+    umount /mnt
+    apt remove -y -q ${headers} build-essential gcc  virtualbox-guest-additions-iso
+    apt autoremove -y -q
     exit
-    sudo cp -vf --dereference squashfs-root/boot/vmlinuz  vmlinuz
-    sudo cp -vf --dereference squashfs-root/boot/initrd.img  initrd.img
-    sudo rm -rf squashfs-root/boot
-    sudo rm -vf filesystem.squashfs
-    for i in proc sys dev  run; do sudo umount squashfs-root/$i; done
-    sudo mksquashfs squashfs-root filesystem.squashfs
-    sudo rm -rf squashfs-root/
+    cp -vf --dereference squashfs-root/boot/vmlinuz  vmlinuz
+    cp -vf --dereference squashfs-root/boot/initrd.img  initrd.img
+    rm -rf squashfs-root/boot
+    rm -vf filesystem.squashfs
+    for i in proc sys dev  run; do umount squashfs-root/$i; done
+    mksquashfs squashfs-root filesystem.squashfs
+    rm -rf squashfs-root/
     cd "${VMPATH}/mnt2"
-    sudo cp -vf ../clonezilla/savedisk/isolinux.cfg  syslinux
+    cp -vf ../clonezilla/savedisk/isolinux.cfg  syslinux
     cd "${VMPATH}"
-    sudo rm -vf ${CLONEZILLACD}
+    rm -vf ${CLONEZILLACD}
     echo
     clonezilla_to_iso ${CLONEZILLACD} "mnt2"
-    sudo rm -rf mnt2
+    rm -rf mnt2
 }
 
 ## @fn build_virtualbox()
@@ -651,7 +657,8 @@ build_virtualbox() {
 
 create_iso_vm() {
     cd ${VMPATH}
-    process_clonezilla_iso
+     process_clonezilla_iso
+     chown -R ${USER} .
     gpasswd -a ${USER} -g vboxusers
     chgrp vboxusers "ISOFILES/home/partimag/image"
     delete_vm ${ISOVM}
@@ -760,7 +767,7 @@ clonezilla_device_to_image() {
 
     # At this stage USB_DEVICE can no longer be a mountpoint as it has been previously converted to device label
 
-    findmnt /dev/${USB_DEVICE}  && echo "Device ${USB_DEVICE} is mounted to: $(get_mountpoint /dev/${USB_DEVICE})"  && echo "The external USB device should not be mounted"  && echo "Trying to unmount..." && sudo umount -l /dev/${USB_DEVICE}
+    findmnt /dev/${USB_DEVICE}  && echo "Device ${USB_DEVICE} is mounted to: $(get_mountpoint /dev/${USB_DEVICE})"  && echo "The external USB device should not be mounted"  && echo "Trying to unmount..." &&  umount -l /dev/${USB_DEVICE}
     if test $? =0; then
         echo "Managed to unmount /dev/${USB_DEVICE}"
     else
@@ -782,7 +789,7 @@ clonezilla_device_to_image() {
         if test $? != 0; then
             echo "Directory /home/partimag needs elevated rights..."
             echo "Waiting for sudo passwd..."
-            sudo  rm -rf /home/partimag
+              rm -rf /home/partimag
             if test $? != 0; then
                 echo "Could not fix /home/partimag issue."
                 exit -1;
@@ -799,7 +806,7 @@ clonezilla_device_to_image() {
         echo "Could not remove old Clonezilla image"
         exit -1
     fi
-    sudo ln -s  ${VMPATH}/ISOFILES/home/partimag/image  /home/partimag
+     ln -s  ${VMPATH}/ISOFILES/home/partimag/image  /home/partimag
     /usr/sbin/ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5 \
                      -i 40960000000 -fsck -senc -p poweroff savedisk gentoo.img ${USB_DEVICE}
     if test $? = 0 -a -f /home/partimag/gentoo.img; then
@@ -888,11 +895,11 @@ cleanup() {
     rm *.iso
     rm -rf ISOFILES
     if test -d mnt; then
-        sudo umount -l mnt
+         umount -l mnt
         rmdir mnt
     fi
     if test -d mnt2; then
-        sudo rm -rf mnt2
+         rm -rf mnt2
     fi
     rm -rvf ${VM}
     rm -vf ${VM}.vdi
@@ -944,7 +951,6 @@ generate_Gentoo() {
 main() {
 
 # Help cases
-
 if test "$(echo ${CLI} | sed 's/help_md//' )" != "${CLI}"; then
     help_md
     exit 0
@@ -954,11 +960,10 @@ if test "$(echo ${CLI} | sed 's/help//' )" != "${CLI}"; then
     exit 0
 fi
 echo
-
 # Analyse commandline and source auxiliary files
-
 test_cli_pre
 for ((i=0; i<ARRAY_LENGTH; i++)) ; do test_cli $i; done
+cd ${VMPATH}
 test_cli_post
 source scripts/fetch_clonezilla_iso.sh
 source scripts/utils.sh

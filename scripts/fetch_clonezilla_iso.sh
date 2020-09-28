@@ -49,10 +49,10 @@ fetch_clonezilla_iso() {
 
     # now mount and unsquashfs
 
-    if ! test -d mnt; then sudo rm -rf mnt; mkdir mnt; fi
-    if ! test -d mnt2; then sudo rm -rf mnt2; mkdir mnt2; fi
+    if ! test -d mnt; then  rm -rf mnt; mkdir mnt; fi
+    if ! test -d mnt2; then  rm -rf mnt2; mkdir mnt2; fi
 
-    if ! $(sudo mount -oloop ${CLONEZILLACD} ./mnt); then
+    if ! $( mount -oloop ${CLONEZILLACD} ./mnt); then
         echo "Could not mount ${CLONEZILLACD} to mnt"
         exit -1
     fi
@@ -61,15 +61,14 @@ fetch_clonezilla_iso() {
         exit -1
     fi
     cd mnt2/live
-    if ! $(sudo unsquashfs filesystem.squashfs); then
+    if ! $( unsquashfs filesystem.squashfs); then
         echo "Failed to unsquash clonezilla's filesystem.squashfs"
         exit -1
     fi
-    cp ${VMPATH}
+    cd ${VMPATH}
     rm -rf ISOFILES/*
     rsync mnt2/ ISOFILES
     cp -vf clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux/
-    cd -
-    sudo cp -vf /etc/resolv.conf squashfs-root/etc
+     cp -vf /etc/resolv.conf mnt2/live/squashfs-root/etc
     return 0
 }

@@ -28,12 +28,12 @@ setup_network() {
     if test -f setup_network; then
         return
     fi
-    local   eth=$(ifconfig | cut -f1 -d' ' | line | cut -f1 -d':')
-    net-setup  $eth #enp0s3
-    dhcpcd -HD $eth #enp0s3
+    net-setup
     if test $? = 0; then
         touch setup_network
     else
+        echo "Could not fix internet access"
+        sleep 10
         exit -1
     fi
 }
@@ -71,6 +71,8 @@ partition() {
         echo "mkswap exit code: ${res3}"    >> partition
         echo "swapon exit code: ${res4}"    >> partition
         echo "mount exit code:  ${res5}"    >> partition
+        echo "Failed to partition main disk"
+        sleep 10
         exit -1
     fi
 }
@@ -100,6 +102,7 @@ install_stage3() {
     tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
     if test $? != 0; then
         echo "stage3 tarball could not be extracted"
+        sleep 10
         exit -1
     fi
     cat temp_bashrc >> .bashrc
@@ -149,10 +152,12 @@ install_stage3() {
         echo "rslave sys exit code: ${res2}"       >> stage3
         echo "mounting dev dev exit code: ${res3}" >> stage3
         echo "rslave dev exit code exit code: ${res4}"    >> stage3
+        echo "Failed to bind liveCD to main disk"
+        sleep 10
         exit -1
     fi
     cd ~
-    chroot /mnt/gentoo ./mkvm_chroot.sh
+    chroot /mnt/gentoo /bin/bash mkvm_chroot.sh
 }
 
 ## @fn finalize()
@@ -165,14 +170,14 @@ finalize() {
     umount /mnt/gentoo/proc
     umount /mnt/gentoo/sys
     umount -R -l  /mnt/gentoo
-    chown -R fab:fab /home/fab
+    chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}
     shutdown -h now
 }
 
 # Logging will only subsist as long as the liveCD is not shut down
 # Logs are provided for debugging purposes
 
-setup_network  | tee setup_network
-partition      | tee partition
-install_stage3 | tee install_stage3
-finalize       | tee finalize
+setup_network  | tee setup_network.log
+partition      | tee partition.log
+install_stage3 | tee install_stage3.log
+finalize       | tee finalize.log

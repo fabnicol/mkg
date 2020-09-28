@@ -55,10 +55,14 @@ adjust_environment() {
     source /etc/profile
 
     # Refresh and rebuild @world
+    # frequently emerge complains about having to be upgraded before anything else.
+    # We shall use emerge-webrsync as emerge --sync is a bit less robust (rsync rotation bans...)
 
-    emerge --sync --quiet
+    emerge-webrsync
+    emerge -1 sys-apps/portage
     if test $? != 0; then
-        echo "emerge --sync failed!"
+        echo "emerge-webrsync failed!"
+	exit -1
     fi
     local profile=$(eselect profile list | grep desktop | grep plasma | grep ${PROCESSOR} | grep -v systemd | tail -1 | cut -f1 -d'[' | cut -f1 -d']')
     eselect profile set ${profile}
@@ -96,6 +100,7 @@ adjust_environment() {
     USE='-qt5' emerge -1 cmake
     if test $? != 0; then
         echo "emerge cmake failed!"
+	exit -1
     fi
 
     # LZ4 is a kernel dependency for newer linux kernels.
