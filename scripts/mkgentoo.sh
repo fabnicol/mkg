@@ -960,8 +960,8 @@ echo
 test_cli_pre
 for ((i=0; i<ARRAY_LENGTH; i++)) ; do test_cli $i; done
 test_cli_post
-source fetch_clonezilla_iso.sh
-source utils.sh
+source scripts/fetch_clonezilla_iso.sh
+source scripts/utils.sh
 
 # if an Gentoo has already been built into an ISO image or on an external device
 # skip generating it; otherwise go for it
