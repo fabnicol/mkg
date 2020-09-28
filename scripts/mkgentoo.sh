@@ -718,6 +718,8 @@ clone_vm_to_raw() {
 }
 
 ## @fn dd_to_usb()
+## @brief Bare-metal copy of temporary RAW disk to external device
+## @note Used only if vbox-img (patched version) has not been built.
 ## @ingroup createInstaller
 
 dd_to_usb() {
@@ -742,6 +744,9 @@ dd_to_usb() {
 }
 
 ## @fn clonezilla_device_to_image()
+## @brief Create CloneZilla xz-compressed image out of an external block device (like a USB stick)
+## @details Image is created under ISOFILES/home/partimag/image under VMPATH
+## @retval 0 on success otherwise exits -1 on failure
 ## @ingroup createInstaller
 
 clonezilla_device_to_image() {
@@ -807,6 +812,10 @@ clonezilla_device_to_image() {
 }
 
 ## @fn vbox_img_works()
+## @brief Test if \b vbox-img is functional
+## @details \b vbox-img is a script; it refers to \b vbox-img.bin, which is a soft link to the VirtuaBox patched build.
+## @retval 0 if vbox-img --version is non-empty
+## @retval 1 otherwise
 ## @ingroup createInstaller
 
 vbox_img_works() {
@@ -817,7 +826,6 @@ vbox_img_works() {
     if test -L bin/vbox-img.bin -a -f bin/vbox-img; then
         vbox_version=$(bin/vbox-img --version)
         if test "${vbox_version}" != ""; then
-
             return 0
         fi
     else
@@ -826,6 +834,13 @@ vbox_img_works() {
 }
 
 ## @fn create_usb_system()
+## @brief Clone VDI virtual disk to external device (like a USB stick)
+## @details Two options are available. If vbox-img (patched) is functional
+## after building VirtualBox from source, then use it and clone VDI directly
+## to external device. Otherwise create a temporary RAW file and bare-metal copy
+## this file to external device.
+## @retval In the first case, the exit code of #clone_vm_to_device
+## @retval In the second case, the exit code of #dd_to_usb following #clone_vm_to_raw
 ## @ingroup createInstaller
 
 create_usb_system() {
@@ -858,20 +873,10 @@ create_usb_system() {
             exit -1
         fi
     fi
-    echo "Launching Clonezilla to create compressed image..."
-    echo
-
-    # Succeeds or exits
-
-    if test ${CREATE_ISO} = "true"; then
-        clonezilla_device_to_image
-    else
-        cleanup
-        exit 0
-    fi
 }
 
 ## @fn cleanup()
+## @brief Clean up all temporary files and directpries (except for VirtualBox build)
 ## @ingroup createInstaller
 
 cleanup() {
