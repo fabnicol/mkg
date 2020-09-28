@@ -140,20 +140,22 @@ Warning: you should have at least 55 GB of free disk space in the current direct
   
 **Switches:**  
   
-Boolean values are either 'true' or 'false'. For example, to build a minimal distribution, specify:  
+Boolean values are either 'true' or 'false'. For example, to build a minimal distribution, specify on command line:  
+  
 >  minimal=true  
-  
-on command line.  
-  
+       
+       
+
  | switch | description | default value |  
  |:-----:|:--------:|:-----:|  
-| minimal 	| Remove *libreoffice* and *data science tools* from default list of installed software 	| [false] |  
+| debug_mode 	| Do not clean up mkgentoo custom logs at root of gentoo system files before VM shutdown. Boolean. 	| [false] |  
+| minimal 	| Remove *libreoffice* and *data science tools* from default list of installed software. Boolean. 	| [false] |  
 | elist 	| 	 File containing a list of Gentoo ebuilds to add to the VM on top of stage3 	| [ebuilds.list] |  
 | vm 	| 	 Virtual Machine name 	| [Gentoo] |  
 | vbpath 	| Path to VirtualBox directory 	| [/usr/bin] |  
 | vmpath 	| Path to VM base directory 	| [/home/fab/Dev/mkgentoo] |  
 | mem 	| 	 VM RAM memory in MiB 	| [8000] |  
-| ncpus 	| 	 Number of VM CPUs 	| [4] |  
+| ncpus 	| 	 Number of VM CPUs. By default the third of available threads. 	| [4] |  
 | processor 	| Processor type 	| [amd64] |  
 | size 	| 	 Dynamic disc size 	| [55000] |  
 | livecd 	| Path to the live CD that will start the VM 	| [gentoo.iso] |  
@@ -166,21 +168,29 @@ on command line.
 | nonroot_user 	| Non-root user 	| [fab] |  
 | passwd 	| User password 	| [dev20] |  
 | rootpasswd 	| Root password 	| [dev20] |  
-| download 	| Download install ISO image from Gentoo mirror 	| [true] |  
-| download_stage3 	| Download and install stage3 tarball to virtual disk 	| [true] |  
-| download_rstudio 	| Download and build RStudio 	| [true] |  
-| download_clonezilla 	| Refresh CloneZilla ISO download 	| [false] |  
-| donwload_clonezilla_path 	| Use the following CloneZilla ISO 	| [https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download] |  
+| download 	| Download install ISO image from Gentoo mirror. Boolean. 	| [true] |  
+| download_stage3 	| Download and install stage3 tarball to virtual disk. Booelan. 	| [true] |  
+| download_rstudio 	| Download and build RStudio. Boolean. 	| [true] |  
+| download_clonezilla 	| Refresh CloneZilla ISO download. Boolean 	| [true] |  
+| download_clonezilla_path 	| Use the following CloneZilla ISO 	| [https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download] |  
+| build_virtualbox 	| Download code source and automatically build virtualbox and tools 	| [false] |  
+| vbox_version 	| Virtualbox version 	| [6.1.14] |  
+| vbox_version_full 	| Virtualbox full version 	| [6.1.14a] |  
+| lineno_patch 	| Line patched against vbox-img.cpp in virtualbox source code 	| [797] |  
 | stage3 	| Path to stage3 archive 	| [stage3.tar.xz] |  
-| create_squashfs 	| (Re)create the squashfs filesystem 	| [true] |  
+| create_squashfs 	| (Re)create the squashfs filesystem. Boolean. 	| [true] |  
 | vmtype 	| gui or headless (silent) 	| [headless] |  
 | kernel_config 	| Use a custom kernel config file 	| [.config] |  
 | language 	| Set default login keyboard layout 	| [us] |  
-| burn 	| Burn to optical disc. Argument is either a device label (e.g. cdrom, sr0) or a mountpoint directory. 	| [false] |  
-| scsi_address 	| In case of several optical disc burners, specify the SCSI address as x,y,z 	| [0,0,0] |  
-| usb_device 	| Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory. 	| [] |  
-| usb_installer 	| Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory. If unspecified, usb_device value will be used. OS Gentoo will be replaced by Clonezilla installer. 	| [] |  
-| disable_md5_check 	| Disable MD5 checkums verification after downloads 	| [true] |  
-| cleanup 	| Cleanup archives, images and virtual machine after successful completion 	| [true] |  
+| burn 	| Burn to optical disc. Boolean. 	| [false] |  
+| cdrecord 	| cdrecord path. Automatically determined if left unspecified. 	| [/usr/local/bin/cdrecord] |  
+| scsi_address 	| In case of several optical disc burners, specify the SCSI address as x,y,z 	| [] |  
+| usb_device 	| Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory (if mounted), or a few consecutive letters of the model (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such. 	| [] |  
+| usb_installer 	| Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer. 	| [] |  
+| disable_md5_check 	| Disable MD5 checkums verification after downloads. Boolean. 	| [true] |  
+| cleanup 	| Clean up archives, temporary images and virtual machine after successful completion. Boolean. 	| [true] |  
 | help 	| 	 This help 	| [] |  
+| from_vm 	| Do not generate Gentoo but use the VM . Boolean. 	| [false] |  
+| from_iso 	| Do not generate Gentoo but use the bootable ISO given on commandline. Boolean. 	| [false] |  
+| from_device 	| Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean. 	| [false] |  
 
