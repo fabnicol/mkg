@@ -1,3 +1,4 @@
+[gentoo-creator](gentoo.png)
 # Gentoo-light
 ## A light Gentoo distribution for GNU/Linux developers            
 
