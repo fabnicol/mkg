@@ -1,4 +1,4 @@
-.TH "mkgentoo.sh" 3 "Mon Sep 28 2020" "Version 1.0" "mkgentoo" \" -*- nroff -*-
+.TH "mkgentoo.sh" 3 "Tue Sep 29 2020" "Version 1.0" "mkgentoo" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -83,18 +83,23 @@ Upgrade it with virtualbox guest additions\&. "
 .ti -1c
 .RI "\fBdd_to_usb\fP ()"
 .br
+.RI "Bare-metal copy of temporary RAW disk to external device\&. "
 .ti -1c
 .RI "\fBclonezilla_device_to_image\fP ()"
 .br
+.RI "Create CloneZilla xz-compressed image out of an external block device (like a USB stick) "
 .ti -1c
 .RI "\fBvbox_img_works\fP ()"
 .br
+.RI "Test if \fBvbox-img\fP is functional\&. "
 .ti -1c
 .RI "\fBcreate_usb_system\fP ()"
 .br
+.RI "Clone VDI virtual disk to external device (like a USB stick) "
 .ti -1c
 .RI "\fBcleanup\fP ()"
 .br
+.RI "Clean up all temporary files and directpries (except for VirtualBox build) "
 .ti -1c
 .RI "\fBgenerate_Gentoo\fP ()"
 .br
@@ -223,7 +228,7 @@ Definition in file \fBmkgentoo\&.sh\fP\&.
 .SS "Exported String PATH = ${PATH}:${VBPATH}"
 
 .PP
-Definition at line 515 of file mkgentoo\&.sh\&.
+Definition at line 519 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for mkgentoo from the source code\&.

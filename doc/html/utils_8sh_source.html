@@ -215,8 +215,24 @@ $(function() {
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;       ${CDRECORD} -eject dev=${SCSI_ADDRESS} <span class="stringliteral">&quot;${ISO_OUTPUT}&quot;</span></div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    fi</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;}</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="preprocessor">## @fn create_install_usb_device()</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="preprocessor">## @brief Create USB-stick (or any external device) Gentoo clonezilla installer</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="preprocessor">## @warning Use with care, check your USB_DEVICE variable.</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="preprocessor">## @ingroup createInstaller</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
+<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="group__create_installer.html#ga532879314181eb08a603971d9ac2b2f3">  154</a></span>&#160;<a class="code" href="group__create_installer.html#ga532879314181eb08a603971d9ac2b2f3">create_install_usb_device</a>() {</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    res=0</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    echo <span class="stringliteral">&quot;Creating installation stick...&quot;</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    dd <span class="keywordflow">if</span>=<span class="stringliteral">&quot;${ISO_OUTPUT}&quot;</span> of=/dev/${USB_DEVICE} bs=4M status=progress</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    res=$?</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    sync</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    res=$? | res</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordflow">return</span> ${res}</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="agroup__auxiliary_functions_html_ga913689f9801eab383c4187327367e870"><div class="ttname"><a href="group__auxiliary_functions.html#ga913689f9801eab383c4187327367e870">check_md5sum</a></div><div class="ttdeci">check_md5sum(filename)</div><div class="ttdoc">Check md5sums in file MD5SUMS.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00035">utils.sh:35</a></div></div>
+<div class="ttc" id="agroup__create_installer_html_ga532879314181eb08a603971d9ac2b2f3"><div class="ttname"><a href="group__create_installer.html#ga532879314181eb08a603971d9ac2b2f3">create_install_usb_device</a></div><div class="ttdeci">create_install_usb_device()</div><div class="ttdoc">Create USB-stick (or any external device) Gentoo clonezilla installer.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00154">utils.sh:154</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_ga37ccab4be14da0e5c11e2e176e48f36a"><div class="ttname"><a href="group__auxiliary_functions.html#ga37ccab4be14da0e5c11e2e176e48f36a">burn_iso</a></div><div class="ttdeci">burn_iso()</div><div class="ttdoc">Burn Gentoo clonezilla installer to DVD using cdrecord.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00127">utils.sh:127</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_ga08542b578002f8342cd3e0a5252b5543"><div class="ttname"><a href="group__auxiliary_functions.html#ga08542b578002f8342cd3e0a5252b5543">test_cdrecord</a></div><div class="ttdeci">test_cdrecord()</div><div class="ttdoc">Test whether cdrecord is functional.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00110">utils.sh:110</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_ga25a80837ae3373590d59e5d558c1ab83"><div class="ttname"><a href="group__auxiliary_functions.html#ga25a80837ae3373590d59e5d558c1ab83">list_block_devices</a></div><div class="ttdeci">list_block_devices()</div><div class="ttdoc">List all non-loop block devices.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00050">utils.sh:50</a></div></div>
