@@ -1,4 +1,3 @@
-[gentoo-creator](gentoo.png)
 # Gentoo creator
 ## A building tool for a lightweight Gentoo GNU/Linux distribution
 
