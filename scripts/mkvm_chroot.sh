@@ -290,20 +290,30 @@ global_config() {
 
     # kernel sources will have to be reinstalled by user if necessary
 
-    emerge --unmerge gentoo-sources  2>&1 | tee log_uninstall_software
-    emerge --depclean   2>&1              | tee log_uninstall_software
-    rm -rf /usr/src/linux/*               | tee log_uninstall_software
+    emerge --unmerge gentoo-sources  2>&1 | tee log_uninstall_software.log
+    emerge --depclean   2>&1              | tee log_uninstall_software.log
+    rm -rf /usr/src/linux/*               | tee log_uninstall_software.log
     eix-update
 
+    # Idealy the installers should do:
+    # emerge gentoo-sources
+    # cd /usr/src/linux
+    # cp -f /boot/config* .config
+    # make syncconfig
+    # make modules_prepare
+    # for the sake of ebuilds requesting prepared kernel sources
+    # TODO: test ocs-run post_run commands.
+    # Also for usb_installer=... *alone* the above code could be deactivated. But then a later from_vm call would have to clean sources to lighten the resulting ISO clonezilla image.
+
     # Configuration
-    # # sddm
+    #-- sddm
 
     echo "#!/bin/sh"                   > /usr/share/sddm/scripts/Xsetup
     echo "setxkbmap ${LANGUAGE},us"    > /usr/share/sddm/scripts/Xsetup
     chmod +x /usr/share/sddm/scripts/Xsetup
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' /etc/conf.d/xdm
 
-    # Services
+    #-- Services
 
     rc-update add sysklogd default
     rc-update add cronie default
@@ -311,24 +321,24 @@ global_config() {
     rc-update add dbus default
     rc-update add elogind boot
 
-    # # Networkmanager
+    #-- Networkmanager
 
     for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done
     rc-update del dhcpcd default
     rc-update add NetworkManager default
 
-    # groups and sudo
+    #-- groups and sudo
 
     useradd -m -G users,wheel,audio,video,plugdev,sudo  -s /bin/bash ${NONROOT_USER}
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
     gpasswd -a sddm video
 
-    # Creating the bootloader
+    #-- Creating the bootloader
 
     grub-install --target=x86_64-efi --efi-directory=/boot --removable
     grub-mkconfig -o /boot/grub/grub.cfg
 
-    # Passwords
+    #-- Passwords
 
     echo ${NONROOT_USER}:${PASSWD}  | chpasswd
     echo root:${ROOTPASSWD} | chpasswd
