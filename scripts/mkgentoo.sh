@@ -634,7 +634,7 @@ build_virtualbox() {
     cd ${VMPATH}
     cp -vf clonezilla/build/* ${CLONEZILLACD}/live
     cd ${CLONEZILLACD}/live
-    ./build_clonezilla.sh
+    ./build_virtualbox.sh
     cd ${VMPATH}
 }
 

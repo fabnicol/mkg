@@ -79,6 +79,10 @@ following features:
 
 ## Other options   
 
+* The default user is **fab** with password **dev20** (same as root). You can
+  specify other choices by adding `nonroot_user=name_of_user` and
+  `passwd=password_of_user` to commandline.
+
 * To create a direct install of Gentoo to e.g. block device `/dev/sdc` add `usb_device=/dev/sdc` to commandine.  
 
 * To create a USB stick CloneZilla installer (or recovery medium) on device `/dev/sdf` add `usb_installer=/dev/sdf` to commandline  
@@ -96,10 +100,6 @@ following features:
   add your configuration file with option:
       `kernel_config=/path/to/cutom/config/file`
 
-* The default user is **fab** with password **dev20** (same as root). You can
-  specify other choices by adding `nonroot_user=name_of_user` and
-  `passwd=password_of_user` to commandline.
-
 * If your PC was made prior to 2015, its processor may not enable
   the AVX2 register, which is set as a global compiling option.
   In this case you should tweak the building process by adding:   
@@ -108,9 +108,11 @@ following features:
 
 * For COREi7 and higher-end processors, you may tweak the `cflags` option
   at your own risk. A good option is `cflags="-native -O2"`.    
+  
+* You can optionnay build a patched version of VirtualBox. This version will noticeably speed up direct install of the OS to external block devices (thanks to a patch against `vbox-img`). You will have to manually add the root directory to your PATH variable and either uninstall the vanilla version of VirtualBox or place the root directory in the PATH so that the patched version gainst precedence.  
 
 ## Warning
-Building the platforms comes in with four dedicated cores as a default.   
+Building the platforms comes in with the third of available threads as a default.   
 If resources are strained, rerun with N cores by adding `ncpus=N`
 to commandline.    
 The `ncpus` number of jobs is used to implement the portage `CFLAGS`
