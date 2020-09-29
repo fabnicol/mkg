@@ -486,7 +486,7 @@ delete_vm() {
     if test_vm_running "$1"; then
         VBoxManage startvm $1 --type emergencystop
     fi
-    if test "$(VBoxManage list vms | grep "$1")" != ""; then
+    if test "$(VBoxManage list vms | grep \"$1\")" != ""; then
         VBoxManage unregistervm "$1" --delete
     fi
 
@@ -500,7 +500,7 @@ delete_vm() {
     if test "$2" != "" -a -f "${VMPATH}/$1.$2"; then
          rm -f   "${VMPATH}/$1.$2"
     fi
-    sed -i -E "s/^.*${VM}.*$//g" er/root/.config/VirtualBox/VirtualBox.xml
+    sed -i -E "s/^.*${VM}.*$//g" /root/.config/VirtualBox/VirtualBox.xml
     res=$(($? | ${res}))
     return ${res}
 }
@@ -518,7 +518,7 @@ delete_vm() {
 create_vm() {
     export PATH=${PATH}:${VBPATH}
     cd ${VMPATH}
-    delete_vm ${VM} "vdi"
+    delete_vm "${VM}" "vdi"
     VBoxManage createvm --name "${VM}" --ostype gentoo_64  --register  --basefolder "${VMPATH}"
     VBoxManage modifyvm "${VM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
     VBoxManage createhd --filename "${VM}.vdi" --size ${SIZE} --variant Standard
@@ -657,8 +657,8 @@ build_virtualbox() {
 
 create_iso_vm() {
     cd ${VMPATH}
-     process_clonezilla_iso
-     chown -R ${USER} .
+    process_clonezilla_iso
+    chown -R ${USER} .
     gpasswd -a ${USER} -g vboxusers
     chgrp vboxusers "ISOFILES/home/partimag/image"
     delete_vm ${ISOVM}
