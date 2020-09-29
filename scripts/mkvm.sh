@@ -28,11 +28,15 @@ setup_network() {
     if test -f setup_network; then
         return
     fi
-    net-setup
+    if test "${VMTYPE}" = "gui"; then
+        dhcpcd -HD $(ifconfig | cut -f1 -d' ' | line | cut -f1 -d':')
+    else
+        net-setup
+    fi
     if test $? = 0; then
         touch setup_network
     else
-        echo "Could not fix internet access"
+        echo "Could not fix internet access" | tee setup_network.log
         sleep 10
         exit -1
     fi
