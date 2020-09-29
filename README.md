@@ -1,6 +1,6 @@
 [gentoo-creator](gentoo.png)
-# Gentoo-light
-## A light Gentoo distribution for GNU/Linux developers            
+# Gentoo creator
+## A building tool for a lightweight Gentoo GNU/Linux distribution
 
 ### Purpose
 
