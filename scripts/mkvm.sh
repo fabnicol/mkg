@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # *
 # * Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
 # *
@@ -28,22 +30,25 @@ setup_network() {
     if test -f setup_network; then
         return
     fi
-    net-setup
-    sleep 40
+    if test "${VMTYPE}" = "headless"; then
+
+        # currently does not work for murky reasons.
+
+        dhcpcd $(ifconfig  | cut -f1 -d' ' | head -n 1 | cut -f1 -d':')
+    else
+        net-setup
+    fi
     if test $? = 0; then
+
         touch setup_network
     else
         echo "Could not fix internet access!" | tee setup_network.log
-        sleep 10
         if test "${VMTYPE}" = "gui"; then
             exit -1
-        else
-
-            # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
-
-            shutdown -h now
+         else
+             # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
+             shutdown -h now
         fi
-
     fi
 }
 
@@ -55,7 +60,8 @@ setup_network() {
 ##  On success, just create empty file.
 ## @warning The VM needs time to recognize /dev/sda in some cases, for unclear reasons.
 ## This may be a kernel issue or a VirtualBox issue.
-## @bug  Same issue with mkswap and swapon. Syncing and a bit of sleep fixed these issues.
+## @bug  Same issue with mkswap and swapon. Cleaning VBox config/settings, syncing and a bit of sleep fixed these issues for the \e net-setup method.
+## @bug However the \e dhcpcd method is consistently broken, which currently blocks headless vmtypes.
 ## @note It might be necessary with older machines to increase the amount of sleep.
 ## @ingroup mkFileSystem
 
@@ -63,6 +69,7 @@ partition() {
     if test -f partition; then
         return
     fi
+    sleep 5
     parted --script --align=opt /dev/sda "mklabel gpt unit mib mkpart primary 1 3 name 1 grub set 1 bios_grub on mkpart primary 3 131  name 2 boot mkpart primary 131 643 name 3 swap mkpart primary 643 -1 set 2 boot on"
     res0=$?
 
@@ -70,7 +77,7 @@ partition() {
     # thereby thwarting filesystem authoring. This insane beavior has been circumvented by syncing,
     # testing for mount and umounting should the case arise. This has even occurred with the swap partition.
     sync
-    sleep 20
+    sleep 5
     mkfs.fat -v -F 32 /dev/sda2
     res1=$?
     sync

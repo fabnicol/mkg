@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ##
 # Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
 #
@@ -17,8 +19,6 @@
 # License along with FFmpeg; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 ##
-
-#!/bin/bash
 
 ## @mainpage Usage
 ## @brief In a nutshell
@@ -85,6 +85,7 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "ncpus"       "\t Number of VM CPUs. By default the third of available threads."    "$(($(nproc --all)/3))"
      "processor"   "Processor type"                                                      "amd64"
      "size"        "\t Dynamic disc size"                                                "55000"
+     "medium_type" "normal or immutable (write only while VM runs). Use standard for debugging."                  "immutable"
      "livecd"      "Path to the live CD that will start the VM"                          "gentoo.iso"
      "mirror"      "Mirror site for downloading of stage3 tarball"                       "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
      "emirrors"    "Mirror sites for downloading ebuilds"                                "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
@@ -149,7 +150,6 @@ test_cli_pre() {
         echo "Please update and reinstall"
         exit -1
     fi
-
     declare -r -x ISO_OUTPUT=$(echo ${CLI} | sed -E 's/.*(\b\w+)\.(iso|ISO)/\1\.iso/')
     if test "${ISO_OUTPUT}" != "" -a "${ISO_OUTPUT}" != "${CLI}"; then
         echo "Build Gentoo distribution to bootable ISO output ${ISO_OUTPUT}"
@@ -249,7 +249,6 @@ help_md() {
         declare -i def=i*3+2
         echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [${ARR[def]}] |  "
     done
-    echo
 }
 
 ## @fn help()
@@ -270,14 +269,16 @@ fetch_livecd() {
     cd "${VMPATH}"
     local CACHED_ISO="install-${PROCESSOR}-minimal.iso"
     if test ${DOWNLOAD} = "false"; then
-        if test -f ${CACHED_ISO}; then
-            cp -vf ${CACHED_ISO} ${ISO}
-            LIVECD=${ISO}
-            return 0
-        else
-            echo "No ISO file was found, please rerun with download=true"
-            exit -1
+        if test "${CREATE_SQUASHFS}" = "true"; then
+            if test -f ${CACHED_ISO}; then
+                cp -vf ${CACHED_ISO} ${ISO}
+            else
+                echo "No ISO file was found, please rerun with download=true"
+                exit -1
+            fi
         fi
+        LIVECD=${ISO}
+        return 0
     fi
     rm install-${PROCESSOR}-minimal*\.iso*
     rm latest-install-${PROCESSOR}-minimal*\.txt*
@@ -380,7 +381,8 @@ make_boot_from_livecd() {
         echo "No active ISO file in current directory!"
         exit -1
     fi
-    if test ${CREATE_SQUASHFS} = "false"; then
+    if test "${CREATE_SQUASHFS}" != "true"; then
+        echo "Reusing ${ISO} which was previously created... use this option with care if only you have run mkgentoo before."
         return 0;
     fi
     mountpoint -q mnt && umount -l mnt
@@ -406,7 +408,6 @@ make_boot_from_livecd() {
         exit -1
     fi
     cd ..
-
     if ! test -f scripts/mkvm.sh; then
         echo "No mkvm.sh script!"
         exit -1
@@ -480,6 +481,21 @@ test_vm_running() {
     return 1
 }
 
+deep_clean() {
+    echo "Cleaning up hard disks in config file because of inconsistencies in VM settings"
+    /etc/init.d/virtualbox stop
+     sed -i  '/^.*HardDisk.*$/d' /root/.config/VirtualBox/VirtualBox.xml
+     sed -i -E  's/^(.*)<MediaRegistry>.*$/\1<MediaRegisty\/>/g' /root/.config/VirtualBox/VirtualBox.xml
+     sed -i '/^.*<\/MediaRegistry>.*$/d' /root/.config/VirtualBox/VirtualBox.xml
+     sed -i  '/^[[:space:]]*$/d' /root/.config/VirtualBox/VirtualBox.xml
+
+     # It is necessary to sleep a bit otherwise doaemons will wake up with inconstitencies
+
+     sleep 10
+    /etc/init.d/virtualbox start
+}
+
+
 ## @fn delete_vm()
 ## @param vm VM name
 ## @param ext virtual disk extension, without dot (defaults to "vdi").
@@ -492,26 +508,45 @@ test_vm_running() {
 
 delete_vm() {
     if test_vm_running "$1"; then
+        echo "Powering off $1"
         VBoxManage controlvm "$1" poweroff
     fi
     if test_vm_running "$1"; then
+        echo "Emergency stop for $1"
         VBoxManage startvm $1 --type emergencystop
     fi
+    echo "Closing medium $1.$2"
+    vboxmanage storageattach "$1" --storagectl "SATA Controller" --port 0 --medium none 2>/dev/null 1>/dev/null
+    vboxmanage closemedium  disk "${VMPATH}/$1.$2" --delete 2>/dev/null 1>/dev/null
+    if test $? != 0; then
+
+        # last resort. Happens when debugging with successive VMS and not enough wait time for daemons to clean up the mess
+        # one nees to deep-clean twice
+        deep_clean
+    fi
     if test "$(VBoxManage list vms | grep \"$1\")" != ""; then
-        VBoxManage unregistervm "$1" --delete
+        VBoxManage list vms | grep "$1"
+        echo "Removing SATA controller"
+        VBoxManage storagectl "$1" --name "SATA Controller" --remove
+        echo "Removing IDE controller"
+        VBoxManage storagectl "$1" --name "IDE Controller" --remove
+            echo "Unregistering $1"
+            VBoxManage unregistervm "$1" --delete
     fi
 
     # The following should be unnecessary except for issues with VBoxManage unregistervm
     # I stubled into such situations a few times
 
     if test -d "${VMPATH}/$1"; then
+         echo "Force removing $1"
          rm -rvf  "${VMPATH}/$1"
     fi
     res=$?
     if test "$2" != "" -a -f "${VMPATH}/$1.$2"; then
+         echo "Force removing $1.$2"
          rm -f   "${VMPATH}/$1.$2"
     fi
-    sed -i -E "s/^.*${VM}.*$//g" /root/.config/VirtualBox/VirtualBox.xml
+#    deep_clean
     res=$(($? | ${res}))
     return ${res}
 }
@@ -530,11 +565,14 @@ create_vm() {
     export PATH=${PATH}:${VBPATH}
     cd ${VMPATH}
     delete_vm "${VM}" "vdi"
+    MEDIUM_UUID=`uuid`
     VBoxManage createvm --name "${VM}" --ostype gentoo_64  --register  --basefolder "${VMPATH}"
-    VBoxManage modifyvm "${VM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
-    VBoxManage createhd --filename "${VM}.vdi" --size ${SIZE} --variant Standard
+    VBoxManage modifyvm "${VM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on  --hwvirtex on --pae on --cpuexecutioncap 80 --ostype Gentoo_64 --cpu-profile host --vtxvpid on --paravirtprovider kvm --rtcuseutc on --firmware bios
+    VBoxManage createmedium --filename "${VM}.vdi" --size ${SIZE} --variant Standard
+    VBoxManage internalcommands sethduuid "${VM}.vdi" ${MEDIUM_UUID}
+    VBoxManage modifymedium disk "${VM}.vdi" --type ${MEDIUM_TYPE}
     VBoxManage storagectl "${VM}" --name "SATA Controller" --add sata --bootable on
-    VBoxManage storageattach "${VM}" --storagectl "SATA Controller"  --medium "${VM}.vdi" --port 0 --device 0 --type hdd
+    VBoxManage storageattach "${VM}" --storagectl "SATA Controller"  --medium "${VM}.vdi" --port 0 --device 0 --type hdd --setuuid ${MEDIUM_UUID}
     VBoxManage storagectl "${VM}" --name "IDE Controller" --add ide
     VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 0   --type dvddrive --medium ${LIVECD}  --tempeject on
     VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium emptydrive
@@ -627,7 +665,7 @@ process_clonezilla_iso() {
     cp -vf ../clonezilla/savedisk/isolinux.cfg  syslinux
     cd "${VMPATH}"
     rm -vf ${CLONEZILLACD}
-    echo
+
     clonezilla_to_iso ${CLONEZILLACD} "mnt2"
     rm -rf mnt2
 }
@@ -672,7 +710,7 @@ create_iso_vm() {
     chown -R ${USER} .
     gpasswd -a ${USER} -g vboxusers
     chgrp vboxusers "ISOFILES/home/partimag/image"
-    delete_vm ${ISOVM}
+    delete_vm ${ISOVM} "vdi"
     VBoxManage createvm --name "${ISOVM}" --ostype ubuntu_64  --register  --basefolder "${VMPATH}"
     VBoxManage modifyvm "${ISOVM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
     VBoxManage storagectl "${ISOVM}" --name "SATA Controller" --add sata --bootable on
@@ -715,7 +753,6 @@ clone_vm_to_device() {
         echo "Could not set USB device ${USB_DEVICE}"
         exit -1
     fi
-
     bin/vbox-img compact --filename "${VMPATH}/${VM}.vdi"
     bin/vbox-img convert --srcfilename "${VMPATH}/${VM}.vdi" --stdout --dstformat RAW | dd of=/dev/${USB_DEVICE} bs=4M status=progress
     if test $? = 0; then
@@ -865,7 +902,6 @@ create_usb_system() {
     if ! vbox_img_works -o ${BUILD_VIRTUALBOX} = "true"; then
         build_virtualbox
     fi
-
     if  vbox_img_works; then
         echo "Cloning virtual disk to USB device ${USB_DEVICE} ..."
         clone_vm_to_device
@@ -880,11 +916,9 @@ create_usb_system() {
             echo "Cloning VDI disk to RAW failed !"
             exit -1
         fi
-        echo
         echo "Copying to USB stick..."
-        echo
         dd_to_usb
-        echo
+
         if test $? != 0; then
             echo "Copying raw file to USB device failed!"
             echo "Check that your USB device has at least 50 GiB of reachable space"
@@ -918,42 +952,30 @@ cleanup() {
 }
 
 ## @fn generate_Gentoo()
-## @brief Launch routines: fetch install ISO, starge3 archive, create VM
+## @brief Launch routines: fetch install IO, starge3 archive, create VM
 ## @ingroup createInstaller
 
 generate_Gentoo() {
-    echo
     echo "Fetching live CD..."
-    echo
     fetch_livecd
-    echo
     echo "Fetching stage3 tarball..."
-    echo
     fetch_stage3
-    echo
     echo "Tweaking live CD..."
-    echo
     make_boot_from_livecd
-    echo
     echo "Creating VM"
-    echo
     create_vm
     if test $? != 0; then
         echo "VM failed to be created!"
         exit -1
     fi
-    echo
 
     # Now on to OS on external device
 
     if test "${USB_DEVICE}" != ""; then
-        echo
         echo "Creating OS on device ${USB_DEVICE}..."
-        echo
         create_usb_system
     fi
 }
-
 
 ## @fn main()
 ## @brief Main function launching routines
@@ -970,8 +992,9 @@ if test "$(echo ${CLI} | sed 's/help//' )" != "${CLI}"; then
     help
     exit 0
 fi
-echo
+
 # Analyse commandline and source auxiliary files
+
 test_cli_pre
 for ((i=0; i<ARRAY_LENGTH; i++)) ; do test_cli $i; done
 cd ${VMPATH}
@@ -1006,12 +1029,8 @@ if test "${FROM_ISO}" = "false"; then
     if test "${FROM_DEVICE}" = "true"; then
         clonezilla_device_to_image
     fi
-    echo
     echo "Creating Clonezilla bootable ISO..."
-    echo
-    echo
     clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
-    echo
     if test $? = 0; then
         echo "Done."
         if test -f "${ISO_OUTPUT}"; then
@@ -1024,7 +1043,6 @@ if test "${FROM_ISO}" = "false"; then
         exit -1
     fi
 fi
-
 if test "${DEVICE_INSTALLER}" != ""; then
     create_install_usb_device
 fi
@@ -1034,5 +1052,4 @@ fi
 cleanup
 exit 0
 }
-
 main
