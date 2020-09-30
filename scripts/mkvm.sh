@@ -29,24 +29,42 @@ setup_network() {
         return
     fi
     if test "${VMTYPE}" = "gui"; then
-        dhcpcd -HD $(ifconfig | cut -f1 -d' ' | line | cut -f1 -d':')
-    else
         net-setup
+        sleep 40
+    else
+        eth=$(ifconfig | cut -f1 -d' ' | line | cut -f1 -d':')
+        echo "eth=${eth}"
+        sleep 10
+        dhcpcd ${eth}
+        sleep 40
     fi
     if test $? = 0; then
         touch setup_network
     else
-        echo "Could not fix internet access" | tee setup_network.log
+        echo "Could not fix internet access!" | tee setup_network.log
         sleep 10
-        exit -1
+        if test "${VMTYPE}" = "gui"; then
+            exit -1
+        else
+
+            # A stricter measure for headless VMs to avoid waiting for 2 days uselessly
+
+            shutdown -h now
+        fi
+
     fi
 }
+
 
 ## @fn partition()
 ## @brief Create partition table, \b /dev/sda1 (bios_grub), \b /dev/sda2 (boot), \b dev/sda3 (swap) and \b /dev/sda4 (system)
 ## @details Create file \b partition. @n
 ##  On error, fill this file with successive exit codes of commands and exit.@n
 ##  On success, just create empty file.
+## @warning The VM needs time to recognize /dev/sda in some cases, for unclear reasons.
+## This may be a kernel issue or a VirtualBox issue.
+## @bug  Same issue with mkswap and swapon. Syncing and a bit of sleep fixed these issues.
+## @note It might be necessary with older machines to increase the amount of sleep.
 ## @ingroup mkFileSystem
 
 partition() {
@@ -55,14 +73,24 @@ partition() {
     fi
     parted --script --align=opt /dev/sda "mklabel gpt unit mib mkpart primary 1 3 name 1 grub set 1 bios_grub on mkpart primary 3 131  name 2 boot mkpart primary 131 643 name 3 swap mkpart primary 643 -1 set 2 boot on"
     res0=$?
-    mkfs.fat -F 32 /dev/sda2
+
+    # This may look unnatural, but it has occurred quite a few times, with /dev/sdaX "still mounted"
+    # thereby thwarting filesystem authoring. This insane beavior has been circumvented by syncing,
+    # testing for mount and umounting should the case arise. This has even occurred with the swap partition.
+    sync
+    sleep 20
+    mkfs.fat -v -F 32 /dev/sda2
     res1=$?
-    mkfs.ext4 /dev/sda4
+    sync
+    mkfs.ext4 -e continue -q -F -F /dev/sda4
     res2=$?
-    mkswap /dev/sda3
+    sync
+    while ! mkswap /dev/sda3; do continue; done
     res3=$?
-    swapon /dev/sda3
+    sync
+    while ! swapon /dev/sda3; do continue; done
     res4=$?
+    sync
     mount  /dev/sda4 /mnt/gentoo
     res5=$?
     res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4} | ${res5}))
@@ -75,9 +103,22 @@ partition() {
         echo "mkswap exit code: ${res3}"    >> partition
         echo "swapon exit code: ${res4}"    >> partition
         echo "mount exit code:  ${res5}"    >> partition
-        echo "Failed to partition main disk"
+        echo "Failed to cleanly partition main disk"
         sleep 10
-        exit -1
+        if test $((${res1} | ${res2} | ${res3} | ${res4} | ${res5})) != 0; then
+            echo  "Critical errors whicle partitioning"
+            if test "${VMTYPE}" = "gui"; then
+                exit -1
+            else
+
+                # A stricter measure for headless VMs to avoid waiting for 2 days uselessly
+
+                shutdown -h now
+            fi
+        else
+            echo "Parted issue but mkfs and mount OK. Going on..."
+            return -1
+        fi
     fi
 }
 
@@ -107,7 +148,14 @@ install_stage3() {
     if test $? != 0; then
         echo "stage3 tarball could not be extracted"
         sleep 10
-        exit -1
+        if test "${VMTYPE}" = "gui"; then
+            exit -1
+        else
+
+            # A stricter measure for headless VMs to avoid waiting for 2 days uselessly
+
+            shutdown -h now
+        fi
     fi
     cat temp_bashrc >> .bashrc
     rm temp_bashrc
@@ -158,7 +206,14 @@ install_stage3() {
         echo "rslave dev exit code exit code: ${res4}"    >> stage3
         echo "Failed to bind liveCD to main disk"
         sleep 10
-        exit -1
+        if test "${VMTYPE}" = "gui"; then
+            exit -1
+        else
+
+            # A stricter measure for headless VMs to avoid waiting for 2 days uselessly
+
+            shutdown -h now
+        fi
     fi
     cd ~
     chroot /mnt/gentoo /bin/bash mkvm_chroot.sh
@@ -181,7 +236,7 @@ finalize() {
 # Logging will only subsist as long as the liveCD is not shut down
 # Logs are provided for debugging purposes
 
-setup_network  | tee setup_network.log
-partition      | tee partition.log
-install_stage3 | tee install_stage3.log
-finalize       | tee finalize.log
+setup_network  2>&1 | tee setup_network.log
+partition      2>&1 | tee partition.log
+install_stage3 2>&1 | tee install_stage3.log
+finalize       2>&1 | tee finalize.log

@@ -20,6 +20,17 @@
 
 #!/bin/bash
 
+## @mainpage Usage
+## @brief In a nutshell
+## @n
+## @code ./mkgentoo [command=argument] ... [command=argument]  [file.iso] @endcode
+## @n
+## @details
+## See <a href="https://github.com/fabnicol/gentoo-creator/wiki"><b>Wiki</b></a> for details.
+## @n
+## @author Fabrice Nicol 2020
+## @copyright This software is licensed under the terms of the <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><b>GPL v3</b></a>
+
 ## @file mkgentoo.sh
 ## @author Fabrice Nicol <fabrnicol@gmail.com>
 ## @copyright GPL v.3

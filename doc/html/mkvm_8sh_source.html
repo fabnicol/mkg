@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>mkgentoo: mkvm.sh Source File</title>
+<title>gentoo-creator: mkvm.sh Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -20,9 +20,9 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="gentoo.png"/></td>
+  <td id="projectlogo"><img alt="Logo" src="gentoo-small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">mkgentoo
+   <div id="projectname">gentoo-creator
    &#160;<span id="projectnumber">1.0</span>
    </div>
    <div id="projectbrief">Gentoo distribution creator</div>
@@ -98,168 +98,223 @@ $(function() {
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordflow">if</span> test -f <a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>; then</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keywordflow">return</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    fi</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">if</span> test <span class="stringliteral">&quot;${VMTYPE}&quot;</span> = <span class="stringliteral">&quot;gui&quot;</span>; then</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        dhcpcd -HD $(ifconfig | cut -f1 -d<span class="charliteral">&#39; &#39;</span> | line | cut -f1 -d<span class="charliteral">&#39;:&#39;</span>)</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        net-setup</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    fi</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">if</span> test $? = 0; then</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        touch <a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        echo <span class="stringliteral">&quot;Could not fix internet access&quot;</span> | tee <a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>.log</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        sleep 10</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        exit -1</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    fi</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;}</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">## @fn partition()</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">## @brief Create partition table, \b /dev/sda1 (bios_grub), \b /dev/sda2 (boot), \b dev/sda3 (swap) and \b /dev/sda4 (system)</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">## @details Create file \b partition. @n</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">##  On error, fill this file with successive exit codes of commands and exit.@n</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">##  On success, just create empty file.</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">## @ingroup mkFileSystem</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordflow">if</span> test <span class="stringliteral">&quot;${VMTYPE}&quot;</span> != <span class="stringliteral">&quot;gui&quot;</span>; then</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        net-setup</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        sleep 40</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        eth=$(ifconfig | cut -f1 -d<span class="charliteral">&#39; &#39;</span> | line | cut -f1 -d<span class="charliteral">&#39;:&#39;</span>)</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        echo <span class="stringliteral">&quot;eth=${eth}&quot;</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        sleep 10</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        dhcpcd ${eth}</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        sleep 40</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    fi</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">if</span> test $? = 0; then</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        touch <a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        echo <span class="stringliteral">&quot;Could not fix internet access!&quot;</span> | tee <a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>.log</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        sleep 10</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordflow">if</span> test <span class="stringliteral">&quot;${VMTYPE}&quot;</span> = <span class="stringliteral">&quot;gui&quot;</span>; then</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            exit -1</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">            # A stricter measure for headless VMs to avoid waiting for 2 days uselessly</span></div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">   52</a></span>&#160;<a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a>() {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">if</span> test -f <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a>; then</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordflow">return</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            shutdown -h now</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        fi</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    fi</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    parted --script --align=opt /dev/sda <span class="stringliteral">&quot;mklabel gpt unit mib mkpart primary 1 3 name 1 grub set 1 bios_grub on mkpart primary 3 131  name 2 boot mkpart primary 131 643 name 3 swap mkpart primary 643 -1 set 2 boot on&quot;</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    res0=$?</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    mkfs.fat -F 32 /dev/sda2</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    res1=$?</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    mkfs.ext4 /dev/sda4</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    res2=$?</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    mkswap /dev/sda3</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    res3=$?</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    swapon /dev/sda3</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    res4=$?</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    mount  /dev/sda4 /mnt/gentoo</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    res5=$?</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4} | ${res5}))</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">if</span> test ${res} = 0; then</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        touch <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        echo <span class="stringliteral">&quot;parted exit code: ${res0}&quot;</span>    &gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        echo <span class="stringliteral">&quot;mkfs.fat exit code: ${res1}&quot;</span>  &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        echo <span class="stringliteral">&quot;mkfs.ext4 exit code: ${res2}&quot;</span> &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        echo <span class="stringliteral">&quot;mkswap exit code: ${res3}&quot;</span>    &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        echo <span class="stringliteral">&quot;swapon exit code: ${res4}&quot;</span>    &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        echo <span class="stringliteral">&quot;mount exit code:  ${res5}&quot;</span>    &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        echo <span class="stringliteral">&quot;Failed to partition main disk&quot;</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        sleep 10</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        exit -1</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    fi</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;}</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">## @fn install_stage3()</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">## @details @li Copy stage3 archive, ebuild list, kernel config and mkvm_chroot.sh to /mnt/gentoo</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">## @li Extract it, fix basic make.conf options</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">## @li Install repos.conf from liveCD (networking parameters)</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">## @li Mount liveCD proc/sys/dev files into new filesystem</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">## @li On failure, print error codes into file \b partition</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">## @li On success, create empty file \b partition</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">## @li &lt;tt&gt; chroot &lt;/tt&gt; into new system</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">## @ingroup mkFileSystem</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">   94</a></span>&#160;<a class="code" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a>() {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordflow">if</span> test -f stage3; then</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keywordflow">return</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    fi</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    mv -vf ${STAGE3} ${ELIST}  mkvm_chroot.sh ${KERNEL_CONFIG} /mnt/gentoo/</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    cp -vf .bashrc /mnt/gentoo/bashrc_temp</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    cd /mnt/gentoo</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    head -n -1 -q bashrc_temp &gt; temp_bashrc &amp;&amp; rm bashrc_temp</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">    # Time</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    ntpd -q -g</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    tar xpJf ${STAGE3} --xattrs-include=<span class="stringliteral">&#39;*.*&#39;</span> --numeric-owner</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">if</span> test $? != 0; then</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        echo <span class="stringliteral">&quot;stage3 tarball could not be extracted&quot;</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        sleep 10</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        exit -1</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    fi</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    cat temp_bashrc &gt;&gt; .bashrc</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    rm temp_bashrc</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    rm -vf ${STAGE3}</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">## @fn partition()</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">## @brief Create partition table, \b /dev/sda1 (bios_grub), \b /dev/sda2 (boot), \b dev/sda3 (swap) and \b /dev/sda4 (system)</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">## @details Create file \b partition. @n</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">##  On error, fill this file with successive exit codes of commands and exit.@n</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">##  On success, just create empty file.</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">## @warning The VM needs time to recognize /dev/sda in some cases, for unclear reasons.</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">## This may be a kernel issue or a VirtualBox issue.</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">## @bug  Same issue with mkswap and swapon. Syncing and a bit of sleep fixed these issues.</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">## @note It might be necessary with older machines to increase the amount of sleep.</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">## @ingroup mkFileSystem</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">   70</a></span>&#160;<a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a>() {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">if</span> test -f <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a>; then</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">return</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    fi</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    parted --script --align=opt /dev/sda <span class="stringliteral">&quot;mklabel gpt unit mib mkpart primary 1 3 name 1 grub set 1 bios_grub on mkpart primary 3 131  name 2 boot mkpart primary 131 643 name 3 swap mkpart primary 643 -1 set 2 boot on&quot;</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    res0=$?</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">    # This may look unnatural, but it has occurred quite a few times, with /dev/sdaX &quot;still mounted&quot;</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">    # thereby thwarting filesystem authoring. This insane beavior has been circumvented by syncing,</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">    # testing for mount and umounting should the case arise. This has even occurred with the swap partition.</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    sync</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    sleep 20</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    mkfs.fat -v -F 32 /dev/sda2</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    res1=$?</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    sync</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    mkfs.ext4 -e <span class="keywordflow">continue</span> -q -F -F /dev/sda4</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    res2=$?</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    sync</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">while</span> ! mkswap /dev/sda3; <span class="keywordflow">do</span> <span class="keywordflow">continue</span>; done</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    res3=$?</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    sync</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordflow">while</span> ! swapon /dev/sda3; <span class="keywordflow">do</span> <span class="keywordflow">continue</span>; done</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    res4=$?</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    sync</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    mount  /dev/sda4 /mnt/gentoo</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    res5=$?</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4} | ${res5}))</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordflow">if</span> test ${res} = 0; then</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        touch <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        echo <span class="stringliteral">&quot;parted exit code: ${res0}&quot;</span>    &gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        echo <span class="stringliteral">&quot;mkfs.fat exit code: ${res1}&quot;</span>  &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        echo <span class="stringliteral">&quot;mkfs.ext4 exit code: ${res2}&quot;</span> &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        echo <span class="stringliteral">&quot;mkswap exit code: ${res3}&quot;</span>    &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        echo <span class="stringliteral">&quot;swapon exit code: ${res4}&quot;</span>    &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        echo <span class="stringliteral">&quot;mount exit code:  ${res5}&quot;</span>    &gt;&gt; <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        echo <span class="stringliteral">&quot;Failed to cleanly partition main disk&quot;</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        sleep 10</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordflow">if</span> test $((${res1} | ${res2} | ${res3} | ${res4} | ${res5})) != 0; then</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            echo  <span class="stringliteral">&quot;Critical errors whicle partitioning&quot;</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <span class="keywordflow">if</span> test <span class="stringliteral">&quot;${VMTYPE}&quot;</span> = <span class="stringliteral">&quot;gui&quot;</span>; then</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                exit -1</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor">                # A stricter measure for headless VMs to avoid waiting for 2 days uselessly</span></div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="preprocessor">    # Ajusting portage</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    local m_conf=<span class="stringliteral">&quot;etc/portage/make.conf&quot;</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    sed  -i <span class="stringliteral">&quot;s/COMMON_FLAGS=.*/COMMON_FLAGS=&#39;${CFLAGS} -pipe&#39;/g&quot;</span>  ${m_conf}</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    echo MAKEOPTS=-j${NCPUS}  &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    echo <span class="stringliteral">&#39;L10N=&quot;fr en&quot;&#39;</span>    &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    echo <span class="stringliteral">&#39;LINGUAS=&quot;fr en&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    sed  -i <span class="stringliteral">&#39;s/USE=&quot;.*&quot;//g&#39;</span>    ${m_conf}</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    echo <span class="stringliteral">&#39;USE=&quot;-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager elogind -consolekit -systemd dbus X&quot;&#39;</span> &gt;&gt;  ${m_conf}</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    echo <span class="stringliteral">&quot;GENTOO_MIRRORS=${EMIRRORS}&quot;</span>  &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">    # note linux-fw-redistributable no-source-code for genkernel</span></div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">    # note bh-luxi for font-bh-* requested by xorg-x11</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    echo <span class="stringliteral">&#39;ACCEPT_LICENSE=&quot;-* @FREE linux-fw-redistributable no-source-code bh-luxi&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    echo <span class="stringliteral">&#39;GRUB_PLATFORMS=&quot;efi-64&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    echo <span class="stringliteral">&#39;VIDEO_CARDS=&quot;nouveau intel&quot;&#39;</span>   &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    echo <span class="stringliteral">&#39;INPUT_DEVICES=&quot;evdev synaptics&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    mkdir --parents etc/portage/repos.conf</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    cp usr/share/portage/config/repos.conf etc/portage/repos.conf/gentoo.conf</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    cp --dereference /etc/resolv.conf etc/</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor">    # Chrooting the new environment</span></div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    mount --types proc /proc proc</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    res0=$?</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    mount --rbind /sys  sys</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    res1=$?</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    mount --make-rslave sys</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    res2=$?</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    mount --rbind /dev  dev</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    res3=$?</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    mount --make-rslave dev</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    res4=$?</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4}))</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keywordflow">if</span> test ${res} = 0; then</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        touch stage3</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        echo <span class="stringliteral">&quot;mounting proc exit code: ${res0}&quot;</span>    &gt; stage3</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        echo <span class="stringliteral">&quot;mounting sys exit code: ${res1}&quot;</span>     &gt;&gt; stage3</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        echo <span class="stringliteral">&quot;rslave sys exit code: ${res2}&quot;</span>       &gt;&gt; stage3</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        echo <span class="stringliteral">&quot;mounting dev dev exit code: ${res3}&quot;</span> &gt;&gt; stage3</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        echo <span class="stringliteral">&quot;rslave dev exit code exit code: ${res4}&quot;</span>    &gt;&gt; stage3</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        echo <span class="stringliteral">&quot;Failed to bind liveCD to main disk&quot;</span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        sleep 10</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        exit -1</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    fi</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    cd ~</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    chroot /mnt/gentoo /bin/bash mkvm_chroot.sh</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;}</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="preprocessor">## @fn finalize()</span></div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="preprocessor">## @brief Unmount chrooted system, restore user rights and shutdown VM</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="preprocessor">## @ingroup mkFileSystem</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00171"></a><span class="lineno"><a class="line" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">  171</a></span>&#160;<a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>() {</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    umount -l /mnt/gentoo/dev{/shm,/pts,}</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    umount /mnt/gentoo/run</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    umount /mnt/gentoo/proc</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    umount /mnt/gentoo/sys</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    umount -R -l  /mnt/gentoo</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    shutdown -h now</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;}</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="preprocessor"># Logging will only subsist as long as the liveCD is not shut down</span></div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="preprocessor"># Logs are provided for debugging purposes</span></div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>  | tee <a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>.log</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a>      | tee <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a>.log</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<a class="code" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a> | tee <a class="code" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a>.log</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>       | tee <a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>.log</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                shutdown -h now</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            fi</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            echo <span class="stringliteral">&quot;Parted issue but mkfs and mount OK. Going on...&quot;</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;            <span class="keywordflow">return</span> -1</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        fi</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    fi</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;}</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="preprocessor">## @fn install_stage3()</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">## @details @li Copy stage3 archive, ebuild list, kernel config and mkvm_chroot.sh to /mnt/gentoo</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">## @li Extract it, fix basic make.conf options</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">## @li Install repos.conf from liveCD (networking parameters)</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">## @li Mount liveCD proc/sys/dev files into new filesystem</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="preprocessor">## @li On failure, print error codes into file \b partition</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">## @li On success, create empty file \b partition</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="preprocessor">## @li &lt;tt&gt; chroot &lt;/tt&gt; into new system</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="preprocessor">## @ingroup mkFileSystem</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno"><a class="line" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">  135</a></span>&#160;<a class="code" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a>() {</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">if</span> test -f stage3; then</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <span class="keywordflow">return</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    fi</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    mv -vf ${STAGE3} ${ELIST}  mkvm_chroot.sh ${KERNEL_CONFIG} /mnt/gentoo/</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    cp -vf .bashrc /mnt/gentoo/bashrc_temp</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    cd /mnt/gentoo</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    head -n -1 -q bashrc_temp &gt; temp_bashrc &amp;&amp; rm bashrc_temp</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="preprocessor">    # Time</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    ntpd -q -g</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    tar xpJf ${STAGE3} --xattrs-include=<span class="stringliteral">&#39;*.*&#39;</span> --numeric-owner</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">if</span> test $? != 0; then</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        echo <span class="stringliteral">&quot;stage3 tarball could not be extracted&quot;</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        sleep 10</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="keywordflow">if</span> test <span class="stringliteral">&quot;${VMTYPE}&quot;</span> = <span class="stringliteral">&quot;gui&quot;</span>; then</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            exit -1</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">            # A stricter measure for headless VMs to avoid waiting for 2 days uselessly</span></div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;            shutdown -h now</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        fi</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    fi</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    cat temp_bashrc &gt;&gt; .bashrc</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    rm temp_bashrc</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    rm -vf ${STAGE3}</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="preprocessor">    # Ajusting portage</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    local m_conf=<span class="stringliteral">&quot;etc/portage/make.conf&quot;</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    sed  -i <span class="stringliteral">&quot;s/COMMON_FLAGS=.*/COMMON_FLAGS=&#39;${CFLAGS} -pipe&#39;/g&quot;</span>  ${m_conf}</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    echo MAKEOPTS=-j${NCPUS}  &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    echo <span class="stringliteral">&#39;L10N=&quot;fr en&quot;&#39;</span>    &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    echo <span class="stringliteral">&#39;LINGUAS=&quot;fr en&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    sed  -i <span class="stringliteral">&#39;s/USE=&quot;.*&quot;//g&#39;</span>    ${m_conf}</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    echo <span class="stringliteral">&#39;USE=&quot;-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager elogind -consolekit -systemd dbus X&quot;&#39;</span> &gt;&gt;  ${m_conf}</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    echo <span class="stringliteral">&quot;GENTOO_MIRRORS=${EMIRRORS}&quot;</span>  &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="preprocessor">    # note linux-fw-redistributable no-source-code for genkernel</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="preprocessor">    # note bh-luxi for font-bh-* requested by xorg-x11</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    echo <span class="stringliteral">&#39;ACCEPT_LICENSE=&quot;-* @FREE linux-fw-redistributable no-source-code bh-luxi&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    echo <span class="stringliteral">&#39;GRUB_PLATFORMS=&quot;efi-64&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    echo <span class="stringliteral">&#39;VIDEO_CARDS=&quot;nouveau intel&quot;&#39;</span>   &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    echo <span class="stringliteral">&#39;INPUT_DEVICES=&quot;evdev synaptics&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    mkdir --parents etc/portage/repos.conf</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    cp usr/share/portage/config/repos.conf etc/portage/repos.conf/gentoo.conf</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    cp --dereference /etc/resolv.conf etc/</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="preprocessor">    # Chrooting the new environment</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    mount --types proc /proc proc</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    res0=$?</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    mount --rbind /sys  sys</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    res1=$?</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    mount --make-rslave sys</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    res2=$?</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    mount --rbind /dev  dev</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    res3=$?</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    mount --make-rslave dev</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    res4=$?</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4}))</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="keywordflow">if</span> test ${res} = 0; then</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        touch stage3</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        echo <span class="stringliteral">&quot;mounting proc exit code: ${res0}&quot;</span>    &gt; stage3</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        echo <span class="stringliteral">&quot;mounting sys exit code: ${res1}&quot;</span>     &gt;&gt; stage3</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        echo <span class="stringliteral">&quot;rslave sys exit code: ${res2}&quot;</span>       &gt;&gt; stage3</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        echo <span class="stringliteral">&quot;mounting dev dev exit code: ${res3}&quot;</span> &gt;&gt; stage3</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        echo <span class="stringliteral">&quot;rslave dev exit code exit code: ${res4}&quot;</span>    &gt;&gt; stage3</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        echo <span class="stringliteral">&quot;Failed to bind liveCD to main disk&quot;</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        sleep 10</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        <span class="keywordflow">if</span> test <span class="stringliteral">&quot;${VMTYPE}&quot;</span> = <span class="stringliteral">&quot;gui&quot;</span>; then</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;            exit -1</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="preprocessor">            # A stricter measure for headless VMs to avoid waiting for 2 days uselessly</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;            shutdown -h now</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        fi</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    fi</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    cd ~</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    chroot /mnt/gentoo /bin/bash mkvm_chroot.sh</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;}</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="preprocessor">## @fn finalize()</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="preprocessor">## @brief Unmount chrooted system, restore user rights and shutdown VM</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">## @ingroup mkFileSystem</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
+<div class="line"><a name="l00226"></a><span class="lineno"><a class="line" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">  226</a></span>&#160;<a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>() {</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    umount -l /mnt/gentoo/dev{/shm,/pts,}</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    umount /mnt/gentoo/run</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    umount /mnt/gentoo/proc</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    umount /mnt/gentoo/sys</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    umount -R -l  /mnt/gentoo</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    shutdown -h now</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;}</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="preprocessor"># Logging will only subsist as long as the liveCD is not shut down</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="preprocessor"># Logs are provided for debugging purposes</span></div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>  2&gt;&amp;1 | tee <a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>.log</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a>      2&gt;&amp;1 | tee <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a>.log</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<a class="code" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a> 2&gt;&amp;1 | tee <a class="code" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a>.log</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>       2&gt;&amp;1 | tee <a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>.log</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="agroup__mk_file_system_html_ga9caaa1f5ea6177e55f13ebe7dec2bd60"><div class="ttname"><a href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a></div><div class="ttdeci">finalize()</div><div class="ttdoc">Unmount chrooted system, restore user rights and shutdown VM.</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00171">mkvm.sh:171</a></div></div>
+<div class="ttc" id="agroup__mk_file_system_html_ga9caaa1f5ea6177e55f13ebe7dec2bd60"><div class="ttname"><a href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a></div><div class="ttdeci">finalize()</div><div class="ttdoc">Unmount chrooted system, restore user rights and shutdown VM.</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00226">mkvm.sh:226</a></div></div>
 <div class="ttc" id="agroup__mk_file_system_html_ga4315b3877c965059c7db8593870066ba"><div class="ttname"><a href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a></div><div class="ttdeci">setup_network()</div><div class="ttdoc">Call net-setup and dhcpcd to enable networking.</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00027">mkvm.sh:27</a></div></div>
-<div class="ttc" id="agroup__mk_file_system_html_ga57eb97a585b6daafed0d93e57b96cca3"><div class="ttname"><a href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a></div><div class="ttdeci">install_stage3()</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00094">mkvm.sh:94</a></div></div>
-<div class="ttc" id="agroup__mk_file_system_html_gaa9952b2711fe0413d7a0bc6639c7f5a5"><div class="ttname"><a href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div><div class="ttdeci">partition()</div><div class="ttdoc">Create partition table, /dev/sda1 (bios_grub), /dev/sda2 (boot), dev/sda3 (swap) and /dev/sda4 (syste...</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00052">mkvm.sh:52</a></div></div>
+<div class="ttc" id="agroup__mk_file_system_html_ga57eb97a585b6daafed0d93e57b96cca3"><div class="ttname"><a href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a></div><div class="ttdeci">install_stage3()</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00135">mkvm.sh:135</a></div></div>
+<div class="ttc" id="agroup__mk_file_system_html_gaa9952b2711fe0413d7a0bc6639c7f5a5"><div class="ttname"><a href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div><div class="ttdeci">partition()</div><div class="ttdoc">Create partition table, /dev/sda1 (bios_grub), /dev/sda2 (boot), dev/sda3 (swap) and /dev/sda4 (syste...</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00070">mkvm.sh:70</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

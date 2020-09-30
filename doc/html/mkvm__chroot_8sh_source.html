@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>mkgentoo: mkvm_chroot.sh Source File</title>
+<title>gentoo-creator: mkvm_chroot.sh Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -20,9 +20,9 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="gentoo.png"/></td>
+  <td id="projectlogo"><img alt="Logo" src="gentoo-small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">mkgentoo
+   <div id="projectname">gentoo-creator
    &#160;<span id="projectnumber">1.0</span>
    </div>
    <div id="projectbrief">Gentoo distribution creator</div>
@@ -360,77 +360,87 @@ $(function() {
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="comment">    # kernel sources will have to be reinstalled by user if necessary</span></div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="comment">    emerge --unmerge gentoo-sources  2&gt;&amp;1 | tee log_uninstall_software</span></div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="comment">    emerge --depclean   2&gt;&amp;1              | tee log_uninstall_software</span></div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="comment">    rm -rf /usr/src/linux/*               | tee log_uninstall_software</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="comment">    emerge --unmerge gentoo-sources  2&gt;&amp;1 | tee log_uninstall_software.log</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="comment">    emerge --depclean   2&gt;&amp;1              | tee log_uninstall_software.log</span></div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="comment">    rm -rf /usr/src/linux/*               | tee log_uninstall_software.log</span></div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="comment">    eix-update</span></div>
 <div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="comment">    # Configuration</span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="comment">    # # sddm</span></div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="comment">    echo &quot;#!/bin/sh&quot;                   &gt; /usr/share/sddm/scripts/Xsetup</span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="comment">    echo &quot;setxkbmap ${LANGUAGE},us&quot;    &gt; /usr/share/sddm/scripts/Xsetup</span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="comment">    chmod +x /usr/share/sddm/scripts/Xsetup</span></div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="comment">    sed -i &#39;s/DISPLAYMANAGER=&quot;.*&quot;/DISPLAYMANAGER=&quot;sddm&quot;/&#39; /etc/conf.d/xdm</span></div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="comment">    # Services</span></div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="comment">    # Idealy the installers should do:</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;<span class="comment">    # emerge gentoo-sources</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;<span class="comment">    # cd /usr/src/linux</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="comment">    # cp -f /boot/config* .config</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="comment">    # make syncconfig</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="comment">    # make modules_prepare</span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="comment">    # for the sake of ebuilds requesting prepared kernel sources</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment">    # TODO: test ocs-run post_run commands.</span></div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="comment">    # Also for usb_installer=... *alone* the above code could be deactivated. But then a later from_vm call would have to clean sources to lighten the resulting ISO clonezilla image.</span></div>
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;<span class="comment">    rc-update add sysklogd default</span></div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment">    rc-update add cronie default</span></div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="comment">    rc-update add xdm default</span></div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="comment">    rc-update add dbus default</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="comment">    rc-update add elogind boot</span></div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;<span class="comment">    # # Networkmanager</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;<span class="comment">    # Configuration</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment">    #-- sddm</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="comment">    echo &quot;#!/bin/sh&quot;                   &gt; /usr/share/sddm/scripts/Xsetup</span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="comment">    echo &quot;setxkbmap ${LANGUAGE},us&quot;    &gt; /usr/share/sddm/scripts/Xsetup</span></div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="comment">    chmod +x /usr/share/sddm/scripts/Xsetup</span></div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;<span class="comment">    sed -i &#39;s/DISPLAYMANAGER=&quot;.*&quot;/DISPLAYMANAGER=&quot;sddm&quot;/&#39; /etc/conf.d/xdm</span></div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="comment">    for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done</span></div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<span class="comment">    rc-update del dhcpcd default</span></div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;<span class="comment">    rc-update add NetworkManager default</span></div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="comment">    # groups and sudo</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="comment">    useradd -m -G users,wheel,audio,video,plugdev,sudo  -s /bin/bash ${NONROOT_USER}</span></div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="comment">    echo &quot;${NONROOT_USER}     ALL=(ALL:ALL) ALL&quot; &gt;&gt; /etc/sudoers</span></div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="comment">    gpasswd -a sddm video</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;<span class="comment">    #-- Services</span></div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;<span class="comment">    rc-update add sysklogd default</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="comment">    rc-update add cronie default</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="comment">    rc-update add xdm default</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="comment">    rc-update add dbus default</span></div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="comment">    rc-update add elogind boot</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="comment">    #-- Networkmanager</span></div>
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="comment">    # Creating the bootloader</span></div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="comment">    grub-install --target=x86_64-efi --efi-directory=/boot --removable</span></div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="comment">    grub-mkconfig -o /boot/grub/grub.cfg</span></div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="comment">    # Passwords</span></div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="comment">    echo ${NONROOT_USER}:${PASSWD}  | chpasswd</span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="comment">    echo root:${ROOTPASSWD} | chpasswd</span></div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="comment">}</span></div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="comment">## @fn finalize()</span></div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<span class="comment">## @details @li Cleanup \b .bashrc</span></div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="comment">## @li Cleanup other files except for logs if debug mode is on.</span></div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="comment">## @li Write zeros as much as possible to prepare for compacting.</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="comment">## @ingroup mkFileSystem</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="comment">    for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="comment">    rc-update del dhcpcd default</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="comment">    rc-update add NetworkManager default</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="comment">    #-- groups and sudo</span></div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="comment">    useradd -m -G users,wheel,audio,video,plugdev,sudo  -s /bin/bash ${NONROOT_USER}</span></div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="comment">    echo &quot;${NONROOT_USER}     ALL=(ALL:ALL) ALL&quot; &gt;&gt; /etc/sudoers</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="comment">    gpasswd -a sddm video</span></div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;<span class="comment">    #-- Creating the bootloader</span></div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<span class="comment">    grub-install --target=x86_64-efi --efi-directory=/boot --removable</span></div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="comment">    grub-mkconfig -o /boot/grub/grub.cfg</span></div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="comment">    #-- Passwords</span></div>
 <div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00343"></a><span class="lineno"><a class="line" href="mkvm__chroot_8sh.html#a9caaa1f5ea6177e55f13ebe7dec2bd60">  343</a></span>&#160;<span class="comment">finalize() {</span></div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;<span class="comment">    # Final steps: cleaning up</span></div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="comment">    echo ${NONROOT_USER}:${PASSWD}  | chpasswd</span></div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="comment">    echo root:${ROOTPASSWD} | chpasswd</span></div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;<span class="comment">}</span></div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="comment">    sed -i &#39;s/^export .*$//g&#39; .bashrc</span></div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="comment">    rm -f mkvm_chroot.sh package_list ${ELIST}</span></div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="comment">    if test &quot;${DEBUG_MODE}&quot; != &quot;true&quot;; then</span></div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="comment">        rm -f *</span></div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;<span class="comment">    fi</span></div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="comment">## @fn finalize()</span></div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="comment">## @details @li Cleanup \b .bashrc</span></div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="comment">## @li Cleanup other files except for logs if debug mode is on.</span></div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="comment">## @li Write zeros as much as possible to prepare for compacting.</span></div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;<span class="comment">## @ingroup mkFileSystem</span></div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;<span class="comment">    # prepare to compact with vbox-img compact --filename ${VMPATH}/${VM}.vdi</span></div>
+<div class="line"><a name="l00353"></a><span class="lineno"><a class="line" href="mkvm__chroot_8sh.html#a9caaa1f5ea6177e55f13ebe7dec2bd60">  353</a></span>&#160;<span class="comment">finalize() {</span></div>
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;<span class="comment">    cat /dev/zero &gt; zeros ; sync ; rm zeros</span></div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;<span class="comment">}</span></div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;<span class="comment">adjust_environment</span></div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;<span class="comment">build_kernel</span></div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;<span class="comment">install_software</span></div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;<span class="comment">global_config</span></div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;<span class="comment">finalize</span></div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;<span class="comment">exit 0</span></div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;<span class="comment">    # Final steps: cleaning up</span></div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="comment">    sed -i &#39;s/^export .*$//g&#39; .bashrc</span></div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;<span class="comment">    rm -f mkvm_chroot.sh package_list ${ELIST}</span></div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;<span class="comment">    if test &quot;${DEBUG_MODE}&quot; != &quot;true&quot;; then</span></div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;<span class="comment">        rm -f *</span></div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;<span class="comment">    fi</span></div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;<span class="comment">    # prepare to compact with vbox-img compact --filename ${VMPATH}/${VM}.vdi</span></div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="comment">    cat /dev/zero &gt; zeros ; sync ; rm zeros</span></div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;<span class="comment">}</span></div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;<span class="comment">adjust_environment</span></div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;<span class="comment">build_kernel</span></div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;<span class="comment">install_software</span></div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="comment">global_config</span></div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;<span class="comment">finalize</span></div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;<span class="comment">exit 0</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="agroup__mk_file_system_html_ga0a168c36e3839b754f641e6639ff2472"><div class="ttname"><a href="group__mk_file_system.html#ga0a168c36e3839b754f641e6639ff2472">build_kernel</a></div><div class="ttdeci">build_kernel()</div><div class="ttdef"><b>Definition:</b> <a href="mkvm__chroot_8sh_source.html#l00162">mkvm_chroot.sh:162</a></div></div>
 <div class="ttc" id="agroup__mk_file_system_html_ga30f3fc39fcff53af9710fea740f38109"><div class="ttname"><a href="group__mk_file_system.html#ga30f3fc39fcff53af9710fea740f38109">global_config</a></div><div class="ttdeci">global_config()</div><div class="ttdef"><b>Definition:</b> <a href="mkvm__chroot_8sh_source.html#l00284">mkvm_chroot.sh:284</a></div></div>

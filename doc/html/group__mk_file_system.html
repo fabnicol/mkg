@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>mkgentoo: Create Gentoo linux filesystem on VM disk and emerge software.</title>
+<title>gentoo-creator: Create Gentoo linux filesystem on VM disk and emerge software.</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -20,9 +20,9 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="gentoo.png"/></td>
+  <td id="projectlogo"><img alt="Logo" src="gentoo-small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">mkgentoo
+   <div id="projectname">gentoo-creator
    &#160;<span id="projectnumber">1.0</span>
    </div>
    <div id="projectbrief">Gentoo distribution creator</div>
@@ -183,7 +183,7 @@ Functions</h2></td></tr>
 <li>Write zeros as much as possible to prepare for compacting. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00171">171</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00226">226</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
 
 </div>
 </div>
@@ -271,7 +271,7 @@ Functions</h2></td></tr>
 <li><code> chroot </code> into new system </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00094">94</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00135">135</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
 
 </div>
 </div>
@@ -293,9 +293,11 @@ Functions</h2></td></tr>
 <p>Create partition table, <b>/dev/sda1</b> (bios_grub), <b>/dev/sda2</b> (boot), <b>dev/sda3</b> (swap) and <b>/dev/sda4</b> (system) </p>
 <p>Create file <b>partition</b>. <br  />
  On error, fill this file with successive exit codes of commands and exit.<br  />
- On success, just create empty file. </p>
+ On success, just create empty file. </p><dl class="section warning"><dt>Warning</dt><dd>The VM needs time to recognize /dev/sda in some cases, for unclear reasons. This may be a kernel issue or a VirtualBox issue. </dd></dl>
+<dl class="bug"><dt><b><a class="el" href="bug.html#_bug000001">Bug:</a></b></dt><dd>Same issue with mkswap and swapon. Syncing and a bit of sleep fixed these issues. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>It might be necessary with older machines to increase the amount of sleep. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00052">52</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00070">70</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
 
 </div>
 </div>
