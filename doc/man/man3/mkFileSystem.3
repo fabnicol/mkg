@@ -77,7 +77,7 @@ Add more regional options by parametrization of commandline
 .PP
 
 .PP
-Definition at line 41 of file mkvm_chroot\&.sh\&.
+Definition at line 43 of file mkvm_chroot\&.sh\&.
 .SS "build_kernel ()"
 
 .PD 0
@@ -98,7 +98,7 @@ Build kernel and initramfs\&. Log into kernel\&.log\&.
 .PP
 
 .PP
-Definition at line 162 of file mkvm_chroot\&.sh\&.
+Definition at line 164 of file mkvm_chroot\&.sh\&.
 .SS "finalize ()"
 
 .PP
@@ -114,7 +114,7 @@ Write zeros as much as possible to prepare for compacting\&.
 .PP
 
 .PP
-Definition at line 240 of file mkvm\&.sh\&.
+Definition at line 247 of file mkvm\&.sh\&.
 .SS "global_config ()"
 
 .PD 0
@@ -145,7 +145,7 @@ Fix \fBsddm\fP startup keyboard issue using \fC setxkbmap\fP
 .PP
 
 .PP
-Definition at line 284 of file mkvm_chroot\&.sh\&.
+Definition at line 286 of file mkvm_chroot\&.sh\&.
 .SS "install_software ()"
 
 .PD 0
@@ -169,7 +169,7 @@ Add a script to build R dependencies
 .PP
 
 .PP
-Definition at line 209 of file mkvm_chroot\&.sh\&.
+Definition at line 211 of file mkvm_chroot\&.sh\&.
 .SS "install_stage3 ()"
 
 .PD 0
@@ -191,7 +191,7 @@ On success, create empty file \fBpartition\fP
 .PP
 
 .PP
-Definition at line 145 of file mkvm\&.sh\&.
+Definition at line 152 of file mkvm\&.sh\&.
 .SS "partition ()"
 
 .PP
@@ -208,7 +208,9 @@ The VM needs time to recognize /dev/sda in some cases, for unclear reasons\&. Th
 .PP
 \fBBug\fP
 .RS 4
-Same issue with mkswap and swapon\&. Syncing and a bit of sleep fixed these issues\&. 
+Same issue with mkswap and swapon\&. Cleaning VBox config/settings, syncing and a bit of sleep fixed these issues for the \fInet-setup\fP method\&. 
+.PP
+However the \fIdhcpcd\fP method is consistently broken, which currently blocks headless vmtypes\&. 
 .RE
 .PP
 \fBNote\fP
@@ -218,7 +220,7 @@ It might be necessary with older machines to increase the amount of sleep\&.
 .PP
 
 .PP
-Definition at line 62 of file mkvm\&.sh\&.
+Definition at line 68 of file mkvm\&.sh\&.
 .SS "setup_network ()"
 
 .PP
@@ -231,7 +233,7 @@ Call net-setup and dhcpcd to enable networking\&. Create file \fBsetup_network\f
 .PP
 
 .PP
-Definition at line 27 of file mkvm\&.sh\&.
+Definition at line 29 of file mkvm\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for gentoo-creator from the source code\&.
