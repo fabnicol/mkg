@@ -370,7 +370,7 @@ This is only needed to reduce disk space requirements and avoid a temporary RAW 
 <p>Register machine, create VDI drive, create IDE drive attach disks to controlers <br  />
 Attach newly augmented clonezilla LiveCD to IDE controller. <br  />
 Wait for the VM to complete its task. Check that it is still running every minute. <br  />
-</p><dl class="section note"><dt>Note</dt><dd>VM may be visible (vmtype=gui) or silent (vmtype=headless, default). Wait for the VM to complete task. <br  />
+</p><dl class="section note"><dt>Note</dt><dd>VM may be visible (vmtype=gui) or silent (vmtype=headless, currently to be fixed). Wait for the VM to complete task. <br  />
 A new VM is necessary as the first VM used to build the Gentoo filesystem does not contain clonezilla or the VirtualBox guest additions (requested for sharing folders with host). Calls <a class="el" href="group__create_installer.html#gac1f727409fd593a27f5e4df3270aab31" title="Download clonezilla ISO or recover it from cache calling fetch_clonezilla_iso.  Upgrade it with virtu...">process_clonezilla_iso</a> to satisfy these requirements. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>the <b>sharedfolder</b> command may fail vith older version of VirtualBox or not be implemented. It is transient, so it disappears on shutdown and requests prior startup of VM to be activated. </dd></dl>
 
@@ -425,7 +425,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 <p>Register machine, create VDI drive, create IDE drive attach disks to controlers <br  />
 Attach augmented clonezilla LiveCD to IDE controller. <br  />
 Wait for the VM to complete its task. Check that it is still running every minute. <br  />
-Finally compact it. </p><dl class="section note"><dt>Note</dt><dd>VM may be visible (vmtype=gui) or silent (vmtype=headless, default) </dd></dl>
+Finally compact it. </p><dl class="section note"><dt>Note</dt><dd>VM may be visible (vmtype=gui) or without GUI (vmtype=headless, currently to be fixed) </dd></dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Find a way to only compact on success and never on failure of VM. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00529">529</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>

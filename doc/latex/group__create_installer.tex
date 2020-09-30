@@ -221,7 +221,7 @@ Register machine, create V\+DI drive, create I\+DE drive attach disks to control
 Attach newly augmented clonezilla Live\+CD to I\+DE controller. ~\newline
 Wait for the VM to complete its task. Check that it is still running every minute. ~\newline
 \begin{DoxyNote}{Note}
-VM may be visible (vmtype=gui) or silent (vmtype=headless, default). Wait for the VM to complete task. ~\newline
+VM may be visible (vmtype=gui) or silent (vmtype=headless, currently to be fixed). Wait for the VM to complete task. ~\newline
 A new VM is necessary as the first VM used to build the Gentoo filesystem does not contain clonezilla or the Virtual\+Box guest additions (requested for sharing folders with host). Calls \mbox{\hyperlink{group__create_installer_gac1f727409fd593a27f5e4df3270aab31}{process\+\_\+clonezilla\+\_\+iso}} to satisfy these requirements. 
 \end{DoxyNote}
 \begin{DoxyWarning}{Warning}
@@ -266,7 +266,7 @@ Register machine, create V\+DI drive, create I\+DE drive attach disks to control
 Attach augmented clonezilla Live\+CD to I\+DE controller. ~\newline
 Wait for the VM to complete its task. Check that it is still running every minute. ~\newline
 Finally compact it. \begin{DoxyNote}{Note}
-VM may be visible (vmtype=gui) or silent (vmtype=headless, default) 
+VM may be visible (vmtype=gui) or without G\+UI (vmtype=headless, currently to be fixed) 
 \end{DoxyNote}
 \begin{DoxyRefDesc}{Todo}
 \item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Find a way to only compact on success and never on failure of VM. \end{DoxyRefDesc}

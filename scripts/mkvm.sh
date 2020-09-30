@@ -28,16 +28,8 @@ setup_network() {
     if test -f setup_network; then
         return
     fi
-    if test "${VMTYPE}" = "gui"; then
-        net-setup
-        sleep 40
-    else
-        eth=$(ifconfig | cut -f1 -d' ' | line | cut -f1 -d':')
-        echo "eth=${eth}"
-        sleep 10
-        dhcpcd ${eth}
-        sleep 40
-    fi
+    net-setup
+    sleep 40
     if test $? = 0; then
         touch setup_network
     else
@@ -47,7 +39,7 @@ setup_network() {
             exit -1
         else
 
-            # A stricter measure for headless VMs to avoid waiting for 2 days uselessly
+            # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
 
             shutdown -h now
         fi
@@ -130,7 +122,7 @@ partition() {
                 exit -1
             else
 
-                # A stricter measure for headless VMs to avoid waiting for 2 days uselessly
+                # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
                 shutdown -h now
             fi
         else
@@ -172,7 +164,7 @@ install_stage3() {
             exit -1
         else
 
-            # A stricter measure for headless VMs to avoid waiting for 2 days uselessly
+            # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
 
             shutdown -h now
         fi
@@ -232,7 +224,7 @@ install_stage3() {
             exit -1
         else
 
-            # A stricter measure for headless VMs to avoid waiting for 2 days uselessly
+            # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
 
             shutdown -h now
         fi

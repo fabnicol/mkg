@@ -106,7 +106,7 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "lineno_patch" "Line patched against vbox-img.cpp in virtualbox source code"        "797"
      "stage3"      "Path to stage3 archive"                                              "stage3.tar.xz"
      "create_squashfs"  "(Re)create the squashfs filesystem. Boolean."                   "true"
-     "vmtype"      "gui or headless (silent)"                                            "headless"
+     "vmtype"      "gui or headless (without graphical interface, currently to be fixed)" "gui"
      "kernel_config"  "Use a custom kernel config file"                                  ".config"
      "language"    "Set default login keyboard layout"                                   "us"
      "burn"        "Burn to optical disc. Boolean."                                      "false"
@@ -522,7 +522,7 @@ delete_vm() {
 ## Attach augmented clonezilla LiveCD to IDE controller. @n
 ## Wait for the VM to complete its task. Check that it is still running every minute. @n
 ## Finally compact it.
-## @note VM may be visible (vmtype=gui) or silent (vmtype=headless, default)
+## @note VM may be visible (vmtype=gui) or without GUI (vmtype=headless, currently to be fixed)
 ## @todo Find a way to only compact on success and never on failure of VM.
 ## @ingroup createInstaller
 
@@ -656,7 +656,7 @@ build_virtualbox() {
 ## @details Register machine, create VDI drive, create IDE drive attach disks to controlers @n
 ## Attach newly augmented clonezilla LiveCD to IDE controller. @n
 ## Wait for the VM to complete its task. Check that it is still running every minute. @n
-## @note VM may be visible (vmtype=gui) or silent (vmtype=headless, default).
+## @note VM may be visible (vmtype=gui) or silent (vmtype=headless, currently to be fixed).
 ## Wait for the VM to complete task. @n
 ## A new VM is necessary as the first VM used to build the Gentoo filesystem does not contain clonezilla
 ## or the VirtualBox guest additions (requested for sharing folders with host).
