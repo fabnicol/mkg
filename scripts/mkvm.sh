@@ -84,6 +84,7 @@ partition() {
     sync
     mkfs.ext4 -e continue -q -F -F /dev/sda4
     res2=$?
+    swapoff -a
     sync
     declare -i index=0
     while ! mkswap /dev/sda3; do
@@ -123,12 +124,13 @@ partition() {
         sleep 10
         if test $((${res1} | ${res2} | ${res3} | ${res4} | ${res5})) != 0; then
             echo  "Critical errors whicle partitioning"
+            swapoff /dev/sda3
+            findmnt /dev/sda4 && umount -l /dev/sda4
             if test "${VMTYPE}" = "gui"; then
                 exit -1
             else
 
                 # A stricter measure for headless VMs to avoid waiting for 2 days uselessly
-
                 shutdown -h now
             fi
         else
@@ -164,6 +166,8 @@ install_stage3() {
     if test $? != 0; then
         echo "stage3 tarball could not be extracted"
         sleep 10
+        swapoff /dev/sda3
+        findmnt /dev/sda4 && umount -l /dev/sda4
         if test "${VMTYPE}" = "gui"; then
             exit -1
         else
@@ -222,6 +226,8 @@ install_stage3() {
         echo "rslave dev exit code exit code: ${res4}"    >> stage3
         echo "Failed to bind liveCD to main disk"
         sleep 10
+        swapoff /dev/sda3
+        findmnt /dev/sda4 && umount -l /dev/sda4
         if test "${VMTYPE}" = "gui"; then
             exit -1
         else
@@ -246,6 +252,7 @@ finalize() {
     umount /mnt/gentoo/sys
     umount -R -l  /mnt/gentoo
     chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}
+    umount -l /dev/sda4
     shutdown -h now
 }
 
