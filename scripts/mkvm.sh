@@ -85,10 +85,26 @@ partition() {
     mkfs.ext4 -e continue -q -F -F /dev/sda4
     res2=$?
     sync
-    while ! mkswap /dev/sda3; do continue; done
+    declare -i index=0
+    while ! mkswap /dev/sda3; do
+        index=index+1
+        if (( index < 10 )); then
+            continue
+        else
+            break
+        fi
+    done
     res3=$?
     sync
-    while ! swapon /dev/sda3; do continue; done
+    index=0
+    while ! swapon /dev/sda3; do
+        index=index+1
+        if (( index < 10 )); then
+            continue
+        else
+            break
+        fi
+    done
     res4=$?
     sync
     mount  /dev/sda4 /mnt/gentoo
