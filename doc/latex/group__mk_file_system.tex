@@ -78,7 +78,7 @@ Unmount chrooted system, restore user rights and shutdown VM.
 \item Cleanup {\bfseries{}}.bashrc \item Cleanup other files except for logs if debug mode is on. \item Write zeros as much as possible to prepare for compacting. \end{DoxyItemize}
 
 
-Definition at line 247 of file mkvm.\+sh.
+Definition at line 266 of file mkvm.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_ga30f3fc39fcff53af9710fea740f38109}\label{group__mk_file_system_ga30f3fc39fcff53af9710fea740f38109}} 
 \index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!global\_config@{global\_config}}
@@ -124,7 +124,7 @@ Definition at line 211 of file mkvm\+\_\+chroot.\+sh.
 \item Copy stage3 archive, ebuild list, kernel config and \mbox{\hyperlink{mkvm__chroot_8sh}{mkvm\+\_\+chroot.\+sh}} to /mnt/gentoo \item Extract it, fix basic make.\+conf options \item Install repos.\+conf from live\+CD (networking parameters) \item Mount live\+CD proc/sys/dev files into new filesystem \item On failure, print error codes into file {\bfseries{partition}} \item On success, create empty file {\bfseries{partition}} \item {\ttfamily  chroot } into new system \end{DoxyItemize}
 
 
-Definition at line 152 of file mkvm.\+sh.
+Definition at line 171 of file mkvm.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_gaa9952b2711fe0413d7a0bc6639c7f5a5}\label{group__mk_file_system_gaa9952b2711fe0413d7a0bc6639c7f5a5}} 
 \index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!partition@{partition}}
@@ -144,13 +144,13 @@ The VM needs time to recognize /dev/sda in some cases, for unclear reasons. This
 \begin{DoxyRefDesc}{Bug}
 \item[\mbox{\hyperlink{bug__bug000001}{Bug}}]Same issue with mkswap and swapon. Cleaning V\+Box config/settings, syncing and a bit of sleep fixed these issues for the {\itshape net-\/setup} method. 
 
-However the {\itshape dhcpcd} method is consistently broken, which currently blocks headless vmtypes. \end{DoxyRefDesc}
+However the {\itshape dhcpcd} method is consistently broken, which currently blocks headless vmtypes. Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a {\ttfamily read}command, all falls back into place. This is why using the net-\/setup script, which forces user input, circumvents the issue. This may be caused by an aging kernel and/or incompatibilities with virtualization. Using a Clone\+Zilla CD as a replacement solved the issue completely yet would need a redraft of much of the code. It might be better to use a beefed-\/up Gentoo install CD. \end{DoxyRefDesc}
 \begin{DoxyNote}{Note}
 It might be necessary with older machines to increase the amount of sleep. 
 \end{DoxyNote}
 
 
-Definition at line 68 of file mkvm.\+sh.
+Definition at line 81 of file mkvm.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_ga4315b3877c965059c7db8593870066ba}\label{group__mk_file_system_ga4315b3877c965059c7db8593870066ba}} 
 \index{Create Gentoo linux filesystem on VM disk and emerge software.@{Create Gentoo linux filesystem on VM disk and emerge software.}!setup\_network@{setup\_network}}

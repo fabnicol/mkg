@@ -183,7 +183,7 @@ Functions</h2></td></tr>
 <li>Write zeros as much as possible to prepare for compacting. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00247">247</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00266">266</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
 
 </div>
 </div>
@@ -271,7 +271,7 @@ Functions</h2></td></tr>
 <li><code> chroot </code> into new system </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00152">152</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00171">171</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
 
 </div>
 </div>
@@ -295,11 +295,11 @@ Functions</h2></td></tr>
  On error, fill this file with successive exit codes of commands and exit.<br  />
  On success, just create empty file. </p><dl class="section warning"><dt>Warning</dt><dd>The VM needs time to recognize /dev/sda in some cases, for unclear reasons. This may be a kernel issue or a VirtualBox issue. </dd></dl>
 <dl class="bug"><dt><b><a class="el" href="bug.html#_bug000001">Bug:</a></b></dt><dd><p class="startdd">Same issue with mkswap and swapon. Cleaning VBox config/settings, syncing and a bit of sleep fixed these issues for the <em>net-setup</em> method. </p>
-<p class="enddd">However the <em>dhcpcd</em> method is consistently broken, which currently blocks headless vmtypes. </p>
+<p class="enddd">However the <em>dhcpcd</em> method is consistently broken, which currently blocks headless vmtypes. Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a <code>read</code>command, all falls back into place. This is why using the net-setup script, which forces user input, circumvents the issue. This may be caused by an aging kernel and/or incompatibilities with virtualization. Using a CloneZilla CD as a replacement solved the issue completely yet would need a redraft of much of the code. It might be better to use a beefed-up Gentoo install CD. </p>
 </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>It might be necessary with older machines to increase the amount of sleep. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00068">68</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00081">81</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
 
 </div>
 </div>

@@ -30,23 +30,31 @@ setup_network() {
     if test -f setup_network; then
         return
     fi
+    local res=0
     if test "${VMTYPE}" = "headless"; then
-
-        # currently does not work for murky reasons.
-
-        dhcpcd $(ifconfig  | cut -f1 -d' ' | head -n 1 | cut -f1 -d':')
+        [ ! -d /tmp/setup.opts ] && mkdir -p /tmp/setup.opts
+        ./input
+        cd /tmp/setup.opts
+        local  iface=$(ifconfig | cut -f1 -d' ' | head -n 1 | cut -f1 -d':')
+        /sbin/dhcpcd -n -t 10 -h $(hostname) ${iface} &
+        res=$?
+        echo "" >> /etc/conf.d/net
+        echo "config_${iface}=\"dhcp\"" >> /etc/conf.d/net
+        cd -
     else
         net-setup
+        res=$?
     fi
-    if test $? = 0; then
-
+    if test ${res} = 0; then
         touch setup_network
     else
         echo "Could not fix internet access!" | tee setup_network.log
         if test "${VMTYPE}" = "gui"; then
             exit -1
-         else
-             # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
+        else
+
+            # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
+
              shutdown -h now
         fi
     fi
@@ -62,29 +70,34 @@ setup_network() {
 ## This may be a kernel issue or a VirtualBox issue.
 ## @bug  Same issue with mkswap and swapon. Cleaning VBox config/settings, syncing and a bit of sleep fixed these issues for the \e net-setup method.
 ## @bug However the \e dhcpcd method is consistently broken, which currently blocks headless vmtypes.
+## Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated
+## owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are
+## mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a `read`command, all
+## falls back into place. This is why using the net-setup script, which forces user input, circumvents the issue.
+## This may be caused by an aging kernel and/or incompatibilities with virtualization.
+## Using a CloneZilla CD as a replacement solved the issue completely yet would need a redraft of much of the code.
+## It might be better to use a beefed-up Gentoo install CD.
 ## @note It might be necessary with older machines to increase the amount of sleep.
 ## @ingroup mkFileSystem
 
 partition() {
-    if test -f partition; then
-        return
+    if test -f partition -a ! -s partition; then
+        return 0
     fi
     sleep 5
     parted --script --align=opt /dev/sda "mklabel gpt unit mib mkpart primary 1 3 name 1 grub set 1 bios_grub on mkpart primary 3 131  name 2 boot mkpart primary 131 643 name 3 swap mkpart primary 643 -1 set 2 boot on"
     res0=$?
-
-    # This may look unnatural, but it has occurred quite a few times, with /dev/sdaX "still mounted"
-    # thereby thwarting filesystem authoring. This insane beavior has been circumvented by syncing,
-    # testing for mount and umounting should the case arise. This has even occurred with the swap partition.
     sync
-    sleep 5
+    sleep 10
     mkfs.fat -v -F 32 /dev/sda2
     res1=$?
     sync
+    sleep 10
     mkfs.ext4 -e continue -q -F -F /dev/sda4
     res2=$?
     swapoff -a
     sync
+    sleep 10
     declare -i index=0
     while ! mkswap /dev/sda3; do
         index=index+1
@@ -107,6 +120,9 @@ partition() {
     done
     res4=$?
     sync
+    if findmnt /dev/sda4; then
+        umount -l /dev/sda4
+    fi
     mount  /dev/sda4 /mnt/gentoo
     res5=$?
     res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4} | ${res5}))
@@ -121,12 +137,12 @@ partition() {
         echo "mount exit code:  ${res5}"    >> partition
         echo "Failed to cleanly partition main disk"
         sleep 10
-        if test $((${res1} | ${res2} | ${res3} | ${res4} | ${res5})) != 0; then
-            echo  "Critical errors whicle partitioning"
-            swapoff /dev/sda3
+        if test $((${res1} | ${res2} | ${res3} | ${res5})) != 0; then
+            echo  "Critical errors while partitioning"
+            swapoff -a
             findmnt /dev/sda4 && umount -l /dev/sda4
             if test "${VMTYPE}" = "gui"; then
-                exit -1
+                return -1
             else
 
                 # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
@@ -259,6 +275,21 @@ finalize() {
 # Logs are provided for debugging purposes
 
 setup_network  2>&1 | tee setup_network.log
-partition      2>&1 | tee partition.log
+if ! partition; then
+    echo "Second chance.."
+    rm partition
+    echo "Enter a keystroke..."
+    read b
+    echo $b
+    # try again
+    if findmnt /dev/sda2; then
+        umount -l /dev/sda2
+    fi
+    if findmnt /dev/sda4; then
+        umount -l /dev/sda4
+    fi
+    swapoff -a
+    partition
+fi
 install_stage3 2>&1 | tee install_stage3.log
 finalize       2>&1 | tee finalize.log

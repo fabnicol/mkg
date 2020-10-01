@@ -121,6 +121,7 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "from_vm"       "Do not generate Gentoo but use the VM ${VM}. Boolean."              "false"
      "from_iso"      "Do not generate Gentoo but use the bootable ISO given on commandline. Boolean." "false"
      "from_device"   "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean." "false"
+     "verbose"       "Increase verbosity"                                                 "false"
     )
 
 ## @var ARRAY_LENGTH
@@ -141,6 +142,66 @@ declare -r ISO="downloaded.iso"
 ## @ingroup createInstaller
 
 test_cli_pre() {
+
+    if [ "$(whoami)" != "root" ]
+    then
+        echo "ERROR: must be root to continue"
+        exit 1
+    fi
+
+    # Configuration tests
+
+    if test "$(VBoxManage --version)" = ""; then
+        echo "Did not find a proper VirtualBox install. Reinstall Virtualbox versionn>= 6.1"
+        exit -1
+    fi
+    if test "$(uuid)" = ""; then
+        echo "Did not find uuid. Intall the uuid package"
+        exit -1
+    fi
+    if test "$(mkisofs -version)" = ""; then
+        echo "Did not find mkisofs. Install the cdrtools package (see Wiki)"
+        exit -1
+    fi
+    if test "$(mksquashfs -version)" = ""; then
+        echo "Did not find squashfs. Install the squashfs package."
+        exit -1
+    fi
+    if test "$(xz --version)" = ""; then
+        echo "Did not find xz. Install xz and its libraries"
+        exit -1
+    fi
+    if test "$(ocs-sr -v)" = ""; then
+        echo "Did not find CloneZilla. Install CloneZilla and dependencies first."
+        exit -1
+    fi
+    if test "$(wget --version)" = "" ; then
+        echo "Did not find wget. Please install it now."
+        exit -1
+    fi
+    if test "$(md5sum --version)" = ""; then
+        echo "Did not find md5sum. Install the coreutils package."
+        exit -1
+    fi
+    if test "$(tar --version)" = ""; then
+        echo "Did not find tar."
+        exit -1
+    fi
+    if test "$(mountpoint --version)" = "" -o "$(findmnt --version)" = ""; then
+        echo "Did not find mountpoint/findmnt. Install util-linux."
+        exit -1
+    fi
+    if test "$(sed --version)" = ""; then
+        echo "Did not find sed."
+        exit -1
+    fi
+    if test "$(which xorriso)" = ""; then
+        echo "Did not find xorriso (libburnia project)"
+        exit -1
+    fi
+
+    # Check VirtualBox version
+
     declare -r vbox_version=$(VBoxManage -v)
     declare -r version_major=$(echo ${vbox_version} | sed -E 's/([0-9]+)\..*/\1/')
     declare -r version_minor=$(echo ${vbox_version} | sed -E 's/[0-9]+\.([0-9]+)\..*/\1/')
@@ -271,7 +332,8 @@ fetch_livecd() {
     if test ${DOWNLOAD} = "false"; then
         if test "${CREATE_SQUASHFS}" = "true"; then
             if test -f ${CACHED_ISO}; then
-                cp -vf ${CACHED_ISO} ${ISO}
+                echo "Uncaching ${ISO} from ${CACHED_ISO}"
+                cp -f ${CACHED_ISO} ${ISO}
             else
                 echo "No ISO file was found, please rerun with download=true"
                 exit -1
@@ -300,7 +362,8 @@ fetch_livecd() {
             check_md5sum ${downloaded}
         fi
         if test -f ${downloaded}; then
-            cp -vf ${downloaded} ${CACHED_ISO}
+            echo "Caching downloaded ISO to ${CACHED_ISO}"
+            cp -f ${downloaded} ${CACHED_ISO}
             mv ${downloaded} ${ISO}
             if test -f ${ISO}; then
                 LIVECD=${ISO}
@@ -327,10 +390,9 @@ fetch_stage3() {
     # Fetching stage3 tarball
 
     local CACHED_STAGE3="stage3-${PROCESSOR}.tar.xz"
-    echo "download_stage3=${DOWNLOAD_STAGE3}"
     if test ${DOWNLOAD_STAGE3} = "true"; then
         echo "Cleaning up stage3 data..."
-        rm -vf latest-stage3*.txt*
+        rm -f latest-stage3*.txt*
         echo "Downloading stage3 data..."
         wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt
         if test $? != 0; then
@@ -347,7 +409,7 @@ fetch_stage3() {
     local current=$(cat latest-stage3-${PROCESSOR}.txt | grep "stage3-${PROCESSOR}.*.tar.xz" | cut -f 1 -d' ')
     if test ${DOWNLOAD_STAGE3} = "true"; then
         echo "Cleaning up stage3 archives(s)..."
-        rm -vf stage3-${PROCESSOR}-*tar.xz*
+        rm -f stage3-${PROCESSOR}-*tar.xz*
         rm  ${STAGE3}
         echo "Downloading ${current}..."
         wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
@@ -358,14 +420,16 @@ fetch_stage3() {
         if test ${DISABLE_MD5_CHECK} = "false"; then
             check_md5sum $(basename ${current})
         fi
-        cp -vf $(echo ${current} | sed 's/.*stage3/stage3/')  ${CACHED_STAGE3}
+        echo "Caching ${current} to ${CACHED_STAGE3}"
+        cp -f $(echo ${current} | sed 's/.*stage3/stage3/')  ${CACHED_STAGE3}
     fi
     if ! test -f "${CACHED_STAGE3}"; then
         echo "No stage3 tarball!"
         echo "Rerun with download_stage3=true"
         exit -1
     fi
-    cp -vf ${CACHED_STAGE3} ${STAGE3}
+    echo "Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}"
+    cp -f ${CACHED_STAGE3} ${STAGE3}
 }
 
 ## @fn make_boot_from_livecd()
@@ -396,13 +460,20 @@ make_boot_from_livecd() {
         rm -rf mnt2
     fi
     mkdir mnt2
-    rsync -av mnt/ mnt2
+    local verb=""
+    if test "${VERBOSE}" = "true"; then
+        verb="-v"
+    fi
+    rsync -a ${verb} mnt/ mnt2
     cd mnt2/isolinux
     sed -i 's/timeout.*/timeout 1/' isolinux.cfg
     sed -i 's/ontimeout.*/ontimeout gentoo/' isolinux.cfg
     cd ..
-    echo "unsquashfs"
-    unsquashfs image.squashfs
+    if test "${VERBOSE}" = "false"; then
+        unsquashfs  image.squashfs 2>&1 >/dev/null
+    else
+        unsquashfs  image.squashfs
+    fi
     if test $? != 0; then
         echo "unsquashfs failed !"
         exit -1
@@ -417,9 +488,9 @@ make_boot_from_livecd() {
         exit -1
     fi
     if test "${MINIMAL}" = "true" -a "${ELIST}" = "ebuilds.list"; then
-        cp -vf ${ELIST}.minimal ${ELIST}
+        cp ${verb} -f ${ELIST}.minimal ${ELIST}
     else
-        cp -vf ${ELIST}.complete ${ELIST}
+        cp ${verb} -f ${ELIST}.complete ${ELIST}
     fi
     if ! test -f ${ELIST}; then
         echo "No ebuild list!"
@@ -434,37 +505,44 @@ make_boot_from_livecd() {
         exit -1
     fi
     local sqrt="mnt2/squashfs-root/root/"
-    mv -vf ${STAGE3} ${sqrt}
-    cp -vf scripts/mkvm.sh ${sqrt}
+    mv ${verb} -f ${STAGE3} ${sqrt}
+    cp ${verb} -f scripts/mkvm.sh ${sqrt}
+    cp ${verb} -f bin/input ${sqrt}
     chmod +x ${sqrt}mkvm.sh
-    cp -vf scripts/mkvm_chroot.sh ${sqrt}
+    cp ${verb} -f scripts/mkvm_chroot.sh ${sqrt}
     chmod +x ${sqrt}mkvm_chroot.sh
-    cp -vf ${ELIST} ${sqrt}
-    cp -vf ${KERNEL_CONFIG} ${sqrt}
+    cp ${verb} -f ${ELIST} ${sqrt}
+    cp ${verb} -f ${KERNEL_CONFIG} ${sqrt}
     cd ${sqrt}
     rc=".bashrc"
-    cp -vf /etc/bash.bashrc ${rc}
+    cp ${verb} -f /etc/bash.bashrc ${rc}
     declare -i i
     for ((i=0; i<ARRAY_LENGTH; i++)); do
         local  capname=${ARR[i*3]^^}
         local  expstring="export ${capname}=\"${!capname}\""
-        echo "${expstring}"
+        if test "${VERBOSE}" = "true"; then
+            echo "${expstring}"
+        fi
         echo "${expstring}" >> ${rc}
     done
     echo  "/bin/bash mkvm.sh"  >> ${rc}
     cd ../..
-    rm  image.squashfs
-    mksquashfs squashfs-root/ image.squashfs
+    rm ${verb} -f image.squashfs
+    local verb2="-quiet"
+    mksquashfs squashfs-root/ image.squashfs ${verb2}
     rm -rf squashfs-root/
     cd ..
-    mkisofs -J -R -o  ${ISO} -b isolinux/isolinux.bin  -c isolinux/boot.cat  -no-emul-boot -boot-load-size 4  -boot-info-table  mnt2
+    if test "${VERBOSE}" = "true"; then
+        verb2="-v"
+    fi
+    mkisofs ${verb2} -J -R -o  ${ISO} -b isolinux/isolinux.bin  -c isolinux/boot.cat  -no-emul-boot -boot-load-size 4  -boot-info-table  mnt2
     if test $? != 0; then
         echo "mkisofs could not recreate the ISO file to boot virtual machine ${VM}"
         exit -1
     fi
     umount -l mnt
-    rm -rvf mnt
-    rm -rvf mnt2
+    rm -rf ${verb} mnt
+    rm -rf ${verb} mnt2
     return 0
 }
 
