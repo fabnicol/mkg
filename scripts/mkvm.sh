@@ -32,15 +32,7 @@ setup_network() {
     fi
     local res=0
     if test "${VMTYPE}" = "headless"; then
-        [ ! -d /tmp/setup.opts ] && mkdir -p /tmp/setup.opts
-        ./input
-        cd /tmp/setup.opts
-        local  iface=$(ifconfig | cut -f1 -d' ' | head -n 1 | cut -f1 -d':')
-        /sbin/dhcpcd -n -t 10 -h $(hostname) ${iface} &
-        res=$?
-        echo "" >> /etc/conf.d/net
-        echo "config_${iface}=\"dhcp\"" >> /etc/conf.d/net
-        cd -
+        ocs-live-netcfg
     else
         net-setup
         res=$?
@@ -276,12 +268,7 @@ finalize() {
 
 setup_network  2>&1 | tee setup_network.log
 if ! partition; then
-    echo "Second chance.."
-    rm partition
-    echo "Enter a keystroke..."
-    read b
-    echo $b
-    # try again
+    echo "Second try at partitioning..."
     if findmnt /dev/sda2; then
         umount -l /dev/sda2
     fi

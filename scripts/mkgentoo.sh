@@ -211,6 +211,10 @@ test_cli_pre() {
         echo "Please update and reinstall"
         exit -1
     fi
+    if test "${DOWNLOAD}" = "true" -a "${CREATE_SQUASHFS}" = "false"; then
+        echo "You cannot set create_squashfs=false with download=true"
+        exit -1
+    fi
     declare -r -x ISO_OUTPUT=$(echo ${CLI} | sed -E 's/.*(\b\w+)\.(iso|ISO)/\1\.iso/')
     if test "${ISO_OUTPUT}" != "" -a "${ISO_OUTPUT}" != "${CLI}"; then
         echo "Build Gentoo distribution to bootable ISO output ${ISO_OUTPUT}"
@@ -329,6 +333,21 @@ help() {
 fetch_livecd() {
     cd "${VMPATH}"
     local CACHED_ISO="install-${PROCESSOR}-minimal.iso"
+
+    # Use clonezilla ISO for headless VM and Gentoo minimal install ISO for gui VM
+
+    if test "${VMTYPE}" = "headless"; then
+        DOWNLOAD_CLONEZILLA=${DOWNLOAD}
+        if test "${DOWNLOAD}" = "true"; then
+            get_clonezilla_iso
+            ISO=${CLONEZILLACD}
+        fi
+        CACHED_ISO=clonezilla.iso
+    else
+        if test ${DOWNLOAD} = "true"; then
+            get_gentoo_install_iso
+        fi
+    fi
     if test ${DOWNLOAD} = "false"; then
         if test "${CREATE_SQUASHFS}" = "true"; then
             if test -f ${CACHED_ISO}; then
@@ -340,41 +359,6 @@ fetch_livecd() {
             fi
         fi
         LIVECD=${ISO}
-        return 0
-    fi
-    rm install-${PROCESSOR}-minimal*\.iso*
-    rm latest-install-${PROCESSOR}-minimal*\.txt*
-    local downloaded=""
-    wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-install-${PROCESSOR}-minimal.txt
-    if test $? != 0; then
-        echo "Could not download live CD from Gentoo mirror"
-        exit -1
-    fi
-    local current=$(cat latest-install-${PROCESSOR}-minimal.txt | grep "install-${PROCESSOR}-minimal.*.iso" | sed -E 's/iso.*$/iso/' )
-    local downloaded=$(basename ${current})
-    echo "Downloading $current..."
-    wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
-    if test $? != 0; then
-        echo "Could not download live CD"
-        exit -1
-    else
-        if test ${DISABLE_MD5_CHECK} = "false"; then
-            check_md5sum ${downloaded}
-        fi
-        if test -f ${downloaded}; then
-            echo "Caching downloaded ISO to ${CACHED_ISO}"
-            cp -f ${downloaded} ${CACHED_ISO}
-            mv ${downloaded} ${ISO}
-            if test -f ${ISO}; then
-                LIVECD=${ISO}
-            else
-                echo "No active ISO (${ISO}) file!"
-                exit -1
-            fi
-        else
-            echo "Could not find downloaded live CD ${downloaded}"
-            exit -1
-        fi
     fi
     return 0
 }
@@ -465,20 +449,34 @@ make_boot_from_livecd() {
         verb="-v"
     fi
     rsync -a ${verb} mnt/ mnt2
-    cd mnt2/isolinux
+    local ROOT_LIVE="${VMPATH}/mnt2"
+    local SQUASHFS_FILESYSTEM=image.squashfs
+    local ISOLINUX_DIR=isolinux
+    if test "${VMTYPE}" = "headless"; then
+        ISOLINUX_DIR=syslinux
+        ROOT_LIVE="${VMPATH}/mnt2/live"
+        SQUASHFS_FILESYSTEM=filesystem.squashfs
+    fi
+    cd ${ROOT_LIVE}/${ISOLINUX_DIR}
+
+    #--- adapt here for clonezilla ---
+
     sed -i 's/timeout.*/timeout 1/' isolinux.cfg
     sed -i 's/ontimeout.*/ontimeout gentoo/' isolinux.cfg
-    cd ..
+    #---------------------
+
+    cd ${ROOT_LIVE}
     if test "${VERBOSE}" = "false"; then
-        unsquashfs  image.squashfs 2>&1 >/dev/null
+        unsquashfs ${SQUASHFS_FILESYSTEM} 2>&1 >/dev/null
     else
-        unsquashfs  image.squashfs
+        unsquashfs ${SQUASHFS_FILESYSTEM}
     fi
+
     if test $? != 0; then
         echo "unsquashfs failed !"
         exit -1
     fi
-    cd ..
+    cd "${VMPATH}"
     if ! test -f scripts/mkvm.sh; then
         echo "No mkvm.sh script!"
         exit -1
@@ -504,16 +502,18 @@ make_boot_from_livecd() {
         echo "No kernel configuration file!"
         exit -1
     fi
-    local sqrt="mnt2/squashfs-root/root/"
+    local sqrt="${ROOT_LIVE}/squashfs-root/root/"
     mv ${verb} -f ${STAGE3} ${sqrt}
     cp ${verb} -f scripts/mkvm.sh ${sqrt}
-    cp ${verb} -f bin/input ${sqrt}
     chmod +x ${sqrt}mkvm.sh
     cp ${verb} -f scripts/mkvm_chroot.sh ${sqrt}
     chmod +x ${sqrt}mkvm_chroot.sh
     cp ${verb} -f ${ELIST} ${sqrt}
     cp ${verb} -f ${KERNEL_CONFIG} ${sqrt}
     cd ${sqrt}
+    if test "${VMTYPE}" = "headless"; then
+        mkdir -p ../mnt/gentoo
+    fi
     rc=".bashrc"
     cp ${verb} -f /etc/bash.bashrc ${rc}
     declare -i i
@@ -527,11 +527,11 @@ make_boot_from_livecd() {
     done
     echo  "/bin/bash mkvm.sh"  >> ${rc}
     cd ../..
-    rm ${verb} -f image.squashfs
+    rm ${verb} -f ${SQUASHFS_FILESYSTEM}
     local verb2="-quiet"
-    mksquashfs squashfs-root/ image.squashfs ${verb2}
+    mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM} ${verb2}
     rm -rf squashfs-root/
-    cd ..
+    cd "${VMPATH}"
     if test "${VERBOSE}" = "true"; then
         verb2="-v"
     fi
