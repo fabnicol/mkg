@@ -1,5 +1,10 @@
 #!/bin/bash
 
+## @fn get_gentoo_install_iso()
+## @brief Download minimal Gentoo install ISO file and caches.
+## @details Optionaly checks MD5SUMS.
+## @ingroup createInstaller
+
 get_gentoo_install_iso() {
     rm install-${PROCESSOR}-minimal*\.iso*
     rm latest-install-${PROCESSOR}-minimal*\.txt*
@@ -37,6 +42,11 @@ get_gentoo_install_iso() {
     fi
 }
 
+
+## @fn get__clonezilla_iso()
+## @brief Download clonezilla ISO file and caches it.
+## @ingroup createInstaller
+
 get_clonezilla_iso() {
     local clonezilla_file=$(echo ${DOWNLOAD_CLONEZILLA_PATH} | sed -E 's/.*\/(.*)\/download/\1/')
     wget ${DOWNLOAD_CLONEZILLA_PATH} -O ${clonezilla_file}
@@ -53,6 +63,10 @@ get_clonezilla_iso() {
 
     cp -vf ${CLONEZILLACD} clonezilla.iso
 }
+
+## @fn get_cache_clonezilla_iso()
+## @brief Either download clonezilla ISO file and caches it OR uncaches it.
+## @ingroup createInstaller
 
 get_cache_clonezilla_iso() {
     if test "${DOWNLOAD_CLONEZILLA}" = "true" -a "${VMTYPE}" = "gui"; then

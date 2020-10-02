@@ -1,4 +1,5 @@
 #!/bin/bash
+[ -z ${CLONEZILLACD} || -z ${VMPATH} ] && echo "Export the CLONEZILLACD and VMPATH variables before running this script." && exit -1
 export VMPATH=$PWD/..
 export DOWNLOAD_CLONEZILLA="true"
 /bin/bash fetch_clonezilla_iso.sh

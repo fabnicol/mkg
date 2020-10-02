@@ -666,7 +666,7 @@ create_vm() {
     VBoxManage storagectl "${VM}" --name "IDE Controller" --add ide
     VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 0   --type dvddrive --medium ${LIVECD}  --tempeject on
     VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium emptydrive
-    VBoxManage startvm "${VM}" --type "gui"   #${VMTYPE}
+    VBoxManage startvm "${VM}" --type "gui" ${VMTYPE}
 
     # VM is created in a separate process
     # Wait for it to come to end
@@ -1069,6 +1069,7 @@ generate_Gentoo() {
 
 ## @fn main()
 ## @brief Main function launching routines
+## @todo Daemonize the part below generate_Gentoo when #VMPTYPE is `headless` so that the script can be detached completely with `nohup mkgentoo ...  &`
 ## @ingroup createInstaller
 
 main() {
