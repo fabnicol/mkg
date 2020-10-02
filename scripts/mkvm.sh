@@ -32,7 +32,7 @@ setup_network() {
     fi
     local res=0
     if test "${VMTYPE}" = "headless"; then
-        ocs-live-netcfg
+        dhclient -v
     else
         net-setup
         res=$?
@@ -165,10 +165,6 @@ install_stage3() {
     cp -vf .bashrc /mnt/gentoo/bashrc_temp
     cd /mnt/gentoo
     head -n -1 -q bashrc_temp > temp_bashrc && rm bashrc_temp
-
-    # Time
-
-    ntpd -q -g
     tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
     if test $? != 0; then
         echo "stage3 tarball could not be extracted"

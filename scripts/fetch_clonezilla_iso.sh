@@ -49,6 +49,9 @@ get_clonezilla_iso() {
         check_md5sum  ${clonezilla_iso}
     fi
     export CLONEZILLACD=${clonezilla_iso}
+    # first cache it
+
+    cp -vf ${CLONEZILLACD} clonezilla.iso
 }
 
 get_cache_clonezilla_iso() {
@@ -57,10 +60,6 @@ get_cache_clonezilla_iso() {
         # if VMTYPE == headless, the ISO has already been downloaded
 
         get_clonezilla_iso
-
-        # first cache it
-
-        cp -vf ${CLONEZILLACD} clonezilla.iso
     else
        if test -f clonezilla.iso -a ! -f ${CLONEZILLACD}; then
 

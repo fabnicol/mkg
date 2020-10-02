@@ -134,7 +134,7 @@ declare -i -r ARRAY_LENGTH=$((${#ARR[*]}/3))
 ## @brief Name of downloaded clonezilla ISO file
 ## @ingroup createInstaller
 
-declare -r ISO="downloaded.iso"
+declare -x ISO="downloaded.iso"
 
 ## @fn test_cli_pre()
 ## @brief Check VirtualBox version and prepare commandline analysis
@@ -429,8 +429,12 @@ make_boot_from_livecd() {
         echo "No active ISO file in current directory!"
         exit -1
     fi
-    if test "${CREATE_SQUASHFS}" != "true"; then
+    if test "${CREATE_SQUASHFS}" = "false"; then
         echo "Reusing ${ISO} which was previously created... use this option with care if only you have run mkgentoo before."
+        echo "create_squashfs should be left at 'true' (default) if mkvm.sh or mkvm_chroot.sh have been altered"
+        echo "or the kernel config file, the global variables, the boot config files, the stage3 archive or the ebuild list."
+        echo "It can be set at 'false' if the install ISO file and stage3 archive are cached in the directory after prior downloads"
+        echo "with no other changes in the above set of files."
         return 0;
     fi
     mountpoint -q mnt && umount -l mnt
@@ -457,21 +461,19 @@ make_boot_from_livecd() {
         ROOT_LIVE="${VMPATH}/mnt2/live"
         SQUASHFS_FILESYSTEM=filesystem.squashfs
     fi
-    cd ${ROOT_LIVE}/${ISOLINUX_DIR}
-
-    #--- adapt here for clonezilla ---
-
-    sed -i 's/timeout.*/timeout 1/' isolinux.cfg
-    sed -i 's/ontimeout.*/ontimeout gentoo/' isolinux.cfg
-    #---------------------
-
+    cd mnt2/${ISOLINUX_DIR}
+    if test "${VMTYPE}" = "gui"; then
+        sed -i 's/timeout.*/timeout 1/' isolinux.cfg
+        sed -i 's/ontimeout.*/ontimeout gentoo/' isolinux.cfg
+    else
+        cp ${verb} -f ${VMPATH}/clonezilla/syslinux/isolinux.cfg .
+    fi
     cd ${ROOT_LIVE}
     if test "${VERBOSE}" = "false"; then
         unsquashfs ${SQUASHFS_FILESYSTEM} 2>&1 >/dev/null
     else
         unsquashfs ${SQUASHFS_FILESYSTEM}
     fi
-
     if test $? != 0; then
         echo "unsquashfs failed !"
         exit -1
@@ -535,14 +537,16 @@ make_boot_from_livecd() {
     if test "${VERBOSE}" = "true"; then
         verb2="-v"
     fi
-    mkisofs ${verb2} -J -R -o  ${ISO} -b isolinux/isolinux.bin  -c isolinux/boot.cat  -no-emul-boot -boot-load-size 4  -boot-info-table  mnt2
+    mkisofs ${verb2} -J -R -o  ${ISO} -b ${ISOLINUX_DIR}/isolinux.bin -c ${ISOLINUX_DIR}/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table mnt2
     if test $? != 0; then
         echo "mkisofs could not recreate the ISO file to boot virtual machine ${VM}"
         exit -1
     fi
     umount -l mnt
-    rm -rf ${verb} mnt
-    rm -rf ${verb} mnt2
+    if test "${CLEANUP}" = "true"; then
+        rm -rf ${verb} mnt
+        rm -rf ${verb} mnt2
+    fi
     return 0
 }
 
@@ -562,14 +566,18 @@ test_vm_running() {
 deep_clean() {
     echo "Cleaning up hard disks in config file because of inconsistencies in VM settings"
     /etc/init.d/virtualbox stop
+    sleep 5
      sed -i  '/^.*HardDisk.*$/d' /root/.config/VirtualBox/VirtualBox.xml
      sed -i -E  's/^(.*)<MediaRegistry>.*$/\1<MediaRegisty\/>/g' /root/.config/VirtualBox/VirtualBox.xml
      sed -i '/^.*<\/MediaRegistry>.*$/d' /root/.config/VirtualBox/VirtualBox.xml
      sed -i  '/^[[:space:]]*$/d' /root/.config/VirtualBox/VirtualBox.xml
+     if test "${VERBOSE}" = "true"; then
+         cat  /root/.config/VirtualBox/VirtualBox.xml
+     fi
 
      # It is necessary to sleep a bit otherwise doaemons will wake up with inconstitencies
 
-     sleep 10
+     sleep 5
     /etc/init.d/virtualbox start
 }
 
@@ -624,7 +632,7 @@ delete_vm() {
          echo "Force removing $1.$2"
          rm -f   "${VMPATH}/$1.$2"
     fi
-#    deep_clean
+    deep_clean
     res=$(($? | ${res}))
     return ${res}
 }
@@ -643,9 +651,13 @@ create_vm() {
     export PATH=${PATH}:${VBPATH}
     cd ${VMPATH}
     delete_vm "${VM}" "vdi"
-    MEDIUM_UUID=`uuid`
+    local MEDIUM_UUID=`uuid`
+    local OSTYPE=Gentoo_64
+    if test "${VMTYPE}" = "headless"; then
+        OSTYPE=Ubuntu_64
+    fi
     VBoxManage createvm --name "${VM}" --ostype gentoo_64  --register  --basefolder "${VMPATH}"
-    VBoxManage modifyvm "${VM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on  --hwvirtex on --pae on --cpuexecutioncap 80 --ostype Gentoo_64 --cpu-profile host --vtxvpid on --paravirtprovider kvm --rtcuseutc on --firmware bios
+    VBoxManage modifyvm "${VM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on  --hwvirtex on --pae on --cpuexecutioncap 80 --ostype ${OSTYPE} --cpu-profile host --vtxvpid on --paravirtprovider kvm --rtcuseutc on --firmware bios
     VBoxManage createmedium --filename "${VM}.vdi" --size ${SIZE} --variant Standard
     VBoxManage internalcommands sethduuid "${VM}.vdi" ${MEDIUM_UUID}
     VBoxManage modifymedium disk "${VM}.vdi" --type ${MEDIUM_TYPE}
@@ -654,7 +666,7 @@ create_vm() {
     VBoxManage storagectl "${VM}" --name "IDE Controller" --add ide
     VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 0   --type dvddrive --medium ${LIVECD}  --tempeject on
     VBoxManage storageattach "${VM}" --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium emptydrive
-    VBoxManage startvm "${VM}" --type ${VMTYPE}
+    VBoxManage startvm "${VM}" --type "gui"   #${VMTYPE}
 
     # VM is created in a separate process
     # Wait for it to come to end
