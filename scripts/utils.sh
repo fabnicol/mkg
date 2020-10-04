@@ -35,12 +35,8 @@
 check_md5sum() {
     local ref=$(cat MD5SUMS | grep "$1" | cut -f 1 -d' ')
     downloaded=$(md5sum $1 | cut -f 1 -d' ')
-    if test ${downloaded} = ${ref}; then
-        return 0
-    else
-        echo "MD5 checkum for $1 is not correct. Please download manually..."
-        exit -1
-    fi
+    [ ${downloaded} = ${ref} ] && return 0
+        || { logger -s "MD5 checkum for $1 is not correct. Please download manually..."; exit -1; }
 }
 
 ## @fn list_block_devices()
@@ -68,10 +64,11 @@ is_block_device() {
 ## @ingroup auxiliaryFunctions
 
 get_mountpoint() {
-    if is_block_device "$1"; then
-        echo "$1  is not a block device!"
-        echo "Device labels should be in the following list:"
-        echo $(list_block_devices)
+    if is_block_device "$1"
+    then
+        logger -s "$1  is not a block device!"
+        logger -s "Device labels should be in the following list:"
+        logger -s $(list_block_devices)
         exit -1
     fi
     echo "$(findmnt --raw --first -a -n -c "$1" | cut -f1 -d' ')"
@@ -82,17 +79,14 @@ get_mountpoint() {
 ## @ingroup auxiliaryFunctions
 
 get_device() {
-    if test -d "$1"; then
+    if [ -d "$1" ]
+    then
         device=$(findmnt --raw --first -a -n -c $1 | cut -f2 -d' ')
+        echo ${device}
     else
-        if is_block_device "$1"; then
-            echo "$1"
-        else
-            echo "$1 is neither a mountpoint nor a block device"
-            exit -1
-        fi
+        is_block_device "$1" && echo "$1" \
+            || { logger -s "$1 is neither a mountpoint nor a block device"; exit -1; }
     fi
-    echo ${device}
 }
 
 ## @fn test_cdrecord()
@@ -108,14 +102,38 @@ get_device() {
 ## @ingroup auxiliaryFunctions
 
 test_cdrecord() {
-    echo "cdrecord scanbus: "
+    logger -s "cdrecord scanbus: "
     ${CDRECORD} -scanbus
-    if test $? != 0; then
-        echo "cdrecord version is not functional"
-        echo "Try reinstalling cdrecord"
+    if [ $? != 0 ]
+    then
+        logger -s "cdrecord version is not functional"
+        logger -s "Try reinstalling cdrecord"
         exit -1
     fi
     return 0
+}
+
+## @fn recreate_liveCD_ISO
+## @brief Create ISO of liveCD out of directory
+## @param dir Directory containing all files
+## @return 0 on success or exits -1 on failure.
+## @note An alternative xorriso solution could be considered
+
+recreate_liveCD_ISO() {
+# using mkisofs out of convention but xorriso could do as well
+
+    mkisofs ${verb2} -J -R -o  ${ISO} \
+            -b ${ISOLINUX_DIR}/isolinux.bin \
+            -c ${ISOLINUX_DIR}/boot.cat -no-emul-boot \
+            -boot-load-size 4 \
+            -boot-info-table "$1"
+
+# mkisofs almost never fails but if it does, hard stop here.
+
+if [ $? != 0 ]; then
+    logger -s "mkisofs could not recreate the ISO file to boot virtual machine ${VM} from directory $1"
+    exit -1
+fi
 }
 
 ## @fn burn_iso()
@@ -125,11 +143,13 @@ test_cdrecord() {
 ## @ingroup auxiliaryFunctions
 
 burn_iso() {
-    if test "${CDRECORD}" = ""; then
-         if $(which cdrecord); then
-             echo "Could not find cdrecord"
-             echo "Please install cdrtools in your PATH or specify cdrecord full filepath on commandline:"
-             echo "burn=true cdrecord=/path/to/cdrecord/executable"
+    if [ -z "${CDRECORD}" ]
+    then
+        if $(which cdrecord)
+        then
+             logger -s "Could not find cdrecord"
+             logger -s "Please install cdrtools in your PATH or specify cdrecord full filepath on commandline:"
+             logger -s "burn=true cdrecord=/path/to/cdrecord/executable"
              return -1
          else
              CDRECORD=$(which cdrecord)
@@ -138,8 +158,9 @@ burn_iso() {
     else
          test_cdrecord
     fi
-    echo "Burning installation medium to optical disc..."
-    if test "${SCSI_ADDRESS}" = ""; then
+    logger -s "Burning installation medium to optical disc..."
+    if [ -z "${SCSI_ADDRESS}" ]
+    then
        ${CDRECORD} -eject  "${ISO_OUTPUT}"
     else
        ${CDRECORD} -eject dev=${SCSI_ADDRESS} "${ISO_OUTPUT}"
@@ -153,7 +174,7 @@ burn_iso() {
 
 create_install_usb_device() {
     res=0
-    echo "Creating installation stick..."
+    logger -s "Creating installation stick..."
     dd if="${ISO_OUTPUT}" of=/dev/${USB_DEVICE} bs=4M status=progress
     res=$?
     sync

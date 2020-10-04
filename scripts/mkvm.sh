@@ -27,28 +27,24 @@
 ## @ingroup mkFileSystem
 
 setup_network() {
-    if test -f setup_network; then
+    if [ -f setup_network ]
+    then
         return
     fi
     local res=0
-    if test "${VMTYPE}" = "headless"; then
-        dhclient -v
-    else
-        net-setup
-        res=$?
-    fi
-    if test ${res} = 0; then
+    "${VERBOSE}" \
+       && logger -s "Checking /etc/conf.d/net before net setting"
+       && cat /etc/conf.d/net
+    "${CLONEZILLA_INSTALL}" && dhclient -v || net-setup
+    res=$?
+    logger -s "Checking /etc/conf.d/net after net setting"
+    "${VERBOSE}" && cat /etc/conf.d/net
+    if [ ${res} = 0 ]
+    then
         touch setup_network
     else
-        echo "Could not fix internet access!" | tee setup_network.log
-        if test "${VMTYPE}" = "gui"; then
-            exit -1
-        else
-
-            # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
-
-             shutdown -h now
-        fi
+        logger -s "Could not fix internet access!"
+        [ "${VMTYPE}" = "gui" ] && exit -1 || shutdown -h now
     fi
 }
 
@@ -73,11 +69,22 @@ setup_network() {
 ## @ingroup mkFileSystem
 
 partition() {
-    if test -f partition -a ! -s partition; then
-        return 0
-    fi
+    [ -f partition ] && [ ! -s partition ] && return 0
     sleep 5
-    parted --script --align=opt /dev/sda "mklabel gpt unit mib mkpart primary 1 3 name 1 grub set 1 bios_grub on mkpart primary 3 131  name 2 boot mkpart primary 131 643 name 3 swap mkpart primary 643 -1 set 2 boot on"
+    parted --script \
+           --align=opt \
+           /dev/sda \
+           "mklabel gpt \
+           unit mib \
+           mkpart primary 1 3 \
+           name 1 grub \
+           set 1 bios_grub on \
+           mkpart primary 3 131\
+           name 2 boot \
+           mkpart primary 131 643 \
+           name 3 swap \
+           mkpart primary 643 -1 \
+           set 2 boot on"
     res0=$?
     sync
     sleep 10
@@ -90,35 +97,18 @@ partition() {
     swapoff -a
     sync
     sleep 10
-    declare -i index=0
-    while ! mkswap /dev/sda3; do
-        index=index+1
-        if (( index < 10 )); then
-            continue
-        else
-            break
-        fi
-    done
+    mkswap /dev/sda3
     res3=$?
     sync
-    index=0
-    while ! swapon /dev/sda3; do
-        index=index+1
-        if (( index < 10 )); then
-            continue
-        else
-            break
-        fi
-    done
+    swapon /dev/sda3
     res4=$?
     sync
-    if findmnt /dev/sda4; then
-        umount -l /dev/sda4
-    fi
+    findmnt /dev/sda4 &&  umount -l /dev/sda4
     mount  /dev/sda4 /mnt/gentoo
     res5=$?
     res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4} | ${res5}))
-    if test ${res} = 0; then
+    if [ ${res} = 0 ]
+    then
         touch partition
     else
         echo "parted exit code: ${res0}"    > partition
@@ -127,21 +117,16 @@ partition() {
         echo "mkswap exit code: ${res3}"    >> partition
         echo "swapon exit code: ${res4}"    >> partition
         echo "mount exit code:  ${res5}"    >> partition
-        echo "Failed to cleanly partition main disk"
+        logger -s "Failed to cleanly partition main disk"
         sleep 10
-        if test $((${res1} | ${res2} | ${res3} | ${res5})) != 0; then
-            echo  "Critical errors while partitioning"
+        if [ $((${res1} | ${res2} | ${res3} | ${res5})) != 0 ]
+        then
+            logger -s  "Critical errors while partitioning"
             swapoff -a
             findmnt /dev/sda4 && umount -l /dev/sda4
-            if test "${VMTYPE}" = "gui"; then
-                return -1
-            else
-
-                # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
-                shutdown -h now
-            fi
+            [ "${VMTYPE}" = "gui" ] && return -1 || shutdown -h now
         else
-            echo "Parted issue but mkfs and mount OK. Going on..."
+            logger -s "Parted issue but mkfs and mount OK. Going on..."
             return -1
         fi
     fi
@@ -158,27 +143,20 @@ partition() {
 ## @ingroup mkFileSystem
 
 install_stage3() {
-    if test -f stage3; then
-        return
-    fi
+    [ -f stage3 ] && return 0
     mv -vf ${STAGE3} ${ELIST}  mkvm_chroot.sh ${KERNEL_CONFIG} /mnt/gentoo/
     cp -vf .bashrc /mnt/gentoo/bashrc_temp
     cd /mnt/gentoo
     head -n -1 -q bashrc_temp > temp_bashrc && rm bashrc_temp
     tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
-    if test $? != 0; then
-        echo "stage3 tarball could not be extracted"
+    if [ $? != 0 ]
+    then
+        logger -s "stage3 tarball could not be extracted"
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
-        if test "${VMTYPE}" = "gui"; then
-            exit -1
-        else
+        [ "${VMTYPE}" = "gui" ] && exit -1 || shutdown -h now
 
-            # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
-
-            shutdown -h now
-        fi
     fi
     cat temp_bashrc >> .bashrc
     rm temp_bashrc
@@ -219,26 +197,20 @@ install_stage3() {
     mount --make-rslave dev
     res4=$?
     res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4}))
-    if test ${res} = 0; then
+    if [ ${res} = 0 ]
+    then
         touch stage3
     else
-        echo "mounting proc exit code: ${res0}"    > stage3
-        echo "mounting sys exit code: ${res1}"     >> stage3
-        echo "rslave sys exit code: ${res2}"       >> stage3
-        echo "mounting dev dev exit code: ${res3}" >> stage3
-        echo "rslave dev exit code exit code: ${res4}"    >> stage3
-        echo "Failed to bind liveCD to main disk"
+        logger -s "mounting proc exit code: ${res0}"    > stage3
+        logger -s "mounting sys exit code: ${res1}"     >> stage3
+        logger -s "rslave sys exit code: ${res2}"       >> stage3
+        logger -s "mounting dev dev exit code: ${res3}" >> stage3
+        logger -s "rslave dev exit code exit code: ${res4}"    >> stage3
+        logger -s "Failed to bind liveCD to main disk"
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
-        if test "${VMTYPE}" = "gui"; then
-            exit -1
-        else
-
-            # A stricter measure for separate VMs to avoid waiting for 2 days uselessly
-
-            shutdown -h now
-        fi
+        [ "${VMTYPE}" = "gui" ] && exit -1 || shutdown -h now
     fi
     cd ~
     chroot /mnt/gentoo /bin/bash mkvm_chroot.sh
@@ -263,14 +235,11 @@ finalize() {
 # Logs are provided for debugging purposes
 
 setup_network  2>&1 | tee setup_network.log
-if ! partition; then
-    echo "Second try at partitioning..."
-    if findmnt /dev/sda2; then
-        umount -l /dev/sda2
-    fi
-    if findmnt /dev/sda4; then
-        umount -l /dev/sda4
-    fi
+if ! partition
+then
+    logger -s "Second try at partitioning..."
+    findmnt /dev/sda2 && umount -l /dev/sda2
+    findmnt /dev/sda4 && umount -l /dev/sda4
     swapoff -a
     partition
 fi

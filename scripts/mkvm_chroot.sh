@@ -44,16 +44,16 @@ adjust_environment() {
 
     # Adjusting /etc/fstab
 
-    local  uuid2=$(blkid | grep sda2 | cut -f2 -d' ')
-    local  uuid3=$(blkid | grep sda3 | cut -f2 -d' ')
-    local  uuid4=$(blkid | grep sda4 | cut -f2 -d' ')
+    local uuid2=$(blkid | grep sda2 | cut -f2 -d' ')
+    local uuid3=$(blkid | grep sda3 | cut -f2 -d' ')
+    local uuid4=$(blkid | grep sda4 | cut -f2 -d' ')
     echo "Partition /dev/sda2 with ${uuid2}" | tee partition_log
     echo "Partition /dev/sda3 with ${uuid3}" | tee partition_log
     echo "Partition /dev/sda4 with ${uuid4}" | tee partition_log
-    echo "${uuid2} /boot           vfat defaults            0 2"    >  /etc/fstab
-    echo "${uuid3} none            swap sw                  0 0"    >> /etc/fstab
-    echo "${uuid4} /               ext4 defaults            0 1"    >> /etc/fstab
-    echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"      >> /etc/fstab
+    echo "${uuid2} /boot           vfat defaults            0 2"  >  /etc/fstab
+    echo "${uuid3} none            swap sw                  0 0"  >> /etc/fstab
+    echo "${uuid4} /               ext4 defaults            0 1"  >> /etc/fstab
+    echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"    >> /etc/fstab
     source /etc/profile
 
     # Refresh and rebuild @world
@@ -61,80 +61,64 @@ adjust_environment() {
     # We shall use emerge-webrsync as emerge --sync is a bit less robust (rsync rotation bans...)
 
     emerge-webrsync
-    emerge -1 sys-apps/portage
-    if test $? != 0; then
-        echo "emerge-webrsync failed!"
-	exit -1
-    fi
-    local profile=$(eselect profile list | grep desktop | grep plasma | grep ${PROCESSOR} | grep -v systemd | tail -1 | cut -f1 -d'[' | cut -f1 -d']')
+    ! emerge -1 sys-apps/portage \
+        && echo "emerge-webrsync failed!" | tee emerge.build && exit -1
+
+    # add logger
+
+    emerge -1 app-admin/sysklogd
+    rc-update add sysklogd default
+
+    # select profile (most recent plasma desktop)
+
+    local profile=$(eselect profile list \
+                        | grep desktop \
+                        | grep plasma \
+                        | grep ${PROCESSOR} \
+                        | grep -v systemd \
+                        | tail -1 \
+                        | cut -f1 -d'[' | cut -f1 -d']')
+
     eselect profile set ${profile}
 
-    # Use and keywords
-    # Currently hard-coded but should be exported to text file later on
+    # Use and keywords (mkdir -p to neutralize error msg)
 
-    mkdir /etc/portage/package.accept_keywords
-    echo '>=dev-libs/libpcre2-10.35 pcre16'        > /etc/portage/package.use/pcre2
-    echo '>=dev-texlive/texlive-latex-2020 xetex' > /etc/portage/package.use/texlive
-    echo 'sys-apps/util-linux caps'              > /etc/portage/package.use/util-linux
-    echo 'app-arch/p7zip -kde -wxwidgets'        > /etc/portage/package.use/p7zip
-    echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}"  > /etc/portage/package.accept_keywords/R
-    echo "app-text/pandoc ~${PROCESSOR}"           > /etc/portage/package.accept_keywords/pandoc
-    echo 'sys-auth/polkit  introspection nls pam'  > /etc/portage/package.use/polkit
-    echo '>=dev-qt/qtcore-5.14.2 icu'  > /etc/portage/package.use/qtcore
-    echo '>=dev-lang/python-2.7.18-r1:2.7 sqlite'  > /etc/portage/package.use/python-2.7
-    echo '>=media-libs/harfbuzz-2.6.7 icu'  > /etc/portage/package.use/harfbuzz
-    echo '>=media-libs/gd-2.3.0 png'  > /etc/portage/package.use/gd
-    echo '>=dev-qt/qtgui-5.14.2-r1 jpeg egl'  > /etc/portage/package.use/qtgui
-    echo '>=media-video/vlc-3.0.11.1 vorbis ogg'  > /etc/portage/package.use/vlc
-    echo '>=sys-libs/zlib-1.2.11-r2 minizip'  > /etc/portage/package.use/zlib
-    echo '>=dev-qt/qtwebengine-5.14.2 widgets'  > /etc/portage/package.use/qtwebengine
-    echo '>=media-libs/mesa-20.0.8 wayland'  > /etc/portage/package.use/mesa
-    echo '>=dev-qt/qtwebchannel-5.14.2 qml'  > /etc/portage/package.use/qtwebchannel
-    echo '>=dev-libs/libxml2-2.9.10-r1 icu'  > /etc/portage/package.use/libxml2
-    echo '>=media-libs/libvpx-1.7.0-r1 svc'  > /etc/portage/package.use/libvpx
-    echo '>=dev-libs/xmlsec-1.2.30 nss'      > /etc/portage/package.use/xmlsec
-    echo '>=app-text/ghostscript-gpl-9.52-r1 cups'  > /etc/portage/package.use/ghostscript
-    echo '>=dev-qt/qtprintsupport-5.14.2 cups'      > /etc/portage/package.use/qtprintsupport
-    echo 'app-text/xmlto text' > /etc/portage/package.use/xmlto
+    mkdir -p /etc/portage/package.accept_keywords
+    mkdir -p /etc/portage/package.use
+    mv -vf "${ELIST}.accept_keywords" /etc/portage/package.accept_keywords/
+    mf -vf "${ELIST}.use"             /etc/portage/package.use/
 
     # One needs to build cmake without the qt5 USE value first, otherwise dependencies cannot be resolved.
 
     USE='-qt5' emerge -1 cmake
-    if test $? != 0; then
-        echo "emerge cmake failed!"
-	exit -1
-    fi
+    [ $? != 0 ] && logger -s "emerge cmake failed!" && exit -1
 
-    # LZ4 is a kernel dependency for newer linux kernels.
+    # other core sysapps to be merged first. LZ4 is a kernel dependency for newer linux kernels.
 
     emerge app-arch/lz4
+    emerge net-misc/netifrc
+    emerge sys-apps/pcmciautils
+    [ $? != 0 ] && logger -s "emerge netifrs/pcmiautils failed!"
 
     # Now on to updating @world set. Be patient and wait for about 15-24 hours
+    # as syslogd is not yet there we tee a custom build log
 
-    emerge -uDN @world  2>&1          | tee emerge.build
-    if test $? != 0; then
-        echo "emerge @world failed!"  | tee emerge.build
-        exit -1
-    fi
+    emerge -uDN @world  2>&1  | tee emerge.build
+    [ $? != 0 ] && logger -s "emerge @world failed!"  | tee emerge.build \
+                && exit -1
 
     # Networking in the new environment
 
     echo hostname=${NONROOT_USER}pc > /etc/conf.d/hostname
-    emerge --verbose net-misc/netifrc
-    emerge --verbose sys-apps/pcmciautils
-    if test $? != 0; then
-        echo "emerge netifrs/pcmiautils failed!"
-    fi
-    echo "config_${eth}=dhcpcd" >> /etc/conf.d/net
     cd /etc/init.d
-    local eth=$(ifconfig | cut -f1 -d' ' | line | cut -f1 -d':')  # No be refreshed as it is not the same shell
-    ln -s net.lo net.${eth}
+    ln -s net.lo net.${iface}
     cd -
-    rc-update add net.${eth} default
+    rc-update add net.${iface} default
 
     # Set keymaps and time
 
-    if test ${LANGUAGE} == "fr"; then
+    if [ "${LANGUAGE}" = "fr" ]
+    then
         echo 'keymap="fr"' > /etc/conf.d/keymaps
         echo 'keymap="us"' >> /etc/conf.d/keymaps
     else
@@ -165,9 +149,7 @@ build_kernel() {
 
     # Building the kernel
 
-    emerge gentoo-sources
-    emerge sys-kernel/genkernel
-    emerge pciutils
+    emerge gentoo-sources sys-kernel/genkernel pciutils
 
     # Now mount the new boot partition
 
@@ -179,25 +161,15 @@ build_kernel() {
 
     make syncconfig  # replaces silentoldconfig as of 4.19
     make -s -j${NCPUS} 2>&1 > kernel.log && make modules_install && make install
-    if test $? != 0; then
-        echo "Kernel building failed!"
-        exit -1
-    fi
+    [ $? != 0 ] && logger -s "Kernel building failed!" &&  exit -1
     genkernel --install initramfs
     emerge sys-kernel/linux-firmware
     make clean
-    if test -f /boot/vmlinu*; then
-        echo "Kernel was built"
-    else
-        echo "Kernel compilation failed!"
-        exit -1
-    fi
-    if test -f /boot/initr*.img; then
-        echo "initramfs was built"
-    else
-        echo "initramfs compilation failed!"
-        exit -1
-    fi
+    [ -f /boot/vmlinu* ] && logger -s "Kernel was built" \
+                         || { logger -s "Kernel compilation failed!"; exit -1; }
+    [ -f /boot/initr*.img ] && { logger -s "initramfs was built"; \
+                                 logger -s "initramfs compilation failed!"; \
+                                 exit -1; }
 }
 
 ## @fn install_software()
@@ -228,33 +200,26 @@ install_software() {
 
     # do not quote `packages' variable!
 
-    emerge -uDN ${packages}
-    res=$?
+    emerge -uDN ${packages}  2>&1 | tee log_install_software
+    if [ $? != 0 ]; then
+        logger -s "Main package build step failed!"
+        exit -1
+    fi
 
     # update environment
 
     env-update
     source /etc/profile
-    if test $? != 0; then
-        echo "Main package build step failed!" | tee log_install_software
-        exit -1
-    fi
 
     # optionally build RStudio and R dependencies (TODO)
 
-    if test "${DOWNLOAD_RSTUDIO}" != "true"; then
-        echo "No RStudio build" | tee log_install_software
-        return
-    fi
+    ! "${DOWNLOAD_RSTUDIO}" && logger -s "No RStudio build" &&  return -1
 
     mkdir Build
     cd Build
     wget ${GITHUBPATH}${RSTUDIO}.zip
-    if test $? != 0; then
-        echo "RStudio download failed!"  | tee log_install_software
-        exit -1
-    fi
-    echo "Building RStudio" | tee log_install_software
+    [ $? != 0 ] && logger -s "RStudio download failed!" &&  exit -1
+    logger -s "Building RStudio"
     unzip *.zip
     cd rstudio*
     mkdir build
@@ -284,8 +249,8 @@ install_software() {
 ## @ingroup mkFileSystem
 
 global_config() {
-    echo "Cleaning up a bit aggressively before cloning..." | tee log_uninstall_software
-    eclean -d packages                                      | tee log_uninstall_software
+    logger -s "Cleaning up a bit aggressively before cloning..."
+    eclean -d packages 2>&1 | tee log_uninstall_software.log
     rm -rf /var/tmp/*
     rm -rf /var/log/*
     rm -rf /var/cache/distfiles/*
@@ -305,17 +270,18 @@ global_config() {
     # make modules_prepare
     # for the sake of ebuilds requesting prepared kernel sources
     # TODO: test ocs-run post_run commands.
-    # Also for usb_installer=... *alone* the above code could be deactivated. But then a later from_vm call would have to clean sources to lighten the resulting ISO clonezilla image.
+    # Also for usb_installer=... *alone* the above code could be deactivated.
+    # But then a later from_vm call would have to clean sources to lighten the resulting ISO clonezilla image.
 
     # Configuration
-    #-- sddm
+    #--- sddm
 
     echo "#!/bin/sh"                   > /usr/share/sddm/scripts/Xsetup
     echo "setxkbmap ${LANGUAGE},us"    > /usr/share/sddm/scripts/Xsetup
     chmod +x /usr/share/sddm/scripts/Xsetup
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' /etc/conf.d/xdm
 
-    #-- Services
+    #--- Services
 
     rc-update add sysklogd default
     rc-update add cronie default
@@ -323,27 +289,31 @@ global_config() {
     rc-update add dbus default
     rc-update add elogind boot
 
-    #-- Networkmanager
+    #--- Networkmanager
 
-    for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done
+    for x in /etc/runlevels/default/net.*
+    do
+        rc-update del $(basename $x) default
+        rc-service --ifstarted $(basename $x) stop
+    done
     rc-update del dhcpcd default
     rc-update add NetworkManager default
 
-    #-- groups and sudo
+    #--- groups and sudo
 
     useradd -m -G users,wheel,audio,video,plugdev,sudo  -s /bin/bash ${NONROOT_USER}
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
     gpasswd -a sddm video
 
-    #-- Creating the bootloader
+    #--- Creating the bootloader
 
     grub-install --target=x86_64-efi --efi-directory=/boot --removable
     grub-mkconfig -o /boot/grub/grub.cfg
 
-    #-- Passwords
+    #--- Passwords
 
-    echo ${NONROOT_USER}:${PASSWD}  | chpasswd
-    echo root:${ROOTPASSWD} | chpasswd
+    chpasswd <<< ${NONROOT_USER}:${PASSWD}
+    chpasswd <<<  root:${ROOTPASSWD}
 }
 
 ## @fn finalize()
@@ -358,18 +328,31 @@ finalize() {
 
     sed -i 's/^export .*$//g' .bashrc
     rm -f mkvm_chroot.sh package_list ${ELIST}
-    if test "${DEBUG_MODE}" != "true"; then
-        rm -f *
-    fi
+    [ "${DEBUG_MODE}" = "false" ] && rm -f *
 
     # prepare to compact with vbox-img compact --filename ${VMPATH}/${VM}.vdi
 
     cat /dev/zero > zeros ; sync ; rm zeros
 }
 
+declare -i res=0
 adjust_environment
+[ $? = 0 ] || res=1
 build_kernel
+[ $? = 0 ] || res=$((res | 2))
 install_software
+[ $? = 0 ] || res=$((res | 4))
 global_config
+[ $? = 0 ] || res=$((res | 8))
 finalize
-exit 0
+[ $? = 0 ] || res=$((res | 16))
+logger -s "Exiting with code: ${res}"
+exit ${res}
+
+# note: return code will be 0 if all went smoothly
+# otherwise:
+#    odd number: Issue with adjust_environment
+#    code or code -1 is even: Issue with build_kernel
+#    code - {0,1,2,3}  can be divided by 4: Issue with install_software
+#    code - {0,...,7}  can be divided by 8: Issue with global_config
+#    code - {0,...,15} can be divided by 16: Issue with finalize
