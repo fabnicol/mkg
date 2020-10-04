@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vmpath_113',['VMPATH',['../build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d',1,'build_virtualbox.sh']]]
+  ['path_115',['PATH',['../mkgentoo_8sh.html#ad1451b50408769582d8f5bd4254fe7b1',1,'mkgentoo.sh']]]
 ];

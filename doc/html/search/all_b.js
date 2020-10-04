@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['setup_5fnetwork_49',['setup_network',['../group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba',1,'mkvm.sh']]]
+  ['res_50',['res',['../mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106',1,'mkvm_chroot.sh']]]
 ];

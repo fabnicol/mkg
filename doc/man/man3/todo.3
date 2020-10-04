@@ -1,4 +1,4 @@
-.TH "todo" 3 "Thu Oct 1 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "todo" 3 "Sun Oct 4 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -9,6 +9,8 @@ Add more regional options by parametrization of commandline
 .IP "\fBGlobal \fBcreate_vm\fP ()\fP" 1c
 Find a way to only compact on success and never on failure of VM\&.  
 .IP "\fBGlobal \fBinstall_software\fP ()\fP" 1c
-Add a script to build R dependencies 
+Add a script to build R dependencies  
+.IP "\fBGlobal \fBmain\fP ()\fP" 1c
+Daemonize the part below generate_Gentoo when #VMPTYPE is \fCheadless\fP so that the script can be detached completely with \fCnohup mkgentoo \&.\&.\&. &\fP 
 .PP
 

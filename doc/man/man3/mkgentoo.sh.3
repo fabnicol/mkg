@@ -1,4 +1,4 @@
-.TH "mkgentoo.sh" 3 "Thu Oct 1 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "mkgentoo.sh" 3 "Sun Oct 4 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -27,7 +27,7 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .br
 .RI "Print usage in markdown format\&. "
 .ti -1c
-.RI "\fBhelp\fP ()"
+.RI "\fBhelp_\fP ()"
 .br
 .RI "Print usage to stdout\&. "
 .ti -1c
@@ -61,7 +61,7 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .ti -1c
 .RI "\fBprocess_clonezilla_iso\fP ()"
 .br
-.RI "Download clonezilla ISO or recover it from cache calling \fBfetch_clonezilla_iso\fP\&. 
+.RI "Download clonezilla ISO or recover it from cache calling #fetch_clonezilla_iso\&. 
 .br
 Upgrade it with virtualbox guest additions\&. "
 .ti -1c
@@ -125,9 +125,15 @@ Upgrade it with virtualbox guest additions\&. "
 .br
 .RI "Number of switches (true length of array divided by 3) "
 .ti -1c
-.RI "ReadOnly String \fBISO\fP = 'downloaded\&.iso'"
+.RI "Exported String \fBISO\fP = 'downloaded\&.iso'"
 .br
 .RI "Name of downloaded clonezilla ISO file\&. "
+.ti -1c
+.RI "Exported String \fBISO_OUTPUT\fP = $(sed \-E 's/\&.*\\b(\\w+\\\&.(iso|\fBISO\fP))\\b\&.*$/\\1/' <<< '${CLI}')"
+.br
+.ti -1c
+.RI "Exported String \fBCREATE_ISO\fP = true"
+.br
 .ti -1c
 .RI "Exported String \fBPATH\fP = ${PATH}:${VBPATH}"
 .br
@@ -225,10 +231,18 @@ mkgento burn usb_device="PNY" usb_installer="Sams" my_gentoo_image\&.iso
 Definition in file \fBmkgentoo\&.sh\fP\&.
 .SH "Variable Documentation"
 .PP 
+.SS "Exported String CREATE_ISO = true"
+
+.PP
+Definition at line 202 of file mkgentoo\&.sh\&.
+.SS "Exported String ISO_OUTPUT = $(sed \-E 's/\&.*\\b(\\w+\\\&.(iso|\fBISO\fP))\\b\&.*$/\\1/' <<< '${CLI}')"
+
+.PP
+Definition at line 198 of file mkgentoo\&.sh\&.
 .SS "Exported String PATH = ${PATH}:${VBPATH}"
 
 .PP
-Definition at line 643 of file mkgentoo\&.sh\&.
+Definition at line 657 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for gentoo-creator from the source code\&.

@@ -69,20 +69,20 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="build__virtualbox_8sh.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#!/bin/bash</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno"><a class="line" href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">    2</a></span>&#160;export <a class="code" href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">VMPATH</a>=$PWD/..</div>
-<div class="line"><a name="l00003"></a><span class="lineno"><a class="line" href="build__virtualbox_8sh.html#a6d8964b5a14b9bfb870e8909608fc5e4">    3</a></span>&#160;export <a class="code" href="build__virtualbox_8sh.html#a6d8964b5a14b9bfb870e8909608fc5e4">DOWNLOAD_CLONEZILLA</a>=<span class="stringliteral">&quot;true&quot;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;/bin/bash <a class="code" href="group__create_installer.html#gae1918429f97793a7d5ff449988d57ebd">fetch_clonezilla_iso</a>.sh</div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<a class="code" href="group__create_installer.html#gae1918429f97793a7d5ff449988d57ebd">fetch_clonezilla_iso</a></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;cd ${<a class="code" href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">VMPATH</a>}</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;cp -vf clonezilla/build<span class="comment">/* ${CLONEZILLACD}/live</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">cd ${CLONEZILLACD}/live</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">./build_virtualbox.sh</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">cd ${VMPATH}</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;[ -z ${CLONEZILLACD} || -z ${<a class="code" href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">VMPATH</a>} ] &amp;&amp; logger <span class="stringliteral">&quot;Export the CLONEZILLACD and VMPATH variables before running this script.&quot;</span> &amp;&amp; exit -1</div>
+<div class="line"><a name="l00003"></a><span class="lineno"><a class="line" href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">    3</a></span>&#160;export <a class="code" href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">VMPATH</a>=$PWD/..</div>
+<div class="line"><a name="l00004"></a><span class="lineno"><a class="line" href="build__virtualbox_8sh.html#a6d8964b5a14b9bfb870e8909608fc5e4">    4</a></span>&#160;export <a class="code" href="build__virtualbox_8sh.html#a6d8964b5a14b9bfb870e8909608fc5e4">DOWNLOAD_CLONEZILLA</a>=<span class="stringliteral">&quot;true&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;/bin/bash fetch_clonezilla_iso.sh</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;fetch_clonezilla_iso</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;cd ${<a class="code" href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">VMPATH</a>}</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;cp -vf clonezilla/build<span class="comment">/* ${CLONEZILLACD}/live</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">cd ${CLONEZILLACD}/live</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">./build_virtualbox.sh</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">cd ${VMPATH}</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="abuild__virtualbox_8sh_html_a6d8964b5a14b9bfb870e8909608fc5e4"><div class="ttname"><a href="build__virtualbox_8sh.html#a6d8964b5a14b9bfb870e8909608fc5e4">DOWNLOAD_CLONEZILLA</a></div><div class="ttdeci">Exported String DOWNLOAD_CLONEZILLA</div><div class="ttdef"><b>Definition:</b> <a href="build__virtualbox_8sh_source.html#l00003">build_virtualbox.sh:3</a></div></div>
-<div class="ttc" id="agroup__create_installer_html_gae1918429f97793a7d5ff449988d57ebd"><div class="ttname"><a href="group__create_installer.html#gae1918429f97793a7d5ff449988d57ebd">fetch_clonezilla_iso</a></div><div class="ttdeci">fetch_clonezilla_iso()</div><div class="ttdoc">Download clonezilla ISO file and process it.</div><div class="ttdef"><b>Definition:</b> <a href="fetch__clonezilla__iso_8sh_source.html#l00017">fetch_clonezilla_iso.sh:17</a></div></div>
-<div class="ttc" id="abuild__virtualbox_8sh_html_a62ad76d689932a98f7cc9667b6fa903d"><div class="ttname"><a href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">VMPATH</a></div><div class="ttdeci">Exported String VMPATH</div><div class="ttdef"><b>Definition:</b> <a href="build__virtualbox_8sh_source.html#l00002">build_virtualbox.sh:2</a></div></div>
+<div class="ttc" id="abuild__virtualbox_8sh_html_a6d8964b5a14b9bfb870e8909608fc5e4"><div class="ttname"><a href="build__virtualbox_8sh.html#a6d8964b5a14b9bfb870e8909608fc5e4">DOWNLOAD_CLONEZILLA</a></div><div class="ttdeci">Exported String DOWNLOAD_CLONEZILLA</div><div class="ttdef"><b>Definition:</b> <a href="build__virtualbox_8sh_source.html#l00004">build_virtualbox.sh:4</a></div></div>
+<div class="ttc" id="abuild__virtualbox_8sh_html_a62ad76d689932a98f7cc9667b6fa903d"><div class="ttname"><a href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">VMPATH</a></div><div class="ttdeci">Exported String VMPATH</div><div class="ttdef"><b>Definition:</b> <a href="build__virtualbox_8sh_source.html#l00003">build_virtualbox.sh:3</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

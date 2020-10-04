@@ -1,4 +1,4 @@
-.TH "auxiliaryFunctions" 3 "Thu Oct 1 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "auxiliaryFunctions" 3 "Sun Oct 4 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -33,34 +33,12 @@ auxiliaryFunctions
 .RI "\fBtest_cdrecord\fP ()"
 .br
 .RI "Test whether \fBcdrecord\fP is functional\&. "
-.ti -1c
-.RI "\fBburn_iso\fP ()"
-.br
-.RI "Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&. "
 .in -1c
 .SH "Detailed Description"
 .PP 
 
 .SH "Function Documentation"
 .PP 
-.SS "burn_iso ()"
-
-.PP
-Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&. 
-.PP
-\fBNote\fP
-.RS 4
-\fBcdrecord\fP should have been installed beforehand 
-.RE
-.PP
-\fBReturn values\fP
-.RS 4
-\fIReturn\fP \fBcdrecord\fP return code 
-.RE
-.PP
-
-.PP
-Definition at line 127 of file utils\&.sh\&.
 .SS "check_md5sum (filename)"
 
 .PP
@@ -84,13 +62,13 @@ Definition at line 35 of file utils\&.sh\&.
 .PP
 Give device from mount folder input\&. 
 .PP
-Definition at line 84 of file utils\&.sh\&.
+Definition at line 81 of file utils\&.sh\&.
 .SS "get_mountpoint ()"
 
 .PP
 Gives mount folder from device label input\&. 
 .PP
-Definition at line 70 of file utils\&.sh\&.
+Definition at line 66 of file utils\&.sh\&.
 .SS "is_block_device (label)"
 
 .PP
@@ -108,13 +86,13 @@ Test if argument is non-loop block device\&.
 .PP
 
 .PP
-Definition at line 60 of file utils\&.sh\&.
+Definition at line 56 of file utils\&.sh\&.
 .SS "list_block_devices ()"
 
 .PP
 List all non-loop block devices\&. 
 .PP
-Definition at line 50 of file utils\&.sh\&.
+Definition at line 46 of file utils\&.sh\&.
 .SS "test_cdrecord ()"
 
 .PP
@@ -141,7 +119,7 @@ chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord
 .PP
 
 .PP
-Definition at line 110 of file utils\&.sh\&.
+Definition at line 104 of file utils\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for gentoo-creator from the source code\&.

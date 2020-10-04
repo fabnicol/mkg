@@ -3,8 +3,8 @@
 \doxysubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{group__create_installer_gae1918429f97793a7d5ff449988d57ebd}{fetch\+\_\+clonezilla\+\_\+iso}} ()
-\begin{DoxyCompactList}\small\item\em Download clonezilla I\+SO file and process it. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__create_installer_ga7ac10e6398a73f00ab13b37123541934}{get\+\_\+gentoo\+\_\+install\+\_\+iso}} ()
+\begin{DoxyCompactList}\small\item\em Download minimal Gentoo install I\+SO file and caches. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__create_installer_ga738e6a30beb886e891dbe9a6befc4d4a}{test\+\_\+cli\+\_\+pre}} ()
 \begin{DoxyCompactList}\small\item\em Check Virtual\+Box version and prepare commandline analysis. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__create_installer_gaff896e7d0252924e2224ab0cde968609}{test\+\_\+cli}} (cli)
@@ -13,7 +13,7 @@
 \begin{DoxyCompactList}\small\item\em Check commanline coherence and incompatibilities. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__create_installer_ga3cd1eb7159583a231db413e892df7f01}{help\+\_\+md}} ()
 \begin{DoxyCompactList}\small\item\em Print usage in markdown format. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__create_installer_ga91482c4db18186b33acbaf1528a50ddc}{help}} ()
+\mbox{\hyperlink{group__create_installer_ga34f49d33f396400becb2b774e0e35c61}{help\+\_\+}} ()
 \begin{DoxyCompactList}\small\item\em Print usage to stdout. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__create_installer_ga747eb6a6a3e3fce1becde116190e868f}{fetch\+\_\+livecd}} ()
 \begin{DoxyCompactList}\small\item\em Downloads Gentoo install CD. \end{DoxyCompactList}\item 
@@ -30,7 +30,7 @@
 \mbox{\hyperlink{group__create_installer_ga9cdb7f95380fd3520d58d31a1cd12f0d}{clonezilla\+\_\+to\+\_\+iso}} (iso, dir)
 \begin{DoxyCompactList}\small\item\em Create Gentoo linux clonezilla I\+SO installer out of a clonezilla directory structure and an clonezilla image. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__create_installer_gac1f727409fd593a27f5e4df3270aab31}{process\+\_\+clonezilla\+\_\+iso}} ()
-\begin{DoxyCompactList}\small\item\em Download clonezilla I\+SO or recover it from cache calling \mbox{\hyperlink{group__create_installer_gae1918429f97793a7d5ff449988d57ebd}{fetch\+\_\+clonezilla\+\_\+iso}}. ~\newline
+\begin{DoxyCompactList}\small\item\em Download clonezilla I\+SO or recover it from cache calling \#fetch\+\_\+clonezilla\+\_\+iso. ~\newline
 Upgrade it with virtualbox guest additions. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__create_installer_ga4775daa2c57227bcbee9ac38d5e37b9b}{build\+\_\+virtualbox}} ()
 \begin{DoxyCompactList}\small\item\em Build Virtual\+Box from source using an unsquashed clonezilla CD as a chrooted environment. \end{DoxyCompactList}\item 
@@ -53,9 +53,7 @@ Upgrade it with virtualbox guest additions. \end{DoxyCompactList}\item
 \mbox{\hyperlink{group__create_installer_ga4a96ee0336af9e52512585ceec9ca3a4}{generate\+\_\+\+Gentoo}} ()
 \begin{DoxyCompactList}\small\item\em Launch routines\+: fetch install IO, starge3 archive, create VM. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__create_installer_ga51af30a60f9f02777c6396b8247e356f}{main}} ()
-\begin{DoxyCompactList}\small\item\em Main function launching routines. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__create_installer_ga532879314181eb08a603971d9ac2b2f3}{create\+\_\+install\+\_\+usb\+\_\+device}} ()
-\begin{DoxyCompactList}\small\item\em Create U\+S\+B-\/stick (or any external device) Gentoo clonezilla installer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Main function launching routines. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
@@ -65,7 +63,7 @@ Read\+Only String Array \mbox{\hyperlink{group__create_installer_ga2b36d9209dbee
 \begin{DoxyCompactList}\small\item\em global string array of switches and default values \end{DoxyCompactList}\item 
 Read\+Only Integer \mbox{\hyperlink{group__create_installer_ga9ef029d8966e03b88fd195a68853c184}{A\+R\+R\+A\+Y\+\_\+\+L\+E\+N\+G\+TH}} = \$((\$\{\#\mbox{\hyperlink{group__create_installer_ga2b36d9209dbee6df3e60d878f3e51005}{A\+RR}}\mbox{[}$\ast$\mbox{]}\}/3))
 \begin{DoxyCompactList}\small\item\em Number of switches (true length of array divided by 3) \end{DoxyCompactList}\item 
-Read\+Only String \mbox{\hyperlink{group__create_installer_ga86cf981e617fa62d9780236ea2756256}{I\+SO}} = \char`\"{}downloaded.\+iso\char`\"{}
+Exported String \mbox{\hyperlink{group__create_installer_ga86cf981e617fa62d9780236ea2756256}{I\+SO}} = \char`\"{}downloaded.\+iso\char`\"{}
 \begin{DoxyCompactList}\small\item\em Name of downloaded clonezilla I\+SO file. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
@@ -89,7 +87,7 @@ This is only needed to reduce disk space requirements and avoid a temporary R\+A
 \end{DoxyNote}
 
 
-Definition at line 760 of file mkgentoo.\+sh.
+Definition at line 843 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_gaff07c1d29d6d6a540c726948254a1764}\label{group__create_installer_gaff07c1d29d6d6a540c726948254a1764}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!cleanup@{cleanup}}
@@ -103,7 +101,7 @@ Clean up all temporary files and directpries (except for Virtual\+Box build)
 
 
 
-Definition at line 1012 of file mkgentoo.\+sh.
+Definition at line 1078 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga318b91c23a0df7a900d71338896b124e}\label{group__create_installer_ga318b91c23a0df7a900d71338896b124e}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!clone\_vm\_to\_device@{clone\_vm\_to\_device}}
@@ -127,7 +125,7 @@ Either build it beforehand or specify on commandline\+:
 \end{DoxyNote}
 
 
-Definition at line 822 of file mkgentoo.\+sh.
+Definition at line 904 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_gaa20a26022083ddbb29df1a6ea3791e0e}\label{group__create_installer_gaa20a26022083ddbb29df1a6ea3791e0e}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!clone\_vm\_to\_raw@{clone\_vm\_to\_raw}}
@@ -145,7 +143,7 @@ Use.
 \end{DoxyCode}
  to clone V\+DI to R\+AW file before bare-\/metal copy to device. 
 
-Definition at line 849 of file mkgentoo.\+sh.
+Definition at line 927 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_gaf8725880181e1189e31629b07163aaa4}\label{group__create_installer_gaf8725880181e1189e31629b07163aaa4}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!clonezilla\_device\_to\_image@{clonezilla\_device\_to\_image}}
@@ -164,7 +162,7 @@ Image is created under I\+S\+O\+F\+I\+L\+E\+S/home/partimag/image under V\+M\+P\
 \end{DoxyRetVals}
 
 
-Definition at line 885 of file mkgentoo.\+sh.
+Definition at line 962 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga9cdb7f95380fd3520d58d31a1cd12f0d}\label{group__create_installer_ga9cdb7f95380fd3520d58d31a1cd12f0d}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!clonezilla\_to\_iso@{clonezilla\_to\_iso}}
@@ -188,24 +186,7 @@ I\+SO can be burned to D\+VD or used to create a bootable U\+SB stick using dd o
 \end{DoxyNote}
 
 
-Definition at line 681 of file mkgentoo.\+sh.
-
-\mbox{\Hypertarget{group__create_installer_ga532879314181eb08a603971d9ac2b2f3}\label{group__create_installer_ga532879314181eb08a603971d9ac2b2f3}} 
-\index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!create\_install\_usb\_device@{create\_install\_usb\_device}}
-\index{create\_install\_usb\_device@{create\_install\_usb\_device}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}}
-\doxysubsubsection{\texorpdfstring{create\_install\_usb\_device()}{create\_install\_usb\_device()}}
-{\footnotesize\ttfamily create\+\_\+install\+\_\+usb\+\_\+device (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
-
-
-
-Create U\+S\+B-\/stick (or any external device) Gentoo clonezilla installer. 
-
-\begin{DoxyWarning}{Warning}
-Use with care, check your U\+S\+B\+\_\+\+D\+E\+V\+I\+CE variable. 
-\end{DoxyWarning}
-
-
-Definition at line 154 of file utils.\+sh.
+Definition at line 765 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_gaf1997aed978fc339deb4a971444274a2}\label{group__create_installer_gaf1997aed978fc339deb4a971444274a2}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!create\_iso\_vm@{create\_iso\_vm}}
@@ -229,7 +210,7 @@ the {\bfseries{sharedfolder}} command may fail vith older version of Virtual\+Bo
 \end{DoxyWarning}
 
 
-Definition at line 785 of file mkgentoo.\+sh.
+Definition at line 868 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_gafcb910ff0a49712375eabe0631b4dcdd}\label{group__create_installer_gafcb910ff0a49712375eabe0631b4dcdd}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!create\_usb\_system@{create\_usb\_system}}
@@ -250,7 +231,7 @@ Two options are available. If vbox-\/img (patched) is functional after building 
 \end{DoxyRetVals}
 
 
-Definition at line 979 of file mkgentoo.\+sh.
+Definition at line 1052 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga629c1830d8dbae377193387edd199399}\label{group__create_installer_ga629c1830d8dbae377193387edd199399}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!create\_vm@{create\_vm}}
@@ -272,7 +253,7 @@ VM may be visible (vmtype=gui) or without G\+UI (vmtype=headless, currently to b
 \item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Find a way to only compact on success and never on failure of VM. \end{DoxyRefDesc}
 
 
-Definition at line 642 of file mkgentoo.\+sh.
+Definition at line 656 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga86464f142e32909fb7bd94e35fd2d171}\label{group__create_installer_ga86464f142e32909fb7bd94e35fd2d171}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!dd\_to\_usb@{dd\_to\_usb}}
@@ -289,7 +270,7 @@ Used only if vbox-\/img (patched version) has not been built.
 \end{DoxyNote}
 
 
-Definition at line 858 of file mkgentoo.\+sh.
+Definition at line 936 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga8e416fab9a9e0ffd0b87927d0ec94a25}\label{group__create_installer_ga8e416fab9a9e0ffd0b87927d0ec94a25}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!delete\_vm@{delete\_vm}}
@@ -317,28 +298,7 @@ Powers off, possibly with emergency stop, the VM names as first argument.
 \end{DoxyItemize}
 
 
-Definition at line 587 of file mkgentoo.\+sh.
-
-\mbox{\Hypertarget{group__create_installer_gae1918429f97793a7d5ff449988d57ebd}\label{group__create_installer_gae1918429f97793a7d5ff449988d57ebd}} 
-\index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!fetch\_clonezilla\_iso@{fetch\_clonezilla\_iso}}
-\index{fetch\_clonezilla\_iso@{fetch\_clonezilla\_iso}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}}
-\doxysubsubsection{\texorpdfstring{fetch\_clonezilla\_iso()}{fetch\_clonezilla\_iso()}}
-{\footnotesize\ttfamily fetch\+\_\+clonezilla\+\_\+iso (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
-
-
-
-Download clonezilla I\+SO file and process it. 
-
-\begin{DoxyItemize}
-\item Download iff \mbox{\hyperlink{build__virtualbox_8sh_a6d8964b5a14b9bfb870e8909608fc5e4}{D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+C\+L\+O\+N\+E\+Z\+I\+L\+LA}} has value \char`\"{}true\char`\"{} \item Optionnally checks M\+D5 sum. \item Caches I\+SO download for later uses. \item Uncaches it if no fresh download. \item Mount I\+SO download. Copy ro mounted filesystem to rw directory. \item Unsquash I\+SO filesystem.\+squashfs. \item Copy clonezilla config file. \item Copy resolv.\+conf to unsquashed filesystem. 
-\begin{DoxyRetVals}{Return values}
-{\em 0} & on success or exits -\/1 on failure. \\
-\hline
-\end{DoxyRetVals}
-\end{DoxyItemize}
-
-
-Definition at line 17 of file fetch\+\_\+clonezilla\+\_\+iso.\+sh.
+Definition at line 597 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga747eb6a6a3e3fce1becde116190e868f}\label{group__create_installer_ga747eb6a6a3e3fce1becde116190e868f}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!fetch\_livecd@{fetch\_livecd}}
@@ -357,7 +317,7 @@ Caches it as \$\{I\+SO\}
 \end{DoxyRetVals}
 
 
-Definition at line 329 of file mkgentoo.\+sh.
+Definition at line 323 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_gaeea237ee4e4e714889c00f67211ddb2b}\label{group__create_installer_gaeea237ee4e4e714889c00f67211ddb2b}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!fetch\_stage3@{fetch\_stage3}}
@@ -376,7 +336,7 @@ Caches it as \$\{S\+T\+A\+G\+E3\}
 \end{DoxyRetVals}
 
 
-Definition at line 388 of file mkgentoo.\+sh.
+Definition at line 366 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga4a96ee0336af9e52512585ceec9ca3a4}\label{group__create_installer_ga4a96ee0336af9e52512585ceec9ca3a4}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!generate\_Gentoo@{generate\_Gentoo}}
@@ -390,13 +350,27 @@ Launch routines\+: fetch install IO, starge3 archive, create VM.
 
 
 
-Definition at line 1036 of file mkgentoo.\+sh.
+Definition at line 1095 of file mkgentoo.\+sh.
 
-\mbox{\Hypertarget{group__create_installer_ga91482c4db18186b33acbaf1528a50ddc}\label{group__create_installer_ga91482c4db18186b33acbaf1528a50ddc}} 
-\index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!help@{help}}
-\index{help@{help}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}}
-\doxysubsubsection{\texorpdfstring{help()}{help()}}
-{\footnotesize\ttfamily help (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+\mbox{\Hypertarget{group__create_installer_ga7ac10e6398a73f00ab13b37123541934}\label{group__create_installer_ga7ac10e6398a73f00ab13b37123541934}} 
+\index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!get\_gentoo\_install\_iso@{get\_gentoo\_install\_iso}}
+\index{get\_gentoo\_install\_iso@{get\_gentoo\_install\_iso}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}}
+\doxysubsubsection{\texorpdfstring{get\_gentoo\_install\_iso()}{get\_gentoo\_install\_iso()}}
+{\footnotesize\ttfamily get\+\_\+gentoo\+\_\+install\+\_\+iso (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Download minimal Gentoo install I\+SO file and caches. 
+
+Optionaly checks M\+D5\+S\+U\+MS. 
+
+Definition at line 8 of file fetch\+\_\+clonezilla\+\_\+iso.\+sh.
+
+\mbox{\Hypertarget{group__create_installer_ga34f49d33f396400becb2b774e0e35c61}\label{group__create_installer_ga34f49d33f396400becb2b774e0e35c61}} 
+\index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!help\_@{help\_}}
+\index{help\_@{help\_}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}}
+\doxysubsubsection{\texorpdfstring{help\_()}{help\_()}}
+{\footnotesize\ttfamily help\+\_\+ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
 
 
 
@@ -404,7 +378,7 @@ Print usage to stdout.
 
 
 
-Definition at line 319 of file mkgentoo.\+sh.
+Definition at line 313 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga3cd1eb7159583a231db413e892df7f01}\label{group__create_installer_ga3cd1eb7159583a231db413e892df7f01}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!help\_md@{help\_md}}
@@ -418,7 +392,7 @@ Print usage in markdown format.
 
 
 
-Definition at line 286 of file mkgentoo.\+sh.
+Definition at line 280 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga51af30a60f9f02777c6396b8247e356f}\label{group__create_installer_ga51af30a60f9f02777c6396b8247e356f}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!main@{main}}
@@ -430,9 +404,11 @@ Definition at line 286 of file mkgentoo.\+sh.
 
 Main function launching routines. 
 
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000002}{Todo}}]Daemonize the part below generate\+\_\+\+Gentoo when \#\+V\+M\+P\+T\+Y\+PE is {\ttfamily headless} so that the script can be detached completely with {\ttfamily nohup mkgentoo ... \&} \end{DoxyRefDesc}
 
 
-Definition at line 1062 of file mkgentoo.\+sh.
+Definition at line 1123 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_gac524b24b0add02df542887f9b251eb42}\label{group__create_installer_gac524b24b0add02df542887f9b251eb42}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!make\_boot\_from\_livecd@{make\_boot\_from\_livecd}}
@@ -458,7 +434,7 @@ Will be run in the \$\{VM\} virtual machine
 \end{DoxyRetVals}
 
 
-Definition at line 443 of file mkgentoo.\+sh.
+Definition at line 417 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_gac1f727409fd593a27f5e4df3270aab31}\label{group__create_installer_gac1f727409fd593a27f5e4df3270aab31}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!process\_clonezilla\_iso@{process\_clonezilla\_iso}}
@@ -468,7 +444,7 @@ Definition at line 443 of file mkgentoo.\+sh.
 
 
 
-Download clonezilla I\+SO or recover it from cache calling \mbox{\hyperlink{group__create_installer_gae1918429f97793a7d5ff449988d57ebd}{fetch\+\_\+clonezilla\+\_\+iso}}. ~\newline
+Download clonezilla I\+SO or recover it from cache calling \#fetch\+\_\+clonezilla\+\_\+iso. ~\newline
 Upgrade it with virtualbox guest additions. 
 
 Chroot into the clonezilla Ubuntu G\+N\+U/\+Linux distribution and runs apt to build kernel modules and install the Virtual\+Box guest additions I\+SO image. ~\newline
@@ -477,7 +453,7 @@ Installing the guest additions is a prerequisite to folder sharing between the I
 \end{DoxyNote}
 
 
-Definition at line 712 of file mkgentoo.\+sh.
+Definition at line 796 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_gaff896e7d0252924e2224ab0cde968609}\label{group__create_installer_gaff896e7d0252924e2224ab0cde968609}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!test\_cli@{test\_cli}}
@@ -497,7 +473,7 @@ Analyse commandline.
 Create globals of the form V\+AR=arg when there is var=arg on commandline ~\newline
 Otherwise assign default values V\+AR=defaults (3rd argument in array A\+RR) 
 
-Definition at line 233 of file mkgentoo.\+sh.
+Definition at line 218 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga9fb02a8000daf0612335a0b6e5f1e815}\label{group__create_installer_ga9fb02a8000daf0612335a0b6e5f1e815}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!test\_cli\_post@{test\_cli\_post}}
@@ -516,7 +492,7 @@ Check commanline coherence and incompatibilities.
 \end{DoxyRetVals}
 
 
-Definition at line 263 of file mkgentoo.\+sh.
+Definition at line 245 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga738e6a30beb886e891dbe9a6befc4d4a}\label{group__create_installer_ga738e6a30beb886e891dbe9a6befc4d4a}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!test\_cli\_pre@{test\_cli\_pre}}
@@ -535,7 +511,7 @@ Check Virtual\+Box version and prepare commandline analysis.
 \end{DoxyRetVals}
 
 
-Definition at line 144 of file mkgentoo.\+sh.
+Definition at line 154 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga321673d67e2987c793505f7f323894a9}\label{group__create_installer_ga321673d67e2987c793505f7f323894a9}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!test\_vm\_running@{test\_vm\_running}}
@@ -559,7 +535,7 @@ Checks if VM as first named argument exists and is running.
 \end{DoxyRetVals}
 
 
-Definition at line 555 of file mkgentoo.\+sh.
+Definition at line 554 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga1eee61abdc54f97375ce8ccb16e1e6aa}\label{group__create_installer_ga1eee61abdc54f97375ce8ccb16e1e6aa}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!vbox\_img\_works@{vbox\_img\_works}}
@@ -580,7 +556,7 @@ Test if {\bfseries{vbox-\/img}} is functional.
 \end{DoxyRetVals}
 
 
-Definition at line 954 of file mkgentoo.\+sh.
+Definition at line 1026 of file mkgentoo.\+sh.
 
 
 
@@ -599,9 +575,14 @@ Structure is as follows\+:
 \begin{DoxyCode}{0}
 \DoxyCodeLine{(\textcolor{stringliteral}{"commandline switch"} \textcolor{stringliteral}{"Description"}  \textcolor{stringliteral}{"Default value"} ...) }
 \end{DoxyCode}
- A double-\/entry arry will be simulated using indexes. 
+ A double-\/entry arry will be simulated using indexes.
 
-Definition at line 78 of file mkgentoo.\+sh.
+\begin{DoxyNote}{Note}
+{\ttfamily debug\+\_\+mode} should be place up front in the array 
+\end{DoxyNote}
+
+
+Definition at line 79 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga9ef029d8966e03b88fd195a68853c184}\label{group__create_installer_ga9ef029d8966e03b88fd195a68853c184}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!ARRAY\_LENGTH@{ARRAY\_LENGTH}}
@@ -615,7 +596,7 @@ Number of switches (true length of array divided by 3)
 
 
 
-Definition at line 131 of file mkgentoo.\+sh.
+Definition at line 141 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{group__create_installer_ga9d96a3318548b34c97ef6e22b23d0b8e}\label{group__create_installer_ga9d96a3318548b34c97ef6e22b23d0b8e}} 
 \index{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!CLI@{CLI}}
@@ -643,5 +624,5 @@ Name of downloaded clonezilla I\+SO file.
 
 
 
-Definition at line 137 of file mkgentoo.\+sh.
+Definition at line 147 of file mkgentoo.\+sh.
 

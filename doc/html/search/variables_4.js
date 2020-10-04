@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['path_112',['PATH',['../mkgentoo_8sh.html#ad1451b50408769582d8f5bd4254fe7b1',1,'mkgentoo.sh']]]
+  ['livecd_114',['LIVECD',['../fetch__clonezilla__iso_8sh.html#a060afc2d4febc5e904b82d131fbc8f3e',1,'fetch_clonezilla_iso.sh']]]
 ];
