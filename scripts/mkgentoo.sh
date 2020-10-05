@@ -471,7 +471,7 @@ make_boot_from_livecd() {
     # now unsquashfs the liveCD filesystem
 
     cd ${ROOT_LIVE}
-    "${VERBOSE}" && logger -s "Unsquashing filesystem..." && unsquashfs ${SQUASHFS_FILESYSTEM}; } \
+    "${VERBOSE}" && logger -s "Unsquashing filesystem..." && unsquashfs ${SQUASHFS_FILESYSTEM}  \
                  ||  unsquashfs -q  ${SQUASHFS_FILESYSTEM} 2>&1 >/dev/null
     [ $? != 0 ] && logger -s "unsquashfs failed !" && exit -1
 
