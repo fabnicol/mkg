@@ -62,7 +62,7 @@ adjust_environment() {
 
     emerge-webrsync
     ! emerge -1 sys-apps/portage \
-        && echo "emerge-webrsync failed!" | tee emerge.build && exit -1
+        && echo "[ERR] emerge-webrsync failed!" | tee emerge.build && exit -1
 
     # add logger
 
@@ -98,13 +98,13 @@ adjust_environment() {
     emerge app-arch/lz4
     emerge net-misc/netifrc
     emerge sys-apps/pcmciautils
-    [ $? != 0 ] && logger -s "emerge netifrs/pcmiautils failed!"
+    [ $? != 0 ] && logger -s "[ERR] emerge netifrs/pcmiautils failed!"
 
     # Now on to updating @world set. Be patient and wait for about 15-24 hours
     # as syslogd is not yet there we tee a custom build log
 
     emerge -uDN @world  2>&1  | tee emerge.build
-    [ $? != 0 ] && logger -s "emerge @world failed!"  | tee emerge.build \
+    [ $? != 0 ] && logger -s "[ERR] emerge @world failed!"  | tee emerge.build \
                 && exit -1
 
     # Networking in the new environment
@@ -161,14 +161,14 @@ build_kernel() {
 
     make syncconfig  # replaces silentoldconfig as of 4.19
     make -s -j${NCPUS} 2>&1 > kernel.log && make modules_install && make install
-    [ $? != 0 ] && logger -s "Kernel building failed!" &&  exit -1
+    [ $? != 0 ] && logger -s "[ERR] Kernel building failed!" &&  exit -1
     genkernel --install initramfs
     emerge sys-kernel/linux-firmware
     make clean
-    [ -f /boot/vmlinu* ] && logger -s "Kernel was built" \
-                         || { logger -s "Kernel compilation failed!"; exit -1; }
-    [ -f /boot/initr*.img ] && { logger -s "initramfs was built"; \
-                                 logger -s "initramfs compilation failed!"; \
+    [ -f /boot/vmlinu* ] && logger -s "[ERR] Kernel was built" \
+                         || { logger -s "[ERR] Kernel compilation failed!"; exit -1; }
+    [ -f /boot/initr*.img ] && { logger -s "[ERR] initramfs was built"; \
+                                 logger -s "[ERR] initramfs compilation failed!"; \
                                  exit -1; }
 }
 
@@ -202,7 +202,7 @@ install_software() {
 
     emerge -uDN ${packages}  2>&1 | tee log_install_software
     if [ $? != 0 ]; then
-        logger -s "Main package build step failed!"
+        logger -s "[ERR] Main package build step failed!"
         exit -1
     fi
 
@@ -213,13 +213,13 @@ install_software() {
 
     # optionally build RStudio and R dependencies (TODO)
 
-    ! "${DOWNLOAD_RSTUDIO}" && logger -s "No RStudio build" &&  return -1
+    ! "${DOWNLOAD_RSTUDIO}" && logger -s "[MSG] No RStudio build" &&  return -1
 
     mkdir Build
     cd Build
     wget ${GITHUBPATH}${RSTUDIO}.zip
-    [ $? != 0 ] && logger -s "RStudio download failed!" &&  exit -1
-    logger -s "Building RStudio"
+    [ $? != 0 ] && logger -s "[ERR] RStudio download failed!" &&  exit -1
+    logger -s "[INF] Building RStudio"
     unzip *.zip
     cd rstudio*
     mkdir build
@@ -346,7 +346,7 @@ global_config
 [ $? = 0 ] || res=$((res | 8))
 finalize
 [ $? = 0 ] || res=$((res | 16))
-logger -s "Exiting with code: ${res}"
+logger -s "[MSG] Exiting with code: ${res}"
 exit ${res}
 
 # note: return code will be 0 if all went smoothly

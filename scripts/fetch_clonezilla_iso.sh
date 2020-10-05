@@ -10,31 +10,29 @@ get_gentoo_install_iso() {
     rm latest-install-${PROCESSOR}-minimal*\.txt*
     local downloaded=""
     wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-install-${PROCESSOR}-minimal.txt
-    [ $? != 0 ] && logger -s "Could not download live CD from Gentoo mirror" && exit -1
+    [ $? != 0 ] && logger -s "[ERR] Could not download live CD from Gentoo mirror" && exit -1
     local current=$(cat latest-install-${PROCESSOR}-minimal.txt \
                         | grep "install-${PROCESSOR}-minimal.*.iso" \
                         | sed -E 's/iso.*$/iso/' )
     local downloaded=$(basename ${current})
-    logger -s "Downloading $current..."
+    logger -s "[INF] Downloading $current..."
     wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
-    [ $? != 0 ] && logger -s "Could not download live CD" && exit -1
+    [ $? != 0 ] && logger -s "[ERR] Could not download live CD" && exit -1
+    ! "${DISABLE_MD5_CHECK}" && check_md5sum "${downloaded}"
+    if [ -f ${downloaded} ]
+    then
+          logger -s "[INF] Caching downloaded ISO to ${CACHED_ISO}"
+          cp -f ${downloaded} ${CACHED_ISO}
+          mv ${downloaded} ${ISO}
+          if [ -f ${ISO} ]; then
+             export LIVECD=${ISO}
+          else
+             logger -s "[ERR] You need to fetch an install ISO (${ISO}) file!"
+             exit -1
+          fi
     else
-        ! ${DISABLE_MD5_CHECK} && check_md5sum ${downloaded}
-        if [ -f ${downloaded} ]
-        then
-            logger -s "Caching downloaded ISO to ${CACHED_ISO}"
-            cp -f ${downloaded} ${CACHED_ISO}
-            mv ${downloaded} ${ISO}
-            if [ -f ${ISO} ]; then
-                export LIVECD=${ISO}
-            else
-                logger -s "No active ISO (${ISO}) file!"
-                exit -1
-            fi
-        else
-            logger -s "Could not find downloaded live CD ${downloaded}"
-            exit -1
-        fi
+          logger -s "[ERR] Could not find downloaded live CD ${downloaded}"
+          exit -1
     fi
 }
 
@@ -73,10 +71,10 @@ get_cache_clonezilla_iso() {
 
            # uncache
 
-           logger -s "Uncaching clonezilla.iso"
+           logger -s "[INF] Uncaching clonezilla.iso"
            CLONEZILLACD=clonezilla.copy.iso
            if ! cp -vf clonezilla.iso ${CLONEZILLACD}; then
-               logger -s "Could not uncache clonezilla.iso"
+               logger -s "[ERR] Could not uncache clonezilla.iso"
                exit -1
            fi
        fi
@@ -106,17 +104,19 @@ fetch_clonezilla_iso() {
 
     [ ! -d mnt ] &&  { rm -rf mnt; mkdir mnt; }
     [ ! -d mnt2 ] && { rm -rf mnt2; mkdir mnt2; }
-    "${VERBOSE}" && logger -s "Mounting CloneZilla CD ${CLONEZILLACD}" && verb="-v"
-    mount -oloop ${CLONEZILLACD} ./mnt || { logger -s "Could not mount ${CLONEZILLACD} to mnt"; exit -1; }
-    "${VERBOSE}" && logger -s "Now syncing CloneZilla CD to mnt2 in rw mode."
-    rsync ${verb} -a ./mnt/ mnt2 || { logger -s "Could not copy clonezilla files to mnt2"; exit -1; }
+    "${VERBOSE}" && logger -s "[INF] Mounting CloneZilla CD ${CLONEZILLACD}" && verb="-v"
+    mount -oloop "${CLONEZILLACD}" ./mnt  \
+	|| { logger -s "[ERR] Could not mount ${CLONEZILLACD} to mnt"; exit -1; }
+    "${VERBOSE}" && logger -s "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."
+    rsync ${verb} -a ./mnt/ mnt2 \
+	|| { logger -s "[ERR] Could not copy clonezilla files to mnt2"; exit -1; }
 
     # copy to ISOFILES as a skeletteon for ISO recovery image authoring
 
     if "${CREATE_ISO}"
     then
         rm ${verb} -rf ISOFILES/*
-        verbose && logger -s "Now copying CloneZilla files to temporary folder ISOFILES"
+        verbose && logger -s "[INF] Now copying CloneZilla files to temporary folder ISOFILES"
         rsync ${verb} -a mnt2/ ISOFILES
         cp ${verb} -f clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux/
     fi
@@ -126,7 +126,7 @@ fetch_clonezilla_iso() {
     ! clonezilla_install && return 0
     cd mnt2/live
     unsquashfs filesystem.squashfs \
-       ||{ logger -s "Failed to unsquash clonezilla's filesystem.squashfs"; exit -1; }
+       ||{ logger -s "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"; exit -1; }
     cp ${verb} -f /etc/resolv.conf mnt2/live/squashfs-root/etc
     return 0
 }

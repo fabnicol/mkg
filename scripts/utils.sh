@@ -36,7 +36,7 @@ check_md5sum() {
     local ref=$(cat MD5SUMS | grep "$1" | cut -f 1 -d' ')
     downloaded=$(md5sum $1 | cut -f 1 -d' ')
     [ ${downloaded} = ${ref} ] && return 0
-        || { logger -s "MD5 checkum for $1 is not correct. Please download manually..."; exit -1; }
+    logger -s "[ERR] MD5 checkum for $1 is not correct. Please download manually..."; exit -1
 }
 
 ## @fn list_block_devices()
@@ -54,9 +54,9 @@ list_block_devices() {
 ## @ingroup auxiliaryFunctions
 
 is_block_device() {
-    local devices=$(list_block_devices)
-    grep -q "$1" <<< "${devices}" && return 0
-    return 1
+    local devices="$(list_block_devices)"
+    grep -q "$1" <<< ${devices}
+    return $?    
 }
 
 ## @fn get_mountpoint()
@@ -66,12 +66,12 @@ is_block_device() {
 get_mountpoint() {
     if is_block_device "$1"
     then
-        logger -s "$1  is not a block device!"
-        logger -s "Device labels should be in the following list:"
+        logger -s "[ERR] $1  is not a block device!"
+        logger -s "[MSG] Device labels should be in the following list:"
         logger -s $(list_block_devices)
         exit -1
     fi
-    echo "$(findmnt --raw --first -a -n -c "$1" | cut -f1 -d' ')"
+    echo $(findmnt --raw --first -a -n -c "$1" | cut -f1 -d' ')
 }
 
 ## @fn get_device()
@@ -81,11 +81,11 @@ get_mountpoint() {
 get_device() {
     if [ -d "$1" ]
     then
-        device=$(findmnt --raw --first -a -n -c $1 | cut -f2 -d' ')
+        device=$(findmnt --raw --first -a -n -c "$1" | cut -f2 -d' ')
         echo ${device}
     else
         is_block_device "$1" && echo "$1" \
-            || { logger -s "$1 is neither a mountpoint nor a block device"; exit -1; }
+            || { logger -s "[ERR] $1 is neither a mountpoint nor a block device"; exit -1; }
     fi
 }
 
@@ -102,12 +102,12 @@ get_device() {
 ## @ingroup auxiliaryFunctions
 
 test_cdrecord() {
-    logger -s "cdrecord scanbus: "
+    logger -s "[MSG] cdrecord scanbus: "
     ${CDRECORD} -scanbus
     if [ $? != 0 ]
     then
-        logger -s "cdrecord version is not functional"
-        logger -s "Try reinstalling cdrecord"
+        logger -s "[ERR] cdrecord version is not functional"
+        logger -s "[MSG] Try reinstalling cdrecord"
         exit -1
     fi
     return 0
@@ -131,7 +131,7 @@ recreate_liveCD_ISO() {
 # mkisofs almost never fails but if it does, hard stop here.
 
 if [ $? != 0 ]; then
-    logger -s "mkisofs could not recreate the ISO file to boot virtual machine ${VM} from directory $1"
+    logger -s "[ERR] mkisofs could not recreate the ISO file to boot virtual machine ${VM} from directory $1"
     exit -1
 fi
 }
@@ -147,9 +147,9 @@ burn_iso() {
     then
         if $(which cdrecord)
         then
-             logger -s "Could not find cdrecord"
-             logger -s "Please install cdrtools in your PATH or specify cdrecord full filepath on commandline:"
-             logger -s "burn=true cdrecord=/path/to/cdrecord/executable"
+             logger -s "[ERR] Could not find cdrecord"
+             logger -s "[ERR] Please install cdrtools in your PATH or specify cdrecord full filepath on commandline:"
+             logger -s "      burn=true cdrecord=/path/to/cdrecord/executable"
              return -1
          else
              CDRECORD=$(which cdrecord)
@@ -158,7 +158,7 @@ burn_iso() {
     else
          test_cdrecord
     fi
-    logger -s "Burning installation medium to optical disc..."
+    logger -s "[INF] Burning installation medium to optical disc..."
     if [ -z "${SCSI_ADDRESS}" ]
     then
        ${CDRECORD} -eject  "${ISO_OUTPUT}"
@@ -174,7 +174,7 @@ burn_iso() {
 
 create_install_usb_device() {
     res=0
-    logger -s "Creating installation stick..."
+    logger -s "[INF] Creating installation stick..."
     dd if="${ISO_OUTPUT}" of=/dev/${USB_DEVICE} bs=4M status=progress
     res=$?
     sync

@@ -33,17 +33,17 @@ setup_network() {
     fi
     local res=0
     "${VERBOSE}" \
-       && logger -s "Checking /etc/conf.d/net before net setting"
+       && logger -s "[INF] Checking /etc/conf.d/net before net setting"
        && cat /etc/conf.d/net
     "${CLONEZILLA_INSTALL}" && dhclient -v || net-setup
     res=$?
-    logger -s "Checking /etc/conf.d/net after net setting"
+    logger -s "[INF] Checking /etc/conf.d/net after net setting"
     "${VERBOSE}" && cat /etc/conf.d/net
     if [ ${res} = 0 ]
     then
         touch setup_network
     else
-        logger -s "Could not fix internet access!"
+        logger -s "[ERR] Could not fix internet access!"
         [ "${VMTYPE}" = "gui" ] && exit -1 || shutdown -h now
     fi
 }
@@ -121,12 +121,12 @@ partition() {
         sleep 10
         if [ $((${res1} | ${res2} | ${res3} | ${res5})) != 0 ]
         then
-            logger -s  "Critical errors while partitioning"
+            logger -s  "[ERR] Critical errors while partitioning"
             swapoff -a
             findmnt /dev/sda4 && umount -l /dev/sda4
             [ "${VMTYPE}" = "gui" ] && return -1 || shutdown -h now
         else
-            logger -s "Parted issue but mkfs and mount OK. Going on..."
+            logger -s "[WAR] Parted issue but mkfs and mount OK. Going on..."
             return -1
         fi
     fi
@@ -151,7 +151,7 @@ install_stage3() {
     tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
     if [ $? != 0 ]
     then
-        logger -s "stage3 tarball could not be extracted"
+        logger -s "[ERR] stage3 tarball could not be extracted"
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
@@ -237,7 +237,7 @@ finalize() {
 setup_network  2>&1 | tee setup_network.log
 if ! partition
 then
-    logger -s "Second try at partitioning..."
+    logger -s "[WAR] Second try at partitioning..."
     findmnt /dev/sda2 && umount -l /dev/sda2
     findmnt /dev/sda4 && umount -l /dev/sda4
     swapoff -a
