@@ -29,18 +29,32 @@
 setup_network() {
     [ -f setup_network ] && return
     local res=0
-    if "${VERBOSE}"
+    if [ "${VMTYPE}" = "gui" ]
     then
-       logger -s "[INF] Checking /etc/conf.d/net before net setting" \
-       && cat /etc/conf.d/net \
-       && { "${CLONEZILLA_INSTALL}" && ocs-live-netcfg || net-setup; }
+       if  "${CLONEZILLA_INSTALL}"
+       then
+           echo "[INF] Running ocs-live-netcfg..." | tee setup_network.log
+           ocs-live-netcfg
+       else
+           echo "[INF] Running net-setup..." | tee setup_network.log
+           net-setup
+       fi
     else
-        "${CLONEZILLA_INSTALL}" && dhclient \
-        || dhcpcd -aH $(ifconfig | cut -d' ' -f1 | head -n 1 | cut -d':' -f1)
+        if "${CLONEZILLA_INSTALL}"
+        then
+            dhclient
+        else
+
+            # Workaround a VirtualBox bug, you need a keyboard input here of some sort.
+            # This is why we wait some time in mkgentoo.sh
+
+            read -p "[MSG] Waiting for keyboard input..."  input_str
+            echo "[MSG] Got input string: $input_str" | tee setup_network.log
+            echo "[INF] Running dhcpcd..."            | tee setup_network.log
+            dhcpcd -HD $(ifconfig | cut -d' ' -f1     | head -n 1 | cut -d':' -f1)
+        fi
     fi
     res=$?
-    logger -s "[INF] Checking /etc/conf.d/net after net setting"
-    "${VERBOSE}" && cat /etc/conf.d/net
     if [ ${res} = 0 ]
     then
         touch setup_network
@@ -59,7 +73,8 @@ setup_network() {
 ## @warning The VM needs time to recognize /dev/sda in some cases, for unclear reasons.
 ## This may be a kernel issue or a VirtualBox issue.
 ## @bug  Same issue with mkswap and swapon. Cleaning VBox config/settings, syncing and a bit of sleep fixed these issues for the \e net-setup method.
-## @bug However the \e dhcpcd method is consistently broken, which currently blocks headless vmtypes.
+## @bug However if vmtype is \e 'headless' the \e dhcpcd method is consistently hampered by a VBox bug, which is tentatively circumvented
+## by sending a `controlvm keyboardputscancode 1c` instruction.
 ## Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated
 ## owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are
 ## mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a `read`command, all
@@ -146,7 +161,7 @@ partition() {
 
 install_stage3() {
     [ -f stage3 ] && return 0
-    mv -vf ${STAGE3} ${ELIST}  mkvm_chroot.sh ${KERNEL_CONFIG} /mnt/gentoo/
+    mv -vf ${STAGE3} ${ELIST}*  mkvm_chroot.sh ${KERNEL_CONFIG} /mnt/gentoo/
     cp -vf .bashrc /mnt/gentoo/bashrc_temp
     cd /mnt/gentoo
     head -n -1 -q bashrc_temp > temp_bashrc && rm bashrc_temp
@@ -202,11 +217,11 @@ install_stage3() {
     then
         touch stage3
     else
-        logger -s "mounting proc exit code: ${res0}"    > stage3
-        logger -s "mounting sys exit code: ${res1}"     >> stage3
-        logger -s "rslave sys exit code: ${res2}"       >> stage3
-        logger -s "mounting dev dev exit code: ${res3}" >> stage3
-        logger -s "rslave dev exit code exit code: ${res4}"    >> stage3
+        logger -s "mounting proc exit code: ${res0}"         > stage3
+        logger -s "mounting sys exit code: ${res1}"         >> stage3
+        logger -s "rslave sys exit code: ${res2}"           >> stage3
+        logger -s "mounting dev dev exit code: ${res3}"     >> stage3
+        logger -s "rslave dev exit code exit code: ${res4}" >> stage3
         logger -s "Failed to bind liveCD to main disk"
         sleep 10
         swapoff /dev/sda3

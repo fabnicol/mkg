@@ -24,7 +24,8 @@ get_gentoo_install_iso() {
           logger -s "[INF] Caching downloaded ISO to ${CACHED_ISO}"
           cp -f ${downloaded} ${CACHED_ISO}
           mv ${downloaded} ${ISO}
-          if [ -f ${ISO} ]; then
+          if [ -f ${ISO} ]
+          then
              export LIVECD=${ISO}
           else
              logger -s "[ERR] You need to fetch an install ISO (${ISO}) file!"
@@ -116,14 +117,14 @@ fetch_clonezilla_iso() {
     if "${CREATE_ISO}"
     then
         rm ${verb} -rf ISOFILES/*
-        verbose && logger -s "[INF] Now copying CloneZilla files to temporary folder ISOFILES"
+        "${VERBOSE}" && logger -s "[INF] Now copying CloneZilla files to temporary folder ISOFILES"
         rsync ${verb} -a mnt2/ ISOFILES
         cp ${verb} -f clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux/
     fi
 
     # unsquashfs iff CloneZilla liveCCD is to replace Gentoo install
 
-    ! clonezilla_install && return 0
+    ! "${CLONEZILLA_INSTALL}" && return 0
     cd mnt2/live
     unsquashfs filesystem.squashfs \
        ||{ logger -s "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"; exit -1; }

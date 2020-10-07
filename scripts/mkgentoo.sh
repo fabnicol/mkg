@@ -84,14 +84,14 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "cflags"      "GCC CFLAGS options for ebuilds"                                      "-march=core-avx2 -O2"
      "cleanup"       "Clean up archives, temporary images and virtual machine after successful completion. Boolean."  "true"
      "clonezilla_install"  "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false"
-     "cpuexecutioncap" "Maximum percentage of CPU per core (0 to 100)"                    "80"
+     "cpuexecutioncap" "Maximum percentage of CPU per core (0 to 100)"                    "100"
      "create_squashfs"  "(Re)create the squashfs filesystem. Boolean."                   "true"
      "disable_md5_check" "Disable MD5 checkums verification after downloads. Boolean."   "true"
      "download"    "Download install ISO image from Gentoo mirror. Boolean."             "true"
      "download_clonezilla" "Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean"                    "true"
      "download_clonezilla_path" "Download the following CloneZilla ISO"                       "https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download"
      "download_rstudio"  "Download and build RStudio. Boolean."                          "true"
-     "download_stage3" "Download and install stage3 tarball to virtual disk. Booelan."   "true"
+     "download_arch" "Download and install stage3 archive to virtual disk. Booelan."     "true"
      "elist"       "\t File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the 'elist'.accept_keywords and 'elist'.use files" "ebuilds.list"
      "emirrors"    "Mirror sites for downloading ebuilds"                                "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
      "firmware"      "Type of bootloader: bios or efi. Use only 'bios', tweaking not supported but might be at later stages." "bios"
@@ -117,13 +117,13 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "processor"   "Processor type"                                                      "amd64"
      "rootpasswd"  "Root password"                                                       "dev20"
      "rstudio"     "RStudio version to be downloaded and built from github source"       "1.3.1073"
-     "rtcuseutc"     "Use UTC as time reference: on/off"                                  "on"
+     "rtcuseutc"   "Use UTC as time reference: on/off"                                   "on"
      "r_version"   "R version"                                                           "4.0.2"
      "scsi_address" "In case of several optical disc burners, specify the SCSI address as x,y,z"  ""
      "size"        "\t Dynamic disc size"                                                "55000"
      "stage3"      "Path to stage3 archive"                                              "stage3.tar.xz"
-     "usbehci"       "Activate USB2 driver: on/off"                                       "on"
-     "usbxhci"       "Activate USB3 driver: on/off"                                       "on"
+     "usbehci"     "Activate USB2 driver: on/off"                                        "off"
+     "usbxhci"     "Activate USB3 driver: on/off. Note: if on, needs extension pack."    "off"
      "usb_device"  "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory (if mounted), or a few consecutive letters of the model (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such."    ""
      "usb_installer" "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer."  ""
      "vm"          "\t Virtual Machine name"                                             "Gentoo"
@@ -238,10 +238,10 @@ test_cli() {
 
     if [ -n "${vm_arg}" ] && [ "${vm_arg}" != "${CLI}" ]
     then
-        "${DEBUG_MODE}" && logger -s "[CLI] ${desc}" = "${vm_arg}" | sed 's/\\t //'
+        "${DEBUG_MODE}" && logger -s "[CLI] ${desc} = ${vm_arg}" | sed 's/\\t //'
         eval "${VAR}"="\"${vm_arg}\""
     else
-        "${DEBUG_MODE}" && logger -s "[CLI] ${desc}" = "${default}" | sed 's/\\t //'
+        "${DEBUG_MODE}" && logger -s "[CLI] ${desc} = ${default}" | sed 's/\\t //'
         eval "${VAR}"="\"${default}\""
     fi
     export "${VAR}"
@@ -380,12 +380,12 @@ fetch_stage3() {
     # Fetching stage3 tarball
 
     local CACHED_STAGE3="stage3-${PROCESSOR}.tar.xz"
-    if "${DOWNLOAD_STAGE3}"
+    if "${DOWNLOAD_ARCH}"
     then
         logger -s "[INF] Cleaning up stage3 data..."
         [ -f latest-stage3*.txt* ] && rm -f latest-stage3*.txt*
         logger -s "[INF] Downloading stage3 data..."
-        wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt
+        wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt 2>&1 | logger -s
         [ $? != 0 ] \
             && logger -s "[ERR] Could not download stage3 from mirrors: ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt" \
             && exit -1
@@ -396,13 +396,13 @@ fetch_stage3() {
             && exit -1
     fi
     local current=$(cat latest-stage3-${PROCESSOR}.txt | grep "stage3-${PROCESSOR}.*.tar.xz" | cut -f 1 -d' ')
-    if "${DOWNLOAD_STAGE3}"
+    if "${DOWNLOAD_ARCH}"
     then
         logger -s "[INF] Cleaning up stage3 archives(s)..."
         [ -f stage3-${PROCESSOR}-*tar.xz* ] && rm -f stage3-${PROCESSOR}-*tar.xz*
         [ -f ${STAGE3} ] && rm ${STAGE3}
         logger -s "[INF] Downloading ${current}..."
-        wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
+        wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"  2>&1 | logger -s
         [ $? != 0 ] \
             && logger -s "[ERR] Could not download stage3 tarball from mirror: ${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" \
             && exit -1
@@ -448,7 +448,7 @@ make_boot_from_livecd() {
     mountpoint -q mnt && umount -l mnt
     [ -d mnt ] && rm -rf mnt
     mkdir mnt
-    mount -oloop ${ISO} mnt/
+    mount -oloop ${ISO} mnt/  2>/dev/null
     ! mountpoint -q mnt && logger -s "[ERR] ISO not mounted!" && exit -1
 
     # get a copy with write access
@@ -507,20 +507,20 @@ make_boot_from_livecd() {
     [ ! -f ${STAGE3} ] && logger -s "[ERR] No stage3 archive!" && exit -1
     [ ! -f ${KERNEL_CONFIG} ] && logger -s "[ERR] No kernel configuration file!" && exit -1
     local sqrt="${ROOT_LIVE}/squashfs-root/root/"
-    mv ${verb} -f ${STAGE3} ${sqrt}
-    cp ${verb} -f scripts/mkvm.sh ${sqrt}
-    chmod +x ${sqrt}mkvm.sh
-    cp ${verb} -f scripts/mkvm_chroot.sh ${sqrt}
-    chmod +x ${sqrt}mkvm_chroot.sh
-    cp ${verb} -f ${ELIST} ${ELIST}.use ${ELIST}.accept_keywords ${sqrt}
-    cp ${verb} -f ${KERNEL_CONFIG} ${sqrt}
+    mv ${verb} -f ${STAGE3} ${sqrt}                    | logger -s
+    cp ${verb} -f scripts/mkvm.sh ${sqrt}              | logger -s
+    chmod +x ${sqrt}mkvm.sh                            | logger -s
+    cp ${verb} -f scripts/mkvm_chroot.sh ${sqrt}       | logger -s
+    chmod +x ${sqrt}mkvm_chroot.sh                     | logger -s
+    cp ${verb} -f ${ELIST} ${ELIST}.use ${ELIST}.accept_keywords ${sqrt}  | logger -s
+    cp ${verb} -f ${KERNEL_CONFIG} ${sqrt}             | logger -s
     cd ${sqrt}
 
     # now prepare the .bashrc file by exporting the environment
     # this will be placed under /root in the VM
 
     rc=".bashrc"
-    cp ${verb} -f /etc/bash.bashrc ${rc}
+    cp ${verb} -f /etc/bash.bashrc ${rc}                | logger -s
     declare -i i
     for ((i=0; i<ARRAY_LENGTH; i++)); do
         local  capname=${ARR[i*3]^^}
@@ -539,17 +539,17 @@ make_boot_from_livecd() {
     # restore the squashfs filesystem
 
     cd ../..
-    rm ${verb} -f ${SQUASHFS_FILESYSTEM}
+    rm ${verb} -f ${SQUASHFS_FILESYSTEM}                | logger -s
     local verb2="-quiet"
-    mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM} ${verb2}
-    rm -rf squashfs-root/
+    mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM} ${verb2}   | logger -s
+    rm -rf squashfs-root/                               | logger -s
 
     # restore the ISO in bootable format
 
     cd "${VMPATH}"
     "${VERBOSE}" &&  verb2="-v"
 
-    recreate_liveCD_ISO mnt2/
+    recreate_liveCD_ISO mnt2/                           | logger -s
 
     # cleanup by default
 
@@ -583,7 +583,7 @@ deep_clean() {
         logger -s "[WAR] Stopping VirtualBox server. You need to stop/snapshot your running VMs."
         logger -s "[WAR] Enter Y when this is done or another key to exit."
         logger -s "[WAR] In which case ${VM}.vdi might not be properly attached to virtual machine ${VM}"
-        #read -p "Enter Y to continue or another key to skip deep clean: " reply
+        read -p "Enter Y to continue or another key to skip deep clean: " reply
         [ reply != "Y" ] && [reply != "y" ] && return 0
     fi
     /etc/init.d/virtualbox stop
@@ -594,7 +594,7 @@ deep_clean() {
     sed -i  '/^[[:space:]]*$/d' registry
     "${VERBOSE}" && cat  registry
 
-     # It is necessary to sleep a bit otherwise doaemons will wake up with inconstitencies
+     # it is necessary to sleep a bit otherwise doaemons will wake up with inconstitencies
 
     sleep 5
     /etc/init.d/virtualbox start
@@ -615,16 +615,16 @@ delete_vm() {
     if test_vm_running "$1"
     then
         logger -s "[INF] Powering off $1"
-        VBoxManage controlvm "$1" poweroff
+        VBoxManage controlvm "$1" poweroff 2>&1 | logger -s
     fi
     if test_vm_running "$1"
     then
         logger -s "[INF] Emergency stop for $1"
-        VBoxManage startvm $1 --type emergencystop
+        VBoxManage startvm $1 --type emergencystop 2>&1 | logger -s
     fi
     logger -s "[INF] Closing medium $1.$2"
-    vboxmanage storageattach "$1" --storagectl "SATA Controller" --port 0 --medium none 2>/dev/null 1>/dev/null
-    vboxmanage closemedium  disk "${VMPATH}/$1.$2" --delete 2>/dev/null 1>/dev/null
+    vboxmanage storageattach "$1" --storagectl "SATA Controller" --port 0 --medium none 2>&1 | logger -s
+    vboxmanage closemedium  disk "${VMPATH}/$1.$2" --delete 2>&1 | logger -s
     local res=$?
     if [ ${res} != 0 ]
     then
@@ -638,23 +638,28 @@ delete_vm() {
     fi
     if [ -n "$(VBoxManage list vms | grep \"$1\")" ]
     then
-        VBoxManage list vms | grep "$1"
+        logger -s "[MSF] Current virtual machine: $(VBoxManage list vms | grep \"$1\"))"
         logger -s "[INF] Removing SATA controller"
-        VBoxManage storagectl "$1" --name "SATA Controller" --remove
+        VBoxManage storagectl "$1" --name "SATA Controller" --remove 2>&1 | logger -s
         logger -s "[INF] Removing IDE controller"
-        VBoxManage storagectl "$1" --name "IDE Controller" --remove
+        VBoxManage storagectl "$1" --name "IDE Controller" --remove  2>&1 | logger -s
         logger -s "[INF] Unregistering $1"
-        VBoxManage unregistervm "$1" --delete
+        VBoxManage unregistervm "$1" --delete 2>&1 | logger -s
     fi
 
-    # The following should be unnecessary except for issues with VBoxManage unregistervm
-    # I stubled into such situations a few times
+    # the following is overall unnecessary except for issues with VBoxManage unregistervm
 
-    [ -d "${VMPATH}/$1" ] && logger -s "Force removing $1" && rm -rvf  "${VMPATH}/$1"
+    [ -d "${VMPATH}/$1" ] \
+        && logger -s "Force removing $1" \
+        && rm -rf  "${VMPATH}/$1"
+
+    # same for disk registration
+
     [ -n "$2" ] && [ -f "${VMPATH}/$1.$2" ] \
-        && logger -s "Force removing $1.$2" && rm -f   "${VMPATH}/$1.$2"
+                && logger -s "Force removing $1.$2" \
+                && rm -f   "${VMPATH}/$1.$2"
 
-    # Deep clean again!
+    # deep clean again!
 
     [ ${res} != 0 ] && deep_clean
     return ${res}
@@ -681,7 +686,7 @@ create_vm() {
     VBoxManage createvm --name "${VM}" \
                --ostype ${OSTYPE}  \
                --register \
-               --basefolder "${VMPATH}"
+               --basefolder "${VMPATH}"  2>&1 | logger -s
 
     # add reasonably optimal options. Note: without --cpu-profile host,
     # building issues have arisen for qtsensors
@@ -704,22 +709,24 @@ create_vm() {
                --vtxvpid ${VTXVPID} \
                --paravirtprovider ${PARAVIRTPROVIDER} \
                --rtcuseutc ${RTCUSEUTC} \
-               --firmware ${FIRMWARE}
+               --firmware ${FIRMWARE} 2>&1 | logger -s
 
     # create virtual VDI disk
 
-    VBoxManage createmedium --filename "${VM}.vdi" --size ${SIZE} --variant Standard
+    VBoxManage createmedium --filename "${VM}.vdi" \
+               --size ${SIZE} \
+               --variant Standard 2>&1 | logger -s
 
 
     # set disk UUID once and for all to avoid serious debugging issues whils several VMS are around,
     # some in zombie state, with same-name disks floating around with different UUIDs and registration issues
 
-    VBoxManage internalcommands sethduuid "${VM}.vdi" ${MEDIUM_UUID}
+    VBoxManage internalcommands sethduuid "${VM}.vdi" ${MEDIUM_UUID} 2>&1 | logger -s
 
     # add storage controllers
 
-    VBoxManage storagectl "${VM}" --name "IDE Controller" --add ide
-    VBoxManage storagectl "${VM}" --name "SATA Controller" --add sata --bootable on
+    VBoxManage storagectl "${VM}" --name "IDE Controller" --add ide 2>&1 | logger -s
+    VBoxManage storagectl "${VM}" --name "SATA Controller" --add sata --bootable on 2>&1 | logger -s
 
     # attach media to controllers and double check that the attached UUID is the right one
     # as there have been occasional issues of UUID switching on attachment. Only one port/device is necessary
@@ -731,7 +738,7 @@ create_vm() {
                --device 0  \
                --type dvddrive \
                --medium ${LIVECD} \
-               --tempeject on
+               --tempeject on  2>&1 | logger -s
 
     VBoxManage storageattach "${VM}" \
                --storagectl "SATA Controller" \
@@ -739,7 +746,7 @@ create_vm() {
                --port 0 \
                --device 0 \
                --type hdd \
-               --setuuid ${MEDIUM_UUID}
+               --setuuid ${MEDIUM_UUID}  2>&1 | logger -s
 
     # note: forcing UUID will potentially cause issues with registration if a prior run with the same disk
     # has set a prior UUID in the register (/root/.config/VirtualBox/VirtualBox.xml). So in the case a deep
@@ -751,23 +758,29 @@ create_vm() {
                --port 0 \
                --device 1 \
                --type dvddrive \
-               --medium emptydrive
+               --medium emptydrive  2>&1 | logger -s
 
     # Starting VM
 
-    VBoxManage startvm "${VM}" --type "gui" # ${VMTYPE}
+    VBoxManage startvm "${VM}" --type ${VMTYPE} 2>&1 | logger -s
+
+    # Sync with VM: this is a VBox bug workaround
+
+    "${CLONEZILLA_INSTALL}" || [ ${VMTYPE} = "headless" ] && sleep 90 \
+                               && VBoxManage controlvm "${VM}" keyboardputscancode 1c  2>&1 | logger -s
 
     # VM is created in a separate process
     # Wait for it to come to end
     # Test if still running every minute
 
-    while test_vm_running ${VM}; do
-        logger ${verb} "[MSG] ${VM} running..."
+    while test_vm_running ${VM}
+    do
+        logger -s "[MSG] ${VM} running..."
         sleep 60
     done
     logger -s "[MSG] ${VM} has stopped"
     logger -s "[INF] Compacting VM..."
-    VBoxManage modifyhd "${VM}.vdi" --compact
+    VBoxManage modifyhd "${VM}.vdi" --compact 2>&1 | logger -s
 }
 
 ## @fn clonezilla_to_iso()
@@ -932,7 +945,7 @@ clone_vm_to_device() {
                          --stdout \
                          --dstformat RAW | \
                          dd of=/dev/${USB_DEVICE} bs=4M status=progress
-    [ $? = 0 ] && sync && return 0 
+    [ $? = 0 ] && sync && return 0
     logger -s "[ERR] Could not convert dynamic virtual disk to raw USB device!"
     exit -1
 }
