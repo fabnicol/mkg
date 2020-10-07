@@ -27,15 +27,17 @@
 ## @ingroup mkFileSystem
 
 setup_network() {
-    if [ -f setup_network ]
-    then
-        return
-    fi
+    [ -f setup_network ] && return
     local res=0
-    "${VERBOSE}" \
-       && logger -s "[INF] Checking /etc/conf.d/net before net setting"
-       && cat /etc/conf.d/net
-    "${CLONEZILLA_INSTALL}" && dhclient -v || net-setup
+    if "${VERBOSE}"
+    then
+       logger -s "[INF] Checking /etc/conf.d/net before net setting" \
+       && cat /etc/conf.d/net \
+       && { "${CLONEZILLA_INSTALL}" && ocs-live-netcfg || net-setup; }
+    else
+        "${CLONEZILLA_INSTALL}" && dhclient \
+        || dhcpcd -aH $(ifconfig | cut -d' ' -f1 | head -n 1 | cut -d':' -f1)
+    fi
     res=$?
     logger -s "[INF] Checking /etc/conf.d/net after net setting"
     "${VERBOSE}" && cat /etc/conf.d/net
@@ -156,7 +158,6 @@ install_stage3() {
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
         [ "${VMTYPE}" = "gui" ] && exit -1 || shutdown -h now
-
     fi
     cat temp_bashrc >> .bashrc
     rm temp_bashrc

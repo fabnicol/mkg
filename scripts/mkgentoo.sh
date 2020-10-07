@@ -156,7 +156,7 @@ test_cli_pre() {
 
     [ "$(whoami)" != "root" ] && { logger -s "[ERR] must be root to continue"; exit 1; }
     [ -d /home/partimage ] && rm -rf /home/partimag
-    mkdir -p /home/partimag 
+    mkdir -p /home/partimag
 
     # Configuration tests
 
@@ -202,9 +202,9 @@ test_cli_pre() {
 
     #--- do_exit:
 
-    [ do_exit = true ] && exit -1
+    [ "$do_exit" = "true" ] && exit -1
 
-    #--- 
+    #---
 
     export  ISO_OUTPUT=$(sed -E 's/.*\b(\w+\.(iso|ISO))\b.*$/\1/' <<< "${CLI}")
     if [ -n "${ISO_OUTPUT}" ]
@@ -359,7 +359,7 @@ fetch_livecd() {
         if  "${CREATE_SQUASHFS}"
         then
             [ -f ${CACHED_ISO} ] \
-                && logger -s "Uncaching ${ISO} from ${CACHED_ISO}" \
+                && logger -s "[INF] Uncaching ${ISO} from ${CACHED_ISO}" \
                 && cp -f ${CACHED_ISO} ${ISO}
         else
             logger -s "[ERR] No ISO file was found, please rerun with download=true" \
@@ -383,7 +383,7 @@ fetch_stage3() {
     if "${DOWNLOAD_STAGE3}"
     then
         logger -s "[INF] Cleaning up stage3 data..."
-        rm -f latest-stage3*.txt*
+        [ -f latest-stage3*.txt* ] && rm -f latest-stage3*.txt*
         logger -s "[INF] Downloading stage3 data..."
         wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt
         [ $? != 0 ] \
@@ -399,8 +399,8 @@ fetch_stage3() {
     if "${DOWNLOAD_STAGE3}"
     then
         logger -s "[INF] Cleaning up stage3 archives(s)..."
-        rm -f stage3-${PROCESSOR}-*tar.xz*
-        rm  ${STAGE3}
+        [ -f stage3-${PROCESSOR}-*tar.xz* ] && rm -f stage3-${PROCESSOR}-*tar.xz*
+        [ -f ${STAGE3} ] && rm ${STAGE3}
         logger -s "[INF] Downloading ${current}..."
         wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
         [ $? != 0 ] \
@@ -462,7 +462,7 @@ make_boot_from_livecd() {
 
     local ROOT_LIVE="${VMPATH}/mnt2"
     local SQUASHFS_FILESYSTEM=image.squashfs
-    local ISOLINUX_DIR=isolinux
+    export ISOLINUX_DIR=isolinux
     if "${CLONEZILLA_INSTALL}"
     then
         ISOLINUX_DIR=syslinux
@@ -549,12 +549,12 @@ make_boot_from_livecd() {
     cd "${VMPATH}"
     "${VERBOSE}" &&  verb2="-v"
 
-   #--> todo remake_liveCD_ISO mnt2
+    recreate_liveCD_ISO mnt2/
 
     # cleanup by default
 
     umount -l mnt
-    "${CLEANUP}" && rm -rf ${verb} mnt && rm -rf ${verb} mnt
+    "${CLEANUP}" && rm -rf ${verb} mnt && rm -rf ${verb} mnt2
     return 0
 }
 
@@ -593,7 +593,7 @@ deep_clean() {
     sed -i '/^.*<\/MediaRegistry>.*$/d' registry
     sed -i  '/^[[:space:]]*$/d' registry
     "${VERBOSE}" && cat  registry
- 
+
      # It is necessary to sleep a bit otherwise doaemons will wake up with inconstitencies
 
     sleep 5
@@ -1020,8 +1020,8 @@ clonezilla_device_to_image() {
     if "${CLEANUP}"
     then
         logger -s "[INF] Erasing virtual disk and virtual machine to save disk space..."
-        rm -f "${VMPATH}/${VM}.vdi"
-        rm -rf "${VMPATH}/${VM}"
+        [ -f "${VMPATH}/${VM}.vdi" ] && rm -f "${VMPATH}/${VM}.vdi"
+        [ -d "${VMPATH}/${VM}" ] && rm -rf "${VMPATH}/${VM}"
     fi
     rm -rf ISOFILES/home/partimag/image/*
     [ $? != 0 ] && { logger -s "[ERR] Could not remove old Clonezilla image"; exit -1; }

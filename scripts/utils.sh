@@ -56,7 +56,7 @@ list_block_devices() {
 is_block_device() {
     local devices="$(list_block_devices)"
     grep -q "$1" <<< ${devices}
-    return $?    
+    return $?
 }
 
 ## @fn get_mountpoint()
@@ -120,20 +120,25 @@ test_cdrecord() {
 ## @note An alternative xorriso solution could be considered
 
 recreate_liveCD_ISO() {
-# using mkisofs out of convention but xorriso could do as well
 
-    mkisofs ${verb2} -J -R -o  ${ISO} \
+    "${VERBOSE}" \
+         &&  mkisofs -v -J -R -o  "${ISO}" \
             -b ${ISOLINUX_DIR}/isolinux.bin \
             -c ${ISOLINUX_DIR}/boot.cat -no-emul-boot \
             -boot-load-size 4 \
-            -boot-info-table "$1"
+            -boot-info-table "$1" \
+         ||  mkisofs -J -R -o  "${ISO}" \
+                         -b ${ISOLINUX_DIR}/isolinux.bin \
+                         -c ${ISOLINUX_DIR}/boot.cat -no-emul-boot \
+                         -boot-load-size 4 \
+                         -boot-info-table "$1" 2>/dev/null 1>/dev/null
 
 # mkisofs almost never fails but if it does, hard stop here.
 
-if [ $? != 0 ]; then
-    logger -s "[ERR] mkisofs could not recreate the ISO file to boot virtual machine ${VM} from directory $1"
-    exit -1
-fi
+    if [ $? != 0 ]; then
+        logger -s "[ERR] mkisofs could not recreate the ISO file to boot virtual machine ${VM} from directory $1"
+        exit -1
+    fi
 }
 
 ## @fn burn_iso()
