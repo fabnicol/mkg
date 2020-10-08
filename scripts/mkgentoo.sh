@@ -86,7 +86,6 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "clonezilla_install"  "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false"
      "cpuexecutioncap" "Maximum percentage of CPU per core (0 to 100)"                    "100"
      "create_squashfs"  "(Re)create the squashfs filesystem. Boolean."                   "true"
-     "force"         "Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running."                                            "false"
      "disable_md5_check" "Disable MD5 checkums verification after downloads. Boolean."   "true"
      "download"    "Download install ISO image from Gentoo mirror. Boolean."             "true"
      "download_clonezilla" "Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean"                    "true"
@@ -94,8 +93,11 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "download_rstudio"  "Download and build RStudio. Boolean."                          "true"
      "download_arch" "Download and install stage3 archive to virtual disk. Booelan."     "true"
      "elist"       "\t File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the 'elist'.accept_keywords and 'elist'.use files" "ebuilds.list"
+     "email"       "Email address to send warning to when Gentoo has been created."      ""
+     "email_passwd" "Password for email if email=<user>@<domain> has been used."         ""
      "emirrors"    "Mirror sites for downloading ebuilds"                                "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
      "firmware"      "Type of bootloader: bios or efi. Use only 'bios', tweaking not supported but might be at later stages." "bios"
+     "force"         "Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running."                                            "false"
      "from_device"   "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean." "false"
      "from_iso"      "Do not generate Gentoo but use the bootable ISO given on commandline. Boolean." "false"
      "from_vm"       "Do not generate Gentoo but use the VM ${VM}. Boolean."              "false"
@@ -122,6 +124,7 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "r_version"   "R version"                                                           "4.0.2"
      "scsi_address" "In case of several optical disc burners, specify the SCSI address as x,y,z"  ""
      "size"        "\t Dynamic disc size"                                                "55000"
+     "smtp_url"    "SMTP URL of email provider for end-of-job warning. Default: gmail SMTP" "smtps://smtp.gmail.com:465"
      "stage3"      "Path to stage3 archive"                                              "stage3.tar.xz"
      "usbehci"     "Activate USB2 driver: on/off"                                        "off"
      "usbxhci"     "Activate USB3 driver: on/off. Note: if on, needs extension pack."    "off"
@@ -793,12 +796,14 @@ create_vm() {
 
     # Starting VM
 
-    logger -s <<< $(VBoxManage startvm "${VM}" --type ${VMTYPE} 2>&1 | xargs echo "[MSG]")
+    logger -s <<< $(VBoxManage startvm "${VM}" --type ${VMTYPE} 2>&1 \
+                               | xargs echo "[MSG]")
 
     # Sync with VM: this is a VBox bug workaround
 
     "${CLONEZILLA_INSTALL}" || [ ${VMTYPE} = "headless" ] && sleep 90 \
-        && logger -s <<< $(VBoxManage controlvm "${VM}" keyboardputscancode 1c  2>&1 | xargs echo "[MSG]")
+        && logger -s <<< $(VBoxManage controlvm "${VM}" keyboardputscancode 1c  2>&1 \
+                                      | xargs echo "[MSG]")
 
     # VM is created in a separate process
     # Wait for it to come to end
@@ -932,23 +937,62 @@ create_iso_vm() {
     gpasswd -a ${USER} -g vboxusers
     chgrp vboxusers "ISOFILES/home/partimag/image"
     delete_vm ${ISOVM} "vdi"
-    VBoxManage createvm --name "${ISOVM}" --ostype ubuntu_64  --register  --basefolder "${VMPATH}"
-    VBoxManage modifyvm "${ISOVM}" --cpus ${NCPUS} --cpu-profile host --memory ${MEM} --vram 256 --ioapic on --usbxhci on --usbehci on
-    VBoxManage storagectl "${ISOVM}" --name "SATA Controller" --add sata --bootable on
+    VBoxManage createvm \
+               --name "${ISOVM}" \
+               --ostype Ubuntu_64 \
+               --register \
+               --basefolder "${VMPATH}"
+    VBoxManage modifyvm "${ISOVM}" \
+               --cpus ${NCPUS} \
+               --cpu-profile host \
+               --memory ${MEM} \
+               --vram 128 \
+               --ioapic ${IOAPIC} \
+               --usbxhci ${USBXHCI} \
+               --usbehci ${USBEHCI}
+    VBoxManage storagectl "${ISOVM}" \
+               --name "SATA Controller" \
+               --add sata \
+               --bootable on
 
     # This to avoid issues with already-used vdis in debug tests
 
     VBoxManage internalcommands sethduuid "${ISOVM}.vdi"
-    VBoxManage storageattach "${ISOVM}" --storagectl "SATA Controller"  --medium "${ISOVM}.vdi" --port 0 --device 0 --type hdd
-    VBoxManage storagectl "${ISOVM}" --name "IDE Controller" --add ide
-    VBoxManage storageattach "${ISOVM}" --storagectl "IDE Controller"  --port 0  --device 0   --type dvddrive --medium ${CLONEZILLACD}  --tempeject on
-    VBoxManage storageattach "${ISOVM}" --storagectl "IDE Controller"  --port 0  --device 1   --type dvddrive --medium emptydrive
-    VBoxManage startvm "${ISOVM}" --type ${VMTYPE}
+    VBoxManage storageattach "${ISOVM}" \
+               --storagectl "SATA Controller" \
+               --medium "${ISOVM}.vdi" \
+               --port 0 \
+               --device 0 \
+               --type hdd
+    VBoxManage storagectl "${ISOVM}" \
+               --name "IDE Controller" \
+               --add ide
+    VBoxManage storageattach "${ISOVM}" \
+               --storagectl "IDE Controller" \
+               --port 0 \
+               --device 0 \
+               --type dvddrive \
+               --medium ${CLONEZILLACD} \
+               --tempeject on
+    VBoxManage storageattach "${ISOVM}" \
+               --storagectl "IDE Controller" \
+               --port 0 \
+               --device 1 \
+               --type dvddrive \
+               --medium emptydrive
+    VBoxManage startvm "${ISOVM}" \
+               --type ${VMTYPE}
 
     # must be running to work
 
-    VBoxManage sharedfolder add "${ISOVM}" --name shared --hostpath "${VMPATH}/ISOFILES/home/partimag/image"  --automount --auto-mount-point "/home/partimag" --transient
-    while [ test_vm_running ${ISOVM} ]; do
+    VBoxManage sharedfolder add "${ISOVM}" \
+               --name shared \
+               --hostpath "${VMPATH}/ISOFILES/home/partimag/image" \
+               --automount \
+               --auto-mount-point "/home/partimag" \
+               --transient
+    while [ test_vm_running ${ISOVM} ]
+    do
         logger -s "[MSG] ${ISOVM} running..."
         sleep 60
     done
@@ -1169,6 +1213,15 @@ generate_Gentoo() {
     fi
 }
 
+send_mail() {
+
+    logger -s "[INF] Sending warning email to ${EMAIL}"
+    logger -s "[WAR] Gmail and other providers request user to activate third-party applications for this mail to be sent."
+    logger -s "[WAR] You will not receive any mail otherwise."
+    curl --url ${SMTP_URL} --ssl-reqd   --mail-from ${EMAIL} --mail-rcpt ${EMAIL} --user ${EMAIL}:${EMAIL_PASSWD} -T <(echo -e  "From: ${EMAIL}\nTo: ${EMAIL}\nSubject: ${VM} now ready!\n\n${VM} finished building at " $(date -Im))
+}
+
+
 ## @fn main()
 ## @brief Main function launching routines
 ## @todo Daemonize the part below generate_Gentoo when #VMPTYPE is `headless`
@@ -1231,8 +1284,32 @@ then
     fi
 fi
 [ -n "${DEVICE_INSTALLER}" ] && create_install_usb_device
+
+# optional disc burning
+
 "${BURN}" &&  burn_iso
+
+# default cleanup
+
 cleanup
+
+# send mail
+
+if [ -n ${EMAIL} ] && [ -n ${SMTP_URL} ]
+then
+
+    # optional email end-of-job warning
+    # stop syslogd daemon to avoid logginf password
+
+    /etc/init.d/syslogd stop
+    [ -z "${EMAIL_PASSWD}" ] && logger -s "[WAR] Enter email password: " && read EMAIL_PASSWD
+    [ -z "${EMAIL_PASSWD}" ] && logger -s "[WAR] Email password was empty. Aborting email job." || send_mail
+    /etc/init.d/syslogd start
+fi
+
+# restart daemon just before exiting
+
+logger -s "[MSG] Gentoo building process ended."
 exit 0
 }
 

@@ -167,7 +167,6 @@ install_stage3() {
     mv -vf "${STAGE3}" \
        "${ELIST}.accept_keywords" \
        "${ELIST}.use" \
-       "${ELIST}.accept_keywords" \
        mkvm_chroot.sh \
        "${KERNEL_CONFIG}"  /mnt/gentoo/
     cp -vf .bashrc /mnt/gentoo/bashrc_temp

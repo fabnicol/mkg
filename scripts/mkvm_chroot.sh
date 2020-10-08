@@ -68,6 +68,7 @@ adjust_environment() {
 
     emerge -1 app-admin/sysklogd
     rc-update add sysklogd default
+    rc-service sysklogd start
 
     # select profile (most recent plasma desktop)
 
@@ -166,9 +167,10 @@ build_kernel() {
     emerge sys-kernel/linux-firmware
     make clean
     [ -f /boot/vmlinu* ] && logger -s "[ERR] Kernel was built" \
-                         || { logger -s "[ERR] Kernel compilation failed!"; exit -1; }
-    [ -f /boot/initr*.img ] && { logger -s "[ERR] initramfs was built"; \
-                                 logger -s "[ERR] initramfs compilation failed!"; \
+            || { logger -s "[ERR] Kernel compilation failed!"; \
+                 exit -1; }
+    [ -f /boot/initr*.img ] && logger -s "[ERR] initramfs was built" \
+                            || { logger -s "[ERR] initramfs compilation failed!"; \
                                  exit -1; }
 }
 
@@ -182,7 +184,7 @@ build_kernel() {
 
 install_software() {
 
-    # to avoid corruption cases of ebuild list dues to Windows editing
+    # to avoid corruption cases of ebuild list caused by Windows editing
 
     cd /
     emerge dos2unix
