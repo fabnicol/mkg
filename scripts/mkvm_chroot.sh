@@ -85,7 +85,7 @@ adjust_environment() {
 
     mkdir -p /etc/portage/package.accept_keywords
     mkdir -p /etc/portage/package.use
-    cp -vf "${ELIST}.accept_keywords" /etc/portage/package.accept_keywords/ | tee.emerge.build
+    cp -vf "${ELIST}.accept_keywords" /etc/portage/package.accept_keywords/ | tee emerge.build
     cp -vf "${ELIST}.use"             /etc/portage/package.use/  | tee emerge.build
 
     # One needs to build cmake without the qt5 USE value first, otherwise dependencies cannot be resolved.

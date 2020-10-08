@@ -86,6 +86,7 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "clonezilla_install"  "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false"
      "cpuexecutioncap" "Maximum percentage of CPU per core (0 to 100)"                    "100"
      "create_squashfs"  "(Re)create the squashfs filesystem. Boolean."                   "true"
+     "force"         "Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running."                                            "false"
      "disable_md5_check" "Disable MD5 checkums verification after downloads. Boolean."   "true"
      "download"    "Download install ISO image from Gentoo mirror. Boolean."             "true"
      "download_clonezilla" "Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean"                    "true"
@@ -126,7 +127,7 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "usbxhci"     "Activate USB3 driver: on/off. Note: if on, needs extension pack."    "off"
      "usb_device"  "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory (if mounted), or a few consecutive letters of the model (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such."    ""
      "usb_installer" "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer."  ""
-     "vm"          "\t Virtual Machine name"                                             "Gentoo"
+     "vm"          "\t Virtual Machine name. Unless 'force=true' is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name."                                             "Gentoo"
      "vbox_version"  "Virtualbox version"                                                "6.1.14"
      "vbox_version_full" "Virtualbox full version"                                       "6.1.14a"
      "vbpath"      "Path to VirtualBox directory"                                        "/usr/bin"
@@ -254,6 +255,9 @@ test_cli() {
 ## @ingroup createInstaller
 
 test_cli_post() {
+
+    # ruling out incompatible options
+
     "${DOWNLOAD}" && ! "${CREATE_SQUASHFS}" \
                   &&  logger -s "[ERR][CLI] You cannot set create_squashfs=false with download=true" \
                   &&  exit -1
@@ -275,9 +279,17 @@ test_cli_post() {
          exit -1
     fi
 
+    # there are two modes of install: with CloneZilla live CD (Ubuntu-based) or official Gentoo install
+
     ${CLONEZILLA_INSTALL} && OSTYPE=Ubuntu_64 || OSTYPE=Gentoo_64
 
+    # minimal CPU allocation
+
     [ "${NCPUS}" = "0" ] && NCPUS=1
+
+    # VM name will be time-stamped to avoid registration issues, unless 'force=true' is used on commandline
+
+    VM="${VM}".$(date -Is)
 
     # this far the only accept_keywords ebuils is dev-lang/R
     # Others can be manually added to file ${ELIST}.accept_keywords defaulting to ebuilds.list.accept_keywords
@@ -574,9 +586,14 @@ test_vm_running() {
 ## @ingroup createInstaller
 
 deep_clean() {
+
+    # no deep clean with 'force=false'
+
+    ! "${FORCE}" && return 0
+
     logger -s "[INF] Cleaning up hard disks in config file because of inconsistencies in VM settings"
     local registry=/root/.config/VirtualBox/VirtualBox.xml
-    if grep -q "${VM}.vdi" registry
+    if grep -q "${VM}.vdi" ${registry}
     then
         logger -s "[MSG] Disk ${VM}.vdi is already registered and needs to be wiped out of the registry"
         logger -s "[MSG] Otherwise issues may arise with UUIDS and data integrity"
@@ -623,8 +640,12 @@ delete_vm() {
         VBoxManage startvm $1 --type emergencystop 2>&1 | logger -s
     fi
     logger -s "[INF] Closing medium $1.$2"
-    VBoxManage storageattach "$1" --storagectl "SATA Controller" --port 0 --medium none 2>&1 | logger -s
-    VBoxManage closemedium  disk "${VMPATH}/$1.$2" --delete 2>&1 | logger -s
+    if VBoxManage showmediuminfo "${VMPATH}/$1.$2" 2>/dev/null 1>/dev/null
+    then
+        VBoxManage storageattach "$1" --storagectl "SATA Controller" --port 0 --medium none 2>&1 | logger -s
+        VBoxManage closemedium  disk "${VMPATH}/$1.$2" --delete 2>&1 | logger -s
+    fi
+
     local res=$?
     if [ ${res} != 0 ]
     then
@@ -785,7 +806,7 @@ create_vm() {
 
     while test_vm_running ${VM}
     do
-        logger -s "[MSG] ${VM} running. Disk size: " $(du -hal "${VMPATH}/${VM}.vdi")
+        logger -s "[MSG] ${VM} running. Disk size: " $(du -hal "${VM}.vdi")
         sleep 60
     done
     logger -s "[MSG] ${VM} has stopped"
