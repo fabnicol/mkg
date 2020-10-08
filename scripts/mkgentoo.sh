@@ -499,21 +499,21 @@ make_boot_from_livecd() {
     cd "${VMPATH}"
     [ ! -f scripts/mkvm.sh ] && logger -s "[ERR] No mkvm.sh script!" && exit -1
     [ ! -f scripts/mkvm_chroot.sh ] && logger -s "[ERR] No mkvm_chroot.sh script!" && exit -1
-    "${MINIMAL}" && cp ${verb} -f ${ELIST}.minimal ${ELIST}  \
-                 || cp ${verb} -f ${ELIST}.complete ${ELIST}
-    [ ! -f ${ELIST} ] || [ ! -f ${ELIST}.use ] || [ ! -f ${ELIST}.accept_keywords ] \
+    "${MINIMAL}" && cp ${verb} -f "${ELIST}.minimal" "${ELIST}"  \
+                 || cp ${verb} -f "${ELIST}.complete" "${ELIST}"
+    [ ! -f "${ELIST}" ] || [ ! -f "${ELIST}.use" ] || [ ! -f "${ELIST}.accept_keywords" ] \
         && logger -s "[ERR] No ebuild list!" \
         && exit -1
-    [ ! -f ${STAGE3} ] && logger -s "[ERR] No stage3 archive!" && exit -1
-    [ ! -f ${KERNEL_CONFIG} ] && logger -s "[ERR] No kernel configuration file!" && exit -1
+    [ ! -f "${STAGE3}" ] && logger -s "[ERR] No stage3 archive!" && exit -1
+    [ ! -f "${KERNEL_CONFIG}" ] && logger -s "[ERR] No kernel configuration file!" && exit -1
     local sqrt="${ROOT_LIVE}/squashfs-root/root/"
-    mv ${verb} -f ${STAGE3} ${sqrt}                    | logger -s
+    mv ${verb} -f "${STAGE3}" ${sqrt}                  | logger -s
     cp ${verb} -f scripts/mkvm.sh ${sqrt}              | logger -s
     chmod +x ${sqrt}mkvm.sh                            | logger -s
     cp ${verb} -f scripts/mkvm_chroot.sh ${sqrt}       | logger -s
     chmod +x ${sqrt}mkvm_chroot.sh                     | logger -s
-    cp ${verb} -f ${ELIST} ${ELIST}.use ${ELIST}.accept_keywords ${sqrt}  | logger -s
-    cp ${verb} -f ${KERNEL_CONFIG} ${sqrt}             | logger -s
+    cp ${verb} -f "${ELIST}" "${ELIST}.use" "${ELIST}.accept_keywords" ${sqrt}  | logger -s
+    cp ${verb} -f "${KERNEL_CONFIG}" ${sqrt}           | logger -s
     cd ${sqrt}
 
     # now prepare the .bashrc file by exporting the environment
@@ -623,8 +623,8 @@ delete_vm() {
         VBoxManage startvm $1 --type emergencystop 2>&1 | logger -s
     fi
     logger -s "[INF] Closing medium $1.$2"
-    vboxmanage storageattach "$1" --storagectl "SATA Controller" --port 0 --medium none 2>&1 | logger -s
-    vboxmanage closemedium  disk "${VMPATH}/$1.$2" --delete 2>&1 | logger -s
+    VBoxManage storageattach "$1" --storagectl "SATA Controller" --port 0 --medium none 2>&1 | logger -s
+    VBoxManage closemedium  disk "${VMPATH}/$1.$2" --delete 2>&1 | logger -s
     local res=$?
     if [ ${res} != 0 ]
     then
@@ -683,10 +683,11 @@ create_vm() {
 
     # create and register VM
 
-    VBoxManage createvm --name "${VM}" \
-               --ostype ${OSTYPE}  \
-               --register \
-               --basefolder "${VMPATH}"  2>&1 | logger -s
+    logger -s <<< $(VBoxManage createvm --name "${VM}" \
+                                      --ostype ${OSTYPE}  \
+                                      --register \
+                                      --basefolder "${VMPATH}"  2>&1 \
+                                      | xargs echo "[INF]")
 
     # add reasonably optimal options. Note: without --cpu-profile host,
     # building issues have arisen for qtsensors
@@ -694,80 +695,89 @@ create_vm() {
     # By default the VB processor configuration is lower-grade
     # all other parameters are listed on commandline options with default values
 
-    VBoxManage modifyvm "${VM}" \
-               --cpus ${NCPUS} \
-               --cpu-profile host \
-               --memory ${MEM} \
-               --vram 128 \
-               --ioapic ${IOAPIC} \
-               --usbxhci ${USBXHCI} \
-               --usbehci ${USBEHCI} \
-               --hwvirtex ${HWVIRTEX} \
-               --pae ${PAE} \
-               --cpuexecutioncap ${CPUEXECUTIONCAP} \
-               --ostype ${OSTYPE} \
-               --vtxvpid ${VTXVPID} \
-               --paravirtprovider ${PARAVIRTPROVIDER} \
-               --rtcuseutc ${RTCUSEUTC} \
-               --firmware ${FIRMWARE} 2>&1 | logger -s
+    logger -s <<< $(VBoxManage modifyvm "${VM}" \
+                             --cpus ${NCPUS} \
+                             --cpu-profile host \
+                             --memory ${MEM} \
+                             --vram 128 \
+                             --ioapic ${IOAPIC} \
+                             --usbxhci ${USBXHCI} \
+                             --usbehci ${USBEHCI} \
+                             --hwvirtex ${HWVIRTEX} \
+                             --pae ${PAE} \
+                             --cpuexecutioncap ${CPUEXECUTIONCAP} \
+                             --ostype ${OSTYPE} \
+                             --vtxvpid ${VTXVPID} \
+                             --paravirtprovider ${PARAVIRTPROVIDER} \
+                             --rtcuseutc ${RTCUSEUTC} \
+                             --firmware ${FIRMWARE} 2>&1 \
+                             | xargs echo "[MSG]")
 
     # create virtual VDI disk
 
-    VBoxManage createmedium --filename "${VM}.vdi" \
-               --size ${SIZE} \
-               --variant Standard 2>&1 | logger -s
-
+    logger -s <<< $(VBoxManage createmedium --filename "${VM}.vdi" \
+                                          --size ${SIZE} \
+                                          --variant Standard 2>&1 | xargs echo "[MSG]")
 
     # set disk UUID once and for all to avoid serious debugging issues whils several VMS are around,
     # some in zombie state, with same-name disks floating around with different UUIDs and registration issues
 
-    VBoxManage internalcommands sethduuid "${VM}.vdi" ${MEDIUM_UUID} 2>&1 | logger -s
+    logger -s <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" ${MEDIUM_UUID} 2>&1 \
+                               | xargs echo "[MSG]")
 
     # add storage controllers
 
-    VBoxManage storagectl "${VM}" --name "IDE Controller" --add ide 2>&1 | logger -s
-    VBoxManage storagectl "${VM}" --name "SATA Controller" --add sata --bootable on 2>&1 | logger -s
+    logger -s <<< $(VBoxManage storagectl "${VM}" \
+                             --name "IDE Controller"  \
+                             --add ide 2>&1 \
+                             | xargs echo "[MSG]")
+    logger -s <<< $(VBoxManage storagectl "${VM}" \
+                             --name "SATA Controller" \
+                             --add sata \
+                             --bootable on 2>&1 \
+                             | xargs echo "[MSG]")
 
     # attach media to controllers and double check that the attached UUID is the right one
     # as there have been occasional issues of UUID switching on attachment. Only one port/device is necessary
     # use --tempeject on for live CD
 
-    VBoxManage storageattach "${VM}" \
-               --storagectl "IDE Controller"  \
-               --port 0 \
-               --device 0  \
-               --type dvddrive \
-               --medium ${LIVECD} \
-               --tempeject on  2>&1 | logger -s
+    logger -s <<< VBoxManage storageattach "${VM}" \
+                             --storagectl "IDE Controller"  \
+                             --port 0 \
+                             --device 0  \
+                             --type dvddrive \
+                             --medium ${LIVECD} \
+                             --tempeject on  2>&1 | xargs echo "[MSG]"
 
-    VBoxManage storageattach "${VM}" \
-               --storagectl "SATA Controller" \
-               --medium "${VM}.vdi" \
-               --port 0 \
-               --device 0 \
-               --type hdd \
-               --setuuid ${MEDIUM_UUID}  2>&1 | logger -s
+    logger -s <<< VBoxManage storageattach "${VM}" \
+                             --storagectl "SATA Controller" \
+                             --medium "${VM}.vdi" \
+                             --port 0 \
+                             --device 0 \
+                             --type hdd \
+                             --setuuid ${MEDIUM_UUID}  2>&1 | xargs echo "[MSG]"
 
     # note: forcing UUID will potentially cause issues with registration if a prior run with the same disk
     # has set a prior UUID in the register (/root/.config/VirtualBox/VirtualBox.xml). So in the case a deep
     # clean is in order (see below).
     # Attaching empty drives may potentially be useful (e.g. when installing guest additions)
 
-    VBoxManage storageattach "${VM}" \
-               --storagectl "IDE Controller" \
-               --port 0 \
-               --device 1 \
-               --type dvddrive \
-               --medium emptydrive  2>&1 | logger -s
+    logger -s <<< $(VBoxManage storageattach "${VM}" \
+                             --storagectl "IDE Controller" \
+                             --port 0 \
+                             --device 1 \
+                             --type dvddrive \
+                             --medium emptydrive  2>&1 \
+                             | xargs echo "[MSG]")
 
     # Starting VM
 
-    VBoxManage startvm "${VM}" --type ${VMTYPE} 2>&1 | logger -s
+    logger -s <<< $(VBoxManage startvm "${VM}" --type ${VMTYPE} 2>&1 | xargs echo "[MSG]")
 
     # Sync with VM: this is a VBox bug workaround
 
     "${CLONEZILLA_INSTALL}" || [ ${VMTYPE} = "headless" ] && sleep 90 \
-                               && VBoxManage controlvm "${VM}" keyboardputscancode 1c  2>&1 | logger -s
+        && logger -s <<< VBoxManage controlvm "${VM}" keyboardputscancode 1c  2>&1 | xargs echo "[MSG]"
 
     # VM is created in a separate process
     # Wait for it to come to end
@@ -780,7 +790,7 @@ create_vm() {
     done
     logger -s "[MSG] ${VM} has stopped"
     logger -s "[INF] Compacting VM..."
-    VBoxManage modifyhd "${VM}.vdi" --compact 2>&1 | logger -s
+    logger -s <<< $(VBoxManage modifyhd "${VM}.vdi" --compact 2>&1 | xargs echo "[MSG]")
 }
 
 ## @fn clonezilla_to_iso()

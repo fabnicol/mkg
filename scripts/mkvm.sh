@@ -161,8 +161,19 @@ partition() {
 
 install_stage3() {
     [ -f stage3 ] && return 0
-    mv -vf ${STAGE3} ${ELIST}*  mkvm_chroot.sh ${KERNEL_CONFIG} /mnt/gentoo/
+
+    # move or copy system files to target OS
+
+    mv -vf "${STAGE3}" \
+       "${ELIST}.accept_keywords" \
+       "${ELIST}.use" \
+       "${ELIST}.accept_keywords" \
+       mkvm_chroot.sh \
+       "${KERNEL_CONFIG}"  /mnt/gentoo/
     cp -vf .bashrc /mnt/gentoo/bashrc_temp
+
+    # cd to target OS and extract stage3 archive
+
     cd /mnt/gentoo
     head -n -1 -q bashrc_temp > temp_bashrc && rm bashrc_temp
     tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
