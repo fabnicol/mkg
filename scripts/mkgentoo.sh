@@ -741,21 +741,21 @@ create_vm() {
     # as there have been occasional issues of UUID switching on attachment. Only one port/device is necessary
     # use --tempeject on for live CD
 
-    logger -s <<< VBoxManage storageattach "${VM}" \
+    logger -s <<< $(VBoxManage storageattach "${VM}" \
                              --storagectl "IDE Controller"  \
                              --port 0 \
                              --device 0  \
                              --type dvddrive \
                              --medium ${LIVECD} \
-                             --tempeject on  2>&1 | xargs echo "[MSG]"
+                             --tempeject on  2>&1 | xargs echo "[MSG]")
 
-    logger -s <<< VBoxManage storageattach "${VM}" \
+    logger -s <<< $(VBoxManage storageattach "${VM}" \
                              --storagectl "SATA Controller" \
                              --medium "${VM}.vdi" \
                              --port 0 \
                              --device 0 \
                              --type hdd \
-                             --setuuid ${MEDIUM_UUID}  2>&1 | xargs echo "[MSG]"
+                             --setuuid ${MEDIUM_UUID}  2>&1 | xargs echo "[MSG]")
 
     # note: forcing UUID will potentially cause issues with registration if a prior run with the same disk
     # has set a prior UUID in the register (/root/.config/VirtualBox/VirtualBox.xml). So in the case a deep
@@ -777,7 +777,7 @@ create_vm() {
     # Sync with VM: this is a VBox bug workaround
 
     "${CLONEZILLA_INSTALL}" || [ ${VMTYPE} = "headless" ] && sleep 90 \
-        && logger -s <<< VBoxManage controlvm "${VM}" keyboardputscancode 1c  2>&1 | xargs echo "[MSG]"
+        && logger -s <<< $(VBoxManage controlvm "${VM}" keyboardputscancode 1c  2>&1 | xargs echo "[MSG]")
 
     # VM is created in a separate process
     # Wait for it to come to end
@@ -785,7 +785,7 @@ create_vm() {
 
     while test_vm_running ${VM}
     do
-        logger -s "[MSG] ${VM} running..."
+        logger -s "[MSG] ${VM} running. Disk size: " $(du -hal "${VMPATH}/${VM}.vdi")
         sleep 60
     done
     logger -s "[MSG] ${VM} has stopped"
