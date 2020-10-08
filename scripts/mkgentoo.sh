@@ -211,13 +211,13 @@ test_cli_pre() {
     #---
 
     export  ISO_OUTPUT=$(sed -E 's/.*\b(\w+\.(iso|ISO))\b.*$/\1/' <<< "${CLI}")
-    if [ -n "${ISO_OUTPUT}" ]
+    if [ -n "${ISO_OUTPUT}" ] && [ "${ISO_OUTPUT}" != "${CLI}" ]
     then
         logger -s "[MSG] Build Gentoo distribution to bootable ISO output ${ISO_OUTPUT}"
         export CREATE_ISO=true
     else
         logger -s "[ERR] You did not indicate an ISO output file."
-        logger -s "[MSG] A Virtual machine will be created with name Gentoo under $HOME"
+        logger -s "[MSG] A Virtual machine will be created with name ${VM}"
         export CREATE_ISO=false
     fi
     return 0
