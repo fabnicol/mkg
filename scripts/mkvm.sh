@@ -165,6 +165,7 @@ install_stage3() {
     # move or copy system files to target OS
 
     mv -vf "${STAGE3}" \
+       "${ELIST}" \
        "${ELIST}.accept_keywords" \
        "${ELIST}.use" \
        mkvm_chroot.sh \

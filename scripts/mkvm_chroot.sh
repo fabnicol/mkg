@@ -37,7 +37,7 @@
 ## @li Update <tt> world </tt>. Log into emerge.build. Exit on error. @n
 ## @li Set keymaps, localization and time
 ## @todo Add more regional options by parametrization of commandline
-## @retval Exit -1 on error at <tt>emerge</tt> stage.
+## @retval -1 on error at <tt>emerge</tt> stage.
 ## @ingroup mkFileSystem
 
 adjust_environment() {
@@ -62,11 +62,11 @@ adjust_environment() {
 
     emerge-webrsync
     ! emerge -1 sys-apps/portage \
-        && echo "[ERR] emerge-webrsync failed!" | tee emerge.build && exit -1
+        && echo "[ERR] emerge-webrsync failed!" | tee emerge.build && return -1
 
     # add logger
 
-    emerge -1 app-admin/sysklogd
+    emerge -uD app-admin/sysklogd
     rc-update add sysklogd default
     rc-service sysklogd start
 
@@ -92,7 +92,7 @@ adjust_environment() {
     # One needs to build cmake without the qt5 USE value first, otherwise dependencies cannot be resolved.
 
     USE='-qt5' emerge -1 cmake
-    [ $? != 0 ] && logger -s "emerge cmake failed!" && exit -1
+    [ $? != 0 ] && logger -s "emerge cmake failed!" && return -1
 
     # other core sysapps to be merged first. LZ4 is a kernel dependency for newer linux kernels.
 
@@ -106,7 +106,7 @@ adjust_environment() {
 
     emerge -uDN @world  2>&1  | tee emerge.build
     [ $? != 0 ] && logger -s "[ERR] emerge @world failed!"  | tee emerge.build \
-                && exit -1
+                && return -1
 
     # Networking in the new environment
 
@@ -143,7 +143,7 @@ adjust_environment() {
 ## @li Emerge \b gentoo-sources, \b genkernel, \b pciutils and \b linux-firmware
 ## @li Mount /dev/sda2 to /boot/
 ## @li Build kernel and initramfs. Log into kernel.log.
-## @retval Exit -1 on error.
+## @retval  -1 on error.
 ## @ingroup mkFileSystem
 
 build_kernel() {
@@ -162,23 +162,23 @@ build_kernel() {
 
     make syncconfig  # replaces silentoldconfig as of 4.19
     make -s -j${NCPUS} 2>&1 > kernel.log && make modules_install && make install
-    [ $? != 0 ] && logger -s "[ERR] Kernel building failed!" &&  exit -1
+    [ $? != 0 ] && logger -s "[ERR] Kernel building failed!" &&  return -1
     genkernel --install initramfs
     emerge sys-kernel/linux-firmware
     make clean
     [ -f /boot/vmlinu* ] && logger -s "[ERR] Kernel was built" \
             || { logger -s "[ERR] Kernel compilation failed!"; \
-                 exit -1; }
+                 return -1; }
     [ -f /boot/initr*.img ] && logger -s "[ERR] initramfs was built" \
                             || { logger -s "[ERR] initramfs compilation failed!"; \
-                                 exit -1; }
+                                 return -1; }
 }
 
 ## @fn install_software()
 ## @details
 ## @li Emerge list of ebuilds on top of stage3 and system utils already merged.
 ## @li Optionaly download and build RStudio
-## @retval Exit -1 on building errors
+## @retval -1 on building errors
 ## @todo Add a script to build R dependencies
 ## @ingroup mkFileSystem
 
@@ -205,7 +205,7 @@ install_software() {
     emerge -uDN ${packages}  2>&1 | tee log_install_software
     if [ $? != 0 ]; then
         logger -s "[ERR] Main package build step failed!"
-        exit -1
+        return -1
     fi
 
     # update environment
@@ -217,10 +217,10 @@ install_software() {
 
     ! "${DOWNLOAD_RSTUDIO}" && logger -s "[MSG] No RStudio build" &&  return -1
 
-    mkdir Build
-    cd Build
+    mkdir /Build
+    cd /Build
     wget ${GITHUBPATH}${RSTUDIO}.zip
-    [ $? != 0 ] && logger -s "[ERR] RStudio download failed!" &&  exit -1
+    [ $? != 0 ] && logger -s "[ERR] RStudio download failed!" &&  return -1
     logger -s "[INF] Building RStudio"
     unzip *.zip
     cd rstudio*
@@ -235,6 +235,7 @@ install_software() {
     make -j${NCPUS} | tee log_install_software
     make -k install
     cd /
+    ! "${DEBUG_MODE}" && rm -rf /Build
 }
 
 
@@ -285,7 +286,6 @@ global_config() {
 
     #--- Services
 
-    rc-update add sysklogd default
     rc-update add cronie default
     rc-update add xdm default
     rc-update add dbus default
@@ -328,9 +328,10 @@ finalize() {
 
     # Final steps: cleaning up
 
-    sed -i 's/^export .*$//g' .bashrc
-    rm -f mkvm_chroot.sh package_list ${ELIST}
-    [ "${DEBUG_MODE}" = "false" ] && rm -f *
+    ! "${DEBUG_MODE}" \
+        && rm -f * \
+        &&  sed -i 's/^export .*$//g' .bashrc \
+        &&  cp -f /var/log/syslog syslog.save
 
     # prepare to compact with vbox-img compact --filename ${VMPATH}/${VM}.vdi
 
@@ -348,7 +349,8 @@ global_config
 [ $? = 0 ] || res=$((res | 8))
 finalize
 [ $? = 0 ] || res=$((res | 16))
-logger -s "[MSG] Exiting with code: ${res}"
+logger -s "[MSG] Exiting with code: ${res}" 2>&1 | tee res.log
+${res}
 exit ${res}
 
 # note: return code will be 0 if all went smoothly

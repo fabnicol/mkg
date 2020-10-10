@@ -282,9 +282,13 @@ test_cli_post() {
          exit -1
     fi
 
+    # align debug_mode and verbose
+
+    "${DEBUG_MODE}" && VERBOSE=true
+
     # there are two modes of install: with CloneZilla live CD (Ubuntu-based) or official Gentoo install
 
-    ${CLONEZILLA_INSTALL} && OSTYPE=Ubuntu_64 || OSTYPE=Gentoo_64
+    "${CLONEZILLA_INSTALL}" && OSTYPE=Ubuntu_64 || OSTYPE=Gentoo_64
 
     # minimal CPU allocation
 
@@ -1232,8 +1236,8 @@ main() {
 
 # Help cases
 
-grep -q 'help'    <<< "${CLI}" &&  help_ && exit 0
 grep -q 'help_md' <<< "${CLI}" &&  help_md && exit 0
+grep -q 'help'    <<< "${CLI}" &&  help_ && exit 0
 
 # Analyse commandline and source auxiliary files
 

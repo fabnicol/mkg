@@ -19,3 +19,4 @@ sys-auth/polkit  introspection nls pam
 >=app-text/ghostscript-gpl-9.52-r1 cups
 >=dev-qt/qtprintsupport-5.14.2 cups
 app-text/xmlto text
+>=kde-frameworks/kitemmodels-5.74.0 qml
