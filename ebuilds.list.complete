@@ -1,4 +1,5 @@
 # System and management
+ app-admin/sudo
  app-admin/sysklogd
  sys-process/cronie
  sys-apps/mlocate
@@ -20,7 +21,8 @@
 # Data science
 
  =dev-lang/R-4.0.2
- 
+ app-editors/emacs
+
 ## KDE
 
  qtcore

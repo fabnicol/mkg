@@ -232,8 +232,8 @@ install_software() {
     cd -
     cd build
     cmake .. -DRSTUDIO_TARGET=Desktop -DCMAKE_BUILD_TYPE=Release -DRSTUDIO_USE_SYSTEM_BOOST=1 -DQT_QMAKE_EXECUTABLE=1
-    make -j${NCPUS} | tee log_install_software
-    make -k install
+    make -j${NCPUS} 2>&1 | tee log_install_software
+    make -k install 2>&1 | tee log_install_software
     cd /
     ! "${DEBUG_MODE}" && rm -rf /Build
 }
@@ -303,7 +303,7 @@ global_config() {
 
     #--- groups and sudo
 
-    useradd -m -G users,wheel,audio,video,plugdev,sudo  -s /bin/bash ${NONROOT_USER}
+    useradd -m -G users,wheel,audio,video,plugdev  -s /bin/bash "${NONROOT_USER}"
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
     gpasswd -a sddm video
 
@@ -314,8 +314,8 @@ global_config() {
 
     #--- Passwords
 
-    chpasswd <<< ${NONROOT_USER}:${PASSWD}
-    chpasswd <<<  root:${ROOTPASSWD}
+    chpasswd <<< "${NONROOT_USER}":"${PASSWD}"
+    chpasswd <<<  root:"${ROOTPASSWD}"
 }
 
 ## @fn finalize()
@@ -328,10 +328,13 @@ finalize() {
 
     # Final steps: cleaning up
 
-    ! "${DEBUG_MODE}" \
-        && rm -f * \
-        &&  sed -i 's/^export .*$//g' .bashrc \
-        &&  cp -f /var/log/syslog syslog.save
+    if ! "${DEBUG_MODE}"
+    then
+        rm -f *
+        sed -i 's/^export .*$//g' .bashrc
+    else
+        cp -f /var/log/syslog syslog.save
+    fi
 
     # prepare to compact with vbox-img compact --filename ${VMPATH}/${VM}.vdi
 
@@ -350,13 +353,12 @@ global_config
 finalize
 [ $? = 0 ] || res=$((res | 16))
 logger -s "[MSG] Exiting with code: ${res}" 2>&1 | tee res.log
-${res}
 exit ${res}
 
 # note: return code will be 0 if all went smoothly
 # otherwise:
 #    odd number: Issue with adjust_environment
-#    code or code -1 is even: Issue with build_kernel
-#    code - {0,1,2,3}  can be divided by 4: Issue with install_software
-#    code - {0,...,7}  can be divided by 8: Issue with global_config
+#    code or code -1 even and not dividable by 4: Issue with build_kernel
+#    code - {0,1,2,3}  can be divided by 4, not by 8: Issue with install_software
+#    code - {0,...,7}  can be divided by 8, not by 16: Issue with global_config
 #    code - {0,...,15} can be divided by 16: Issue with finalize

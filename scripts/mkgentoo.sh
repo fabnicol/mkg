@@ -94,7 +94,6 @@ declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root o
      "download_arch" "Download and install stage3 archive to virtual disk. Booelan."     "true"
      "elist"       "\t File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the 'elist'.accept_keywords and 'elist'.use files" "ebuilds.list"
      "email"       "Email address to send warning to when Gentoo has been created."      ""
-     "email_passwd" "Password for email if email=<user>@<domain> has been used."         ""
      "emirrors"    "Mirror sites for downloading ebuilds"                                "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
      "firmware"      "Type of bootloader: bios or efi. Use only 'bios', tweaking not supported but might be at later stages." "bios"
      "force"         "Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running."                                            "false"
@@ -298,11 +297,15 @@ test_cli_post() {
 
     VM="${VM}".$(date -Is)
 
-    # this far the only accept_keywords ebuils is dev-lang/R
-    # Others can be manually added to file ${ELIST}.accept_keywords defaulting to ebuilds.list.accept_keywords
+    # other accept_keywords can be manually added to file ${ELIST}.accept_keywords
+    # defaulting to ebuilds.list.accept_keywords
 
     sed -i '/dev-lang\/R.*$/d'  "${ELIST}.accept_keywords"
     echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}" >> "${ELIST}.accept_keywords"
+
+    /etc/init.d/syslogd start
+    [ -n "${EMAIL}" ] && read -p "[MSG] Enter email password: " EMAIL_PASSWD
+    [ -z "${EMAIL_PASSWD}" ] && logger -s "[WAR] No email password, aborting sendmail."
 }
 
 ## @fn help_md()
@@ -865,34 +868,57 @@ clonezilla_to_iso() {
 
 process_clonezilla_iso() {
     fetch_clonezilla_iso
+
+    # prepare chroot in clonezilla filesystem
+
     for i in proc sys dev run; do mount -B /$i squashfs-root/$i; done
-    chroot squashfs-root
-    mkdir -p  /boot
-    apt update -yq
-    apt upgrade -yq <<< $(echo N)
-    local headers=$(apt-cache search ^linux-headers | tail -n1 | cut -f 1 -d' ')
-    local kernel=$(apt-cache search ^linux-image | grep -v unsigned | tail -n1 | cut -f 1 -d' ')
-    apt install -qy ${headers}
-    apt install -qy ${kernel}
-    apt install -qy build-essential gcc <<< "N"
-    apt install -qy virtualbox-dkms
-    apt install -qy virtualbox-guest-additions-iso
-    mount -oloop /usr/share/virtualbox/VBoxGuestAdditions.iso /mnt
-    cd /mnt
-    /sbin/rcvboxadd quicksetup all
-    /bin/bash VBoxLinuxAdditions.run
-    cd /
-    umount /mnt
-    apt remove -y -q ${headers} build-essential gcc  virtualbox-guest-additions-iso
-    apt autoremove -y -q
-    exit
+
+    # add uupdate script to clonezilla filesystem. Do not indent!
+
+    cat > squashfs-root/update_clonezilla.sh << EOF
+#!/bin/bash
+mkdir -p  /boot
+apt update -yq
+apt upgrade -yq <<< $(echo N)
+local headers=$(apt-cache search ^linux-headers | tail -n1 | cut -f 1 -d' ')
+local kernel=$(apt-cache search ^linux-image | grep -v unsigned | tail -n1 | cut -f 1 -d' ')
+apt install -qy ${headers}
+apt install -qy ${kernel}
+apt install -qy build-essential gcc <<< "N"
+apt install -qy virtualbox-dkms
+apt install -qy virtualbox-guest-additions-iso
+mount -oloop /usr/share/virtualbox/VBoxGuestAdditions.iso /mnt
+cd /mnt
+/sbin/rcvboxadd quicksetup all
+/bin/bash VBoxLinuxAdditions.run
+cd /
+umount /mnt
+apt remove -y -q ${headers} build-essential gcc  virtualbox-guest-additions-iso
+apt autoremove -y -q
+exit
+EOF
+
+    chmod +x squashfs-root/update_clonezilla.sh
+
+    # no chroot and run update script
+
+    chroot squashfs-root /bin/bash update_clonezilla.sh
+
+    # afet exit now back under live/. Update linux kernel:
+
     cp -vf --dereference squashfs-root/boot/vmlinuz  vmlinuz
     cp -vf --dereference squashfs-root/boot/initrd.img  initrd.img
+
+    # clean up and restore squashfs back
+
     rm -rf squashfs-root/boot
     rm -vf filesystem.squashfs
     for i in proc sys dev  run; do umount squashfs-root/$i; done
     mksquashfs squashfs-root filesystem.squashfs
     rm -rf squashfs-root/
+
+    # add 'savedisk' config file and create ISO
+
     cd "${VMPATH}/mnt2"
     cp -vf ../clonezilla/savedisk/isolinux.cfg  syslinux
     cd "${VMPATH}"
@@ -1305,10 +1331,7 @@ then
     # optional email end-of-job warning
     # stop syslogd daemon to avoid logginf password
 
-    /etc/init.d/syslogd stop
-    [ -z "${EMAIL_PASSWD}" ] && logger -s "[WAR] Enter email password: " && read EMAIL_PASSWD
-    [ -z "${EMAIL_PASSWD}" ] && logger -s "[WAR] Email password was empty. Aborting email job." || send_mail
-    /etc/init.d/syslogd start
+    [ -n "${EMAIL_PASSWD}" ] && [ -n "${EMAIL}" ] && [ -n "${SMTP_URL}" ] && send_mail
 fi
 
 # restart daemon just before exiting

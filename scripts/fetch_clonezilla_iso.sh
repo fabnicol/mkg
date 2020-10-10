@@ -107,24 +107,22 @@ fetch_clonezilla_iso() {
     [ ! -d mnt2 ] && { rm -rf mnt2; mkdir mnt2; }
     "${VERBOSE}" && logger -s "[INF] Mounting CloneZilla CD ${CLONEZILLACD}" && verb="-v"
     mount -oloop "${CLONEZILLACD}" ./mnt  \
-	|| { logger -s "[ERR] Could not mount ${CLONEZILLACD} to mnt"; exit -1; }
+     	|| { logger -s "[ERR] Could not mount ${CLONEZILLACD} to mnt"; exit -1; }
     "${VERBOSE}" && logger -s "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."
     rsync ${verb} -a ./mnt/ mnt2 \
-	|| { logger -s "[ERR] Could not copy clonezilla files to mnt2"; exit -1; }
+    	|| { logger -s "[ERR] Could not copy clonezilla files to mnt2"; exit -1; }
 
     # copy to ISOFILES as a skeletteon for ISO recovery image authoring
 
     if "${CREATE_ISO}"
     then
-        rm ${verb} -rf ISOFILES/*
+        rm ${verb} -rf ISOFILES
+        mkdir ISOFILES
         "${VERBOSE}" && logger -s "[INF] Now copying CloneZilla files to temporary folder ISOFILES"
         rsync ${verb} -a mnt2/ ISOFILES
         cp ${verb} -f clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux/
     fi
 
-    # unsquashfs iff CloneZilla liveCCD is to replace Gentoo install
-
-    ! "${CLONEZILLA_INSTALL}" && return 0
     cd mnt2/live
     unsquashfs filesystem.squashfs \
        ||{ logger -s "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"; exit -1; }
