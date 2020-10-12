@@ -43,6 +43,8 @@ get_gentoo_install_iso() {
 ## @ingroup createInstaller
 
 get_clonezilla_iso() {
+
+    logger -s "[INF] Downloading CloneZilla..."
     local clonezilla_file=$(sed -E 's/.*\/(.*)\/download/\1/' <<< ${DOWNLOAD_CLONEZILLA_PATH})
     wget ${DOWNLOAD_CLONEZILLA_PATH} -O ${clonezilla_file}
     [ $? != 0 ] && { logger -s "Could not download CloneZilla iso"; exit -1; }
@@ -51,8 +53,9 @@ get_clonezilla_iso() {
     export CLONEZILLACD=${clonezilla_iso}
 
     # first cache it
-
-    cp -vf ${CLONEZILLACD} clonezilla.iso
+    local verb=""
+    "${VERBOSE}" && verb="-v"
+    cp ${verb} -f ${CLONEZILLACD} clonezilla.iso
 }
 
 ## @fn get_cache_clonezilla_iso()
@@ -67,7 +70,7 @@ get_cache_clonezilla_iso() {
 
         get_clonezilla_iso
     else
-        if [ -f clonezilla.iso ] && [ ! -f ${CLONEZILLACD} ]
+        if [ -f clonezilla.iso ]
         then
 
            # uncache
@@ -78,7 +81,10 @@ get_cache_clonezilla_iso() {
                logger -s "[ERR] Could not uncache clonezilla.iso"
                exit -1
            fi
-       fi
+        else
+            logger -s "[WAR] No CloneZilla ISO file was found. Please run again with 'download_clonezilla=true'"
+            exit -1
+        fi
     fi
 }
 
@@ -97,6 +103,7 @@ get_cache_clonezilla_iso() {
 ## @ingroup createInstaller
 
 fetch_clonezilla_iso() {
+
     get_cache_clonezilla_iso
     cd ${VMPATH}
     local verb=""

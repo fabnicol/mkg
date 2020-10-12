@@ -62,12 +62,31 @@
 ## @code mkgento burn usb_device="PNY" usb_installer="Sams" my_gentoo_image.iso @endcode
 ## @defgroup createInstaller Create Gentoo linux image and installer.
 
-## @var CLI
-## @brief Command line
-## @ingroup createInstaller
 
-declare -r CLI="$*"
-DEBUG_MODE=true
+# parse command line. All arguments must be in the form a=b except for help, file.iso
+
+while (( "$#" ))
+do
+    if grep '=' <<< "$1"
+    then
+        left=$(sed -E 's/(.*)=(.*)/\1/'  <<< "$1")
+        right=$(sed -E 's/(.*)=(.*)/\2/' <<< "$1")
+        declare -u VAR=${left}
+        eval "${VAR}"="\"${right}\""
+        shift
+    else
+        if  grep ".iso"  <<< "$1"
+        then
+            ISO_OUTPUT="$1"
+            shift
+        else
+            logger -s "[ERR] Unsupported option $1"
+            logger -s "[ERR] All options must be in the form a=b except for 'help' and the iso file"
+            exit 1
+        fi
+    fi
+done
+
 
 ## @var ARR
 ## @brief global string array of switches and default values
@@ -207,10 +226,9 @@ test_cli_pre() {
 
     [ "$do_exit" = "true" ] && exit -1
 
-    #---
+    #--- ISO output
 
-    export  ISO_OUTPUT=$(sed -E 's/.*\b(\w+\.(iso|ISO))\b.*$/\1/' <<< "${CLI}")
-    if [ -n "${ISO_OUTPUT}" ] && [ "${ISO_OUTPUT}" != "${CLI}" ]
+    if [ -n "${ISO_OUTPUT}" ]
     then
         logger -s "[MSG] Build Gentoo distribution to bootable ISO output ${ISO_OUTPUT}"
         export CREATE_ISO=true
@@ -222,6 +240,8 @@ test_cli_pre() {
     return 0
 }
 
+
+
 ## @fn test_cli()
 ## @brief Analyse commandline
 ## @param cli  Commandline
@@ -230,24 +250,24 @@ test_cli_pre() {
 ## @ingroup createInstaller
 
 test_cli() {
+
     declare -i i=$1
     local sw=${ARR[i*3]}
     local desc=${ARR[i*3+1]}
     local default=${ARR[i*3+2]}
-    local vm_arg=$(sed -E "s/.*${sw}=([^ ]+).*$/\1/" <<< "${CLI}")
-    declare -u VAR=${sw}
+    local cli_arg=false
+    declare -u V=${sw}
 
     # debug_mode should be placed on top of ARR
 
-    if [ -n "${vm_arg}" ] && [ "${vm_arg}" != "${CLI}" ]
+    if [ -n "${!V}" ]
     then
-        "${DEBUG_MODE}" && logger -s "[CLI] ${desc} = ${vm_arg}" | sed 's/\\t //'
-        eval "${VAR}"="\"${vm_arg}\""
+         logger -s "[CLI] ${desc} = ${!V}" | sed 's/\\t //'
     else
         "${DEBUG_MODE}" && logger -s "[CLI] ${desc} = ${default}" | sed 's/\\t //'
-        eval "${VAR}"="\"${default}\""
+        eval "${V}"="\"${default}\""
     fi
-    export "${VAR}"
+    export "${V}"
 }
 
 
@@ -303,7 +323,6 @@ test_cli_post() {
     sed -i '/dev-lang\/R.*$/d'  "${ELIST}.accept_keywords"
     echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}" >> "${ELIST}.accept_keywords"
 
-    /etc/init.d/syslogd start
     [ -n "${EMAIL}" ] && read -p "[MSG] Enter email password: " EMAIL_PASSWD
     [ -z "${EMAIL_PASSWD}" ] && logger -s "[WAR] No email password, aborting sendmail."
 }
@@ -836,14 +855,20 @@ create_vm() {
 ## @ingroup createInstaller
 
 clonezilla_to_iso() {
-    if ! [ -f "${VMPATH}/$2"/syslinux/isohdpfx.bin ]; then
-         cp -vf ${VMPATH}/clonezilla/syslinux/isohdpfx.bin "${VMPATH}/$2"/syslinux
+
+    [ ! -d "${VMPATH}/$2" ] && logger -s "[ERR] Directory $2 was not found under ${VMPATH}" && exit -1
+    if  [ ! -f "${VMPATH}/$2/syslinux/isohdpfx.bin" ]
+    then
+        local verb=""
+        "${VERBOSE}" && verb="-v"
+        cp ${verb} -f "${VMPATH}/clonezilla/syslinux/isohdpfx.bin" "${VMPATH}/$2/syslinux"
     fi
-    xorriso -as mkisofs   -isohybrid-mbr "$2"/syslinux/isohdpfx.bin  \
+    xorriso -as mkisofs   -isohybrid-mbr "$2/syslinux/isohdpfx.bin"  \
             -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
-            -boot-load-size 4   -boot-info-table   -eltorito-alt-boot   -e boot/grub/efiboot.img \
+            -boot-load-size 4   -boot-info-table   -eltorito-alt-boot   -e boot/grub/efi.img \
             -no-emul-boot   -isohybrid-gpt-basdat   -o "$1"  "$2"
-    if [ $? != 0 ]; then
+    if [ $? != 0 ]
+    then
         logger -s "[ERR] Could not create ISO image from ISO package creation directory"
         exit -1
     fi
@@ -867,6 +892,7 @@ clonezilla_to_iso() {
 ## @ingroup createInstaller
 
 process_clonezilla_iso() {
+
     fetch_clonezilla_iso
 
     # prepare chroot in clonezilla filesystem
@@ -1111,7 +1137,7 @@ clonezilla_device_to_image() {
         && logger -s "[MSG] Device ${USB_DEVICE} is mounted to: $(get_mountpoint /dev/${USB_DEVICE})" \
         && logger -s "[WAR] The external USB device should not be mounted" \
         && logger -s "[INF] Trying to unmount..." &&  umount -l /dev/${USB_DEVICE}
-    if  $?
+    if  [ $? = 0 ]
     then
         logger -s "[MSG] Managed to unmount /dev/${USB_DEVICE}"
     else
@@ -1262,8 +1288,8 @@ main() {
 
 # Help cases
 
-grep -q 'help_md' <<< "${CLI}" &&  help_md && exit 0
-grep -q 'help'    <<< "${CLI}" &&  help_ && exit 0
+grep -q 'help_md' <<< "$@" &&  help_md && exit 0
+grep -q 'help'    <<< "$@" &&  help_ && exit 0
 
 # Analyse commandline and source auxiliary files
 
@@ -1280,30 +1306,30 @@ source scripts/utils.sh
 ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}" && generate_Gentoo
 
 # process the virtual disk into a clonezilla image
-
+echo  "${VM}.vdi"  "${CREATE_ISO}" "${FROM_DEVICE}"
 if [ -f "${VM}.vdi" ] && "${CREATE_ISO}"  && ! "${FROM_DEVICE}"
 then
     # Now create a new VM from clonezilla ISO to retrieve
     # Gentoo filesystem from the VDI virtual disk.
 
-    logger -s "[ERR] Adding VirtualBox Guest Additions to CloneZilla ISO VM..."
-    "${VERBOSE}" && logger -s "[ERR] These are necessary to activate folder sharing."
+    logger -s "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM..."
+    "${VERBOSE}" && logger -s "[INF] These are necessary to activate folder sharing."
     process_clonezilla_iso
 
     # And launch the corresponding VM
 
-    logger -s "[ERR] Launching Clonezilla VM to convert virtual disk to clonezilla image..."
+    logger -s "[INF] Launching Clonezilla VM to convert virtual disk to clonezilla image..."
     create_iso_vm
 fi
 
-# Now convert the clonzilla xz image image into a bootable ISO
+# Now convert the clonezilla xz image image into a bootable ISO
 
-if ! "${FROM_ISO}"
+if "${CREATE_ISO}"
 then
     [ "${FROM_DEVICE}" = "true" ] && clonezilla_device_to_image
-    logger -s "[ERR] Creating Clonezilla bootable ISO..."
+    logger -s "[INF] Creating Clonezilla bootable ISO..."
     clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
-    if $?
+    if [ $? = 0 ]
     then
         logger -s "[MSG] Done."
         [ -f "${ISO_OUTPUT}" ] && logger -s "[MSG] ISO install medium was created here: ${ISO_OUTPUT}"  \
@@ -1329,7 +1355,6 @@ if [ -n ${EMAIL} ] && [ -n ${SMTP_URL} ]
 then
 
     # optional email end-of-job warning
-    # stop syslogd daemon to avoid logginf password
 
     [ -n "${EMAIL_PASSWD}" ] && [ -n "${EMAIL}" ] && [ -n "${SMTP_URL}" ] && send_mail
 fi
