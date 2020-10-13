@@ -303,7 +303,7 @@ test_cli_post() {
 
     # align debug_mode and verbose
 
-    "${DEBUG_MODE}" && VERBOSE=true
+    "${DEBUG_MODE}" && VERBOSE=true && CLEANUP=false
 
     # there are two modes of install: with CloneZilla live CD (Ubuntu-based) or official Gentoo install
 
@@ -315,7 +315,13 @@ test_cli_post() {
 
     # VM name will be time-stamped to avoid registration issues, unless 'force=true' is used on commandline
 
-    VM="${VM}".$(date -Is)
+    ! "${FORCE}" && ! "${FROM_VM}" && VM="${VM}".$(date +%F-%H-%M-%S)
+
+    "${CREATE_ISO}" && ISOVM="${VM}_ISO"
+
+    "${FROM_VM}" && [ ! -f "${VM}.vdi" ] \
+        && logger -s "[ERR] Virtual machine disk ${VMPATH}/${VM}.vdi was not found" \
+        && exit -1
 
     # other accept_keywords can be manually added to file ${ELIST}.accept_keywords
     # defaulting to ebuilds.list.accept_keywords
@@ -555,6 +561,7 @@ make_boot_from_livecd() {
     chmod +x ${sqrt}mkvm_chroot.sh                     | logger -s
     cp ${verb} -f "${ELIST}" "${ELIST}.use" "${ELIST}.accept_keywords" ${sqrt}  | logger -s
     cp ${verb} -f "${KERNEL_CONFIG}" ${sqrt}           | logger -s
+
     cd ${sqrt}
 
     # now prepare the .bashrc file by exporting the environment
@@ -563,12 +570,11 @@ make_boot_from_livecd() {
     rc=".bashrc"
     cp ${verb} -f /etc/bash.bashrc ${rc}                | logger -s
     declare -i i
-    for ((i=0; i<ARRAY_LENGTH; i++)); do
+    for ((i=0; i<ARRAY_LENGTH; i++))
+    do
         local  capname=${ARR[i*3]^^}
         local  expstring="export ${capname}=\"${!capname}\""
-        if [ "${VERBOSE}" = "true" ]; then
-            logger -s "${expstring}"
-        fi
+        "${VERBOSE}" && logger -s "${expstring}"
         echo "${expstring}" >> ${rc}
     done
 
@@ -629,8 +635,9 @@ deep_clean() {
         logger -s "[WAR] Stopping VirtualBox server. You need to stop/snapshot your running VMs."
         logger -s "[WAR] Enter Y when this is done or another key to exit."
         logger -s "[WAR] In which case ${VM}.vdi might not be properly attached to virtual machine ${VM}"
-        read -p "Enter Y to continue or another key to skip deep clean: " reply
-        [ reply != "Y" ] && [reply != "y" ] && return 0
+        [ "$1" != "ISO_STAGE" ] \
+            &&   read -p "Enter Y to continue or another key to skip deep clean: " reply || reply="Y"
+        [ "${reply}" != "Y" ] && [ "${reply}" != "y" ] && return 0
     fi
     /etc/init.d/virtualbox stop
     sleep 5
@@ -658,6 +665,7 @@ deep_clean() {
 ## @ingroup createInstaller
 
 delete_vm() {
+
     if test_vm_running "$1"
     then
         logger -s "[INF] Powering off $1"
@@ -676,6 +684,7 @@ delete_vm() {
     fi
 
     local res=$?
+
     if [ ${res} != 0 ]
     then
 
@@ -684,7 +693,7 @@ delete_vm() {
         # one needs to deep-clean twice. deep_clean will peek and clean the registry
         # altering it only if requested for security. This may cause other VMs to crash.
 
-        deep_clean
+        deep_clean "$3"
     fi
     if [ -n "$(VBoxManage list vms | grep \"$1\")" ]
     then
@@ -699,19 +708,22 @@ delete_vm() {
 
     # the following is overall unnecessary except for issues with VBoxManage unregistervm
 
-    [ -d "${VMPATH}/$1" ] \
-        && logger -s "Force removing $1" \
-        && rm -rf  "${VMPATH}/$1"
+    if [ "$3" != "ISO_STAGE" ]
+    then
+        [ -d "${VMPATH}/$1" ] \
+            && logger -s "Force removing $1" \
+            && rm -rf  "${VMPATH}/$1"
 
-    # same for disk registration
+        # same for disk registration
 
-    [ -n "$2" ] && [ -f "${VMPATH}/$1.$2" ] \
-                && logger -s "Force removing $1.$2" \
-                && rm -f   "${VMPATH}/$1.$2"
+        [ -n "$2" ] && [ -f "${VMPATH}/$1.$2" ] \
+            && logger -s "Force removing $1.$2" \
+            && rm -f   "${VMPATH}/$1.$2"
+    fi
 
     # deep clean again!
 
-    [ ${res} != 0 ] && deep_clean
+    [ ${res} != 0 ] && deep_clean "$3"
     return ${res}
 }
 
@@ -726,6 +738,7 @@ delete_vm() {
 ## @ingroup createInstaller
 
 create_vm() {
+
     export PATH=${PATH}:${VBPATH}
     cd ${VMPATH}
     delete_vm "${VM}" "vdi"
@@ -888,41 +901,57 @@ clonezilla_to_iso() {
 ## @note Installing the guest additions is a prerequisite to folder sharing between the ISO VM
 ## and the host.
 ## Folder sharing is necessary to recover a compressed clonezilla image of the VDI virtual disk
-## into the ISOFILES/home/partimag/image directory.
+## into the directory ISOFILES/home/partimag/image
 ## @ingroup createInstaller
 
 process_clonezilla_iso() {
 
     fetch_clonezilla_iso
 
+    # copy to ISOFILES as a skeletteon for ISO recovery image authoring
+
+    if "${CREATE_ISO}"
+    then
+        rm ${verb} -rf ISOFILES
+        mkdir -p ISOFILES/home/partimag
+        "${VERBOSE}" && logger -s "[INF] Now copying CloneZilla files to temporary folder ISOFILES"
+        rsync ${verb} -a mnt2/ ISOFILES
+        cp ${verb} -f clonezilla/savedisk/isolinux.cfg ISOFILES/syslinux/
+        cd ISOFILES/live
+    fi
+
     # prepare chroot in clonezilla filesystem
 
     for i in proc sys dev run; do mount -B /$i squashfs-root/$i; done
 
-    # add uupdate script to clonezilla filesystem. Do not indent!
+    # add update script to clonezilla filesystem. Do not indent!
 
     cat > squashfs-root/update_clonezilla.sh << EOF
 #!/bin/bash
 mkdir -p  /boot
 apt update -yq
-apt upgrade -yq <<< $(echo N)
-local headers=$(apt-cache search ^linux-headers | tail -n1 | cut -f 1 -d' ')
-local kernel=$(apt-cache search ^linux-image | grep -v unsigned | tail -n1 | cut -f 1 -d' ')
-apt install -qy ${headers}
-apt install -qy ${kernel}
+apt upgrade -yq <<< 'N'
+headers="\$(apt-cache search ^linux-headers-[5-9]+.*generic | tail -n1 | grep -v unsigned |  cut -f 1 -d' ')"
+kernel="\$(apt-cache  search ^linux-image-[5-9]+.*generic   | tail -n1 | grep -v unsigned |  cut -f 1 -d' ')"
+modules="\$(apt-cache search ^linux-modules-[5-9]+.*generic | tail -n1 | grep -v unsigned |  cut -f 1 -d' ')"
+apt install -qy "\${headers}"
+apt install -qy "\${kernel}"
+apt install -qy "\${modules}"
 apt install -qy build-essential gcc <<< "N"
-apt install -qy virtualbox-dkms
+apt install -qy virtualbox virtualbox-dkms
 apt install -qy virtualbox-guest-additions-iso
 mount -oloop /usr/share/virtualbox/VBoxGuestAdditions.iso /mnt
 cd /mnt
-/sbin/rcvboxadd quicksetup all
 /bin/bash VBoxLinuxAdditions.run
+/sbin/rcvboxadd quicksetup all
 cd /
+mkdir -p /home/partimag/image
 umount /mnt
-apt remove -y -q ${headers} build-essential gcc  virtualbox-guest-additions-iso
 apt autoremove -y -q
 exit
 EOF
+
+#  apt remove -y -q "\${headers}" build-essential gcc  virtualbox-guest-additions-iso virtualbox
 
     chmod +x squashfs-root/update_clonezilla.sh
 
@@ -939,17 +968,15 @@ EOF
 
     rm -rf squashfs-root/boot
     rm -vf filesystem.squashfs
-    for i in proc sys dev  run; do umount squashfs-root/$i; done
+    for i in proc sys dev run; do umount squashfs-root/$i; done
     mksquashfs squashfs-root filesystem.squashfs
     rm -rf squashfs-root/
 
     # add 'savedisk' config file and create ISO
 
-    cd "${VMPATH}/mnt2"
-    cp -vf ../clonezilla/savedisk/isolinux.cfg  syslinux
     cd "${VMPATH}"
     rm -vf ${CLONEZILLACD}
-    clonezilla_to_iso ${CLONEZILLACD} "mnt2"
+    clonezilla_to_iso ${CLONEZILLACD} "ISOFILES"
     rm -rf mnt2
 }
 
@@ -989,65 +1016,88 @@ build_virtualbox() {
 
 create_iso_vm() {
     cd ${VMPATH}
-    chown -R ${USER} .
     gpasswd -a ${USER} -g vboxusers
-    chgrp vboxusers "ISOFILES/home/partimag/image"
-    delete_vm ${ISOVM} "vdi"
-    VBoxManage createvm \
+    chgrp vboxusers "ISOFILES/home/partimag"
+    delete_vm "${ISOVM}" "vdi"
+    logger -s <<< $(VBoxManage createvm \
                --name "${ISOVM}" \
                --ostype Ubuntu_64 \
                --register \
-               --basefolder "${VMPATH}"
-    VBoxManage modifyvm "${ISOVM}" \
+               --basefolder "${VMPATH}"  2>&1 \
+                | xargs echo "[MSG]")
+
+    logger -s <<< $(VBoxManage modifyvm "${ISOVM}" \
                --cpus ${NCPUS} \
                --cpu-profile host \
                --memory ${MEM} \
                --vram 128 \
                --ioapic ${IOAPIC} \
                --usbxhci ${USBXHCI} \
-               --usbehci ${USBEHCI}
-    VBoxManage storagectl "${ISOVM}" \
+               --usbehci ${USBEHCI} \
+               --hwvirtex ${HWVIRTEX} \
+               --pae ${PAE} \
+               --cpuexecutioncap ${CPUEXECUTIONCAP} \
+               --vtxvpid ${VTXVPID} \
+               --paravirtprovider ${PARAVIRTPROVIDER} \
+               --rtcuseutc ${RTCUSEUTC} \
+               --firmware ${FIRMWARE} 2>&1 \
+                | xargs echo "[MSG]")
+
+    logger -s <<< $(VBoxManage storagectl "${ISOVM}" \
                --name "SATA Controller" \
                --add sata \
-               --bootable on
+               --bootable on 2>&1 \
+                | xargs echo "[MSG]")
 
-    # This to avoid issues with already-used vdis in debug tests
+    # set disk UUID once and for all to avoid serious debugging issues whils several VMS are around,
+    # some in zombie state, with same-name disks floating around with different UUIDs and registration issues
+    local MEDIUM_UUID=`uuid`
+    logger -s <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" ${MEDIUM_UUID} 2>&1 \
+                        | xargs echo "[MSG]")
 
-    VBoxManage internalcommands sethduuid "${ISOVM}.vdi"
-    VBoxManage storageattach "${ISOVM}" \
+    logger -s <<< $(VBoxManage storageattach "${ISOVM}" \
                --storagectl "SATA Controller" \
-               --medium "${ISOVM}.vdi" \
+               --medium "${VM}.vdi" \
                --port 0 \
                --device 0 \
-               --type hdd
-    VBoxManage storagectl "${ISOVM}" \
+               --type hdd 2>&1 \
+                | xargs echo "[MSG]")
+
+    logger -s <<< $(VBoxManage storagectl "${ISOVM}" \
                --name "IDE Controller" \
-               --add ide
-    VBoxManage storageattach "${ISOVM}" \
+               --add ide 2>&1 \
+                | xargs echo "[MSG]")
+
+    logger -s <<< $(VBoxManage storageattach "${ISOVM}" \
                --storagectl "IDE Controller" \
                --port 0 \
                --device 0 \
                --type dvddrive \
                --medium ${CLONEZILLACD} \
-               --tempeject on
-    VBoxManage storageattach "${ISOVM}" \
+               --tempeject on 2>&1 \
+                | xargs echo "[MSG]")
+
+    logger -s <<< $(VBoxManage storageattach "${ISOVM}" \
                --storagectl "IDE Controller" \
                --port 0 \
                --device 1 \
                --type dvddrive \
-               --medium emptydrive
-    VBoxManage startvm "${ISOVM}" \
-               --type ${VMTYPE}
+               --medium emptydrive 2>&1 \
+                | xargs echo "[MSG]")
 
-    # must be running to work
+    logger -s <<< $(VBoxManage sharedfolder add "${ISOVM}" \
+                               --name shared \
+                               --hostpath "${VMPATH}/ISOFILES/home/partimag" \
+                               --automount \
+                               --auto-mount-point "/home/partimag"  2>&1 \
+                        | xargs echo "[MSG]")
+    #               --transient
 
-    VBoxManage sharedfolder add "${ISOVM}" \
-               --name shared \
-               --hostpath "${VMPATH}/ISOFILES/home/partimag/image" \
-               --automount \
-               --auto-mount-point "/home/partimag" \
-               --transient
-    while [ test_vm_running ${ISOVM} ]
+    logger -s <<< $(VBoxManage startvm "${ISOVM}" \
+               --type ${VMTYPE} 2>&1 \
+                | xargs echo "[MSG]")
+
+    while test_vm_running ${ISOVM}
     do
         logger -s "[MSG] ${ISOVM} running..."
         sleep 60
@@ -1238,8 +1288,9 @@ cleanup() {
     rm -rf ISOFILES
     [ -d mnt ]  && umount -l mnt && rmdir mnt
     [ -d mnt2 ] && rm -rf mnt2
-    rm -rvf ${VM}
-    rm -vf ${VM}.vdi
+    [ -d "${VM}" ] && rm -rvf "${VM}"
+    [ -d "${VM}_ISO" ] && rm -rvf "${VM}_ISO"
+    [ -f "${VM}.vdi" ] && rm -vf "${VM}.vdi"
     return 0
 }
 
@@ -1306,7 +1357,7 @@ source scripts/utils.sh
 ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}" && generate_Gentoo
 
 # process the virtual disk into a clonezilla image
-echo  "${VM}.vdi"  "${CREATE_ISO}" "${FROM_DEVICE}"
+echo mmmmm"${VM}.vdi"  "${CREATE_ISO}" "${FROM_DEVICE}"
 if [ -f "${VM}.vdi" ] && "${CREATE_ISO}"  && ! "${FROM_DEVICE}"
 then
     # Now create a new VM from clonezilla ISO to retrieve

@@ -6,6 +6,7 @@
 ## @ingroup createInstaller
 
 get_gentoo_install_iso() {
+
     rm install-${PROCESSOR}-minimal*\.iso*
     rm latest-install-${PROCESSOR}-minimal*\.txt*
     local downloaded=""
@@ -105,7 +106,7 @@ get_cache_clonezilla_iso() {
 fetch_clonezilla_iso() {
 
     get_cache_clonezilla_iso
-    cd ${VMPATH}
+    cd "${VMPATH}"
     local verb=""
 
     # now mount
@@ -118,21 +119,10 @@ fetch_clonezilla_iso() {
     "${VERBOSE}" && logger -s "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."
     rsync ${verb} -a ./mnt/ mnt2 \
     	|| { logger -s "[ERR] Could not copy clonezilla files to mnt2"; exit -1; }
-
-    # copy to ISOFILES as a skeletteon for ISO recovery image authoring
-
-    if "${CREATE_ISO}"
-    then
-        rm ${verb} -rf ISOFILES
-        mkdir ISOFILES
-        "${VERBOSE}" && logger -s "[INF] Now copying CloneZilla files to temporary folder ISOFILES"
-        rsync ${verb} -a mnt2/ ISOFILES
-        cp ${verb} -f clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux/
-    fi
-
     cd mnt2/live
     unsquashfs filesystem.squashfs \
-       ||{ logger -s "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"; exit -1; }
-    cp ${verb} -f /etc/resolv.conf mnt2/live/squashfs-root/etc
+       || { logger -s "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"; exit -1; }
+    cp ${verb} -f /etc/resolv.conf squashfs-root/etc
+    cd "${VMPATH}"
     return 0
 }
