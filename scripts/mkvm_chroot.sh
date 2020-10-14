@@ -59,12 +59,6 @@ adjust_environment() {
     ! emerge -1 sys-apps/portage \
         && echo "[ERR] emerge-webrsync failed!" | tee emerge.build && return -1
 
-    # add logger
-
-    emerge -uD app-admin/sysklogd
-    rc-update add sysklogd default
-    rc-service sysklogd start
-
     # select profile (most recent plasma desktop)
 
     local profile=$(eselect profile list \
@@ -90,17 +84,22 @@ adjust_environment() {
     cp -vf "${ELIST}.accept_keywords" /etc/portage/package.accept_keywords/ \
         |  tee emerge.build
 
-
     # One needs to build cmake without the qt5 USE value first, otherwise
     # dependencies cannot be resolved.
 
     USE='-qt5' emerge -1 cmake [ $? != 0 ] \
         && logger -s "emerge cmake failed!" && return -1
 
+    # add logger
+
+    emerge -uD app-admin/sysklogd
+    rc-update add sysklogd default
+    rc-service sysklogd start
+
     # other core sysapps to be merged first. LZ4 is a kernel dependency for
     # newer linux kernels.
 
-    emerge app-arch/lz4 emerge net-misc/netifrc emerge sys-apps/pcmciautils
+    emerge -u app-arch/lz4 emerge net-misc/netifrc emerge sys-apps/pcmciautils
     [ $? != 0 ] && logger -s "[ERR] emerge netifrs/pcmiautils failed!"
 
     # Now on to updating @world set. Be patient and wait for about 15-24 hours

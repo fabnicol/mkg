@@ -29,7 +29,7 @@
 setup_network() {
     [ -f setup_network ] && return
     local res=0
-    if [ "${VMTYPE}" = "gui" ]
+    if "${GUI}"
     then
        if  "${CLONEZILLA_INSTALL}"
        then
@@ -60,7 +60,7 @@ setup_network() {
         touch setup_network
     else
         logger -s "[ERR] Could not fix internet access!"
-        [ "${VMTYPE}" = "gui" ] && exit -1 || shutdown -h now
+        "${GUI}" && exit -1 || shutdown -h now
     fi
 }
 
@@ -73,7 +73,7 @@ setup_network() {
 ## @warning The VM needs time to recognize /dev/sda in some cases, for unclear reasons.
 ## This may be a kernel issue or a VirtualBox issue.
 ## @bug  Same issue with mkswap and swapon. Cleaning VBox config/settings, syncing and a bit of sleep fixed these issues for the \e net-setup method.
-## @bug However if vmtype is \e 'headless' the \e dhcpcd method is consistently hampered by a VBox bug, which is tentatively circumvented
+## @bug However if vm type is \e 'headless' the \e dhcpcd method is consistently hampered by a VBox bug, which is tentatively circumvented
 ## by sending a `controlvm keyboardputscancode 1c` instruction.
 ## Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated
 ## owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are
@@ -141,7 +141,7 @@ partition() {
             logger -s  "[ERR] Critical errors while partitioning"
             swapoff -a
             findmnt /dev/sda4 && umount -l /dev/sda4
-            [ "${VMTYPE}" = "gui" ] && return -1 || shutdown -h now
+            "${GUI}" && return -1 || shutdown -h now
         else
             logger -s "[WAR] Parted issue but mkfs and mount OK. Going on..."
             return -1
@@ -183,7 +183,7 @@ install_stage3() {
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
-        [ "${VMTYPE}" = "gui" ] && exit -1 || shutdown -h now
+        "${GUI}" && exit -1 || shutdown -h now
     fi
     cat temp_bashrc >> .bashrc
     rm temp_bashrc
@@ -237,7 +237,7 @@ install_stage3() {
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
-        [ "${VMTYPE}" = "gui" ] && exit -1 || shutdown -h now
+        "${GUI}" && exit -1 || shutdown -h now
     fi
     cd ~
     chroot /mnt/gentoo /bin/bash mkvm_chroot.sh

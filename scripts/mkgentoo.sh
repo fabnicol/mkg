@@ -377,14 +377,14 @@ test_cli_post() {
 
     if [ -n "${EMAIL}" ]
     then
-        [ "${VMTYPE}" != "headless" ] && read -p "[MSG] Enter email password: " EMAIL_PASSWD
+        "${GUI}" && read -p "[MSG] Enter email password: " EMAIL_PASSWD
         [ -z "${EMAIL_PASSWD}" ] && logger -s "[WAR] No email password, aborting sendmail."
         logger -s "[INF] Sending warning email to ${EMAIL}"
         logger -s "[WAR] Gmail and other providers request user to activate third-party applications for this mail to be sent."
         logger -s "[WAR] You will not receive any mail otherwise."
     fi
 
-
+    "${GUI}" && VMTYPE="gui" || VMTYPE="headless"
 }
 
 ## @fn help_md()
@@ -801,7 +801,7 @@ delete_vm() {
 ## Attach augmented clonezilla LiveCD to IDE controller. @n
 ## Wait for the VM to complete its task. Check that it is still running every minute. @n
 ## Finally compact it.
-## @note VM may be visible (vmtype=gui) or without GUI (vmtype=headless, currently to be fixed)
+## @note VM may be visible (vm type=gui) or without GUI (vm type=headless, currently to be fixed)
 ## @todo Find a way to only compact on success and never on failure of VM.
 ## @ingroup createInstaller
 
@@ -914,7 +914,7 @@ create_vm() {
 
     # Sync with VM: this is a VBox bug workaround
 
-    "${CLONEZILLA_INSTALL}" || [ ${VMTYPE} = "headless" ] && sleep 90 \
+    "${CLONEZILLA_INSTALL}" || ! "${GUI}" && sleep 90 \
         && logger -s <<< $(VBoxManage controlvm "${VM}" keyboardputscancode 1c  2>&1 \
                                       | xargs echo "[MSG]")
 
@@ -1084,7 +1084,7 @@ build_virtualbox() {
 ## @details Register machine, create VDI drive, create IDE drive attach disks to controlers @n
 ## Attach newly augmented clonezilla LiveCD to IDE controller. @n
 ## Wait for the VM to complete its task. Check that it is still running every minute. @n
-## @note VM may be visible (vmtype=gui) or silent (vmtype=headless, currently to be fixed).
+## @note VM may be visible (vm type=gui) or silent (vm type=headless, currently to be fixed).
 ## Wait for the VM to complete task. @n
 ## A new VM is necessary as the first VM used to build the Gentoo filesystem does not contain clonezilla
 ## or the VirtualBox guest additions (requested for sharing folders with host).
