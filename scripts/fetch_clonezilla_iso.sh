@@ -7,24 +7,28 @@
 
 get_gentoo_install_iso() {
 
+    local verb=""
+    ! ${VERBOSE} && verb="-s"
     rm install-${PROCESSOR}-minimal*\.iso*
     rm latest-install-${PROCESSOR}-minimal*\.txt*
     local downloaded=""
-    wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-install-${PROCESSOR}-minimal.txt
+    curl -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-install-${PROCESSOR}-minimal.txt ${verb}
     [ $? != 0 ] && logger -s "[ERR] Could not download live CD from Gentoo mirror" && exit -1
     local current=$(cat latest-install-${PROCESSOR}-minimal.txt \
                         | grep "install-${PROCESSOR}-minimal.*.iso" \
                         | sed -E 's/iso.*$/iso/' )
     local downloaded=$(basename ${current})
     logger -s "[INF] Downloading $current..."
-    wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
+    curl -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" ${verb}
     [ $? != 0 ] && logger -s "[ERR] Could not download live CD" && exit -1
     ! "${DISABLE_MD5_CHECK}" && check_md5sum "${downloaded}"
     if [ -f ${downloaded} ]
     then
+          verb=""
+          ${VERBOSE} && verb="-v"
           logger -s "[INF] Caching downloaded ISO to ${CACHED_ISO}"
-          cp -f ${downloaded} ${CACHED_ISO}
-          mv ${downloaded} ${ISO}
+          cp ${verb} -f ${downloaded} ${CACHED_ISO}
+          mv ${verb} ${downloaded} ${ISO}
           if [ -f ${ISO} ]
           then
              export LIVECD=${ISO}
@@ -45,16 +49,20 @@ get_gentoo_install_iso() {
 
 get_clonezilla_iso() {
 
+    local verb=""
     logger -s "[INF] Downloading CloneZilla..."
-    local clonezilla_file=$(sed -E 's/.*\/(.*)\/download/\1/' <<< ${DOWNLOAD_CLONEZILLA_PATH})
-    wget ${DOWNLOAD_CLONEZILLA_PATH} -O ${clonezilla_file}
+    local clonezilla_file=$(sed -E 's/.*\/(.*)\/download/\1/' \
+                                <<< ${DOWNLOAD_CLONEZILLA_PATH})
+    ! "${VERBOSE}" && verb="-s"
+    curl ${DOWNLOAD_CLONEZILLA_PATH} -o ${clonezilla_file} ${verb}
     [ $? != 0 ] && { logger -s "Could not download CloneZilla iso"; exit -1; }
     local clonezilla_iso=$(ls clonezilla-live*${PROCESSOR}.iso)
     [ ${DISABLE_MD5_CHECK} = "false" ] && check_md5sum ${clonezilla_iso}
     export CLONEZILLACD=${clonezilla_iso}
 
     # first cache it
-    local verb=""
+
+    verb=""
     "${VERBOSE}" && verb="-v"
     cp ${verb} -f ${CLONEZILLACD} clonezilla.iso
 }
@@ -83,7 +91,8 @@ get_cache_clonezilla_iso() {
                exit -1
            fi
         else
-            logger -s "[WAR] No CloneZilla ISO file was found. Please run again with 'download_clonezilla=true'"
+            logger -s "[WAR] No CloneZilla ISO file was found.\
+ Please run again with 'download_clonezilla=true'"
             exit -1
         fi
     fi
@@ -113,7 +122,8 @@ fetch_clonezilla_iso() {
 
     [ ! -d mnt ] &&  { rm -rf mnt; mkdir mnt; }
     [ ! -d mnt2 ] && { rm -rf mnt2; mkdir mnt2; }
-    "${VERBOSE}" && logger -s "[INF] Mounting CloneZilla CD ${CLONEZILLACD}" && verb="-v"
+    "${VERBOSE}" \
+        && logger -s "[INF] Mounting CloneZilla CD ${CLONEZILLACD}" && verb="-v"
     mount -oloop "${CLONEZILLACD}" ./mnt  \
      	|| { logger -s "[ERR] Could not mount ${CLONEZILLACD} to mnt"; exit -1; }
     "${VERBOSE}" && logger -s "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."

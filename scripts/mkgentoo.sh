@@ -87,81 +87,91 @@ do
     fi
 done
 
-
 ## @var ARR
 ## @brief global string array of switches and default values
 ## @details Structure is as follows: @code
-## ("commandline switch" "Description"  "Default value" ...) @endcode
-## A double-entry arry will be simulated using indexes.
+## {{"Commandline option", "Description", "Default value", "Type"}, {...},...} @endcode
+## 'Type' is among the following values:
+## @li @b b  Boolean, 'false' or 'true'
+## @li @b d  An existing directory
+## @li @b e  Email address: regexp "[a-z]+@[a-z]+\.[a-z]+"
+## @li @b f  An existing file
+## @li @b n  Numeric value
+## @li @b o  'on' or 'off', a VBoxManage custom Boolean
+## @li @b s  String
+## @li @b u  Url
+## A double-entry array will be simulated using indexes.
 ## @ingroup createInstaller
 ## @note `debug_mode` should be place up front in the array
 
-declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root of gentoo system files before VM shutdown. Boolean."  "false"
-     "build_virtualbox"   "Download code source and automatically build virtualbox and tools" "false"
-     "burn"        "Burn to optical disc. Boolean."                                      "false"
-     "cdrecord"    "cdrecord path. Automatically determined if left unspecified."        "$(which cdrecord)"
-     "cflags"      "GCC CFLAGS options for ebuilds"                                      "-march=core-avx2 -O2"
-     "cleanup"       "Clean up archives, temporary images and virtual machine after successful completion. Boolean."  "true"
-     "clonezilla_install"  "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false"
-     "cpuexecutioncap" "Maximum percentage of CPU per core (0 to 100)"                    "100"
-     "create_squashfs"  "(Re)create the squashfs filesystem. Boolean."                   "true"
-     "disable_md5_check" "Disable MD5 checkums verification after downloads. Boolean."   "true"
-     "download"    "Download install ISO image from Gentoo mirror. Boolean."             "true"
-     "download_clonezilla" "Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean"                    "true"
-     "download_clonezilla_path" "Download the following CloneZilla ISO"                       "https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download"
-     "download_rstudio"  "Download and build RStudio. Boolean."                          "true"
-     "download_arch" "Download and install stage3 archive to virtual disk. Booelan."     "true"
-     "elist"       "\t File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the 'elist'.accept_keywords and 'elist'.use files" "ebuilds.list"
-     "email"       "Email address to send warning to when Gentoo has been created."      ""
-     "emirrors"    "Mirror sites for downloading ebuilds"                                "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
-     "firmware"      "Type of bootloader: bios or efi. Use only 'bios', tweaking not supported but might be at later stages." "bios"
-     "force"         "Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running."                                            "false"
-     "from_device"   "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean." "false"
-     "from_iso"      "Do not generate Gentoo but use the bootable ISO given on commandline. Boolean." "false"
-     "from_vm"       "Do not generate Gentoo but use the VM ${VM}. Boolean."              "false"
-     "githubpath"  "RStudio Github path to zip: path right before version.zip"           "https://github.com/rstudio/rstudio/archive/v"
-     "help"          "\t This help"                                                       ""
-     "hwvirtex"      "Activate HWVIRTEX: on/off"                                          "on"
-     "ioapic"        "IOAPIC parameter: on or off"                                        "on"
-     "kernel_config"  "Use a custom kernel config file"                                  ".config"
-     "language"    "Set default login keyboard layout"                                   "us"
-     "lineno_patch" "Line patched against vbox-img.cpp in virtualbox source code"        "797"
-     "livecd"      "Path to the live CD that will start the VM"                          "gentoo.iso"
-     "mem"         "\t VM RAM memory in MiB"                                             "8000"
-     "minimal"     "Remove *libreoffice* and *data science tools* from default list of installed software. Boolean."  "false"
-     "mirror"      "Mirror site for downloading of stage3 tarball"                       "http://gentoo.mirrors.ovh.net/gentoo-distfiles/"
-     "ncpus"       "\t Number of VM CPUs. By default the third of available threads."    "$(($(nproc --all)/3))"
-     "nonroot_user" "Non-root user"                                                      "fab"
-     "pae"           "Activate PAE: on/off"                                               "on"
-     "paravirtprovider" "Virtualization interface: kvm for GNU/Linux, may be tweaked (see VirtualBox documentation)"     "kvm"
-     "passwd"      "User password"                                                       "dev20"
-     "processor"   "Processor type"                                                      "amd64"
-     "rootpasswd"  "Root password"                                                       "dev20"
-     "rstudio"     "RStudio version to be downloaded and built from github source"       "1.3.1073"
-     "rtcuseutc"   "Use UTC as time reference: on/off"                                   "on"
-     "r_version"   "R version"                                                           "4.0.2"
-     "scsi_address" "In case of several optical disc burners, specify the SCSI address as x,y,z"  ""
-     "size"        "\t Dynamic disc size"                                                "55000"
-     "smtp_url"    "SMTP URL of email provider for end-of-job warning. Default: gmail SMTP" "smtps://smtp.gmail.com:465"
-     "stage3"      "Path to stage3 archive"                                              "stage3.tar.xz"
-     "usbehci"     "Activate USB2 driver: on/off"                                        "off"
-     "usbxhci"     "Activate USB3 driver: on/off. Note: if on, needs extension pack."    "off"
-     "usb_device"  "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory (if mounted), or a few consecutive letters of the model (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such."    ""
-     "usb_installer" "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer."  ""
-     "vm"          "\t Virtual Machine name. Unless 'force=true' is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name."                                             "Gentoo"
-     "vbox_version"  "Virtualbox version"                                                "6.1.14"
-     "vbox_version_full" "Virtualbox full version"                                       "6.1.14a"
-     "vbpath"      "Path to VirtualBox directory"                                        "/usr/bin"
-     "vmpath"      "Path to VM base directory"                                           "$PWD"
-     "vmtype"      "gui or headless (without graphical interface, currently to be fixed)" "gui"
-     "verbose"       "Increase verbosity"                                                 "false"
-     "vtxvpid"       "Activate VTXVPID: on/off"                                           "on"  )
+declare -a -r ARR=("debug_mode"  "Do not clean up mkgentoo custom logs at root of gentoo system files before VM shutdown. Boolean."  "false" "b"
+     "build_virtualbox"   "Download code source and automatically build virtualbox and tools" "false" "b"
+     "burn"        "Burn to optical disc. Boolean."                                      "false" "b"
+     "cdrecord"    "cdrecord full path. Automatically determined if left unspecified."   "$(which cdrecord)" "f"
+     "cflags"      "GCC CFLAGS options for ebuilds"                                      "-march=core-avx2 -O2" "s"
+     "cleanup"     "Clean up archives, temporary images and virtual machine after successful completion. Boolean."  "true" "b"
+     "clonezilla_install"  "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false" "b"
+     "cpuexecutioncap" "Maximum percentage of CPU per core (0 to 100)"                    "100" "n"
+     "create_squashfs"  "(Re)create the squashfs filesystem. Boolean."                   "true" "b"
+     "disable_md5_check" "Disable MD5 checkums verification after downloads. Boolean."   "true" "b"
+     "download"    "Download install ISO image from Gentoo mirror. Boolean."             "true" "b"
+     "download_clonezilla" "Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean"                    "true" "b"
+     "download_clonezilla_path" "Download the following CloneZilla ISO"                       "https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download" "u"
+     "download_rstudio"  "Download and build RStudio. Boolean."                          "true" "b"
+     "download_arch" "Download and install stage3 archive to virtual disk. Booelan."     "true" "b"
+     "elist"       "\t File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the 'elist'.accept_keywords and 'elist'.use files" "ebuilds.list" "f"
+     "email"       "Email address to send warning to when Gentoo has been created."      "" "e"
+     "email_passwd"  "Email password"                                                    "" "s"
+     "emirrors"    "Mirror sites for downloading ebuilds"                                "http://gentoo.mirrors.ovh.net/gentoo-distfiles/" "u"
+     "firmware"      "Type of bootloader: bios or efi. Use only 'bios', tweaking not supported but might be at later stages." "bios" "s"
+     "force"         "Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running." "false" "b"
+     "from_device"   "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean." "false" "b"
+     "from_iso"      "Do not generate Gentoo but use the bootable ISO given on commandline. Boolean." "false" "b"
+     "from_vm"       "Do not generate Gentoo but use the VM ${VM}. Boolean."             "false" "b"
+     "githubpath"  "RStudio Github path to zip: path right before version.zip"           "https://github.com/rstudio/rstudio/archive/v" "u"
+     "help"          "\t This help"                                                      ""   ""
+     "hwvirtex"      "Activate HWVIRTEX: on/off"                                         "on" "o"
+     "ioapic"        "IOAPIC parameter: on or off"                                       "on" "o"
+     "kernel_config"  "Use a custom kernel config file"                                  ".config"    "f"
+     "language"    "Set default login keyboard layout"                                   "us"         "s"
+     "lineno_patch" "Line patched against vbox-img.cpp in virtualbox source code"        "797"        "n"
+     "livecd"      "Path to the live CD that will start the VM"                          "gentoo.iso" "f"
+     "mem"         "\t VM RAM memory in MiB"                                             "8000"       "n"
+     "minimal"     "Remove *libreoffice* and *data science tools* from default list of installed software. Boolean."  "false" "b"
+     "mirror"      "Mirror site for downloading of stage3 tarball"                       "http://gentoo.mirrors.ovh.net/gentoo-distfiles/" "u"
+     "ncpus"       "\t Number of VM CPUs. By default the third of available threads."    "$(($(nproc --all)/3))" "n"
+     "nonroot_user" "Non-root user"                                                      "fab" "s"
+     "pae"           "Activate PAE: on/off"                                              "on"  "o"
+     "paravirtprovider" "Virtualization interface: kvm for GNU/Linux, may be tweaked (see VirtualBox documentation)" "kvm" "s"
+     "passwd"      "User password"                                                       "dev20" "s"
+     "processor"   "Processor type"                                                      "amd64" "s"
+     "remove_vdi"  "Remove virtual disk on clean-up"                                     "false" "b"
+     "rootpasswd"  "Root password"                                                       "dev20" "s"
+     "rstudio"     "RStudio version to be downloaded and built from github source"       "1.3.1073" "s"
+     "rtcuseutc"   "Use UTC as time reference: on/off"                                   "on"    "o"
+     "r_version"   "R version"                                                           "4.0.2" "s"
+     "scsi_address" "In case of several optical disc burners, specify the SCSI address as x,y,z"  "" "s"
+     "size"        "\t Dynamic disc size"                                                "55000" "n"
+     "smtp_url"    "SMTP URL of email provider for end-of-job warning. Default: gmail SMTP" "smtps://smtp.gmail.com:465" "u"
+     "stage3"      "Path to stage3 archive"                                              "stage3.tar.xz" "f"
+     "usbehci"     "Activate USB2 driver: on/off"                                        "off" "o"
+     "usbxhci"     "Activate USB3 driver: on/off. Note: if on, needs extension pack."    "off" "o"
+     "usb_device"  "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory (if mounted), or a few consecutive letters of the model (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such."    "" "s"
+     "usb_installer" "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer."  "" "s"
+     "vm"          "\t Virtual Machine name. Unless 'force=true' is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name."                                             "Gentoo" "s"
+     "vbox_version"  "Virtualbox version"                                                 "6.1.14"   "s"
+     "vbox_version_full" "Virtualbox full version"                                        "6.1.14a"  "s"
+     "vbpath"      "Path to VirtualBox directory"                                         "/usr/bin" "d"
+     "vmpath"      "Path to VM base directory"                                            "$PWD"     "d"
+     "gui"      "gui or headless (without graphical interface, currently to be fixed)"    "true"     "b"
+     "verbose"       "Increase verbosity"                                                 "false"    "b"
+     "vtxvpid"       "Activate VTXVPID: on/off"                                           "on"       "o")
 
 ## @var ARRAY_LENGTH
-## @brief Number of switches (true length of array divided by 3)
+## @brief Number of switches (true length of array divided by 4)
 ## @ingroup createInstaller
 
-declare -i -r ARRAY_LENGTH=$((${#ARR[*]}/3))
+declare -i -r ARRAY_LENGTH=$((${#ARR[*]}/4))
 
 ## @var ISO
 ## @brief Name of downloaded clonezilla ISO file
@@ -195,8 +205,8 @@ test_cli_pre() {
         && { logger -s "[ERR] Did not find xz. Install xz and its libraries"; do_exit=true; }
     [ -z "$(ocs-sr -v)" ] \
         && { logger -s "[ERR] Did not find CloneZilla. Install CloneZilla and dependencies first."; do_exit=true; }
-    [ -z "$(wget --version)" ] \
-        && { logger -s "[ERR] Did not find wget. Please install it now."; do_exit=true; }
+    [ -z "$(curl --version)" ] \
+        && { logger -s "[ERR] Did not find curl. Please install it now."; do_exit=true; }
     [ -z "$(md5sum --version)" ] \
         && { logger -s "[ERR] Did not find md5sum. Install the coreutils package."; do_exit=true; }
     [ -z "$(tar --version)" ] \
@@ -212,9 +222,9 @@ test_cli_pre() {
     # Check VirtualBox version
 
     declare -r vbox_version=$(VBoxManage -v)
-    declare -r version_major=$(echo ${vbox_version} | sed -E 's/([0-9]+)\..*/\1/')
-    declare -r version_minor=$(echo ${vbox_version} | sed -E 's/[0-9]+\.([0-9]+)\..*/\1/')
-    declare -r version_index=$(echo ${vbox_version} | sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/')
+    declare -r version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< ${vbox_version})
+    declare -r version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' <<< ${vbox_version})
+    declare -r version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/' <<< ${vbox_version})
     if [ ${version_major} -lt 6 ] || [ ${version_minor} -lt 1 ] || [ ${version_index} -lt 10 ]
     then
         logger -s "[ERR] VirtualBox must be at least version 6.1.10"
@@ -245,26 +255,60 @@ test_cli_pre() {
 ## @fn test_cli()
 ## @brief Analyse commandline
 ## @param cli  Commandline
-## @details Create globals of the form VAR=arg  when there is var=arg on commandline @n
-## Otherwise assign default values VAR=defaults (3rd argument in array ARR)
+## @details @li Create globals of the form VAR=arg  when there is var=arg on commandline
+## @li Otherwise assign default values VAR=defaults (3rd argument in array #ARR)
+## @li Also checks type of argument against types described for #ARR
 ## @ingroup createInstaller
 
 test_cli() {
 
     declare -i i=$1
-    local sw=${ARR[i*3]}
-    local desc=${ARR[i*3+1]}
-    local default=${ARR[i*3+2]}
+    local sw=${ARR[i*4]}
+    local desc=${ARR[i*4+1]}
+    local default=${ARR[i*4+2]}
+    local type=${ARR[i*4+3]}
     local cli_arg=false
     declare -u V=${sw}
 
     # debug_mode should be placed on top of ARR
 
+    # checking on types
+
     if [ -n "${!V}" ]
     then
-         logger -s "[CLI] ${desc} = ${!V}" | sed 's/\\t //'
+        logger -s "[CLI] ${desc} = ${!V}" | sed 's/\\t //'
+        case "${type}" in
+            b)  if  [ "${!V}" != "true" ] && [ "${!V}" != "false" ]
+                then
+                    logger -s "[ERR] ${sw} is Boolean: specify its value as either 'false' or 'true' on command line"
+                    exit -1
+                fi
+                ;;
+            d)  [ ! -d "${!V}" ] \
+                    && logger -s "[ERR] ${sw}=... must be an existing directory." \
+                    && exit -1 ;;
+            e)  [ test_email "${!V}" != 0 ] \
+                    && logger -s "[ERR] ${sw}=... must be a valid email address" \
+                    && exit -1 ;;
+            f)  [ ! -f "${!V}" ] \
+                    && logger -s "[ERR] ${sw}=... must be an existing file." \
+                    && exit -1 ;;
+            n)  [ test_numeric "${!V}" != 0 ] \
+                    && logger -s "[ERR] ${sw}=... is not numeric." \
+                    && exit -1;;
+            o)  [ "${!V}" != "on" ] && [ "${!V}" != "off" ] \
+                    && logger -s "[ERR] ${sw}=on or ${sw}=off are the only two possible values." \
+                    && exit -1;;
+            s)  [ -z "${!V}" ] \
+                    && logger -s "[ERR] ${sw}=... should not be empty." \
+                    && exit -1 ;;
+            u)  [ test_URL "${!V}" != 0 ] \
+                    && logger -s "[ERR] ${sw}=... must be a valid URL" \
+                    && exit -1 ;;
+        esac
     else
-        "${DEBUG_MODE}" && logger -s "[CLI] ${desc} = ${default}" | sed 's/\\t //'
+        "${DEBUG_MODE}" \
+            && logger -s "[CLI] ${desc} = ${default}" | sed 's/\\t //'
         eval "${V}"="\"${default}\""
     fi
     export "${V}"
@@ -305,7 +349,8 @@ test_cli_post() {
 
     "${DEBUG_MODE}" && VERBOSE=true && CLEANUP=false
 
-    # there are two modes of install: with CloneZilla live CD (Ubuntu-based) or official Gentoo install
+    # there are two modes of install: with CloneZilla live CD
+    # (Ubuntu-based) or official Gentoo install
 
     "${CLONEZILLA_INSTALL}" && OSTYPE=Ubuntu_64 || OSTYPE=Gentoo_64
 
@@ -313,7 +358,8 @@ test_cli_post() {
 
     [ "${NCPUS}" = "0" ] && NCPUS=1
 
-    # VM name will be time-stamped to avoid registration issues, unless 'force=true' is used on commandline
+    # VM name will be time-stamped to avoid registration issues,
+    # unless 'force=true' is used on commandline
 
     ! "${FORCE}" && ! "${FROM_VM}" && VM="${VM}".$(date +%F-%H-%M-%S)
 
@@ -329,8 +375,16 @@ test_cli_post() {
     sed -i '/dev-lang\/R.*$/d'  "${ELIST}.accept_keywords"
     echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}" >> "${ELIST}.accept_keywords"
 
-    [ -n "${EMAIL}" ] && read -p "[MSG] Enter email password: " EMAIL_PASSWD
-    [ -z "${EMAIL_PASSWD}" ] && logger -s "[WAR] No email password, aborting sendmail."
+    if [ -n "${EMAIL}" ]
+    then
+        [ "${VMTYPE}" != "headless" ] && read -p "[MSG] Enter email password: " EMAIL_PASSWD
+        [ -z "${EMAIL_PASSWD}" ] && logger -s "[WAR] No email password, aborting sendmail."
+        logger -s "[INF] Sending warning email to ${EMAIL}"
+        logger -s "[WAR] Gmail and other providers request user to activate third-party applications for this mail to be sent."
+        logger -s "[WAR] You will not receive any mail otherwise."
+    fi
+
+
 }
 
 ## @fn help_md()
@@ -359,9 +413,9 @@ help_md() {
     echo " |:-----:|:--------:|:-----:|  "
     declare -i i
     for ((i=0; i<ARRAY_LENGTH; i++)); do
-        declare -i sw=i*3       # no spaces!
-        declare -i desc=i*3+1
-        declare -i def=i*3+2
+        declare -i sw=i*4       # no spaces!
+        declare -i desc=i*4+1
+        declare -i def=i*4+2
         echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [${ARR[def]}] |  "
     done
 }
@@ -427,12 +481,16 @@ fetch_stage3() {
     # Fetching stage3 tarball
 
     local CACHED_STAGE3="stage3-${PROCESSOR}.tar.xz"
+    local verb1=""
+    local verb2=""
+    ! "${VERBOSE}" && verb1="-s"
+    "${VERBOSE}" && verb2="-v"
     if "${DOWNLOAD_ARCH}"
     then
         logger -s "[INF] Cleaning up stage3 data..."
-        [ -f latest-stage3*.txt* ] && rm -f latest-stage3*.txt*
+        [ -f latest-stage3*.txt* ] && rm ${verb2} -f latest-stage3*.txt*
         logger -s "[INF] Downloading stage3 data..."
-        wget ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt 2>&1 | logger -s
+        logger -s <<< $(curl -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt" ${verb1} 2>&1 | xargs echo "[INF]")
         [ $? != 0 ] \
             && logger -s "[ERR] Could not download stage3 from mirrors: ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt" \
             && exit -1
@@ -442,27 +500,27 @@ fetch_stage3() {
             && logger -s "[ERR] Rerun with download_stage3=true" \
             && exit -1
     fi
-    local current=$(cat latest-stage3-${PROCESSOR}.txt | grep "stage3-${PROCESSOR}.*.tar.xz" | cut -f 1 -d' ')
+    local current=$(cat latest-stage3-${PROCESSOR}.txt | grep "stage3-${PROCESSOR}".*.tar.xz | cut -f 1 -d' ')
     if "${DOWNLOAD_ARCH}"
     then
         logger -s "[INF] Cleaning up stage3 archives(s)..."
-        [ -f stage3-${PROCESSOR}-*tar.xz* ] && rm -f stage3-${PROCESSOR}-*tar.xz*
-        [ -f ${STAGE3} ] && rm ${STAGE3}
+        [ -f "stage3-${PROCESSOR}"-*tar.xz* ] && rm ${verb2} -f "stage3-${PROCESSOR}"-*tar.xz*
+        [ -f ${STAGE3} ] && rm ${verb2} -f ${STAGE3}
         logger -s "[INF] Downloading ${current}..."
-        wget "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"  2>&1 | logger -s
+        logger -s <<< $(curl -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" ${verb1} 2>&1 | xargs echo "[INF]")
         [ $? != 0 ] \
             && logger -s "[ERR] Could not download stage3 tarball from mirror: ${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" \
             && exit -1
         ! ${DISABLE_MD5_CHECK} && check_md5sum $(basename ${current})
         logger -s "[INF] Caching ${current} to ${CACHED_STAGE3}"
-        cp -f $(echo -s ${current} | sed 's/.*stage3/stage3/')  ${CACHED_STAGE3}
+        cp ${verb2} -f $(echo -s ${current} | sed 's/.*stage3/stage3/')  ${CACHED_STAGE3}
     fi
     [ ! -f "${CACHED_STAGE3}" ] \
         && logger -s "[ERR] No stage3 tarball!" \
         && logger -s "[ERR] Rerun with download_stage3=true" \
         && exit -1
     logger -s "[INF] Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}"
-    cp -f ${CACHED_STAGE3} ${STAGE3}
+    cp ${verb2} -f ${CACHED_STAGE3} ${STAGE3}
 }
 
 ## @fn make_boot_from_livecd()
@@ -519,7 +577,7 @@ make_boot_from_livecd() {
 
     # ISOLINUX config adjustments to automate the boot and reduce user input
 
-    cd mnt2/${ISOLINUX_DIR}
+    cd "mnt2/${ISOLINUX_DIR}"
     if "${CLONEZILLA_INSTALL}"
     then
         cp ${verb} -f ${VMPATH}/clonezilla/syslinux/isolinux.cfg .
@@ -530,8 +588,9 @@ make_boot_from_livecd() {
 
     # now unsquashfs the liveCD filesystem
 
-    cd ${ROOT_LIVE}
-    "${VERBOSE}" && logger -s "[INF] Unsquashing filesystem..." && unsquashfs ${SQUASHFS_FILESYSTEM}  \
+    cd "${ROOT_LIVE}"
+    "${VERBOSE}" && logger -s "[INF] Unsquashing filesystem..." \
+                 && unsquashfs ${SQUASHFS_FILESYSTEM}  \
                  ||  unsquashfs -q  ${SQUASHFS_FILESYSTEM} 2>&1 >/dev/null
     [ $? != 0 ] && logger -s "[ERR] unsquashfs failed !" && exit -1
 
@@ -572,7 +631,7 @@ make_boot_from_livecd() {
     declare -i i
     for ((i=0; i<ARRAY_LENGTH; i++))
     do
-        local  capname=${ARR[i*3]^^}
+        local  capname=${ARR[i*4]^^}
         local  expstring="export ${capname}=\"${!capname}\""
         "${VERBOSE}" && logger -s "${expstring}"
         echo "${expstring}" >> ${rc}
@@ -647,7 +706,8 @@ deep_clean() {
     sed -i  '/^[[:space:]]*$/d' registry
     "${VERBOSE}" && cat  registry
 
-     # it is necessary to sleep a bit otherwise doaemons will wake up with inconstitencies
+    # it is necessary to sleep a bit otherwise doaemons will wake up
+    # with inconstitencies
 
     sleep 5
     /etc/init.d/virtualbox start
@@ -657,10 +717,13 @@ deep_clean() {
 ## @fn delete_vm()
 ## @param vm VM name
 ## @param ext virtual disk extension, without dot (defaults to "vdi").
-## @brief Powers off, possibly with emergency stop, the VM names as first argument.
+## @brief Powers off, possibly with emergency stop,
+##        the VM names as first argument.
 ## @details @li Unregisters it
-## @li Deletes its folder structure and hard drive (default is "vdi" as a second argument)
-## @retval Returns 0 if Directory and hard drive could be erased, otherwise the OR value of both
+## @li Deletes its folder structure and hard drive
+##     (default is "vdi" as a second argument)
+## @retval Returns 0 if Directory and hard drive could be erased,
+##         otherwise the OR value of both
 ## erasing commands
 ## @ingroup createInstaller
 
@@ -688,10 +751,14 @@ delete_vm() {
     if [ ${res} != 0 ]
     then
 
-        # last resort. Happens when debugging with successive VMS
-        # with same names or disk names and not enough wait time for daemons to clean up the mess
-        # one needs to deep-clean twice. deep_clean will peek and clean the registry
-        # altering it only if requested for security. This may cause other VMs to crash.
+        # last resort.
+        # Happens when debugging with successive VMS with
+        # same names or disk names and not enough wait time for
+        # daemons to clean up the mess one needs to deep-clean
+        # twice.
+        # deep_clean will peek and clean the registry altering
+        # it only if requested for security. This may cause other VMs
+        # to crash.
 
         deep_clean "$3"
     fi
@@ -706,7 +773,8 @@ delete_vm() {
         VBoxManage unregistervm "$1" --delete 2>&1 | logger -s
     fi
 
-    # the following is overall unnecessary except for issues with VBoxManage unregistervm
+    # the following is overall unnecessary except for issues with
+    # VBoxManage unregistervm
 
     if [ "$3" != "ISO_STAGE" ]
     then
@@ -782,8 +850,10 @@ create_vm() {
                                           --size ${SIZE} \
                                           --variant Standard 2>&1 | xargs echo "[MSG]")
 
-    # set disk UUID once and for all to avoid serious debugging issues whils several VMS are around,
-    # some in zombie state, with same-name disks floating around with different UUIDs and registration issues
+    # set disk UUID once and for all to avoid serious debugging issues
+    # whilst several VMS are around, some in zombie state, with
+    # same-name disks floating around with different UUIDs and
+    # registration issues
 
     logger -s <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" ${MEDIUM_UUID} 2>&1 \
                                | xargs echo "[MSG]")
@@ -800,8 +870,10 @@ create_vm() {
                              --bootable on 2>&1 \
                              | xargs echo "[MSG]")
 
-    # attach media to controllers and double check that the attached UUID is the right one
-    # as there have been occasional issues of UUID switching on attachment. Only one port/device is necessary
+    # attach media to controllers and double check that the attached
+    # UUID is the right one as there have been occasional issues of
+    # UUID switching on attachment.
+    # Only one port/device is necessary
     # use --tempeject on for live CD
 
     logger -s <<< $(VBoxManage storageattach "${VM}" \
@@ -820,10 +892,12 @@ create_vm() {
                              --type hdd \
                              --setuuid ${MEDIUM_UUID}  2>&1 | xargs echo "[MSG]")
 
-    # note: forcing UUID will potentially cause issues with registration if a prior run with the same disk
-    # has set a prior UUID in the register (/root/.config/VirtualBox/VirtualBox.xml). So in the case a deep
-    # clean is in order (see below).
-    # Attaching empty drives may potentially be useful (e.g. when installing guest additions)
+    # note: forcing UUID will potentially cause issues with
+    # registration if a prior run with the same disk has set a prior
+    # UUID in the register
+    # (/root/.config/VirtualBox/VirtualBox.xml). So in the case a deep
+    # clean is in order (see below).  Attaching empty drives may
+    # potentially be useful (e.g. when installing guest additions)
 
     logger -s <<< $(VBoxManage storageattach "${VM}" \
                              --storagectl "IDE Controller" \
@@ -869,13 +943,16 @@ create_vm() {
 
 clonezilla_to_iso() {
 
-    [ ! -d "${VMPATH}/$2" ] && logger -s "[ERR] Directory $2 was not found under ${VMPATH}" && exit -1
-    if  [ ! -f "${VMPATH}/$2/syslinux/isohdpfx.bin" ]
-    then
-        local verb=""
-        "${VERBOSE}" && verb="-v"
-        cp ${verb} -f "${VMPATH}/clonezilla/syslinux/isohdpfx.bin" "${VMPATH}/$2/syslinux"
-    fi
+    cd "${VMPATH}"
+
+    [ ! -d "$2" ] && logger -s "[ERR] Directory $2 was not found under ${VMPATH}" && exit -1
+
+    local verb=""
+    "${VERBOSE}" && verb="-v"
+
+    [ ! -f "$2/syslinux/isohdpfx.bin" ] \
+         && cp ${verb} -f "clonezilla/syslinux/isohdpfx.bin" "$2/syslinux"
+
     xorriso -as mkisofs   -isohybrid-mbr "$2/syslinux/isohdpfx.bin"  \
             -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
             -boot-load-size 4   -boot-info-table   -eltorito-alt-boot   -e boot/grub/efi.img \
@@ -976,6 +1053,9 @@ EOF
 
     cd "${VMPATH}"
     rm -vf ${CLONEZILLACD}
+
+    # this first ISO image is a "save" one: from virtual disk to clonezilla image
+
     clonezilla_to_iso ${CLONEZILLACD} "ISOFILES"
     rm -rf mnt2
 }
@@ -1018,7 +1098,7 @@ create_iso_vm() {
     cd ${VMPATH}
     gpasswd -a ${USER} -g vboxusers
     chgrp vboxusers "ISOFILES/home/partimag"
-    delete_vm "${ISOVM}" "vdi"
+    delete_vm "${ISOVM}" "vdi" "ISO_STAGE"
     logger -s <<< $(VBoxManage createvm \
                --name "${ISOVM}" \
                --ostype Ubuntu_64 \
@@ -1049,8 +1129,11 @@ create_iso_vm() {
                --bootable on 2>&1 \
                 | xargs echo "[MSG]")
 
-    # set disk UUID once and for all to avoid serious debugging issues whils several VMS are around,
-    # some in zombie state, with same-name disks floating around with different UUIDs and registration issues
+    # set disk UUID once and for all to avoid serious debugging issues
+    # whils several VMS are around, some in zombie state, with
+    # same-name disks floating around with different UUIDs and
+    # registration issues
+
     local MEDIUM_UUID=`uuid`
     logger -s <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" ${MEDIUM_UUID} 2>&1 \
                         | xargs echo "[MSG]")
@@ -1176,12 +1259,14 @@ clonezilla_device_to_image() {
     if [ -z "$find_ocs_sr" ]
     then
         logger -s "[ERR] Could not find ocs_sr !"
-        logger -s "[MSG] Install Clonezilla in a standard path or rerun after adding its parth to the PATH environment variable"
+        logger -s "[MSG] Install Clonezilla in a standard path or rerun \
+ after adding its parth to the PATH environment variable"
         logger -s "[MSG] Note: Debian-based distributions provide a handy `clonezilla` package."
         exit -1
     fi
 
-    # At this stage USB_DEVICE can no longer be a mountpoint as it has been previously converted to device label
+    # At this stage USB_DEVICE can no longer be a mountpoint as it has
+    # been previously converted to device label
 
     findmnt /dev/${USB_DEVICE}  \
         && logger -s "[MSG] Device ${USB_DEVICE} is mounted to: $(get_mountpoint /dev/${USB_DEVICE})" \
@@ -1198,7 +1283,8 @@ clonezilla_device_to_image() {
 
     # double check
 
-    [ `findmnt /dev/${USB_DEVICE}` ] && { logger -s "[ERR] Impossible to unmount device ${USB_DEVICE}"; exit -1; }
+    [ `findmnt /dev/${USB_DEVICE}` ] \
+        && { logger -s "[ERR] Impossible to unmount device ${USB_DEVICE}"; exit -1; }
     if [ -d /home/partimag ]
     then
         logger -s "[WAR] /home/partimag needs to be wiped out..."
@@ -1229,7 +1315,8 @@ clonezilla_device_to_image() {
 
 ## @fn vbox_img_works()
 ## @brief Test if \b vbox-img is functional
-## @details \b vbox-img is a script; it refers to \b vbox-img.bin, which is a soft link to the VirtuaBox patched build.
+## @details \b vbox-img is a script; it refers to \b vbox-img.bin,
+##           which is a soft link to the VirtuaBox patched build.
 ## @retval 0 if vbox-img --version is non-empty
 ## @retval 1 otherwise
 ## @ingroup createInstaller
@@ -1281,16 +1368,19 @@ create_usb_system() {
 ## @ingroup createInstaller
 
 cleanup() {
+
     ! "${CLEANUP}" && return 0
+    local verb=""
+    ${VERBOSE} && verb="-v"
     cd ${VMPATH}
-    rm *.xz
-    rm *.iso
-    rm -rf ISOFILES
-    [ -d mnt ]  && umount -l mnt && rmdir mnt
-    [ -d mnt2 ] && rm -rf mnt2
-    [ -d "${VM}" ] && rm -rvf "${VM}"
-    [ -d "${VM}_ISO" ] && rm -rvf "${VM}_ISO"
-    [ -f "${VM}.vdi" ] && rm -vf "${VM}.vdi"
+    rm ${verb} -f *.xz
+    rm ${verb} -f *.txt
+    rm ${verb} -rf ISOFILES
+    [ -d mnt ]  && umount -l mnt && rmdir ${verb} mnt
+    [ -d mnt2 ] && rm ${verb} -rf mnt2
+    [ -d "${VM}" ] && rm ${verb} -rf "${VM}"
+    [ -d "${VM}_ISO" ] && rm ${verb} -rf "${VM}_ISO"
+    "${REMOVE_VDI}" && [ -f "${VM}.vdi" ] && rm ${verb} -f "${VM}.vdi"
     return 0
 }
 
@@ -1322,10 +1412,10 @@ generate_Gentoo() {
 
 send_mail() {
 
-    logger -s "[INF] Sending warning email to ${EMAIL}"
-    logger -s "[WAR] Gmail and other providers request user to activate third-party applications for this mail to be sent."
-    logger -s "[WAR] You will not receive any mail otherwise."
-    curl --url ${SMTP_URL} --ssl-reqd   --mail-from ${EMAIL} --mail-rcpt ${EMAIL} --user ${EMAIL}:${EMAIL_PASSWD} -T <(echo -e  "From: ${EMAIL}\nTo: ${EMAIL}\nSubject: ${VM} now ready!\n\n${VM} finished building at " $(date -Im))
+    curl --url ${SMTP_URL} --ssl-reqd   --mail-from ${EMAIL} --mail-rcpt ${EMAIL} \
+         --user ${EMAIL}:${EMAIL_PASSWD} -T \
+         <(echo -e  "From: ${EMAIL}\nTo: ${EMAIL}\nSubject: ${VM} now ready!\n\
+\n${VM} finished building at " $(date -Im))
 }
 
 
@@ -1357,6 +1447,7 @@ source scripts/utils.sh
 ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}" && generate_Gentoo
 
 # process the virtual disk into a clonezilla image
+
 echo mmmmm"${VM}.vdi"  "${CREATE_ISO}" "${FROM_DEVICE}"
 if [ -f "${VM}.vdi" ] && "${CREATE_ISO}"  && ! "${FROM_DEVICE}"
 then
@@ -1379,12 +1470,20 @@ if "${CREATE_ISO}"
 then
     [ "${FROM_DEVICE}" = "true" ] && clonezilla_device_to_image
     logger -s "[INF] Creating Clonezilla bootable ISO..."
+
+    # this second ISO image is the "restore" one: from clonezilla image to target disk.
+    # Now replacing the older "save" (from virtual disk to clonezilla image) config file
+    # by the opposite "restore" one (from clonezilla image to target disk)
+
+    cp ${verb} -f clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux
+
     clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
     if [ $? = 0 ]
     then
         logger -s "[MSG] Done."
-        [ -f "${ISO_OUTPUT}" ] && logger -s "[MSG] ISO install medium was created here: ${ISO_OUTPUT}"  \
-                               || logger -s "[ERR] ISO install medium failed to be created."
+        [ -f "${ISO_OUTPUT}" ] \
+            && logger -s "[MSG] ISO install medium was created here: ${ISO_OUTPUT}"  \
+            || logger -s "[ERR] ISO install medium failed to be created."
     else
         logger -s "[ERR] ISO install medium failed to be created!"
         exit -1
@@ -1394,11 +1493,12 @@ fi
 
 # optional disc burning
 
-"${BURN}" &&  burn_iso
+"${BURN}" \
+    &&  loggers -s <<< $(burn_iso 2>&1 | xargs echo "[INF] Now burning disk: ")
 
 # default cleanup
 
-cleanup
+logger -s <<< $(cleanup 2>&1 | xargs echo "[INF] Cleaning up: ")
 
 # send mail
 
@@ -1407,10 +1507,10 @@ then
 
     # optional email end-of-job warning
 
-    [ -n "${EMAIL_PASSWD}" ] && [ -n "${EMAIL}" ] && [ -n "${SMTP_URL}" ] && send_mail
+    [ -n "${EMAIL_PASSWD}" ] \
+        && [ -n "${EMAIL}" ] && [ -n "${SMTP_URL}" ] \
+        && logger -s <<< $(send_mail 2>&1 | xargs echo "[INF] Sending mail: ")
 fi
-
-# restart daemon just before exiting
 
 logger -s "[MSG] Gentoo building process ended."
 exit 0

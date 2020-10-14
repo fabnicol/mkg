@@ -39,6 +39,36 @@ check_md5sum() {
     logger -s "[ERR] MD5 checkum for $1 is not correct. Please download manually..."; exit -1
 }
 
+## @fn test_numeric()
+## @brief Test whether the input value is numeric
+## @param number in string form
+## @return grep value against input string
+## @ingroup auxiliaryFunctions
+
+test_numeric() {
+  grep -E "^[+-]?[0-9]+([.][0-9]+)?$" <<< "$1"
+}
+
+## @fn test_URL()
+## @brief Test whether the input value is a valid URL
+## @param Internet URL
+## @return grep value against input string
+## @ingroup auxiliaryFunctions
+
+test_URL() {
+    grep -E "(\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!\(\),\$_\{\}\^~\[\]|]+" <<< "$1"
+}
+
+## @fn test_email()
+## @brief Test whether the input value is a valid email address
+## @param Email address
+## @return grep value against input string
+## @ingroup auxiliaryFunctions
+
+test_email() {
+    grep -E "[a-z]+@[a-z]+\.[a-z]+" <<< "$1"
+}
+
 ## @fn list_block_devices()
 ## @brief List all non-loop block devices
 ## @ingroup auxiliaryFunctions

@@ -1,24 +1,18 @@
 #!/bin/bash
 
-# *
-# * Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
-# *
+# * Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>.
 # * This file is part of mkgentoo.
-# *
-# * mkgentoo is free software; you can redistribute it and/or
-# * modify it under the terms of the GNU Lesser General Public
-# * License as published by the Free Software Foundation; either
-# * version 3 of the License, or (at your option) any later version.
-# *
-# * FFmpeg is distributed in the hope that it will be useful,
-# * but WITHOUT ANY WARRANTY; without even the implied warranty of
-# * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# * Lesser General Public License for more details.
-# *
-# * You should have received a copy of the GNU Lesser General Public
-# * License along with FFmpeg; if not, write to the Free Software
-# * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-# *******************************************************************************
+# * mkgentoo is free software; you can redistribute it and/or modify
+# * it under the terms of the GNU Lesser General Public License as published by
+# * the Free Software Foundation; either version 3 of the License, or (at your
+# * option) any later version. mkgento distributed in the hope that it will
+# * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+# * General Public License for more details.  You should have received a copy of
+# * the GNU Lesser General Public License along with FFmpeg; if not, write to
+# * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+# * MA 02110-1301 USA
+# * ******************************************************************************
 #
 ## @file mkvm_chroot.sh
 ## @author Fabrice Nicol
@@ -26,7 +20,8 @@
 ## @brief Creating Gentoo filesystem in virtual disk
 ## @note This file is included into the clonezilla ISO liveCD,
 ## then copied to the root of the virtual disk.
-## @defgroup mkFileSystem Create Gentoo linux filesystem on VM disk and emerge software.
+## @defgroup mkFileSystem Create Gentoo linux filesystem on VM disk
+## and emerge software.
 
 ## @fn adjust_environment()
 ## @details
@@ -56,9 +51,9 @@ adjust_environment() {
     echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"    >> /etc/fstab
     source /etc/profile
 
-    # Refresh and rebuild @world
-    # frequently emerge complains about having to be upgraded before anything else.
-    # We shall use emerge-webrsync as emerge --sync is a bit less robust (rsync rotation bans...)
+    # Refresh and rebuild @world frequently emerge complains about having to be
+    # upgraded before anything else.  We shall use emerge-webrsync as emerge
+    # --sync is a bit less robust (rsync rotation bans...)
 
     emerge-webrsync
     ! emerge -1 sys-apps/portage \
@@ -86,27 +81,34 @@ adjust_environment() {
 
     mkdir -p /etc/portage/package.accept_keywords
     mkdir -p /etc/portage/package.use
-    cp -vf "${ELIST}.accept_keywords" /etc/portage/package.accept_keywords/ | tee emerge.build
-    cp -vf "${ELIST}.use"             /etc/portage/package.use/  | tee emerge.build
+    cp -vf "${ELIST}.accept_keywords" /etc/portage/package.accept_keywords/ \
+        | tee emerge.build
 
-    # One needs to build cmake without the qt5 USE value first, otherwise dependencies cannot be resolved.
+    cp -vf "${ELIST}.use"             /etc/portage/package.use/ \
+        |  tee emerge.build
 
-    USE='-qt5' emerge -1 cmake
-    [ $? != 0 ] && logger -s "emerge cmake failed!" && return -1
+    cp -vf "${ELIST}.accept_keywords" /etc/portage/package.accept_keywords/ \
+        |  tee emerge.build
 
-    # other core sysapps to be merged first. LZ4 is a kernel dependency for newer linux kernels.
 
-    emerge app-arch/lz4
-    emerge net-misc/netifrc
-    emerge sys-apps/pcmciautils
+    # One needs to build cmake without the qt5 USE value first, otherwise
+    # dependencies cannot be resolved.
+
+    USE='-qt5' emerge -1 cmake [ $? != 0 ] \
+        && logger -s "emerge cmake failed!" && return -1
+
+    # other core sysapps to be merged first. LZ4 is a kernel dependency for
+    # newer linux kernels.
+
+    emerge app-arch/lz4 emerge net-misc/netifrc emerge sys-apps/pcmciautils
     [ $? != 0 ] && logger -s "[ERR] emerge netifrs/pcmiautils failed!"
 
     # Now on to updating @world set. Be patient and wait for about 15-24 hours
     # as syslogd is not yet there we tee a custom build log
 
-    emerge -uDN @world  2>&1  | tee emerge.build
-    [ $? != 0 ] && logger -s "[ERR] emerge @world failed!"  | tee emerge.build \
-                && return -1
+    emerge -uDN @world 2>&1 | tee emerge.build [ $? != 0 ] \
+        && logger -s "[ERR] emerge @world failed!"  | tee emerge.build \
+        && return -1
 
     # Networking in the new environment
 
@@ -140,7 +142,8 @@ adjust_environment() {
 
 ## @fn build_kernel()
 ## @details
-## @li Emerge \b gentoo-sources, \b genkernel, \b pciutils and \b linux-firmware
+## @li Emerge \b gentoo-sources, \b genkernel, \b pciutils and
+##     \b linux-firmware
 ## @li Mount /dev/sda2 to /boot/
 ## @li Build kernel and initramfs. Log into kernel.log.
 ## @retval  -1 on error.
@@ -266,18 +269,15 @@ global_config() {
     eix-update
 
     # Idealy the installers should do:
-    # emerge gentoo-sources
-    # cd /usr/src/linux
-    # cp -f /boot/config* .config
-    # make syncconfig
-    # make modules_prepare
+    # emerge gentoo-sources cd /usr/src/linux
+    # cp -f /boot/config* .config make syncconfig make modules_prepare
     # for the sake of ebuilds requesting prepared kernel sources
-    # TODO: test ocs-run post_run commands.
-    # Also for usb_installer=... *alone* the above code could be deactivated.
-    # But then a later from_vm call would have to clean sources to lighten the resulting ISO clonezilla image.
+    # TODO: test ocs-run
+    # post_run commands.  Also for usb_installer=... *alone* the above code
+    # could be deactivated.  But then a later from_vm call would have to clean
+    # sources to lighten the resulting ISO clonezilla image.
 
-    # Configuration
-    #--- sddm
+    # Configuration --- sddm
 
     echo "#!/bin/sh"                   > /usr/share/sddm/scripts/Xsetup
     echo "setxkbmap ${LANGUAGE},us"    > /usr/share/sddm/scripts/Xsetup
@@ -357,8 +357,8 @@ exit ${res}
 
 # note: return code will be 0 if all went smoothly
 # otherwise:
-#    odd number: Issue with adjust_environment
-#    code or code -1 even and not dividable by 4: Issue with build_kernel
-#    code - {0,1,2,3}  can be divided by 4, not by 8: Issue with install_software
-#    code - {0,...,7}  can be divided by 8, not by 16: Issue with global_config
-#    code - {0,...,15} can be divided by 16: Issue with finalize
+# odd number: Issue with adjust_environment
+# code or code -1 even and not dividable by 4: Issue with build_kernel
+# code - {0,1,2,3}  can be divided by 4, not by 8: Issue with install_software
+# code - {0,...,7}  can be divided by 8, not by 16: Issue with global_config
+# code - {0,...,15} can be divided by 16: Issue with finalize
