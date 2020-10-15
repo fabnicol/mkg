@@ -2,17 +2,19 @@
 
 # * Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>.
 # * This file is part of mkgentoo.
-# * mkgentoo is free software; you can redistribute it and/or modify
-# * it under the terms of the GNU Lesser General Public License as published by
-# * the Free Software Foundation; either version 3 of the License, or (at your
-# * option) any later version. mkgento distributed in the hope that it will
-# * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-# * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
-# * General Public License for more details.  You should have received a copy of
-# * the GNU Lesser General Public License along with FFmpeg; if not, write to
-# * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# * MA 02110-1301 USA
-# * ******************************************************************************
+# * mkgentoo is free software; you can
+# * redistribute it and/or modify it under the terms of the GNU Lesser
+# * General Public License as published by the Free Software
+# * Foundation; either version 3 of the License, or (at your option)
+# * any later version. mkgento distributed in the hope that it will be
+# * useful, but WITHOUT ANY WARRANTY; without even the implied
+# * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# * See the GNU Lesser General Public License for more details.  You
+# * should have received a copy of the GNU Lesser General Public
+# * License along with FFmpeg; if not, write to the Free Software
+# * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# * 02110-1301 USA
+# * ******************************************************************
 #
 ## @file mkvm_chroot.sh
 ## @author Fabrice Nicol
@@ -57,7 +59,8 @@ adjust_environment() {
 
     emerge-webrsync
     ! emerge -1 sys-apps/portage \
-        && echo "[ERR] emerge-webrsync failed!" | tee emerge.build && return -1
+        && echo "[ERR] emerge-webrsync failed!" | tee emerge.build \
+        && return -1
 
     # select profile (most recent plasma desktop)
 
@@ -87,8 +90,10 @@ adjust_environment() {
     # One needs to build cmake without the qt5 USE value first, otherwise
     # dependencies cannot be resolved.
 
-    USE='-qt5' emerge -1 cmake [ $? != 0 ] \
-        && logger -s "emerge cmake failed!" && return -1
+    USE='-qt5' emerge -1 cmake
+    [ $? != 0 ] \
+        && logger -s "emerge cmake failed!" | tee emerge.build \
+        && return -1
 
     # add logger
 
@@ -100,12 +105,14 @@ adjust_environment() {
     # newer linux kernels.
 
     emerge -u app-arch/lz4 emerge net-misc/netifrc emerge sys-apps/pcmciautils
-    [ $? != 0 ] && logger -s "[ERR] emerge netifrs/pcmiautils failed!"
+    [ $? != 0 ] && logger -s "[ERR] emerge netifrs/pcmiautils failed!" \
+            | tee emerge.build
 
     # Now on to updating @world set. Be patient and wait for about 15-24 hours
     # as syslogd is not yet there we tee a custom build log
 
-    emerge -uDN @world 2>&1 | tee emerge.build [ $? != 0 ] \
+    emerge -uDN @world 2>&1 | tee emerge.build
+    [ $? != 0 ] \
         && logger -s "[ERR] emerge @world failed!"  | tee emerge.build \
         && return -1
 
@@ -169,10 +176,10 @@ build_kernel() {
     emerge sys-kernel/linux-firmware
     make clean
     [ -f /boot/vmlinu* ] && logger -s "[ERR] Kernel was built" \
-            || { logger -s "[ERR] Kernel compilation failed!"; \
+            || { logger -s "[ERR] Kernel compilation failed!"
                  return -1; }
     [ -f /boot/initr*.img ] && logger -s "[ERR] initramfs was built" \
-                            || { logger -s "[ERR] initramfs compilation failed!"; \
+                            || { logger -s "[ERR] initramfs compilation failed!"
                                  return -1; }
 }
 
@@ -196,7 +203,8 @@ install_software() {
 
     # TODO: develop several options wrt to package set.
 
-    local packages=`grep -E -v '(^\s*$|^\s*#.*$)' ${ELIST} | sed "s/dev-lang\/R-.*$/dev-lang\/R-${R_VERSION}/"`
+    local packages=`grep -E -v '(^\s*$|^\s*#.*$)' ${ELIST} \
+| sed "s/dev-lang\/R-.*$/dev-lang\/R-${R_VERSION}/"`
 
     # Trace for debugging
 
@@ -205,10 +213,8 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN ${packages}  2>&1 | tee log_install_software
-    if [ $? != 0 ]; then
-        logger -s "[ERR] Main package build step failed!"
-        return -1
-    fi
+    [ $? != 0 ] && logger -s "[ERR] Main package build step failed!" \
+                && return -1
 
     # update environment
 
@@ -233,7 +239,10 @@ install_software() {
     ./install-pandoc
     cd -
     cd build
-    cmake .. -DRSTUDIO_TARGET=Desktop -DCMAKE_BUILD_TYPE=Release -DRSTUDIO_USE_SYSTEM_BOOST=1 -DQT_QMAKE_EXECUTABLE=1
+    cmake .. -DRSTUDIO_TARGET=Desktop \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DRSTUDIO_USE_SYSTEM_BOOST=1 \
+          -DQT_QMAKE_EXECUTABLE=1
     make -j${NCPUS} 2>&1 | tee log_install_software
     make -k install 2>&1 | tee log_install_software
     cd /
@@ -242,7 +251,8 @@ install_software() {
 
 
 ## @fn global_config()
-## @details @li Cleanup log, distfiles (for deployment), kernel build sources and objects
+## @details @li Cleanup log, distfiles (for deployment),
+##          kernel build sources and objects
 ## @li Log this into \b log_uninstall_software
 ## @li Update \b eix cache. Sets displaymanager for \b xdm.
 ## @li Add services: <b>sysklog, cronie, xdm, dbus, elogind</b>
@@ -272,9 +282,10 @@ global_config() {
     # cp -f /boot/config* .config make syncconfig make modules_prepare
     # for the sake of ebuilds requesting prepared kernel sources
     # TODO: test ocs-run
-    # post_run commands.  Also for usb_installer=... *alone* the above code
-    # could be deactivated.  But then a later from_vm call would have to clean
-    # sources to lighten the resulting ISO clonezilla image.
+    # post_run commands.  Also for usb_installer=... *alone* the above
+    # code could be deactivated.  But then a later from_vm call would
+    # have to clean sources to lighten the resulting ISO clonezilla
+    # image.
 
     # Configuration --- sddm
 
@@ -302,7 +313,8 @@ global_config() {
 
     #--- groups and sudo
 
-    useradd -m -G users,wheel,audio,video,plugdev  -s /bin/bash "${NONROOT_USER}"
+    useradd -m -G users,wheel,audio,video,plugdev \
+            -s /bin/bash "${NONROOT_USER}"
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
     gpasswd -a sddm video
 
@@ -332,7 +344,9 @@ finalize() {
         rm -f *
         sed -i 's/^export .*$//g' .bashrc
     else
-        cp -f /var/log/syslog syslog.save
+        [ -f /var/log/syslog ] \
+            &&  cp -f /var/log/syslog syslog.save 2>&1 | tee finalize.log \
+            || echo "No log" | tee finalize.log
     fi
 
     # prepare to compact with vbox-img compact --filename ${VMPATH}/${VM}.vdi
@@ -357,7 +371,10 @@ exit ${res}
 # note: return code will be 0 if all went smoothly
 # otherwise:
 # odd number: Issue with adjust_environment
-# code or code -1 even and not dividable by 4: Issue with build_kernel
-# code - {0,1,2,3}  can be divided by 4, not by 8: Issue with install_software
-# code - {0,...,7}  can be divided by 8, not by 16: Issue with global_config
-# code - {0,...,15} can be divided by 16: Issue with finalize
+# code & 2 == 1:
+# Issue with build_kernel
+# code & 4 == 1:
+# Issue with install_software
+# code & 8 == 1:
+# Issue with global_config
+# code & 16 == 1: Issue with finalize

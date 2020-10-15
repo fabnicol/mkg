@@ -55,13 +55,10 @@ setup_network() {
         fi
     fi
     res=$?
-    if [ ${res} = 0 ]
-    then
-        touch setup_network
-    else
+    [ ${res} = 0 ] && touch setup_network || {
         logger -s "[ERR] Could not fix internet access!"
         "${GUI}" && exit -1 || shutdown -h now
-    fi
+    }
 }
 
 
