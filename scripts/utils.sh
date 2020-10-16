@@ -36,7 +36,7 @@
 
 create_options_array() {
     IFS=';'
-    read -r -a A <<< $(awk -F"\"" '{if ( ! grep "#" $1 && $2 != "") printf "%s;%s;%s;%s;",$2,$4,$6,$8}' options)
+    read -r -a A <<< $(awk -F"\"" '{if ( ! match($1, "#")  && $1 != "") printf "%s;%s;%s;%s;",$2,$4,$6,$8}' options)
     export A
 }
 

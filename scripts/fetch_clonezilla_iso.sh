@@ -12,14 +12,14 @@ get_gentoo_install_iso() {
     rm install-${PROCESSOR}-minimal*\.iso*
     rm latest-install-${PROCESSOR}-minimal*\.txt*
     local downloaded=""
-    curl -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-install-${PROCESSOR}-minimal.txt ${verb}
+    curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-install-${PROCESSOR}-minimal.txt ${verb}
     [ $? != 0 ] && logger -s "[ERR] Could not download live CD from Gentoo mirror" && exit -1
     local current=$(cat latest-install-${PROCESSOR}-minimal.txt \
                         | grep "install-${PROCESSOR}-minimal.*.iso" \
                         | sed -E 's/iso.*$/iso/' )
     local downloaded=$(basename ${current})
     logger -s "[INF] Downloading $current..."
-    curl -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" ${verb}
+    curl -L -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" ${verb}
     [ $? != 0 ] && logger -s "[ERR] Could not download live CD" && exit -1
     ! "${DISABLE_MD5_CHECK}" && check_md5sum "${downloaded}"
     if [ -f ${downloaded} ]
@@ -54,7 +54,7 @@ get_clonezilla_iso() {
     local clonezilla_file=$(sed -E 's/.*\/(.*)\/download/\1/' \
                                 <<< ${DOWNLOAD_CLONEZILLA_PATH})
     ! "${VERBOSE}" && verb="-s"
-    curl ${DOWNLOAD_CLONEZILLA_PATH} -o ${clonezilla_file} ${verb}
+    curl -L ${DOWNLOAD_CLONEZILLA_PATH} -o ${clonezilla_file} ${verb}
     [ $? != 0 ] && { logger -s "Could not download CloneZilla iso"; exit -1; }
     local clonezilla_iso=$(ls clonezilla-live*${PROCESSOR}.iso)
     [ ${DISABLE_MD5_CHECK} = "false" ] && check_md5sum ${clonezilla_iso}
@@ -121,7 +121,7 @@ fetch_clonezilla_iso() {
 
     # now cleanup, mount and copy CloneZilla live CD
 
-    [ ! -d mnt ]  &&  mkdir mnt  ||  unlink -l mnt  && rmdir ${verb} -f mnt
+    [ ! -d mnt ]  &&  mkdir mnt   ||  { mountpoint mnt && umount -l mnt; rm ${verb} -rf mnt; }
     [ ! -d mnt2 ] &&  mkdir mnt2 »||  rm ${verb} -rf mnt2
 
     "${VERBOSE}"  && logger -s "[INF] Mounting CloneZilla CD ${CLONEZILLACD}"

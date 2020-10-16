@@ -22,6 +22,7 @@
 
  =dev-lang/R-4.0.2
  app-editors/emacs
+ app-editors/vim
 
 ## KDE
 

@@ -59,8 +59,8 @@ adjust_environment() {
 
     emerge-webrsync
     ! emerge -1 sys-apps/portage \
-        && echo "[ERR] emerge-webrsync failed!" | tee emerge.build \
-        && return -1
+        && { echo "[ERR] emerge-webrsync failed!" | tee emerge.build
+        return -1; }
 
     # select profile (most recent plasma desktop)
 
@@ -92,14 +92,14 @@ adjust_environment() {
 
     USE='-qt5' emerge -1 cmake
     [ $? != 0 ] \
-        && logger -s "emerge cmake failed!" | tee emerge.build \
-        && return -1
+        && { logger -s "emerge cmake failed!" | tee emerge.build
+        return -1; }
 
-    # add logger
+    # add logger. However it will not be usable for now, this is why we are
+    # using custom logs and tee's.
 
     emerge -uD app-admin/sysklogd
     rc-update add sysklogd default
-    rc-service sysklogd start
 
     # other core sysapps to be merged first. LZ4 is a kernel dependency for
     # newer linux kernels.
@@ -112,9 +112,8 @@ adjust_environment() {
     # as syslogd is not yet there we tee a custom build log
 
     emerge -uDN @world 2>&1 | tee emerge.build
-    [ $? != 0 ] \
-        && logger -s "[ERR] emerge @world failed!"  | tee emerge.build \
-        && return -1
+    [ $? != 0 ] && { logger -s "[ERR] emerge @world failed!"  | tee emerge.build
+        return -1; }
 
     # Networking in the new environment
 
@@ -128,10 +127,10 @@ adjust_environment() {
 
     if [ "${LANGUAGE}" = "fr" ]
     then
-        echo 'keymap="fr"' > /etc/conf.d/keymaps
+        echo 'keymap="fr"' >  /etc/conf.d/keymaps
         echo 'keymap="us"' >> /etc/conf.d/keymaps
     else
-        echo 'keymap="us"' > /etc/conf.d/keymaps
+        echo 'keymap="us"' >  /etc/conf.d/keymaps
     fi
     sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
 
@@ -159,7 +158,7 @@ build_kernel() {
 
     # Building the kernel
 
-    emerge gentoo-sources sys-kernel/genkernel pciutils
+    emerge gentoo-sources sys-kernel/genkernel pciutils | tee kernel.log
 
     # Now mount the new boot partition
 
@@ -170,8 +169,11 @@ build_kernel() {
     # kernel config issue here
 
     make syncconfig  # replaces silentoldconfig as of 4.19
-    make -s -j${NCPUS} 2>&1 > kernel.log && make modules_install && make install
-    [ $? != 0 ] && logger -s "[ERR] Kernel building failed!" &&  return -1
+    make -s -j${NCPUS}   2>&1 | tee kernel.log
+    make modules_install 2>&1 | tee kernel.log
+    make install         2>&1 | tee kernel.log
+    [ $? != 0 ] && { logger -s "[ERR] Kernel building failed!"
+                     return -1; }
     genkernel --install initramfs
     emerge sys-kernel/linux-firmware
     make clean
@@ -196,7 +198,7 @@ install_software() {
     # to avoid corruption cases of ebuild list caused by Windows editing
 
     cd /
-    emerge dos2unix
+    emerge dos2unix  | tee log_install_software.log
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
@@ -212,9 +214,9 @@ install_software() {
 
     # do not quote `packages' variable!
 
-    emerge -uDN ${packages}  2>&1 | tee log_install_software
-    [ $? != 0 ] && logger -s "[ERR] Main package build step failed!" \
-                && return -1
+    emerge -uDN ${packages}  2>&1 | tee log_install_software.log
+    [ $? != 0 ] && { logger -s "[ERR] Main package build step failed!" \
+                         | tee log_install_software.log; return -1; }
 
     # update environment
 
@@ -223,13 +225,15 @@ install_software() {
 
     # optionally build RStudio and R dependencies (TODO)
 
-    ! "${DOWNLOAD_RSTUDIO}" && logger -s "[MSG] No RStudio build" &&  return -1
+    ! "${DOWNLOAD_RSTUDIO}" && { logger -s "[MSG] No RStudio build" \
+                                    | tee log_install_software.log; return -1; }
 
     mkdir /Build
     cd /Build
     wget ${GITHUBPATH}${RSTUDIO}.zip
-    [ $? != 0 ] && logger -s "[ERR] RStudio download failed!" &&  return -1
-    logger -s "[INF] Building RStudio"
+    [ $? != 0 ] && { logger -s "[ERR] RStudio download failed!" \
+                         | tee log_install_software.log; return -1; }
+    logger -s "[INF] Building RStudio" | tee log_install_software.log
     unzip *.zip
     cd rstudio*
     mkdir build
@@ -242,11 +246,17 @@ install_software() {
     cmake .. -DRSTUDIO_TARGET=Desktop \
           -DCMAKE_BUILD_TYPE=Release \
           -DRSTUDIO_USE_SYSTEM_BOOST=1 \
-          -DQT_QMAKE_EXECUTABLE=1
-    make -j${NCPUS} 2>&1 | tee log_install_software
-    make -k install 2>&1 | tee log_install_software
+          -DQT_QMAKE_EXECUTABLE=1  2>&1   | tee log_install_software.log
+    make -j${NCPUS} 2>&1 | tee log_install_software.log
+    make -k install 2>&1 | tee log_install_software.log
+    res=$?
     cd /
     ! "${DEBUG_MODE}" && rm -rf /Build
+
+    # if DEBUG_MODE is true, would return 1, undesirably.
+    # using $res instead
+
+    return ${res}
 }
 
 
@@ -264,7 +274,8 @@ install_software() {
 ## @ingroup mkFileSystem
 
 global_config() {
-    logger -s "Cleaning up a bit aggressively before cloning..."
+    logger -s "Cleaning up a bit aggressively before cloning..." \
+        | tee log_uninstall_software.log
     eclean -d packages 2>&1 | tee log_uninstall_software.log
     rm -rf /var/tmp/*
     rm -rf /var/log/*
@@ -273,7 +284,7 @@ global_config() {
     # kernel sources will have to be reinstalled by user if necessary
 
     emerge --unmerge gentoo-sources  2>&1 | tee log_uninstall_software.log
-    emerge --depclean   2>&1              | tee log_uninstall_software.log
+    emerge --depclean                2>&1 | tee log_uninstall_software.log
     rm -rf /usr/src/linux/*               | tee log_uninstall_software.log
     eix-update
 
@@ -289,8 +300,10 @@ global_config() {
 
     # Configuration --- sddm
 
-    echo "#!/bin/sh"                   > /usr/share/sddm/scripts/Xsetup
-    echo "setxkbmap ${LANGUAGE},us"    > /usr/share/sddm/scripts/Xsetup
+    echo "#!/bin/sh"                   > /usr/share/sddm/scripts/Xsetup \
+        | tee log_uninstall_software.log
+    echo "setxkbmap ${LANGUAGE},us"    > /usr/share/sddm/scripts/Xsetup \
+        | tee log_uninstall_software.log
     chmod +x /usr/share/sddm/scripts/Xsetup
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' /etc/conf.d/xdm
 
@@ -323,7 +336,7 @@ global_config() {
     grub-install --target=x86_64-efi --efi-directory=/boot --removable
     grub-mkconfig -o /boot/grub/grub.cfg
 
-    #--- Passwords
+    #--- Passwords: take care to use long enough passwds
 
     chpasswd <<< "${NONROOT_USER}":"${PASSWD}"
     chpasswd <<<  root:"${ROOTPASSWD}"
@@ -339,15 +352,7 @@ finalize() {
 
     # Final steps: cleaning up
 
-    if ! "${DEBUG_MODE}"
-    then
-        rm -f *
-        sed -i 's/^export .*$//g' .bashrc
-    else
-        [ -f /var/log/syslog ] \
-            &&  cp -f /var/log/syslog syslog.save 2>&1 | tee finalize.log \
-            || echo "No log" | tee finalize.log
-    fi
+    ! "${DEBUG_MODE}" &&  rm -f * && sed -i 's/^export .*$//g' .bashrc
 
     # prepare to compact with vbox-img compact --filename ${VMPATH}/${VM}.vdi
 
