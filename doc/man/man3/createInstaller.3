@@ -1,4 +1,4 @@
-.TH "createInstaller" 3 "Sun Oct 4 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "createInstaller" 3 "Fri Oct 16 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -13,6 +13,18 @@ createInstaller
 .RI "\fBget_gentoo_install_iso\fP ()"
 .br
 .RI "Download minimal Gentoo install ISO file and caches\&. "
+.ti -1c
+.RI "\fBget_clonezilla_iso\fP ()"
+.br
+.RI "Download clonezilla ISO file and caches it\&. "
+.ti -1c
+.RI "\fBget_cache_clonezilla_iso\fP ()"
+.br
+.RI "Either download clonezilla ISO file and caches it OR uncaches it\&. "
+.ti -1c
+.RI "\fBfetch_clonezilla_iso\fP ()"
+.br
+.RI "Download clonezilla ISO file and process it\&. "
 .ti -1c
 .RI "\fBtest_cli_pre\fP ()"
 .br
@@ -48,7 +60,11 @@ createInstaller
 .ti -1c
 .RI "\fBtest_vm_running\fP (vm)"
 .br
-.RI "Checks if VM as first named argument exists and is running\&. "
+.RI "Check if VM as first named argument exists and is running\&. "
+.ti -1c
+.RI "\fBdeep_clean\fP ()"
+.br
+.RI "Force-clean root VirtualBox registry\&. "
 .ti -1c
 .RI "\fBdelete_vm\fP (vm, ext)"
 .br
@@ -64,7 +80,7 @@ createInstaller
 .ti -1c
 .RI "\fBprocess_clonezilla_iso\fP ()"
 .br
-.RI "Download clonezilla ISO or recover it from cache calling #fetch_clonezilla_iso\&. 
+.RI "Download clonezilla ISO or recover it from cache calling \fBfetch_clonezilla_iso\fP\&. 
 .br
 Upgrade it with virtualbox guest additions\&. "
 .ti -1c
@@ -111,22 +127,22 @@ Upgrade it with virtualbox guest additions\&. "
 .RI "\fBmain\fP ()"
 .br
 .RI "Main function launching routines\&. "
+.ti -1c
+.RI "\fBcreate_install_usb_device\fP ()"
+.br
+.RI "Create USB-stick (or any external device) Gentoo clonezilla installer\&. "
 .in -1c
 .SS "Variables"
 
 .in +1c
 .ti -1c
-.RI "ReadOnly String \fBCLI\fP = '$*'"
-.br
-.RI "Command line\&. "
-.ti -1c
 .RI "ReadOnly String Array \fBARR\fP"
 .br
 .RI "global string array of switches and default values "
 .ti -1c
-.RI "ReadOnly Integer \fBARRAY_LENGTH\fP = $((${#\fBARR\fP[*]}/3))"
+.RI "ReadOnly Integer \fBARRAY_LENGTH\fP = $((${#\fBARR\fP[*]}/4))"
 .br
-.RI "Number of switches (true length of array divided by 3) "
+.RI "Number of switches (true length of array divided by 4) "
 .ti -1c
 .RI "Exported String \fBISO\fP = 'downloaded\&.iso'"
 .br
@@ -151,13 +167,13 @@ This is only needed to reduce disk space requirements and avoid a temporary RAW 
 .PP
 
 .PP
-Definition at line 843 of file mkgentoo\&.sh\&.
+Definition at line 1132 of file mkgentoo\&.sh\&.
 .SS "cleanup ()"
 
 .PP
 Clean up all temporary files and directpries (except for VirtualBox build) 
 .PP
-Definition at line 1078 of file mkgentoo\&.sh\&.
+Definition at line 1435 of file mkgentoo\&.sh\&.
 .SS "clone_vm_to_device ()"
 
 .PP
@@ -182,7 +198,7 @@ build_virtualbox=true
 .PP
 
 .PP
-Definition at line 904 of file mkgentoo\&.sh\&.
+Definition at line 1263 of file mkgentoo\&.sh\&.
 .SS "clone_vm_to_raw ()"
 
 .PP
@@ -195,7 +211,7 @@ VBoxManage clonemedium
 .PP
  to clone VDI to RAW file before bare-metal copy to device\&. 
 .PP
-Definition at line 927 of file mkgentoo\&.sh\&.
+Definition at line 1287 of file mkgentoo\&.sh\&.
 .SS "clonezilla_device_to_image ()"
 
 .PP
@@ -208,7 +224,7 @@ Create CloneZilla xz-compressed image out of an external block device (like a US
 .PP
 
 .PP
-Definition at line 962 of file mkgentoo\&.sh\&.
+Definition at line 1322 of file mkgentoo\&.sh\&.
 .SS "clonezilla_to_iso (iso, dir)"
 
 .PP
@@ -228,7 +244,20 @@ ISO can be burned to DVD or used to create a bootable USB stick using dd on *nix
 .PP
 
 .PP
-Definition at line 765 of file mkgentoo\&.sh\&.
+Definition at line 989 of file mkgentoo\&.sh\&.
+.SS "create_install_usb_device ()"
+
+.PP
+Create USB-stick (or any external device) Gentoo clonezilla installer\&. 
+.PP
+\fBWarning\fP
+.RS 4
+Use with care, check your USB_DEVICE variable\&. 
+.RE
+.PP
+
+.PP
+Definition at line 229 of file utils\&.sh\&.
 .SS "create_iso_vm ()"
 
 .PP
@@ -240,7 +269,7 @@ Wait for the VM to complete its task\&. Check that it is still running every min
 .br
 \fBNote\fP
 .RS 4
-VM may be visible (vmtype=gui) or silent (vmtype=headless, currently to be fixed)\&. Wait for the VM to complete task\&. 
+VM may be visible (vm type=gui) or silent (vm type=headless, currently to be fixed)\&. Wait for the VM to complete task\&. 
 .br
 A new VM is necessary as the first VM used to build the Gentoo filesystem does not contain clonezilla or the VirtualBox guest additions (requested for sharing folders with host)\&. Calls \fBprocess_clonezilla_iso\fP to satisfy these requirements\&. 
 .RE
@@ -252,7 +281,7 @@ the \fBsharedfolder\fP command may fail vith older version of VirtualBox or not 
 .PP
 
 .PP
-Definition at line 868 of file mkgentoo\&.sh\&.
+Definition at line 1162 of file mkgentoo\&.sh\&.
 .SS "create_usb_system ()"
 
 .PP
@@ -267,21 +296,25 @@ Clone VDI virtual disk to external device (like a USB stick) Two options are ava
 .PP
 
 .PP
-Definition at line 1052 of file mkgentoo\&.sh\&.
+Definition at line 1409 of file mkgentoo\&.sh\&.
 .SS "create_vm ()"
 
 .PP
-Create main VirtualBox machine using VBoxManage commandline\&. Register machine, create VDI drive, create IDE drive attach disks to controlers 
-.br
+Create main VirtualBox machine using VBoxManage commandline\&. 
+.PD 0
+
+.IP "\(bu" 2
+Register machine, create VDI drive, create IDE drive attach disks to controlers 
+.IP "\(bu" 2
 Attach augmented clonezilla LiveCD to IDE controller\&. 
-.br
+.IP "\(bu" 2
 Wait for the VM to complete its task\&. Check that it is still running every minute\&. 
-.br
+.IP "\(bu" 2
 Finally compact it\&. 
 .PP
 \fBNote\fP
 .RS 4
-VM may be visible (vmtype=gui) or without GUI (vmtype=headless, currently to be fixed) 
+VM may be visible (vm type=gui) or without GUI (vm type=headless, currently to be fixed) 
 .RE
 .PP
 \fBTodo\fP
@@ -291,7 +324,9 @@ Find a way to only compact on success and never on failure of VM\&.
 .PP
 
 .PP
-Definition at line 656 of file mkgentoo\&.sh\&.
+
+.PP
+Definition at line 853 of file mkgentoo\&.sh\&.
 .SS "dd_to_usb ()"
 
 .PP
@@ -304,7 +339,13 @@ Used only if vbox-img (patched version) has not been built\&.
 .PP
 
 .PP
-Definition at line 936 of file mkgentoo\&.sh\&.
+Definition at line 1296 of file mkgentoo\&.sh\&.
+.SS "deep_clean ()"
+
+.PP
+Force-clean root VirtualBox registry\&. 
+.PP
+Definition at line 709 of file mkgentoo\&.sh\&.
 .SS "delete_vm (vm, ext)"
 
 .PP
@@ -332,7 +373,40 @@ Deletes its folder structure and hard drive (default is 'vdi' as a second argume
 .PP
 
 .PP
-Definition at line 597 of file mkgentoo\&.sh\&.
+Definition at line 763 of file mkgentoo\&.sh\&.
+.SS "fetch_clonezilla_iso ()"
+
+.PP
+Download clonezilla ISO file and process it\&. 
+.PD 0
+
+.IP "\(bu" 2
+Download iff \fBDOWNLOAD_CLONEZILLA\fP has value 'true' 
+.IP "\(bu" 2
+Optionnally checks MD5 sum\&. 
+.IP "\(bu" 2
+Caches ISO download for later uses\&. 
+.IP "\(bu" 2
+Uncaches it if no fresh download\&. 
+.IP "\(bu" 2
+Mount ISO download\&. Copy ro mounted filesystem to rw directory\&. 
+.IP "\(bu" 2
+Unsquash ISO filesystem\&.squashfs\&. 
+.IP "\(bu" 2
+Copy clonezilla config file\&. 
+.IP "\(bu" 2
+Copy resolv\&.conf to unsquashed filesystem\&. 
+.PP
+\fBReturn values\fP
+.RS 4
+\fI0\fP on success or exits -1 on failure\&. 
+.RE
+.PP
+
+.PP
+
+.PP
+Definition at line 115 of file fetch_clonezilla_iso\&.sh\&.
 .SS "fetch_livecd ()"
 
 .PP
@@ -345,26 +419,31 @@ Downloads Gentoo install CD\&. Caches it as ${ISO}
 .PP
 
 .PP
-Definition at line 323 of file mkgentoo\&.sh\&.
+Definition at line 457 of file mkgentoo\&.sh\&.
 .SS "fetch_stage3 ()"
 
 .PP
 Downloads a fresh stage3 Gentoo archive\&. Caches it as ${STAGE3} 
 .PP
-\fBReturn values\fP
-.RS 4
-\fIReturns\fP 0 on success or -1 on exit 
-.RE
-.PP
-
-.PP
-Definition at line 366 of file mkgentoo\&.sh\&.
+Definition at line 500 of file mkgentoo\&.sh\&.
 .SS "generate_Gentoo ()"
 
 .PP
 Launch routines: fetch install IO, starge3 archive, create VM\&. 
 .PP
-Definition at line 1095 of file mkgentoo\&.sh\&.
+Definition at line 1456 of file mkgentoo\&.sh\&.
+.SS "get_cache_clonezilla_iso ()"
+
+.PP
+Either download clonezilla ISO file and caches it OR uncaches it\&. 
+.PP
+Definition at line 74 of file fetch_clonezilla_iso\&.sh\&.
+.SS "get_clonezilla_iso ()"
+
+.PP
+Download clonezilla ISO file and caches it\&. 
+.PP
+Definition at line 50 of file fetch_clonezilla_iso\&.sh\&.
 .SS "get_gentoo_install_iso ()"
 
 .PP
@@ -376,13 +455,13 @@ Definition at line 8 of file fetch_clonezilla_iso\&.sh\&.
 .PP
 Print usage to stdout\&. 
 .PP
-Definition at line 313 of file mkgentoo\&.sh\&.
+Definition at line 447 of file mkgentoo\&.sh\&.
 .SS "help_md ()"
 
 .PP
 Print usage in markdown format\&. 
 .PP
-Definition at line 280 of file mkgentoo\&.sh\&.
+Definition at line 409 of file mkgentoo\&.sh\&.
 .SS "main ()"
 
 .PP
@@ -390,12 +469,12 @@ Main function launching routines\&.
 .PP
 \fBTodo\fP
 .RS 4
-Daemonize the part below generate_Gentoo when #VMPTYPE is \fCheadless\fP so that the script can be detached completely with \fCnohup mkgentoo \&.\&.\&. &\fP 
+Daemonize the part below generate_Gentoo when #VMTYPE is \fCheadless\fP so that the script can be detached completely with \fCnohup mkgentoo \&.\&.\&. &\fP 
 .RE
 .PP
 
 .PP
-Definition at line 1123 of file mkgentoo\&.sh\&.
+Definition at line 1493 of file mkgentoo\&.sh\&.
 .SS "make_boot_from_livecd ()"
 
 .PP
@@ -420,11 +499,11 @@ Will be run in the ${VM} virtual machine
 .PP
 
 .PP
-Definition at line 417 of file mkgentoo\&.sh\&.
+Definition at line 555 of file mkgentoo\&.sh\&.
 .SS "process_clonezilla_iso ()"
 
 .PP
-Download clonezilla ISO or recover it from cache calling #fetch_clonezilla_iso\&. 
+Download clonezilla ISO or recover it from cache calling \fBfetch_clonezilla_iso\fP\&. 
 .br
 Upgrade it with virtualbox guest additions\&. Chroot into the clonezilla Ubuntu GNU/Linux distribution and runs apt to build kernel modules and install the VirtualBox guest additions ISO image\&. 
 .br
@@ -432,12 +511,12 @@ Upgrade clonezilla kernel consequently Recreates the quashfs system after exitin
 .PP
 \fBNote\fP
 .RS 4
-Installing the guest additions is a prerequisite to folder sharing between the ISO VM and the host\&. Folder sharing is necessary to recover a compressed clonezilla image of the VDI virtual disk into the ISOFILES/home/partimag/image directory\&. 
+Installing the guest additions is a prerequisite to folder sharing between the ISO VM and the host\&. Folder sharing is necessary to recover a compressed clonezilla image of the VDI virtual disk into the directory ISOFILES/home/partimag/image 
 .RE
 .PP
 
 .PP
-Definition at line 796 of file mkgentoo\&.sh\&.
+Definition at line 1036 of file mkgentoo\&.sh\&.
 .SS "test_cli (cli)"
 
 .PP
@@ -448,11 +527,17 @@ Analyse commandline\&.
 \fIcli\fP Commandline
 .RE
 .PP
+.PD 0
+.IP "\(bu" 2
 Create globals of the form VAR=arg when there is var=arg on commandline 
-.br
-Otherwise assign default values VAR=defaults (3rd argument in array ARR) 
+.IP "\(bu" 2
+Otherwise assign default values VAR=defaults (3rd argument in array \fBARR\fP) 
+.IP "\(bu" 2
+Also checks type of argument against types described for \fBARR\fP 
 .PP
-Definition at line 218 of file mkgentoo\&.sh\&.
+
+.PP
+Definition at line 268 of file mkgentoo\&.sh\&.
 .SS "test_cli_post ()"
 
 .PP
@@ -465,7 +550,7 @@ Check commanline coherence and incompatibilities\&.
 .PP
 
 .PP
-Definition at line 245 of file mkgentoo\&.sh\&.
+Definition at line 331 of file mkgentoo\&.sh\&.
 .SS "test_cli_pre ()"
 
 .PP
@@ -478,11 +563,11 @@ Check VirtualBox version and prepare commandline analysis\&.
 .PP
 
 .PP
-Definition at line 154 of file mkgentoo\&.sh\&.
+Definition at line 177 of file mkgentoo\&.sh\&.
 .SS "test_vm_running (vm)"
 
 .PP
-Checks if VM as first named argument exists and is running\&. 
+Check if VM as first named argument exists and is running\&. 
 .PP
 \fBParameters\fP
 .RS 4
@@ -496,7 +581,7 @@ Checks if VM as first named argument exists and is running\&.
 .PP
 
 .PP
-Definition at line 554 of file mkgentoo\&.sh\&.
+Definition at line 699 of file mkgentoo\&.sh\&.
 .SS "vbox_img_works ()"
 
 .PP
@@ -511,7 +596,7 @@ Test if \fBvbox-img\fP is functional\&. \fBvbox-img\fP is a script; it refers to
 .PP
 
 .PP
-Definition at line 1026 of file mkgentoo\&.sh\&.
+Definition at line 1389 of file mkgentoo\&.sh\&.
 .SH "Variable Documentation"
 .PP 
 .SS "ARR"
@@ -520,11 +605,29 @@ Definition at line 1026 of file mkgentoo\&.sh\&.
 global string array of switches and default values Structure is as follows:
 .PP
 .nf
-("commandline switch" "Description"  "Default value" \&.\&.\&.) 
+{{"Commandline option", "Description", "Default value", "Type"}, {\&.\&.\&.},\&.\&.\&.}
 
 .fi
 .PP
- A double-entry arry will be simulated using indexes\&.
+ 'Type' is among the following values: 
+.PD 0
+
+.IP "\(bu" 2
+\fBb\fP Boolean, 'false' or 'true' 
+.IP "\(bu" 2
+\fBd\fP An existing directory 
+.IP "\(bu" 2
+\fBe\fP Email address: regexp '[a-z]+@[a-z]+\\\&.[a-z]+' 
+.IP "\(bu" 2
+\fBf\fP An existing file 
+.IP "\(bu" 2
+\fBn\fP Numeric value 
+.IP "\(bu" 2
+\fBo\fP 'on' or 'off', a VBoxManage custom Boolean 
+.IP "\(bu" 2
+\fBs\fP String 
+.IP "\(bu" 2
+\fBu\fP Url A double-entry array will be simulated using indexes\&.
 .PP
 \fBNote\fP
 .RS 4
@@ -533,25 +636,19 @@ global string array of switches and default values Structure is as follows:
 .PP
 
 .PP
-Definition at line 79 of file mkgentoo\&.sh\&.
-.SS "ARRAY_LENGTH = $((${#\fBARR\fP[*]}/3))"
+Definition at line 108 of file mkgentoo\&.sh\&.
+.SS "ARRAY_LENGTH = $((${#\fBARR\fP[*]}/4))"
 
 .PP
-Number of switches (true length of array divided by 3) 
+Number of switches (true length of array divided by 4) 
 .PP
-Definition at line 141 of file mkgentoo\&.sh\&.
-.SS "CLI = '$*'"
-
-.PP
-Command line\&. 
-.PP
-Definition at line 69 of file mkgentoo\&.sh\&.
+Definition at line 115 of file mkgentoo\&.sh\&.
 .SS "ISO = 'downloaded\&.iso'"
 
 .PP
 Name of downloaded clonezilla ISO file\&. 
 .PP
-Definition at line 147 of file mkgentoo\&.sh\&.
+Definition at line 170 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for gentoo-creator from the source code\&.

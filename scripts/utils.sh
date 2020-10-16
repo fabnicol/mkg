@@ -8,14 +8,15 @@
 # License as published by the Free Software Foundation; either
 # version 3 of the License, or (at your option) any later version.
 #
-# FFmpeg is distributed in the hope that it will be useful,
+# mkgentoo is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public
 # License along with FFmpeg; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+# MA 02110-1301
 ##
 #!/bin/bash
 
@@ -24,7 +25,20 @@
 ## @copyright GPL v.3
 ## @brief Auxiliary functions
 ## @note This file is not included into the clonezilla ISO liveCD.
-## @defgroup auxiliaryFunctions Auxiliary functions to check files, devices and burn disk.
+## @defgroup auxiliaryFunctions Auxiliary functions to check
+##           lines, files, devices and burn disk.
+
+## @fn create_options_array()
+## @brief Read file @b options into a temporary array A
+##        which will contain command line specifications
+## @details Later on A initializes the read-only array #ARR
+## @ingroup auxiliaryFunctions
+
+create_options_array() {
+    IFS=';'
+    read -r -a A <<< $(awk -F"\"" '{if ( ! grep "#" $1 && $2 != "") printf "%s;%s;%s;%s;",$2,$4,$6,$8}' options)
+    export A
+}
 
 ## @fn check_md5sum()
 ## @param filename Local name of file to be checked for md5sum.
@@ -36,7 +50,9 @@ check_md5sum() {
     local ref=$(cat MD5SUMS | grep "$1" | cut -f 1 -d' ')
     downloaded=$(md5sum $1 | cut -f 1 -d' ')
     [ ${downloaded} = ${ref} ] && return 0
-    logger -s "[ERR] MD5 checkum for $1 is not correct. Please download manually..."; exit -1
+    logger -s "[ERR] MD5 checkum for $1 is not correct. \
+Please download manually..."
+    exit -1
 }
 
 ## @fn test_numeric()
@@ -56,7 +72,9 @@ test_numeric() {
 ## @ingroup auxiliaryFunctions
 
 test_URL() {
-    grep -E "(\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!\(\),\$_\{\}\^~\[\]|]+" <<< "$1"
+    grep -E \
+         "(\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!\(\),\$_\{\}\^~\[\]|]+"\
+         <<< "$1"
 }
 
 ## @fn test_email()
@@ -79,7 +97,8 @@ list_block_devices() {
 
 ## @fn is_block_device()
 ## @brief Test if argument is non-loop block device
-## @param label  Label of potential block device (e.g. \b sdc) to be tested.
+## @param label  Label of potential block device (e.g. \b sdc) to be
+##               tested.
 ## @retval Return 0 (true) if input is a block device otherwise 1.
 ## @ingroup auxiliaryFunctions
 
@@ -97,7 +116,8 @@ get_mountpoint() {
     if is_block_device "$1"
     then
         logger -s "[ERR] $1  is not a block device!"
-        logger -s "[MSG] Device labels should be in the following list:"
+        logger -s "[MSG] Device labels should be in the following \
+list:"
         logger -s $(list_block_devices)
         exit -1
     fi
@@ -115,7 +135,8 @@ get_device() {
         echo ${device}
     else
         is_block_device "$1" && echo "$1" \
-            || { logger -s "[ERR] $1 is neither a mountpoint nor a block device"; exit -1; }
+            || { logger -s "[ERR] $1 is neither a mountpoint nor a \
+block device"; exit -1; }
     fi
 }
 
@@ -127,23 +148,22 @@ get_device() {
 ## rights to perform burning with some hardware configurations. @n
 ## In such an event, either run script with elevated rights or
 ## modify \b cdrecord rights using: @code
-## chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord @endcode
+## chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord
+## @endcode
 ## @retval 0 on success otherwise exits -1 on failure.
 ## @ingroup auxiliaryFunctions
 
 test_cdrecord() {
     logger -s "[MSG] cdrecord scanbus: "
     ${CDRECORD} -scanbus
-    if [ $? != 0 ]
-    then
-        logger -s "[ERR] cdrecord version is not functional"
+    [ $? != 0 ] \
+        && { logger -s "[ERR] cdrecord version is not functional"
         logger -s "[MSG] Try reinstalling cdrecord"
-        exit -1
-    fi
+        exit -1; }
     return 0
 }
 
-## @fn recreate_liveCD_ISO
+## @fn recreate_liveCD_ISO()
 ## @brief Create ISO of liveCD out of directory
 ## @param dir Directory containing all files
 ## @return 0 on success or exits -1 on failure.
@@ -165,10 +185,10 @@ recreate_liveCD_ISO() {
 
 # mkisofs almost never fails but if it does, hard stop here.
 
-    if [ $? != 0 ]; then
-        logger -s "[ERR] mkisofs could not recreate the ISO file to boot virtual machine ${VM} from directory $1"
-        exit -1
-    fi
+    [ $? != 0 ] && {
+        logger -s "[ERR] mkisofs could not recreate the ISO file to \
+boot virtual machine ${VM} from directory $1"
+        exit -1; }
 }
 
 ## @fn burn_iso()
@@ -183,8 +203,10 @@ burn_iso() {
         if $(which cdrecord)
         then
              logger -s "[ERR] Could not find cdrecord"
-             logger -s "[ERR] Please install cdrtools in your PATH or specify cdrecord full filepath on commandline:"
-             logger -s "      burn=true cdrecord=/path/to/cdrecord/executable"
+             logger -s "[ERR] Please install cdrtools in your PATH or \
+ specify cdrecord full filepath on commandline:"
+             logger -s "      burn=true \
+cdrecord=/path/to/cdrecord/executable"
              return -1
          else
              CDRECORD=$(which cdrecord)
@@ -194,16 +216,13 @@ burn_iso() {
          test_cdrecord
     fi
     logger -s "[INF] Burning installation medium to optical disc..."
-    if [ -z "${SCSI_ADDRESS}" ]
-    then
-       ${CDRECORD} -eject  "${ISO_OUTPUT}"
-    else
-       ${CDRECORD} -eject dev=${SCSI_ADDRESS} "${ISO_OUTPUT}"
-    fi
+    [ -z "${SCSI_ADDRESS}" ] && ${CDRECORD} -eject  "${ISO_OUTPUT}" \
+        || ${CDRECORD} -eject dev=${SCSI_ADDRESS} "${ISO_OUTPUT}"
 }
 
 ## @fn create_install_usb_device()
-## @brief Create USB-stick (or any external device) Gentoo clonezilla installer
+## @brief Create USB-stick (or any external device) Gentoo clonezilla
+##        installer
 ## @warning Use with care, check your USB_DEVICE variable.
 ## @ingroup createInstaller
 

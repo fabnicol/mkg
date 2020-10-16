@@ -1,4 +1,4 @@
-.TH "utils.sh" 3 "Sun Oct 4 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "utils.sh" 3 "Fri Oct 16 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -11,9 +11,25 @@ utils.sh \- Auxiliary functions\&.
 
 .in +1c
 .ti -1c
+.RI "\fBcreate_options_array\fP ()"
+.br
+.RI "Read file \fBoptions\fP into a temporary array A which will contain command line specifications\&. "
+.ti -1c
 .RI "\fBcheck_md5sum\fP (filename)"
 .br
 .RI "Check md5sums in file MD5SUMS\&. "
+.ti -1c
+.RI "\fBtest_numeric\fP (number)"
+.br
+.RI "Test whether the input value is numeric\&. "
+.ti -1c
+.RI "\fBtest_URL\fP (Internet)"
+.br
+.RI "Test whether the input value is a valid URL\&. "
+.ti -1c
+.RI "\fBtest_email\fP (Email)"
+.br
+.RI "Test whether the input value is a valid email address\&. "
 .ti -1c
 .RI "\fBlist_block_devices\fP ()"
 .br
@@ -34,6 +50,25 @@ utils.sh \- Auxiliary functions\&.
 .RI "\fBtest_cdrecord\fP ()"
 .br
 .RI "Test whether \fBcdrecord\fP is functional\&. "
+.ti -1c
+.RI "\fBrecreate_liveCD_ISO\fP (dir)"
+.br
+.RI "Create ISO of liveCD out of directory\&. "
+.ti -1c
+.RI "\fBburn_iso\fP ()"
+.br
+.RI "Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&. "
+.ti -1c
+.RI "\fBcreate_install_usb_device\fP ()"
+.br
+.RI "Create USB-stick (or any external device) Gentoo clonezilla installer\&. "
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "Exported String \fBA\fP"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -59,6 +94,37 @@ This file is not included into the clonezilla ISO liveCD\&.
 
 .PP
 Definition in file \fButils\&.sh\fP\&.
+.SH "Function Documentation"
+.PP 
+.SS "recreate_liveCD_ISO (dir)"
+
+.PP
+Create ISO of liveCD out of directory\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdir\fP Directory containing all files 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+0 on success or exits -1 on failure\&. 
+.RE
+.PP
+\fBNote\fP
+.RS 4
+An alternative xorriso solution could be considered 
+.RE
+.PP
+
+.PP
+Definition at line 172 of file utils\&.sh\&.
+.SH "Variable Documentation"
+.PP 
+.SS "Exported String A"
+
+.PP
+Definition at line 40 of file utils\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for gentoo-creator from the source code\&.

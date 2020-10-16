@@ -1,8 +1,9 @@
-.TH "auxiliaryFunctions" 3 "Sun Oct 4 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "auxiliaryFunctions" 3 "Fri Oct 16 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-auxiliaryFunctions
+auxiliaryFunctions \- lines, files, devices and burn disk\&.  
+
 .SH SYNOPSIS
 .br
 .PP
@@ -10,9 +11,29 @@ auxiliaryFunctions
 
 .in +1c
 .ti -1c
+.RI "\fBvalidate_option\fP (option)"
+.br
+.RI "Check if argument is part of array \fBARR\fP as a legitimate commandline option\&. "
+.ti -1c
+.RI "\fBcreate_options_array\fP ()"
+.br
+.RI "Read file \fBoptions\fP into a temporary array A which will contain command line specifications\&. "
+.ti -1c
 .RI "\fBcheck_md5sum\fP (filename)"
 .br
 .RI "Check md5sums in file MD5SUMS\&. "
+.ti -1c
+.RI "\fBtest_numeric\fP (number)"
+.br
+.RI "Test whether the input value is numeric\&. "
+.ti -1c
+.RI "\fBtest_URL\fP (Internet)"
+.br
+.RI "Test whether the input value is a valid URL\&. "
+.ti -1c
+.RI "\fBtest_email\fP (Email)"
+.br
+.RI "Test whether the input value is a valid email address\&. "
 .ti -1c
 .RI "\fBlist_block_devices\fP ()"
 .br
@@ -33,12 +54,36 @@ auxiliaryFunctions
 .RI "\fBtest_cdrecord\fP ()"
 .br
 .RI "Test whether \fBcdrecord\fP is functional\&. "
+.ti -1c
+.RI "\fBburn_iso\fP ()"
+.br
+.RI "Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&. "
 .in -1c
 .SH "Detailed Description"
 .PP 
+lines, files, devices and burn disk\&. 
+
 
 .SH "Function Documentation"
 .PP 
+.SS "burn_iso ()"
+
+.PP
+Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&. 
+.PP
+\fBNote\fP
+.RS 4
+\fBcdrecord\fP should have been installed beforehand 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIReturn\fP \fBcdrecord\fP return code 
+.RE
+.PP
+
+.PP
+Definition at line 200 of file utils\&.sh\&.
 .SS "check_md5sum (filename)"
 
 .PP
@@ -56,19 +101,25 @@ Check md5sums in file MD5SUMS\&.
 .PP
 
 .PP
-Definition at line 35 of file utils\&.sh\&.
+Definition at line 49 of file utils\&.sh\&.
+.SS "create_options_array ()"
+
+.PP
+Read file \fBoptions\fP into a temporary array A which will contain command line specifications\&. Later on A initializes the read-only array \fBARR\fP 
+.PP
+Definition at line 37 of file utils\&.sh\&.
 .SS "get_device ()"
 
 .PP
 Give device from mount folder input\&. 
 .PP
-Definition at line 81 of file utils\&.sh\&.
+Definition at line 131 of file utils\&.sh\&.
 .SS "get_mountpoint ()"
 
 .PP
 Gives mount folder from device label input\&. 
 .PP
-Definition at line 66 of file utils\&.sh\&.
+Definition at line 115 of file utils\&.sh\&.
 .SS "is_block_device (label)"
 
 .PP
@@ -86,13 +137,13 @@ Test if argument is non-loop block device\&.
 .PP
 
 .PP
-Definition at line 56 of file utils\&.sh\&.
+Definition at line 105 of file utils\&.sh\&.
 .SS "list_block_devices ()"
 
 .PP
 List all non-loop block devices\&. 
 .PP
-Definition at line 46 of file utils\&.sh\&.
+Definition at line 94 of file utils\&.sh\&.
 .SS "test_cdrecord ()"
 
 .PP
@@ -105,7 +156,7 @@ There may be a rights issue with versions of \fBcdrecord\fP built from original 
 In such an event, either run script with elevated rights or modify \fBcdrecord\fP rights using:
 .PP
 .nf
-chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord 
+chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord
 
 .fi
 .PP
@@ -119,7 +170,79 @@ chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord
 .PP
 
 .PP
-Definition at line 104 of file utils\&.sh\&.
+Definition at line 156 of file utils\&.sh\&.
+.SS "test_email (Email)"
+
+.PP
+Test whether the input value is a valid email address\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIEmail\fP address 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+grep value against input string 
+.RE
+.PP
+
+.PP
+Definition at line 86 of file utils\&.sh\&.
+.SS "test_numeric (number)"
+
+.PP
+Test whether the input value is numeric\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fInumber\fP in string form 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+grep value against input string 
+.RE
+.PP
+
+.PP
+Definition at line 64 of file utils\&.sh\&.
+.SS "test_URL (Internet)"
+
+.PP
+Test whether the input value is a valid URL\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIInternet\fP URL 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+grep value against input string 
+.RE
+.PP
+
+.PP
+Definition at line 74 of file utils\&.sh\&.
+.SS "validate_option (option)"
+
+.PP
+Check if argument is part of array \fBARR\fP as a legitimate commandline option\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIoption\fP String of option\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+true if legitimate option otherwise false\&. 
+.RE
+.PP
+
+.PP
+Definition at line 124 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for gentoo-creator from the source code\&.

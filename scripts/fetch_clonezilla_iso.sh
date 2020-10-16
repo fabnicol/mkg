@@ -43,7 +43,7 @@ get_gentoo_install_iso() {
 }
 
 
-## @fn get__clonezilla_iso()
+## @fn get_clonezilla_iso()
 ## @brief Download clonezilla ISO file and caches it.
 ## @ingroup createInstaller
 
@@ -117,13 +117,14 @@ fetch_clonezilla_iso() {
     get_cache_clonezilla_iso
     cd "${VMPATH}"
     local verb=""
+    "${VERBOSE}" && verb=-v
 
-    # now mount
+    # now cleanup, mount and copy CloneZilla live CD
 
-    [ ! -d mnt ] &&  { rm -rf mnt; mkdir mnt; }
-    [ ! -d mnt2 ] && { rm -rf mnt2; mkdir mnt2; }
-    "${VERBOSE}" \
-        && logger -s "[INF] Mounting CloneZilla CD ${CLONEZILLACD}" && verb="-v"
+    [ ! -d mnt ]  &&  mkdir mnt  ||  unlink -l mnt  && rmdir ${verb} -f mnt
+    [ ! -d mnt2 ] &&  mkdir mnt2 »||  rm ${verb} -rf mnt2
+
+    "${VERBOSE}"  && logger -s "[INF] Mounting CloneZilla CD ${CLONEZILLACD}"
     mount -oloop "${CLONEZILLACD}" ./mnt  \
      	|| { logger -s "[ERR] Could not mount ${CLONEZILLACD} to mnt"; exit -1; }
     "${VERBOSE}" && logger -s "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."

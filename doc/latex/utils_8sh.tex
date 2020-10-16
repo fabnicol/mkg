@@ -8,8 +8,16 @@ Auxiliary functions.
 \doxysubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
+\mbox{\hyperlink{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}{create\+\_\+options\+\_\+array}} ()
+\begin{DoxyCompactList}\small\item\em Read file {\bfseries{options}} into a temporary array A which will contain command line specifications. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}{check\+\_\+md5sum}} (filename)
 \begin{DoxyCompactList}\small\item\em Check md5sums in file M\+D5\+S\+U\+MS. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga70900c9c46939d6381db66e4216b33b4}{test\+\_\+numeric}} (number)
+\begin{DoxyCompactList}\small\item\em Test whether the input value is numeric. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_gad3c2bc1a09d31ccc6f3130b9329b4690}{test\+\_\+\+U\+RL}} (Internet)
+\begin{DoxyCompactList}\small\item\em Test whether the input value is a valid U\+RL. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga7fdfcebe48c43147ccff0fba99b51e26}{test\+\_\+email}} (Email)
+\begin{DoxyCompactList}\small\item\em Test whether the input value is a valid email address. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga25a80837ae3373590d59e5d558c1ab83}{list\+\_\+block\+\_\+devices}} ()
 \begin{DoxyCompactList}\small\item\em List all non-\/loop block devices. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga3684c6e188b7eb9eec7fbe851ab7e660}{is\+\_\+block\+\_\+device}} (label)
@@ -19,7 +27,18 @@ Auxiliary functions.
 \mbox{\hyperlink{group__auxiliary_functions_gab53bde930eb12adf7c84b549b7a4e241}{get\+\_\+device}} ()
 \begin{DoxyCompactList}\small\item\em Give device from mount folder input. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga08542b578002f8342cd3e0a5252b5543}{test\+\_\+cdrecord}} ()
-\begin{DoxyCompactList}\small\item\em Test whether {\bfseries{cdrecord}} is functional. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Test whether {\bfseries{cdrecord}} is functional. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{utils_8sh_a38ca6200b4d28d4ea8fcadb531533519}{recreate\+\_\+live\+C\+D\+\_\+\+I\+SO}} (dir)
+\begin{DoxyCompactList}\small\item\em Create I\+SO of live\+CD out of directory. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}{burn\+\_\+iso}} ()
+\begin{DoxyCompactList}\small\item\em Burn Gentoo clonezilla installer to D\+VD using {\bfseries{cdrecord}}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__create_installer_ga532879314181eb08a603971d9ac2b2f3}{create\+\_\+install\+\_\+usb\+\_\+device}} ()
+\begin{DoxyCompactList}\small\item\em Create U\+S\+B-\/stick (or any external device) Gentoo clonezilla installer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+Exported String \mbox{\hyperlink{utils_8sh_a21c8dd72c8ea1465437bf09c6ae1413d}{A}}
+\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
@@ -34,3 +53,44 @@ G\+PL v.\+3
 \begin{DoxyNote}{Note}
 This file is not included into the clonezilla I\+SO live\+CD. 
 \end{DoxyNote}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{utils_8sh_a38ca6200b4d28d4ea8fcadb531533519}\label{utils_8sh_a38ca6200b4d28d4ea8fcadb531533519}} 
+\index{utils.sh@{utils.sh}!recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}}
+\index{recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}!utils.sh@{utils.sh}}
+\doxysubsubsection{\texorpdfstring{recreate\_liveCD\_ISO()}{recreate\_liveCD\_ISO()}}
+{\footnotesize\ttfamily recreate\+\_\+live\+C\+D\+\_\+\+I\+SO (\begin{DoxyParamCaption}\item[{dir}]{ }\end{DoxyParamCaption})}
+
+
+
+Create I\+SO of live\+CD out of directory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir} & Directory containing all files \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success or exits -\/1 on failure. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+An alternative xorriso solution could be considered 
+\end{DoxyNote}
+
+
+Definition at line 172 of file utils.\+sh.
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{utils_8sh_a21c8dd72c8ea1465437bf09c6ae1413d}\label{utils_8sh_a21c8dd72c8ea1465437bf09c6ae1413d}} 
+\index{utils.sh@{utils.sh}!A@{A}}
+\index{A@{A}!utils.sh@{utils.sh}}
+\doxysubsubsection{\texorpdfstring{A}{A}}
+{\footnotesize\ttfamily Exported String A}
+
+
+
+Definition at line 40 of file utils.\+sh.
+

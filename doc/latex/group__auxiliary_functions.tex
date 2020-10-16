@@ -1,10 +1,25 @@
-\hypertarget{group__auxiliary_functions}{}\doxysection{Auxiliary functions to check files, devices and burn disk.}
-\label{group__auxiliary_functions}\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\hypertarget{group__auxiliary_functions}{}\doxysection{Auxiliary functions to check}
+\label{group__auxiliary_functions}\index{Auxiliary functions to check@{Auxiliary functions to check}}
+
+
+lines, files, devices and burn disk.  
+
+
 \doxysubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
+\mbox{\hyperlink{group__auxiliary_functions_ga70ccc3a81e02612a86b3a3983bc1c586}{validate\+\_\+option}} (option)
+\begin{DoxyCompactList}\small\item\em Check if argument is part of array \mbox{\hyperlink{group__create_installer_ga2b36d9209dbee6df3e60d878f3e51005}{A\+RR}} as a legitimate commandline option. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}{create\+\_\+options\+\_\+array}} ()
+\begin{DoxyCompactList}\small\item\em Read file {\bfseries{options}} into a temporary array A which will contain command line specifications. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}{check\+\_\+md5sum}} (filename)
 \begin{DoxyCompactList}\small\item\em Check md5sums in file M\+D5\+S\+U\+MS. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga70900c9c46939d6381db66e4216b33b4}{test\+\_\+numeric}} (number)
+\begin{DoxyCompactList}\small\item\em Test whether the input value is numeric. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_gad3c2bc1a09d31ccc6f3130b9329b4690}{test\+\_\+\+U\+RL}} (Internet)
+\begin{DoxyCompactList}\small\item\em Test whether the input value is a valid U\+RL. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga7fdfcebe48c43147ccff0fba99b51e26}{test\+\_\+email}} (Email)
+\begin{DoxyCompactList}\small\item\em Test whether the input value is a valid email address. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga25a80837ae3373590d59e5d558c1ab83}{list\+\_\+block\+\_\+devices}} ()
 \begin{DoxyCompactList}\small\item\em List all non-\/loop block devices. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga3684c6e188b7eb9eec7fbe851ab7e660}{is\+\_\+block\+\_\+device}} (label)
@@ -14,16 +29,42 @@
 \mbox{\hyperlink{group__auxiliary_functions_gab53bde930eb12adf7c84b549b7a4e241}{get\+\_\+device}} ()
 \begin{DoxyCompactList}\small\item\em Give device from mount folder input. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga08542b578002f8342cd3e0a5252b5543}{test\+\_\+cdrecord}} ()
-\begin{DoxyCompactList}\small\item\em Test whether {\bfseries{cdrecord}} is functional. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Test whether {\bfseries{cdrecord}} is functional. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}{burn\+\_\+iso}} ()
+\begin{DoxyCompactList}\small\item\em Burn Gentoo clonezilla installer to D\+VD using {\bfseries{cdrecord}}. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
+lines, files, devices and burn disk. 
+
 
 
 \doxysubsection{Function Documentation}
+\mbox{\Hypertarget{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}\label{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}} 
+\index{Auxiliary functions to check@{Auxiliary functions to check}!burn\_iso@{burn\_iso}}
+\index{burn\_iso@{burn\_iso}!Auxiliary functions to check@{Auxiliary functions to check}}
+\doxysubsubsection{\texorpdfstring{burn\_iso()}{burn\_iso()}}
+{\footnotesize\ttfamily burn\+\_\+iso (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Burn Gentoo clonezilla installer to D\+VD using {\bfseries{cdrecord}}. 
+
+\begin{DoxyNote}{Note}
+{\bfseries{cdrecord}} should have been installed beforehand 
+\end{DoxyNote}
+
+\begin{DoxyRetVals}{Return values}
+{\em Return} & {\bfseries{cdrecord}} return code \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line 200 of file utils.\+sh.
+
 \mbox{\Hypertarget{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}\label{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}} 
-\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!check\_md5sum@{check\_md5sum}}
-\index{check\_md5sum@{check\_md5sum}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\index{Auxiliary functions to check@{Auxiliary functions to check}!check\_md5sum@{check\_md5sum}}
+\index{check\_md5sum@{check\_md5sum}!Auxiliary functions to check@{Auxiliary functions to check}}
 \doxysubsubsection{\texorpdfstring{check\_md5sum()}{check\_md5sum()}}
 {\footnotesize\ttfamily check\+\_\+md5sum (\begin{DoxyParamCaption}\item[{filename}]{ }\end{DoxyParamCaption})}
 
@@ -43,11 +84,25 @@ Check md5sums in file M\+D5\+S\+U\+MS.
 \end{DoxyRetVals}
 
 
-Definition at line 35 of file utils.\+sh.
+Definition at line 49 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}\label{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}} 
+\index{Auxiliary functions to check@{Auxiliary functions to check}!create\_options\_array@{create\_options\_array}}
+\index{create\_options\_array@{create\_options\_array}!Auxiliary functions to check@{Auxiliary functions to check}}
+\doxysubsubsection{\texorpdfstring{create\_options\_array()}{create\_options\_array()}}
+{\footnotesize\ttfamily create\+\_\+options\+\_\+array (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Read file {\bfseries{options}} into a temporary array A which will contain command line specifications. 
+
+Later on A initializes the read-\/only array \mbox{\hyperlink{group__create_installer_ga2b36d9209dbee6df3e60d878f3e51005}{A\+RR}} 
+
+Definition at line 37 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_gab53bde930eb12adf7c84b549b7a4e241}\label{group__auxiliary_functions_gab53bde930eb12adf7c84b549b7a4e241}} 
-\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!get\_device@{get\_device}}
-\index{get\_device@{get\_device}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\index{Auxiliary functions to check@{Auxiliary functions to check}!get\_device@{get\_device}}
+\index{get\_device@{get\_device}!Auxiliary functions to check@{Auxiliary functions to check}}
 \doxysubsubsection{\texorpdfstring{get\_device()}{get\_device()}}
 {\footnotesize\ttfamily get\+\_\+device (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
 
@@ -57,11 +112,11 @@ Give device from mount folder input.
 
 
 
-Definition at line 81 of file utils.\+sh.
+Definition at line 131 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_gaa35d741a19132f1ec7a0a699640e6b5a}\label{group__auxiliary_functions_gaa35d741a19132f1ec7a0a699640e6b5a}} 
-\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!get\_mountpoint@{get\_mountpoint}}
-\index{get\_mountpoint@{get\_mountpoint}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\index{Auxiliary functions to check@{Auxiliary functions to check}!get\_mountpoint@{get\_mountpoint}}
+\index{get\_mountpoint@{get\_mountpoint}!Auxiliary functions to check@{Auxiliary functions to check}}
 \doxysubsubsection{\texorpdfstring{get\_mountpoint()}{get\_mountpoint()}}
 {\footnotesize\ttfamily get\+\_\+mountpoint (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
 
@@ -71,11 +126,11 @@ Gives mount folder from device label input.
 
 
 
-Definition at line 66 of file utils.\+sh.
+Definition at line 115 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_ga3684c6e188b7eb9eec7fbe851ab7e660}\label{group__auxiliary_functions_ga3684c6e188b7eb9eec7fbe851ab7e660}} 
-\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!is\_block\_device@{is\_block\_device}}
-\index{is\_block\_device@{is\_block\_device}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\index{Auxiliary functions to check@{Auxiliary functions to check}!is\_block\_device@{is\_block\_device}}
+\index{is\_block\_device@{is\_block\_device}!Auxiliary functions to check@{Auxiliary functions to check}}
 \doxysubsubsection{\texorpdfstring{is\_block\_device()}{is\_block\_device()}}
 {\footnotesize\ttfamily is\+\_\+block\+\_\+device (\begin{DoxyParamCaption}\item[{label}]{ }\end{DoxyParamCaption})}
 
@@ -95,11 +150,11 @@ Test if argument is non-\/loop block device.
 \end{DoxyRetVals}
 
 
-Definition at line 56 of file utils.\+sh.
+Definition at line 105 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_ga25a80837ae3373590d59e5d558c1ab83}\label{group__auxiliary_functions_ga25a80837ae3373590d59e5d558c1ab83}} 
-\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!list\_block\_devices@{list\_block\_devices}}
-\index{list\_block\_devices@{list\_block\_devices}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\index{Auxiliary functions to check@{Auxiliary functions to check}!list\_block\_devices@{list\_block\_devices}}
+\index{list\_block\_devices@{list\_block\_devices}!Auxiliary functions to check@{Auxiliary functions to check}}
 \doxysubsubsection{\texorpdfstring{list\_block\_devices()}{list\_block\_devices()}}
 {\footnotesize\ttfamily list\+\_\+block\+\_\+devices (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
 
@@ -109,11 +164,11 @@ List all non-\/loop block devices.
 
 
 
-Definition at line 46 of file utils.\+sh.
+Definition at line 94 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_ga08542b578002f8342cd3e0a5252b5543}\label{group__auxiliary_functions_ga08542b578002f8342cd3e0a5252b5543}} 
-\index{Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}!test\_cdrecord@{test\_cdrecord}}
-\index{test\_cdrecord@{test\_cdrecord}!Auxiliary functions to check files, devices and burn disk.@{Auxiliary functions to check files, devices and burn disk.}}
+\index{Auxiliary functions to check@{Auxiliary functions to check}!test\_cdrecord@{test\_cdrecord}}
+\index{test\_cdrecord@{test\_cdrecord}!Auxiliary functions to check@{Auxiliary functions to check}}
 \doxysubsubsection{\texorpdfstring{test\_cdrecord()}{test\_cdrecord()}}
 {\footnotesize\ttfamily test\+\_\+cdrecord (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
 
@@ -125,7 +180,7 @@ Try to scan the S\+C\+SI bus and exit on error \begin{DoxyWarning}{Warning}
 There may be a rights issue with versions of {\bfseries{cdrecord}} built from original source as they sometimes request elevated rights to perform burning with some hardware configurations. ~\newline
 In such an event, either run script with elevated rights or modify {\bfseries{cdrecord}} rights using\+:
 \begin{DoxyCode}{0}
-\DoxyCodeLine{chown root cdrecord \&\& chgrp bin cdrecord \&\& chmod 04755 cdrecord }
+\DoxyCodeLine{chown root cdrecord \&\& chgrp bin cdrecord \&\& chmod 04755 cdrecord}
 \end{DoxyCode}
  
 \end{DoxyWarning}
@@ -136,5 +191,93 @@ In such an event, either run script with elevated rights or modify {\bfseries{cd
 \end{DoxyRetVals}
 
 
-Definition at line 104 of file utils.\+sh.
+Definition at line 156 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_ga7fdfcebe48c43147ccff0fba99b51e26}\label{group__auxiliary_functions_ga7fdfcebe48c43147ccff0fba99b51e26}} 
+\index{Auxiliary functions to check@{Auxiliary functions to check}!test\_email@{test\_email}}
+\index{test\_email@{test\_email}!Auxiliary functions to check@{Auxiliary functions to check}}
+\doxysubsubsection{\texorpdfstring{test\_email()}{test\_email()}}
+{\footnotesize\ttfamily test\+\_\+email (\begin{DoxyParamCaption}\item[{Email}]{ }\end{DoxyParamCaption})}
+
+
+
+Test whether the input value is a valid email address. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Email} & address \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+grep value against input string 
+\end{DoxyReturn}
+
+
+Definition at line 86 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_ga70900c9c46939d6381db66e4216b33b4}\label{group__auxiliary_functions_ga70900c9c46939d6381db66e4216b33b4}} 
+\index{Auxiliary functions to check@{Auxiliary functions to check}!test\_numeric@{test\_numeric}}
+\index{test\_numeric@{test\_numeric}!Auxiliary functions to check@{Auxiliary functions to check}}
+\doxysubsubsection{\texorpdfstring{test\_numeric()}{test\_numeric()}}
+{\footnotesize\ttfamily test\+\_\+numeric (\begin{DoxyParamCaption}\item[{number}]{ }\end{DoxyParamCaption})}
+
+
+
+Test whether the input value is numeric. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em number} & in string form \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+grep value against input string 
+\end{DoxyReturn}
+
+
+Definition at line 64 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_gad3c2bc1a09d31ccc6f3130b9329b4690}\label{group__auxiliary_functions_gad3c2bc1a09d31ccc6f3130b9329b4690}} 
+\index{Auxiliary functions to check@{Auxiliary functions to check}!test\_URL@{test\_URL}}
+\index{test\_URL@{test\_URL}!Auxiliary functions to check@{Auxiliary functions to check}}
+\doxysubsubsection{\texorpdfstring{test\_URL()}{test\_URL()}}
+{\footnotesize\ttfamily test\+\_\+\+U\+RL (\begin{DoxyParamCaption}\item[{Internet}]{ }\end{DoxyParamCaption})}
+
+
+
+Test whether the input value is a valid U\+RL. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Internet} & U\+RL \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+grep value against input string 
+\end{DoxyReturn}
+
+
+Definition at line 74 of file utils.\+sh.
+
+\mbox{\Hypertarget{group__auxiliary_functions_ga70ccc3a81e02612a86b3a3983bc1c586}\label{group__auxiliary_functions_ga70ccc3a81e02612a86b3a3983bc1c586}} 
+\index{Auxiliary functions to check@{Auxiliary functions to check}!validate\_option@{validate\_option}}
+\index{validate\_option@{validate\_option}!Auxiliary functions to check@{Auxiliary functions to check}}
+\doxysubsubsection{\texorpdfstring{validate\_option()}{validate\_option()}}
+{\footnotesize\ttfamily validate\+\_\+option (\begin{DoxyParamCaption}\item[{option}]{ }\end{DoxyParamCaption})}
+
+
+
+Check if argument is part of array \mbox{\hyperlink{group__create_installer_ga2b36d9209dbee6df3e60d878f3e51005}{A\+RR}} as a legitimate commandline option. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em option} & String of option. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if legitimate option otherwise false. 
+\end{DoxyReturn}
+
+
+Definition at line 124 of file mkgentoo.\+sh.
 

@@ -1,4 +1,4 @@
-.TH "mkgentoo.sh" 3 "Sun Oct 4 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "mkgentoo.sh" 3 "Fri Oct 16 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -10,6 +10,10 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .SS "Functions"
 
 .in +1c
+.ti -1c
+.RI "\fBvalidate_option\fP (option)"
+.br
+.RI "Check if argument is part of array \fBARR\fP as a legitimate commandline option\&. "
 .ti -1c
 .RI "\fBtest_cli_pre\fP ()"
 .br
@@ -45,7 +49,11 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .ti -1c
 .RI "\fBtest_vm_running\fP (vm)"
 .br
-.RI "Checks if VM as first named argument exists and is running\&. "
+.RI "Check if VM as first named argument exists and is running\&. "
+.ti -1c
+.RI "\fBdeep_clean\fP ()"
+.br
+.RI "Force-clean root VirtualBox registry\&. "
 .ti -1c
 .RI "\fBdelete_vm\fP (vm, ext)"
 .br
@@ -61,7 +69,7 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .ti -1c
 .RI "\fBprocess_clonezilla_iso\fP ()"
 .br
-.RI "Download clonezilla ISO or recover it from cache calling #fetch_clonezilla_iso\&. 
+.RI "Download clonezilla ISO or recover it from cache calling \fBfetch_clonezilla_iso\fP\&. 
 .br
 Upgrade it with virtualbox guest additions\&. "
 .ti -1c
@@ -113,26 +121,22 @@ Upgrade it with virtualbox guest additions\&. "
 
 .in +1c
 .ti -1c
-.RI "ReadOnly String \fBCLI\fP = '$*'"
-.br
-.RI "Command line\&. "
-.ti -1c
 .RI "ReadOnly String Array \fBARR\fP"
 .br
 .RI "global string array of switches and default values "
 .ti -1c
-.RI "ReadOnly Integer \fBARRAY_LENGTH\fP = $((${#\fBARR\fP[*]}/3))"
+.RI "ReadOnly Integer \fBARRAY_LENGTH\fP = $((${#\fBARR\fP[*]}/4))"
 .br
-.RI "Number of switches (true length of array divided by 3) "
+.RI "Number of switches (true length of array divided by 4) "
 .ti -1c
 .RI "Exported String \fBISO\fP = 'downloaded\&.iso'"
 .br
 .RI "Name of downloaded clonezilla ISO file\&. "
 .ti -1c
-.RI "Exported String \fBISO_OUTPUT\fP = $(sed \-E 's/\&.*\\b(\\w+\\\&.(iso|\fBISO\fP))\\b\&.*$/\\1/' <<< '${CLI}')"
+.RI "Exported String \fBCREATE_ISO\fP = true"
 .br
 .ti -1c
-.RI "Exported String \fBCREATE_ISO\fP = true"
+.RI "Exported String \fBISOLINUX_DIR\fP = isolinux"
 .br
 .ti -1c
 .RI "Exported String \fBPATH\fP = ${PATH}:${VBPATH}"
@@ -197,7 +201,7 @@ mkgentoo help
 .PP
 \fBWarning\fP
 .RS 4
-you should have at least 55 GB of free disk space in the current directory or in vmpath if specified\&. Boolean values are either 'true' or 'false'\&. For example, to build a minimal distribution, specify \fC minimal=true\fP on command line\&. 
+you should have at least 55 GB of free disk space in the current directory or in vmpath if specified\&. Boolean values are either 'true' or 'false'\&. An option no followed by '=' is equivalent to \fBoption=true\fP, except for help and a possible ISO file\&. For example, to build a minimal: distribution,specify \fCminimal\fP or \fC minimal=true\fP on command line\&. 
 .RE
 .PP
 \fB\fBExamples\fP:\fP
@@ -209,7 +213,8 @@ you should have at least 55 GB of free disk space in the current directory or in
 Only create the VM and virtual disk, in debug mode, without R or RStudio and set new passwords, for a French-language platform\&. Use 8 cores\&. 
 .PP
 .nf
-mkgentoo language=fr minimal=true debug_mode=true ncpus=8 nonroot_user=ken passwd='util!Hx&32F' rootpasswd='Hk_32!_CD' cleanup=false 
+ mkgentoo language=fr minimal debug_mode ncpus=8
+nonroot_user=ken passwd='util!Hx&32F' rootpasswd='Hk_32!_CD' cleanup=false
 
 .fi
 .PP
@@ -218,7 +223,7 @@ mkgentoo language=fr minimal=true debug_mode=true ncpus=8 nonroot_user=ken passw
 Create ISO clonezilla image of Gentoo linux, burn it to DVD, create an installed OS on a USB stick whose model label starts with \fIPNY\fP and finally create a clonezilla installer on another USB stick mounted under \fC /media/ken/AA45E \fP 
 .PP
 .nf
-mkgento burn usb_device="PNY" usb_installer="Sams" my_gentoo_image\&.iso 
+mkgento burn usb_device="PNY" usb_installer="Sams" my_gentoo_image\&.iso
 
 .fi
 .PP
@@ -234,15 +239,15 @@ Definition in file \fBmkgentoo\&.sh\fP\&.
 .SS "Exported String CREATE_ISO = true"
 
 .PP
-Definition at line 202 of file mkgentoo\&.sh\&.
-.SS "Exported String ISO_OUTPUT = $(sed \-E 's/\&.*\\b(\\w+\\\&.(iso|\fBISO\fP))\\b\&.*$/\\1/' <<< '${CLI}')"
+Definition at line 248 of file mkgentoo\&.sh\&.
+.SS "Exported String ISOLINUX_DIR = isolinux"
 
 .PP
-Definition at line 198 of file mkgentoo\&.sh\&.
+Definition at line 591 of file mkgentoo\&.sh\&.
 .SS "Exported String PATH = ${PATH}:${VBPATH}"
 
 .PP
-Definition at line 657 of file mkgentoo\&.sh\&.
+Definition at line 855 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for gentoo-creator from the source code\&.
