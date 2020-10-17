@@ -1,5 +1,11 @@
 #!/bin/bash
-[ -z ${CLONEZILLACD} || -z ${VMPATH} ] && logger "Export the CLONEZILLACD and VMPATH variables before running this script." && exit -1
+if [ -z ${CLONEZILLACD} ] || [ -z ${VMPATH} ]
+then
+    logger "Export the CLONEZILLACD and VMPATH variables \
+before running this script."
+    exit -1
+fi
+
 export VMPATH=$PWD/..
 export DOWNLOAD_CLONEZILLA="true"
 /bin/bash fetch_clonezilla_iso.sh

@@ -36,7 +36,9 @@
 
 create_options_array() {
     IFS=';'
-    read -r -a A <<< $(awk -F"\"" '{if ( ! match($1, "#")  && $1 != "") printf "%s;%s;%s;%s;",$2,$4,$6,$8}' options)
+    read -r -a A <<< $(awk -F"\"" \
+     '{if ( ! match($1, "#")  && $1 != "") printf "%s;%s;%s;%s;",$2,$4,$6,$8}' \
+       options)
     export A
 }
 
@@ -229,7 +231,7 @@ cdrecord=/path/to/cdrecord/executable"
 create_install_usb_device() {
     res=0
     logger -s "[INF] Creating installation stick..."
-    dd if="${ISO_OUTPUT}" of=/dev/${USB_DEVICE} bs=4M status=progress
+    dd if="${ISO_OUTPUT}" of=/dev/${DEVICE_INSTALLER} bs=4M status=progress
     res=$?
     sync
     res=$? | res

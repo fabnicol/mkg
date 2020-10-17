@@ -31,7 +31,7 @@
 ## @li Set a set of per-package use files and keywords @n
 ## @li Oneshot emerge of @b cmake and @b lz4, prerequisites to
 ## <tt> world </tt> update.
-## @li Update <tt> world </tt>. Log into emerge.build. Exit on error. @n
+## @li Update <tt> world </tt>. Log into emerge.build. Exit on error.
 ## @li Set keymaps, localization and time
 ## @todo Add more regional options by parametrization of commandline
 ## @retval -1 on error at <tt>emerge</tt> stage.
@@ -349,6 +349,8 @@ global_config() {
 ## @ingroup mkFileSystem
 
 finalize() {
+
+    umount -l /boot
 
     # Final steps: cleaning up
 

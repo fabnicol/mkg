@@ -45,13 +45,13 @@ setup_network() {
             dhclient
         else
 
-            # Workaround a VirtualBox bug, you need a keyboard input here of some sort.
-            # This is why we wait some time in mkgentoo.sh
+            # Workaround a VirtualBox bug, you need a keyboard input here of
+            # some sort.  This is why we wait some time in mkgentoo.sh
 
             read -p "[MSG] Waiting for keyboard input..."  input_str
             echo "[MSG] Got input string: $input_str" | tee setup_network.log
             echo "[INF] Running dhcpcd..."            | tee setup_network.log
-            dhcpcd -HD $(ifconfig | cut -d' ' -f1     | head -n 1 | cut -d':' -f1)
+            dhcpcd -HD $(ifconfig | cut -d' ' -f1   | head -n 1 | cut -d':' -f1)
         fi
     fi
     res=$?
@@ -63,23 +63,33 @@ setup_network() {
 
 
 ## @fn partition()
-## @brief Create partition table, \b /dev/sda1 (bios_grub), \b /dev/sda2 (boot), \b dev/sda3 (swap) and \b /dev/sda4 (system)
+## @brief Create partition table, \b /dev/sda1 (bios_grub), \b /dev/sda2 (boot),
+##        \b dev/sda3 (swap) and \b /dev/sda4 (system)
 ## @details Create file \b partition. @n
 ##  On error, fill this file with successive exit codes of commands and exit.@n
 ##  On success, just create empty file.
-## @warning The VM needs time to recognize /dev/sda in some cases, for unclear reasons.
+## @warning The VM needs time to recognize /dev/sda in some cases, for unclear
+##          reasons.
 ## This may be a kernel issue or a VirtualBox issue.
-## @bug  Same issue with mkswap and swapon. Cleaning VBox config/settings, syncing and a bit of sleep fixed these issues for the \e net-setup method.
-## @bug However if vm type is \e 'headless' the \e dhcpcd method is consistently hampered by a VBox bug, which is tentatively circumvented
+## @bug  Same issue with mkswap and swapon. Cleaning VBox config/settings,
+## syncing and a bit of sleep fixed these issues for the \e net-setup method.
+## @bug However if vm type is \e 'headless' the \e dhcpcd method is consistently
+## hampered by a VBox bug, which is tentatively circumvented
 ## by sending a `controlvm keyboardputscancode 1c` instruction.
-## Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated
-## owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are
-## mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a `read`command, all
-## falls back into place. This is why using the net-setup script, which forces user input, circumvents the issue.
-## This may be caused by an aging kernel and/or incompatibilities with virtualization.
-## Using a CloneZilla CD as a replacement solved the issue completely yet would need a redraft of much of the code.
+## Tests show that this is linked to a requested user keyboard or mouse input by
+## the Gentoo minimal install CD. This cannot be simulated
+## owing to the lack of /dev/uinput. The reason why user input is requested has
+## not been found. Without it, /dev/sda2 and/or sda4 are
+## mistakenly identified as being mounted and/or busy, while this cannot be the
+## case. With even a single keystroke for a `read`command, all
+## falls back into place. This is why using the net-setup script, which forces
+## user input, circumvents the issue.
+## This may be caused by an aging kernel and/or incompatibilities with
+## virtualization.
+## Using a CloneZilla CD as a replacement solved the issue completely.
 ## It might be better to use a beefed-up Gentoo install CD.
-## @note It might be necessary with older machines to increase the amount of sleep.
+## @note It might be necessary with older machines to increase the amount of
+## sleep.
 ## @ingroup mkFileSystem
 
 partition() {
@@ -147,7 +157,8 @@ partition() {
 }
 
 ## @fn install_stage3()
-## @details @li Copy stage3 archive, ebuild list, kernel config and mkvm_chroot.sh to /mnt/gentoo
+## @details @li Copy stage3 archive, ebuild list, kernel config and
+##              mkvm_chroot.sh to /mnt/gentoo
 ## @li Extract it, fix basic make.conf options
 ## @li Install repos.conf from liveCD (networking parameters)
 ## @li Mount liveCD proc/sys/dev files into new filesystem
@@ -194,13 +205,15 @@ install_stage3() {
     echo 'L10N="fr en"'    >> ${m_conf}
     echo 'LINGUAS="fr en"' >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
-    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager elogind -consolekit -systemd dbus X"' >>  ${m_conf}
+    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager \
+elogind -consolekit -systemd dbus X"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=${EMIRRORS}"  >> ${m_conf}
 
     # note linux-fw-redistributable no-source-code for genkernel
     # note bh-luxi for font-bh-* requested by xorg-x11
 
-    echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code bh-luxi"' >> ${m_conf}
+    echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code \
+bh-luxi"' >> ${m_conf}
     echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
     echo 'VIDEO_CARDS="nouveau intel"'   >> ${m_conf}
     echo 'INPUT_DEVICES="evdev synaptics"' >> ${m_conf}
@@ -252,6 +265,7 @@ finalize() {
     umount -R -l  /mnt/gentoo
     chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}
     umount -l /dev/sda4
+    fsck -AR -y
     shutdown -h now
 }
 

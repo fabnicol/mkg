@@ -115,6 +115,54 @@ unset A
 
 declare -i -r ARRAY_LENGTH=$((${#ARR[*]}/4))
 
+
+## @fn help_md()
+## @brief Print usage in markdown format
+## @ingroup createInstaller
+
+help_md() {
+    echo "**USAGE:**  "
+    echo "**mkgentoo**  [[switch=argument]...]  filename.iso  [1]  "
+    echo "**mkgentoo**  [[switch=argument]...]                [2]  "
+    echo "**mkgentoo**  help[=md]                             [3]  "
+    echo "  "
+    echo "Usage [1] creates a bootable ISO output file with a current Gentoo \
+distribution.  "
+    echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine \
+with name Gentoo.  "
+    echo "Usage [3] prints this help, in markdown form if argument 'md' is \
+specified.  "
+    echo "Warning: you should have at least 55 GB of free disk space in the \
+current directory or in vmpath if specified.  "
+    echo "  "
+    echo "**Switches:**  "
+    echo "  "
+    echo "Boolean values are either 'true' or 'false'. For example, to build a \
+minimal distribution, specify:  "
+    echo ">  minimal=true  "
+    echo "  "
+    echo "on command line.  "
+    echo "  "
+    echo " | Option | Description | Default value |  "
+    echo " |:-----:|:--------:|:-----:|:---------:|  "
+    declare -i i
+    for ((i=0; i<ARRAY_LENGTH; i++)); do
+        declare -i sw=i*4       # no spaces!
+        declare -i desc=i*4+1
+        declare -i def=i*4+2
+        declare -i type=i*4+3
+        echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [${ARR[def]}] | ${ARR[type]}|"
+    done
+}
+
+## @fn help_()
+## @brief Print usage to stdout
+## @ingroup createInstaller
+
+help_() {
+    help_md | sed 's/[\*\|\>]//g'
+}
+
 ## @fn validate_option()
 ## @brief Check if argument is part of array #ARR as a legitimate commandline
 ##        option.
@@ -133,6 +181,11 @@ validate_option() {
 
 # parse command line. All arguments must be in the form a=true/false except
 # for help, file.iso. But 'a' can be used as shorthand for 'a=true'
+
+# Help cases: bail out
+
+grep -q 'help_md' <<< "$@" &&  help_md && exit 0
+grep -q 'help'    <<< "$@" &&  help_ && exit 0
 
 while (( "$#" ))
 do
@@ -214,8 +267,8 @@ package."; do_exit=true; }
         do_exit=true; }
     [ -z "$(sed --version)" ] && { logger -s "[ERR] Did not find sed."
                                    do_exit=true; }
-    [ -z "$(which xorriso)" ] && \
-        { logger -s "[ERR] Did not find xorriso (libburnia project)"
+    [ -z "$(which xorriso)" ] \
+        && { logger -s "[ERR] Did not find xorriso (libburnia project)"
           do_exit=true; }
 
     # Check VirtualBox version
@@ -399,52 +452,6 @@ third-party applications for this mail to be sent."
     fi
 
     "${GUI}" && VMTYPE="gui" || VMTYPE="headless"
-}
-
-## @fn help_md()
-## @brief Print usage in markdown format
-## @ingroup createInstaller
-
-help_md() {
-    echo "**USAGE:**  "
-    echo "**mkgentoo**  [[switch=argument]...]  filename.iso  [1]  "
-    echo "**mkgentoo**  [[switch=argument]...]                [2]  "
-    echo "**mkgentoo**  help[=md]                             [3]  "
-    echo "  "
-    echo "Usage [1] creates a bootable ISO output file with a current Gentoo \
-distribution.  "
-    echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine \
-with name Gentoo.  "
-    echo "Usage [3] prints this help, in markdown form if argument 'md' is \
-specified.  "
-    echo "Warning: you should have at least 55 GB of free disk space in the \
-current directory or in vmpath if specified.  "
-    echo "  "
-    echo "**Switches:**  "
-    echo "  "
-    echo "Boolean values are either 'true' or 'false'. For example, to build a \
-minimal distribution, specify:  "
-    echo ">  minimal=true  "
-    echo "  "
-    echo "on command line.  "
-    echo "  "
-    echo " | switch | description | default value |  "
-    echo " |:-----:|:--------:|:-----:|  "
-    declare -i i
-    for ((i=0; i<ARRAY_LENGTH; i++)); do
-        declare -i sw=i*4       # no spaces!
-        declare -i desc=i*4+1
-        declare -i def=i*4+2
-        echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [${ARR[def]}] |  "
-    done
-}
-
-## @fn help_()
-## @brief Print usage to stdout
-## @ingroup createInstaller
-
-help_() {
-    help_md | sed 's/[\*\|\>]//g'
 }
 
 ## @fn fetch_livecd()
@@ -729,7 +736,7 @@ deep_clean() {
 
     logger -s "[INF] Cleaning up hard disks in config file because of \
 inconsistencies in VM settings"
-    local registry=/root/.config/VirtualBox/VirtualBox.xml
+    local registry="/root/.config/VirtualBox/VirtualBox.xml"
     if grep -q "${VM}.vdi" ${registry}
     then
         logger -s "[MSG] Disk ${VM}.vdi is already registered and needs to be \
@@ -748,11 +755,11 @@ clean: " reply || reply="Y"
     fi
     /etc/init.d/virtualbox stop
     sleep 5
-    sed -i  '/^.*HardDisk.*$/d' registry
-    sed -i -E  's/^(.*)<MediaRegistry>.*$/\1<MediaRegisty\/>/g' registry
-    sed -i '/^.*<\/MediaRegistry>.*$/d' registry
-    sed -i  '/^[[:space:]]*$/d' registry
-    "${VERBOSE}" && cat  registry
+    sed -i  '/^.*HardDisk.*$/d' ${registry}
+    sed -i -E  's/^(.*)<MediaRegistry>.*$/\1<MediaRegisty\/>/g' ${registry}
+    sed -i '/^.*<\/MediaRegistry>.*$/d' ${registry}
+    sed -i  '/^[[:space:]]*$/d' ${registry}
+    "${VERBOSE}" && cat  ${registry}
 
     # it is necessary to sleep a bit otherwise doaemons will wake up
     # with inconstitencies
@@ -799,7 +806,7 @@ delete_vm() {
 
     local res=$?
 
-    if [ ${res} != 0 ]
+    if [ ${res} != 0 ] || "${FORCE}"
     then
 
         # last resort.
@@ -848,7 +855,7 @@ delete_vm() {
 
     # deep clean again!
 
-    [ ${res} != 0 ] && deep_clean "$3"
+    { [ ${res} != 0 ] || "${FORCE}"; } && deep_clean "$3"
     return ${res}
 }
 
@@ -871,7 +878,6 @@ create_vm() {
     export PATH=${PATH}:${VBPATH}
     cd ${VMPATH}
     delete_vm "${VM}" "vdi"
-    local MEDIUM_UUID=`uuid`
 
     # create and register VM
 
@@ -905,11 +911,24 @@ create_vm() {
                              --firmware ${FIRMWARE} 2>&1 \
                              | xargs echo "[MSG]")
 
-    # create virtual VDI disk
+    # create virtual VDI disk, if it does not exist
 
-    logger -s <<< $(VBoxManage createmedium --filename "${VM}.vdi" \
-                             --size ${SIZE} \
-                             --variant Standard 2>&1 | xargs echo "[MSG]")
+    MEDIUM_UUID=$(VBoxManage showmediuminfo "${VM}.vdi"  | head -n1 \
+                      | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
+
+    [ -z "${MEDIUM_UUID}" ] && MEDIUM_UUID=`uuid`
+
+    if [ ! -f  "${VM}.vdi" ] || "${FORCE}"
+    then
+
+        logger -s <<< $(VBoxManage createmedium --filename "${VM}.vdi" \
+                                   --size ${SIZE} \
+                                   --variant Standard 2>&1 | xargs echo "[MSG]")
+    else
+        logger -s "[MSG] Using again old VDI disk: ${VM}.vdi, \
+UUID: ${MEDIUM_UUID}"
+        logger -s "[WAR] Hopefully size and caracteristics are correct."
+    fi
 
     # set disk UUID once and for all to avoid serious debugging issues
     # whilst several VMS are around, some in zombie state, with
@@ -1022,10 +1041,10 @@ clonezilla_to_iso() {
             -boot-load-size 4   -boot-info-table   -eltorito-alt-boot  \
             -e boot/grub/efi.img \
             -no-emul-boot   -isohybrid-gpt-basdat   -o "$1"  "$2"
-    [ $? != 0 ] \
-    && { logger -s "[ERR] Could not create ISO image from ISO package \
+    [ $? = 0 ] && return 0 || {
+            logger -s "[ERR] Could not create ISO image from ISO package \
 creation directory"
-        exit -1; }
+            exit -1; }
 }
 
 ## @fn process_clonezilla_iso()
@@ -1077,17 +1096,17 @@ folder ISOFILES"
 mkdir -p  /boot
 apt update -yq
 apt upgrade -yq <<< 'N'
-headers="\$(apt-cache search ^linux-headers-[5-9]+.*generic \
-| tail -n1 | grep -v unsigned |  cut -f 1 -d' ')"
-kernel="\$(apt-cache  search ^linux-image-[5-9]+.*generic   \
-| tail -n1 | grep -v unsigned |  cut -f 1 -d' ')"
-modules="\$(apt-cache search ^linux-modules-[5-9]+.*generic \
-| tail -n1 | grep -v unsigned |  cut -f 1 -d' ')"
+headers="\$(apt-cache search ^linux-headers-[5-9]\.[0-9]+.*generic \
+| head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
+kernel="\$(apt-cache  search ^linux-image-[5-9]\.[0-9]+.*generic   \
+| head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
+modules="\$(apt-cache search ^linux-modules-[5-9]\.[0-9]+.*generic \
+| head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
 apt install -qy "\${headers}"
 apt install -qy "\${kernel}"
 apt install -qy "\${modules}"
 apt install -qy build-essential gcc <<< "N"
-apt install -qy virtualbox virtualbox-dkms
+apt install -qy virtualbox virtualbox-modules virtualbox-dkms
 apt install -qy virtualbox-guest-additions-iso
 mount -oloop /usr/share/virtualbox/VBoxGuestAdditions.iso /mnt
 cd /mnt
@@ -1178,9 +1197,19 @@ build_virtualbox() {
 
 create_iso_vm() {
     cd ${VMPATH}
+
+    # adding user to group vboxusers is recommended although not strictly
+    # necessary here
+
     gpasswd -a ${USER} -g vboxusers
     chgrp vboxusers "ISOFILES/home/partimag"
+
+    # cleaning up
+
     delete_vm "${ISOVM}" "vdi" "ISO_STAGE"
+
+    # creating ISO VM
+
     logger -s <<< $(VBoxManage createvm \
                --name "${ISOVM}" \
                --ostype Ubuntu_64 \
@@ -1211,14 +1240,24 @@ create_iso_vm() {
                --bootable on 2>&1 \
                 | xargs echo "[MSG]")
 
-    # set disk UUID once and for all to avoid serious debugging issues
-    # whils several VMS are around, some in zombie state, with
-    # same-name disks floating around with different UUIDs and
-    # registration issues
+    # # set disk UUID once and for all to avoid serious debugging issues
+    # # whils several VMS are around, some in zombie state, with
+    # # same-name disks floating around with different UUIDs and
+    # # registration issues
 
-    local MEDIUM_UUID=`uuid`
-    logger -s <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" \
-                    ${MEDIUM_UUID} 2>&1 | xargs echo "[MSG]")
+    if [ -z ${MEDIUM_UUID} ]
+    then
+        "${FROM_VM}" && logger -s "[MSG] Setting new UUID for VDI disk." \
+        || logger -s "[WAR] Could not use again VDI uuid. Setting a new one."
+
+        local MEDIUM_UUID=$(VBoxManage showmediuminfo "${VM}.vdi"  \
+                            | head -n1 | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
+
+        logger -s <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" \
+                               ${MEDIUM_UUID} 2>&1 | xargs echo "[MSG]")
+    else
+        logger -s "[MSG] UUID of ${VM}.vdi will be used again: ${MEDIUM_UUID}"
+    fi
 
     logger -s <<< $(VBoxManage storageattach "${ISOVM}" \
                --storagectl "SATA Controller" \
@@ -1256,11 +1295,9 @@ create_iso_vm() {
                                --automount \
                                --auto-mount-point "/home/partimag"  2>&1 \
                         | xargs echo "[MSG]")
-    #               --transient
 
     logger -s <<< $(VBoxManage startvm "${ISOVM}" \
-               --type ${VMTYPE} 2>&1 \
-                | xargs echo "[MSG]")
+                    --type ${VMTYPE} 2>&1 | xargs echo "[MSG]")
 
     while test_vm_running ${ISOVM}
     do
@@ -1534,11 +1571,6 @@ send_mail() {
 ## @ingroup createInstaller
 
 main() {
-
-# Help cases
-
-grep -q 'help_md' <<< "$@" &&  help_md && exit 0
-grep -q 'help'    <<< "$@" &&  help_ && exit 0
 
 # Analyse commandline and source auxiliary files
 

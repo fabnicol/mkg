@@ -12,8 +12,11 @@ get_gentoo_install_iso() {
     rm install-${PROCESSOR}-minimal*\.iso*
     rm latest-install-${PROCESSOR}-minimal*\.txt*
     local downloaded=""
-    curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-install-${PROCESSOR}-minimal.txt ${verb}
-    [ $? != 0 ] && logger -s "[ERR] Could not download live CD from Gentoo mirror" && exit -1
+    curl -L -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/\
+latest-install-${PROCESSOR}-minimal.txt" ${verb}
+    [ $? != 0 ] \
+        && { logger -s "[ERR] Could not download live CD from Gentoo mirror"
+             exit -1; }
     local current=$(cat latest-install-${PROCESSOR}-minimal.txt \
                         | grep "install-${PROCESSOR}-minimal.*.iso" \
                         | sed -E 's/iso.*$/iso/' )
@@ -121,18 +124,23 @@ fetch_clonezilla_iso() {
 
     # now cleanup, mount and copy CloneZilla live CD
 
-    [ ! -d mnt ]  &&  mkdir mnt   ||  { mountpoint mnt && umount -l mnt; rm ${verb} -rf mnt; }
+    [ ! -d mnt ]  &&  mkdir mnt   ||  { mountpoint mnt && umount -l mnt
+                                        rm ${verb} -rf mnt && mkdir mnt; }
     [ ! -d mnt2 ] &&  mkdir mnt2 »||  rm ${verb} -rf mnt2
 
     "${VERBOSE}"  && logger -s "[INF] Mounting CloneZilla CD ${CLONEZILLACD}"
     mount -oloop "${CLONEZILLACD}" ./mnt  \
-     	|| { logger -s "[ERR] Could not mount ${CLONEZILLACD} to mnt"; exit -1; }
-    "${VERBOSE}" && logger -s "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."
+     	|| { logger -s "[ERR] Could not mount ${CLONEZILLACD} to mnt"
+             exit -1; }
+    "${VERBOSE}" \
+        && logger -s "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."
     rsync ${verb} -a ./mnt/ mnt2 \
-    	|| { logger -s "[ERR] Could not copy clonezilla files to mnt2"; exit -1; }
+    	|| { logger -s "[ERR] Could not copy clonezilla files to mnt2"
+             exit -1; }
     cd mnt2/live
     unsquashfs filesystem.squashfs \
-       || { logger -s "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"; exit -1; }
+      || { logger -s "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"
+             exit -1; }
     cp ${verb} -f /etc/resolv.conf squashfs-root/etc
     cd "${VMPATH}"
     return 0
