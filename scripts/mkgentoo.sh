@@ -100,8 +100,12 @@ create_options_array
 ## @li @b f  An existing file
 ## @li @b n  Numeric value
 ## @li @b o  'on' or 'off', a VBoxManage custom Boolean
-## @li @b s  String
+## @li @b s  Non-empty string. Corresponding defaults may be empty however.
+##           This is the notably case for passwords. For such options, explicit
+##           commandline value after '=' is requested.
 ## @li @b u  Url
+## @li @b x:y Conditional type x: one of the above, with [ -z "$x" ]
+##            <=> { [ "$y" = "false" ] ||  [ -z "$y" ]; } && [ "$y" != "true" ]
 ## A double-entry array will be simulated using indexes.
 ## @ingroup createInstaller
 ## @note `debug_mode` should be place up front in the array
@@ -306,8 +310,6 @@ ISO output ${ISO_OUTPUT}"
     return 0
 }
 
-
-
 ## @fn test_cli()
 ## @brief Analyse commandline
 ## @param cli  Commandline
@@ -326,15 +328,17 @@ test_cli() {
     local type=${ARR[i*4+3]}
     local cli_arg=false
     declare -u V=${sw}
+    local y=$(sed '/.*:/d' "${type}")
+    local cond="${!y^^}"
 
     # debug_mode should be placed on top of ARR
 
     if [ -n "${!V}" ]
     then
-
-       # checking on types among values found on commandline
-
         "${DEBUG_MODE}" && logger -s "[CLI] ${desc} = ${!V}" | sed 's/\\t //'
+
+        # checking on types among values found on commandline
+
         case "${type}" in
             b)  if  [ "${!V}" != "true" ] && [ "${!V}" != "false" ]
                 then
@@ -362,12 +366,62 @@ possible values."
                     exit -1; } ;;
             u)  [ test_URL "${!V}" != 0 ] \
                     && { logger -s "[ERR] ${sw}=... must be a valid URL"
-                    exit -1; } ;;
+                         exit -1; } ;;
+
+            # conditional types of the form e/f/s:...
+
+            *:*)
+                 if [ "${cond}" != "true" ] && { [ "${cond}" = "false" ] \
+                                                     || [ -z "${cond}" ]; }
+                 then
+                     if [ -z "${cond}" ]
+                     then
+                         logger -s "[ERR] Execution cannot proceed without \
+specifying an explicit value for ${y}=..."
+                     else
+                         logger -s "[ERR] Execution cannot proceed as option
+values for ${y}=false and ${dw}=${!V} are incompatible."
+                     fi
+                     logger -s "[ERR] Fatal. Exiting..."
+                     exit -1
+                 fi
+
+        # [ -z "${!V}" ] <=> { [ "${cond}" = "false" ]
+                 # ||  [ -z "${cond}" ]; } && [ "${cond}" != "true" ]
+
         esac
     else
+        if [ "${cond}" = "true" ] || { [ "${cond}" != "false" ] \
+                                           &&  [ -n "${cond}" ]; }
+        then
+            logger -s "[ERR] Execution cannot proceed without an explicit value \
+ for ${dw}=... as ${y}=${cond}"
+            logger -s "[ERR] Fatal. Exiting..."
+            exit -1
+        fi
 
         # not found on command line or erroneously empty
-        # replacing by default in any case
+        # replacing by default in any case, except if type == "s"
+        # and default empty. This is the case e.g. for passwds.
+
+        if [ "${type}" = "s" ] && [ -z "${default}" ]
+        then
+            logger -s "[ERR] Execution cannot proceed without explit value for \
+${dw}"
+            if "${interactive}"
+            then
+                local reply=""
+                while [ -z ${reply} ]
+                do
+                    logger -s "[MSG] Please enter value: "
+                    read reply
+                    eval "${V}"="${reply}"
+                done
+            else
+                logger -s "[ERR] Fatal. Exiting..."
+                exit -1
+            fi
+        fi
 
         "${DEBUG_MODE}" \
             && logger -s "[CLI] Default: ${desc} = ${default}" | sed 's/\\t //'
@@ -375,6 +429,7 @@ possible values."
     fi
 
     # exporting is made necessary by usage in companion scripts.
+
     "${DEBUG_MODE}" && logger -s "[MSG] Export: ${V}"
     export "${V}"
 }
@@ -443,7 +498,8 @@ disk ${VMPATH}/${VM}.vdi was not found"
     # ${ELIST}.accept_keywords defaulting to ebuilds.list.accept_keywords
 
     sed -i '/dev-lang\/R.*$/d'  "${ELIST}.accept_keywords"
-    echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}" >> "${ELIST}.accept_keywords"
+    echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}" \
+         >> "${ELIST}.accept_keywords"
 
     if [ -n "${EMAIL}" ]
     then

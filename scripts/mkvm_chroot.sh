@@ -233,7 +233,8 @@ install_software() {
     echo 'install.packages(c("data.table", "dplyr", "ggplot2",\
 "bit64", "devtools", "rmarkdown"))' > libs.R
 
-   { Rscript libs.R 2>&1 && rm -f libs.R; } | tee Rlibs.log
+    ! "${MINIMAL}" && { Rscript libs.R 2>&1 | tee Rlibs.log
+                        rm -f libs.R; }
 
     # update environment
 
