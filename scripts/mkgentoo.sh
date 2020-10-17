@@ -1038,6 +1038,8 @@ clonezilla_to_iso() {
     local verb=""
     "${VERBOSE}" && verb="-v"
 
+    rm ${verb} -rf "$2/live/squashfs-root/"
+
     [ ! -f "$2/syslinux/isohdpfx.bin" ] \
          && cp ${verb} -f "clonezilla/syslinux/isohdpfx.bin" "$2/syslinux"
 
@@ -1101,6 +1103,13 @@ folder ISOFILES"
 mkdir -p  /boot
 apt update -yq
 apt upgrade -yq <<< 'N'
+
+# We take the oldest supported 5.x linux headers, modules and images
+# Sometimes the most recent ones are not aligned with VB wrt. building.
+# Sometimes current CloneZilla kernel has no corresponding apt headers
+# So replacing with common base for which headers are available and
+# compilation issues probably lesser
+
 headers="\$(apt-cache search ^linux-headers-[5-9]\.[0-9]+.*generic \
 | head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
 kernel="\$(apt-cache  search ^linux-image-[5-9]\.[0-9]+.*generic   \
@@ -1140,12 +1149,9 @@ EOF
 
     # clean up and restore squashfs back
 
-    rm -rf squashfs-root/boot
     rm -vf filesystem.squashfs
     for i in proc sys dev run; do umount squashfs-root/$i; done
     mksquashfs squashfs-root filesystem.squashfs
-    rm -rf squashfs-root/
-
     # add 'savedisk' config file and create ISO
 
     cd "${VMPATH}"
@@ -1245,10 +1251,10 @@ create_iso_vm() {
                --bootable on 2>&1 \
                 | xargs echo "[MSG]")
 
-    # # set disk UUID once and for all to avoid serious debugging issues
-    # # whils several VMS are around, some in zombie state, with
-    # # same-name disks floating around with different UUIDs and
-    # # registration issues
+    # set disk UUID once and for all to avoid serious debugging issues
+    # whils several VMS are around, some in zombie state, with
+    # same-name disks floating around with different UUIDs and
+    # registration issues
 
     if [ -z ${MEDIUM_UUID} ]
     then
