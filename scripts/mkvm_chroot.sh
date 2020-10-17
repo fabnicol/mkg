@@ -47,15 +47,20 @@ adjust_environment() {
     echo "Partition /dev/sda2 with ${uuid2}" | tee partition_log
     echo "Partition /dev/sda3 with ${uuid3}" | tee partition_log
     echo "Partition /dev/sda4 with ${uuid4}" | tee partition_log
-    echo "${uuid2} /boot           vfat defaults            0 2"  >  /etc/fstab
-    echo "${uuid3} none            swap sw                  0 0"  >> /etc/fstab
-    echo "${uuid4} /               ext4 defaults            0 1"  >> /etc/fstab
-    echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"    >> /etc/fstab
+    echo "${uuid2} /boot           vfat defaults            0 2" \
+         >  /etc/fstab
+    echo "${uuid3} none            swap sw                  0 0" \
+         >> /etc/fstab
+    echo "${uuid4} /               ext4 defaults            0 1" \
+         >> /etc/fstab
+    echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"   \
+         >> /etc/fstab
     source /etc/profile
 
-    # Refresh and rebuild @world frequently emerge complains about having to be
-    # upgraded before anything else.  We shall use emerge-webrsync as emerge
-    # --sync is a bit less robust (rsync rotation bans...)
+    # Refresh and rebuild @world frequently emerge complains about
+    # having to be upgraded before anything else.  We shall use
+    # emerge-webrsync as emerge --sync is a bit less robust (rsync
+    # rotation bans...)
 
     emerge-webrsync
     ! emerge -1 sys-apps/portage \
@@ -78,41 +83,45 @@ adjust_environment() {
 
     mkdir -p /etc/portage/package.accept_keywords
     mkdir -p /etc/portage/package.use
-    cp -vf "${ELIST}.accept_keywords" /etc/portage/package.accept_keywords/ \
+    cp -vf "${ELIST}.accept_keywords" \
+       /etc/portage/package.accept_keywords/ \
         | tee emerge.build
 
     cp -vf "${ELIST}.use"             /etc/portage/package.use/ \
         |  tee emerge.build
 
-    cp -vf "${ELIST}.accept_keywords" /etc/portage/package.accept_keywords/ \
+    cp -vf "${ELIST}.accept_keywords" \
+       /etc/portage/package.accept_keywords/ \
         |  tee emerge.build
 
-    # One needs to build cmake without the qt5 USE value first, otherwise
-    # dependencies cannot be resolved.
+    # One needs to build cmake without the qt5 USE value first,
+    # otherwise dependencies cannot be resolved.
 
     USE='-qt5' emerge -1 cmake
     [ $? != 0 ] \
         && { logger -s "emerge cmake failed!" | tee emerge.build
         return -1; }
 
-    # add logger. However it will not be usable for now, this is why we are
-    # using custom logs and tee's.
+    # add logger. However it will not be usable for now,
+    # this is why we are using custom logs and tee's.
 
     emerge -uD app-admin/sysklogd
     rc-update add sysklogd default
 
-    # other core sysapps to be merged first. LZ4 is a kernel dependency for
-    # newer linux kernels.
+    # other core sysapps to be merged first. LZ4 is a kernel
+    # dependency for newer linux kernels.
 
-    emerge -u app-arch/lz4 emerge net-misc/netifrc emerge sys-apps/pcmciautils
-    [ $? != 0 ] && logger -s "[ERR] emerge netifrs/pcmiautils failed!" \
+    emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
+    [ $? != 0 ] && logger -s "[ERR] emerge netifrs/pcmiautils failed!"\
             | tee emerge.build
 
-    # Now on to updating @world set. Be patient and wait for about 15-24 hours
+    # Now on to updating @world set. Be patient and wait for about
+    # 15-24 hours
     # as syslogd is not yet there we tee a custom build log
 
     emerge -uDN @world 2>&1 | tee emerge.build
-    [ $? != 0 ] && { logger -s "[ERR] emerge @world failed!"  | tee emerge.build
+    [ $? != 0 ] && {
+        logger -s "[ERR] emerge @world failed!"  | tee emerge.build
         return -1; }
 
     # Networking in the new environment
@@ -158,7 +167,8 @@ build_kernel() {
 
     # Building the kernel
 
-    emerge gentoo-sources sys-kernel/genkernel pciutils | tee kernel.log
+    emerge gentoo-sources sys-kernel/genkernel pciutils \
+        | tee kernel.log
 
     # Now mount the new boot partition
 
@@ -181,13 +191,14 @@ build_kernel() {
             || { logger -s "[ERR] Kernel compilation failed!"
                  return -1; }
     [ -f /boot/initr*.img ] && logger -s "[ERR] initramfs was built" \
-                            || { logger -s "[ERR] initramfs compilation failed!"
-                                 return -1; }
+                  || { logger -s "[ERR] initramfs compilation failed!"
+                       return -1; }
 }
 
 ## @fn install_software()
 ## @details
-## @li Emerge list of ebuilds on top of stage3 and system utils already merged.
+## @li Emerge list of ebuilds on top of stage3 and system utils
+##     already merged.
 ## @li Optionaly download and build RStudio
 ## @retval -1 on building errors
 ## @todo Add a script to build R dependencies
@@ -195,7 +206,8 @@ build_kernel() {
 
 install_software() {
 
-    # to avoid corruption cases of ebuild list caused by Windows editing
+    # to avoid corruption cases of ebuild list
+    # caused by Windows editing
 
     cd /
     emerge dos2unix  | tee log_install_software.log
@@ -215,8 +227,13 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN ${packages}  2>&1 | tee log_install_software.log
-    [ $? != 0 ] && { logger -s "[ERR] Main package build step failed!" \
+    [ $? != 0 ] && { logger -s "[ERR] Main package build step failed" \
                          | tee log_install_software.log; return -1; }
+
+    echo 'install.packages(c("data.table", "dplyr", "ggplot2",\
+"bit64", "devtools", "rmarkdown"))' > libs.R
+
+   { Rscript libs.R 2>&1 && rm -f libs.R; } | tee Rlibs.log
 
     # update environment
 
@@ -226,13 +243,13 @@ install_software() {
     # optionally build RStudio and R dependencies (TODO)
 
     ! "${DOWNLOAD_RSTUDIO}" && { logger -s "[MSG] No RStudio build" \
-                                    | tee log_install_software.log; return -1; }
+         | tee log_install_software.log; return -1; }
 
     mkdir /Build
     cd /Build
     wget ${GITHUBPATH}${RSTUDIO}.zip
     [ $? != 0 ] && { logger -s "[ERR] RStudio download failed!" \
-                         | tee log_install_software.log; return -1; }
+                | tee log_install_software.log; return -1; }
     logger -s "[INF] Building RStudio" | tee log_install_software.log
     unzip *.zip
     cd rstudio*
@@ -246,7 +263,8 @@ install_software() {
     cmake .. -DRSTUDIO_TARGET=Desktop \
           -DCMAKE_BUILD_TYPE=Release \
           -DRSTUDIO_USE_SYSTEM_BOOST=1 \
-          -DQT_QMAKE_EXECUTABLE=1  2>&1   | tee log_install_software.log
+          -DQT_QMAKE_EXECUTABLE=1  2>&1  \
+        | tee log_install_software.log
     make -j${NCPUS} 2>&1 | tee log_install_software.log
     make -k install 2>&1 | tee log_install_software.log
     res=$?
@@ -270,7 +288,8 @@ install_software() {
 ## @li Adjust group and \b sudo settings for non-root user and \b sddm
 ## @li Install \b grub in EFI mode.
 ## @li Set passwords for root and non-root user.
-## @warning Fix \b sddm startup keyboard issue using <tt> setxkbmap</tt>
+## @warning Fix \b sddm startup keyboard issue using
+##          <tt> setxkbmap</tt>
 ## @ingroup mkFileSystem
 
 global_config() {
@@ -283,9 +302,9 @@ global_config() {
 
     # kernel sources will have to be reinstalled by user if necessary
 
-    emerge --unmerge gentoo-sources  2>&1 | tee log_uninstall_software.log
-    emerge --depclean                2>&1 | tee log_uninstall_software.log
-    rm -rf /usr/src/linux/*               | tee log_uninstall_software.log
+    emerge --unmerge gentoo-sources  2>&1 | tee log_uninstall.log
+    emerge --depclean                2>&1 | tee log_uninstall.log
+    rm -rf /usr/src/linux/*               | tee log_uninstall.log
     eix-update
 
     # Idealy the installers should do:
@@ -300,12 +319,13 @@ global_config() {
 
     # Configuration --- sddm
 
-    echo "#!/bin/sh"                   > /usr/share/sddm/scripts/Xsetup \
+    echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
         | tee log_uninstall_software.log
-    echo "setxkbmap ${LANGUAGE},us"    > /usr/share/sddm/scripts/Xsetup \
+    echo "setxkbmap ${LANGUAGE},us" > /usr/share/sddm/scripts/Xsetup \
         | tee log_uninstall_software.log
     chmod +x /usr/share/sddm/scripts/Xsetup
-    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' /etc/conf.d/xdm
+    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
+        /etc/conf.d/xdm
 
     #--- Services
 
@@ -356,7 +376,8 @@ finalize() {
 
     ! "${DEBUG_MODE}" &&  rm -f * && sed -i 's/^export .*$//g' .bashrc
 
-    # prepare to compact with vbox-img compact --filename ${VMPATH}/${VM}.vdi
+    # prepare to compact with vbox-img compact --filename
+    # ${VMPATH}/${VM}.vdi
 
     cat /dev/zero > zeros ; sync ; rm zeros
 }
