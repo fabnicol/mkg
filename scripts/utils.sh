@@ -217,9 +217,11 @@ cdrecord=/path/to/cdrecord/executable"
     else
          test_cdrecord
     fi
+    "${BLANK}" && BLANK='blank=fast' || BLANK=""
+    [ -z "${SCSI_ADDRESS}" ] && OPT="-eject ${BLANK}" \
+            || OPT="-eject ${BLANK} dev=${SCSI_ADDRESS}"
     logger -s "[INF] Burning installation medium to optical disc..."
-    [ -z "${SCSI_ADDRESS}" ] && ${CDRECORD} -eject  "${ISO_OUTPUT}" \
-        || ${CDRECORD} -eject dev=${SCSI_ADDRESS} "${ISO_OUTPUT}"
+    "${CDRECORD}" "${OPT}" "${ISO_OUTPUT}"
 }
 
 ## @fn create_install_usb_device()
