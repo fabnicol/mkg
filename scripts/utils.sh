@@ -231,7 +231,7 @@ cdrecord=/path/to/cdrecord/executable"
 create_install_usb_device() {
     res=0
     logger -s "[INF] Creating installation stick..."
-    dd if="${ISO_OUTPUT}" of=/dev/${DEVICE_INSTALLER} bs=4M status=progress
+    dd if="${ISO_OUTPUT}" of="/dev/${DEVICE_INSTALLER}" bs=4M status=progress
     res=$?
     sync
     res=$? | res

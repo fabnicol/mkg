@@ -197,7 +197,7 @@ do
         then
             declare -u VAR=${left}
             eval "${VAR}"="\"${right}\""
-            logger -s "[CLI] ${VAR}=${!VAR}"
+            logger -s "[CLI] Assign: ${VAR}=${!VAR}"
         fi
     else
         if  grep ".iso"  <<< "$1"
@@ -208,7 +208,7 @@ do
             then
                 declare -u VAR="$1"
                 eval "${VAR}"=true
-                logger -s "[CLI] ${VAR}=true"
+                logger -s "[CLI] Assign: ${VAR}=true"
             fi
         fi
     fi
@@ -329,11 +329,12 @@ test_cli() {
 
     # debug_mode should be placed on top of ARR
 
-    # checking on types
-
     if [ -n "${!V}" ]
     then
-        logger -s "[CLI] ${desc} = ${!V}" | sed 's/\\t //'
+
+       # checking on types among values found on commandline
+
+        "${DEBUG_MODE}" && logger -s "[CLI] ${desc} = ${!V}" | sed 's/\\t //'
         case "${type}" in
             b)  if  [ "${!V}" != "true" ] && [ "${!V}" != "false" ]
                 then
@@ -359,18 +360,22 @@ directory."
                    && { logger -s "[ERR] ${sw}=on or ${sw}=off are the only two \
 possible values."
                     exit -1; } ;;
-            s)  [ -z "${!V}" ] \
-                    && { logger -s "[ERR] ${sw}=... should not be empty."
-                    exit -1; } ;;
             u)  [ test_URL "${!V}" != 0 ] \
                     && { logger -s "[ERR] ${sw}=... must be a valid URL"
                     exit -1; } ;;
         esac
     else
+
+        # not found on command line or erroneously empty
+        # replacing by default in any case
+
         "${DEBUG_MODE}" \
-            && logger -s "[CLI] ${desc} = ${default}" | sed 's/\\t //'
+            && logger -s "[CLI] Default: ${desc} = ${default}" | sed 's/\\t //'
         eval "${V}"="\"${default}\""
     fi
+
+    # exporting is made necessary by usage in companion scripts.
+    "${DEBUG_MODE}" && logger -s "[MSG] Export: ${V}"
     export "${V}"
 }
 
@@ -1082,8 +1087,8 @@ process_clonezilla_iso() {
             && logger -s "[INF] Now copying CloneZilla files to temporary \
 folder ISOFILES"
         rsync ${verb} -a mnt2/ ISOFILES
-        cp ${verb} -f clonezilla/savedisk/isolinux.cfg ISOFILES/syslinux/
-        cd ISOFILES/live; }
+        cp ${verb} -f clonezilla/savedisk/isolinux.cfg mnt2/syslinux/
+        cd mnt2/live; }
 
     # prepare chroot in clonezilla filesystem
 
@@ -1128,7 +1133,7 @@ EOF
 
     chroot squashfs-root /bin/bash update_clonezilla.sh
 
-    # afet exit now back under live/. Update linux kernel:
+    # after exit now back under live/. Update linux kernel:
 
     cp -vf --dereference squashfs-root/boot/vmlinuz  vmlinuz
     cp -vf --dereference squashfs-root/boot/initrd.img  initrd.img
@@ -1149,8 +1154,7 @@ EOF
     # this first ISO image is a "save" one: from virtual disk to clonezilla
     # image
 
-    clonezilla_to_iso ${CLONEZILLACD} "ISOFILES"
-    rm -rf mnt2
+    clonezilla_to_iso ${CLONEZILLACD} "mnt2"
 }
 
 ## @fn build_virtualbox()
@@ -1196,6 +1200,7 @@ build_virtualbox() {
 ## @ingroup createInstaller
 
 create_iso_vm() {
+
     cd ${VMPATH}
 
     # adding user to group vboxusers is recommended although not strictly
@@ -1517,8 +1522,9 @@ cleanup() {
     cd ${VMPATH}
     rm ${verb} -f *.xz
     rm ${verb} -f *.txt
-    rm ${verb} -rf ISOFILES
-    [ -d mnt ]  && umount -l mnt && rmdir ${verb} mnt
+    rm ${verb} -rf ISOFILES/ mnt2/
+    mountpoint mnt && umount -l mnt/
+    [ -d mnt ]  && rmdir ${verb} -rf mnt
     [ -d mnt2 ] && rm ${verb} -rf mnt2
     [ -d "${VM}" ] && rm ${verb} -rf "${VM}"
     [ -d "${VM}_ISO" ] && rm ${verb} -rf "${VM}_ISO"

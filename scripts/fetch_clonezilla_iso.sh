@@ -126,7 +126,7 @@ fetch_clonezilla_iso() {
 
     [ ! -d mnt ]  &&  mkdir mnt   ||  { mountpoint mnt && umount -l mnt
                                         rm ${verb} -rf mnt && mkdir mnt; }
-    [ ! -d mnt2 ] &&  mkdir mnt2 »||  rm ${verb} -rf mnt2
+    [ ! -d mnt2 ] &&  mkdir mnt2  ||  { rm ${verb} -rf mnt2 && mkdir mnt2; }
 
     "${VERBOSE}"  && logger -s "[INF] Mounting CloneZilla CD ${CLONEZILLACD}"
     mount -oloop "${CLONEZILLACD}" ./mnt  \
