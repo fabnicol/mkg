@@ -77,7 +77,8 @@
 ## on a USB stick whose model label starts with \e PNY and finally create a
 ## clonezilla installer
 ## on another USB stick mounted under <tt> /media/ken/AA45E </tt>
-## @code mkgento burn usb_device="PNY" usb_installer="Sams" my_gentoo_image.iso
+## @code mkgento burn hot_install ext_device="PNY" device_installer="Sams"
+##       my_gentoo_image.iso
 ## @endcode
 ## @defgroup createInstaller Create Gentoo linux image and installer.
 
@@ -106,6 +107,9 @@ create_options_array
 ## @li @b u  Url
 ## @li @b x:y Conditional type x: one of the above, with [ -z "$x" ]
 ##            <=> { [ "$y" = "false" ] ||  [ -z "$y" ]; } && [ "$y" != "true" ]
+## @li @b vm Restricted to the <tt>vm</tt> option:
+##           can be set to @ code <tt>false</tt> to bypass OS building and only
+##           perform burning/external device operations.
 ## A double-entry array will be simulated using indexes.
 ## @ingroup createInstaller
 ## @note `debug_mode` should be place up front in the array
@@ -118,7 +122,6 @@ unset A
 ## @ingroup createInstaller
 
 declare -i -r ARRAY_LENGTH=$((${#ARR[*]}/4))
-
 
 ## @fn help_md()
 ## @brief Print usage in markdown format
@@ -191,9 +194,24 @@ validate_option() {
 grep -q 'help_md' <<< "$@" &&  help_md && exit 0
 grep -q 'help'    <<< "$@" &&  help_ && exit 0
 
+# default value is false
+# Can be reversed by a name of type filename.iso on command line.
+# Otherwise option iso_output=filename.iso is used when ISO file has been
+# previously created and is reused to burn or dd to device installer
+
+export CREATE_ISO=false
+
+# temporarily define LOG as logger -s, but this may be changed on
+# commandline dynamically
+
+LOGGING="true"
+LOGGER="$(which logger)"
+[ -n "${LOGGER}" ] && LOGGER_VERBOSE_OPTION="-s" || LOGGER="$(which echo)"
+export LOG="eval ${LOGGER} ${LOGGER_VERBOSE_OPTION}"
+
 while (( "$#" ))
 do
-    if grep '=' <<< "$1"
+    if grep '=' <<< "$1" 2>/dev/null 1>/dev/null
     then
         left=$(sed -E 's/(.*)=(.*)/\1/'  <<< "$1")
         right=$(sed -E 's/(.*)=(.*)/\2/' <<< "$1")
@@ -201,21 +219,30 @@ do
         then
             declare -u VAR=${left}
             eval "${VAR}"="\"${right}\""
-            logger -s "[CLI] Assign: ${VAR}=${!VAR}"
+            [ "${VERBOSE}" = "true" ] \
+                &&  eval ${LOG} "[CLI] Assign: ${VAR}=${!VAR}"
         fi
     else
         if  grep ".iso"  <<< "$1"
         then
             ISO_OUTPUT="$1"
+            CREATE_ISO=true
         else
             if validate_option "$1"
             then
                 declare -u VAR="$1"
                 eval "${VAR}"=true
-                logger -s "[CLI] Assign: ${VAR}=true"
+                [ "${VERBOSE}" = "true" ] \
+                    && eval ${LOG} "[CLI] Assign: ${VAR}=true"
             fi
         fi
     fi
+    [ "${LOGGING}" = "true" ] && LOGGER="$(which logger)" \
+            || { LOGGER="$(which echo)"
+                 LOGGER_VERBOSE_OPTION=""; }
+    [ -z "${LOGGER}" ] && LOGGER="$(which echo)"  # fallback
+    [ "${QUIET}" = "true" ]   && LOG="${LOGGER}" \
+            || LOG="${LOGGER} ${LOGGER_VERBOSE_OPTION}"
     shift
 done
 
@@ -232,7 +259,14 @@ export ISO="downloaded.iso"
 
 test_cli_pre() {
 
-    [ "$(whoami)" != "root" ] && { logger -s "[ERR] must be root to continue"
+    { [ "${VERBOSE}" = "true" ] || [ "${DEBUG_MODE}" = "true" ]; } \
+        && [ "${QUIET}" = "true" ] \
+        && { eval ${LOG} "[ERR] You cannot have 'quiet' and verbose modes at the same time"
+             exit -1;}
+
+    # do not use ${}  as true/false in this function as vars. are not all set
+
+    [ "$(whoami)" != "root" ] && { eval ${LOG} "[ERR] must be root to continue"
                                    exit 1; }
     [ -d /home/partimage ] && rm -rf /home/partimag
     mkdir -p /home/partimag
@@ -241,38 +275,38 @@ test_cli_pre() {
 
     local do_exit=false
     [ -z "$(VBoxManage --version)" ] \
-        && { logger -s "[ERR] Did not find a proper VirtualBox install. \
+        && { eval ${LOG} "[ERR] Did not find a proper VirtualBox install. \
 Reinstall Virtualbox version >= 6.1"; do_exit=true; }
     [ -z "$(uuid)" ] \
-        && { logger -s "[ERR] Did not find uuid. Intall the uuid package"
+        && { eval ${LOG} "[ERR] Did not find uuid. Intall the uuid package"
              do_exit=true; }
     [ -z "$(mkisofs -version)" ] \
-        && { logger -s "[ERR] Did not find mkisofs. Install the cdrtools \
+        && { eval ${LOG} "[ERR] Did not find mkisofs. Install the cdrtools \
 package (see Wiki)"; do_exit=true; }
     [ -z "$(mksquashfs -version)" ] \
-        && { logger -s "[ERR] Did not find squashfs. Install the squashfs \
+        && { eval ${LOG} "[ERR] Did not find squashfs. Install the squashfs \
 package."; do_exit=true; }
     [ -z "$(xz --version)" ] \
-        && { logger -s "[ERR] Did not find xz. Install xz and its libraries"
+        && { eval ${LOG} "[ERR] Did not find xz. Install xz and its libraries"
              do_exit=true; }
     [ -z "$(ocs-sr -v)" ] \
-        && { logger -s "[ERR] Did not find CloneZilla. Install CloneZilla and \
+        && { eval ${LOG} "[ERR] Did not find CloneZilla. Install CloneZilla and \
 dependencies first."; do_exit=true; }
     [ -z "$(curl --version)" ] \
-        && { logger -s "[ERR] Did not find curl. Please install it now."
+        && { eval ${LOG} "[ERR] Did not find curl. Please install it now."
              do_exit=true; }
     [ -z "$(md5sum --version)" ] \
-        && { logger -s "[ERR] Did not find md5sum. Install the coreutils \
+        && { eval ${LOG} "[ERR] Did not find md5sum. Install the coreutils \
 package."; do_exit=true; }
     [ -z "$(tar --version)" ] \
-        && { logger -s "[ERR] Did not find tar."; do_exit=true; }
+        && { eval ${LOG} "[ERR] Did not find tar."; do_exit=true; }
     { [ -z "$(mountpoint --version)" ] || [ -z "$(findmnt --version)" ]; } && {
-        logger -s "[ERR] Did not find mountpoint/findmnt. Install util-linux."
+        eval ${LOG} "[ERR] Did not find mountpoint/findmnt. Install util-linux."
         do_exit=true; }
-    [ -z "$(sed --version)" ] && { logger -s "[ERR] Did not find sed."
+    [ -z "$(sed --version)" ] && { eval ${LOG} "[ERR] Did not find sed."
                                    do_exit=true; }
     [ -z "$(which xorriso)" ] \
-        && { logger -s "[ERR] Did not find xorriso (libburnia project)"
+        && { eval ${LOG} "[ERR] Did not find xorriso (libburnia project)"
           do_exit=true; }
 
     # Check VirtualBox version
@@ -286,8 +320,8 @@ package."; do_exit=true; }
     if [ ${version_major} -lt 6 ] || [ ${version_minor} -lt 1 ] \
            || [ ${version_index} -lt 10 ]
     then
-        logger -s "[ERR] VirtualBox must be at least version 6.1.10"
-        logger -s "[ERR] Please update and reinstall"
+        eval ${LOG} "[ERR] VirtualBox must be at least version 6.1.10"
+        eval ${LOG} "[ERR] Please update and reinstall"
         do_exit=true
     fi
 
@@ -299,14 +333,27 @@ package."; do_exit=true; }
 
     if [ -n "${ISO_OUTPUT}" ]
     then
-        logger -s "[MSG] Build Gentoo distribution to bootable \
-ISO output ${ISO_OUTPUT}"
-        export CREATE_ISO=true
+        if [ "${VERBOSE}" = "true" ]
+        then
+            eval ${LOG} "[MSG] Bootable ISO output is: ${ISO_OUTPUT}"
+            if [ "${CREATE_ISO}"  = "true" ]
+            then
+                eval ${LOG} "[MSG] Build Gentoo to bootable ISO"
+            else
+                eval ${LOG} "[MSG] Using previously built ISO"
+            fi
+        fi
     else
-        logger -s "[ERR] You did not indicate an ISO output file."
-        logger -s "[MSG] A Virtual machine will be created with name ${VM}"
-        export CREATE_ISO=false
+        if [ "${VERBOSE}" = "true" ]
+        then
+            eval ${LOG} "[ERR] You did not indicate an ISO output file."
+            export CREATE_ISO=false
+        fi
     fi
+
+     [ -n "${VM}" ] && [ "${VM}" != "false" ] \
+       && eval ${LOG} "[MSG] A Virtual machine will be created with name ${VM}"
+
     return 0
 }
 
@@ -328,45 +375,55 @@ test_cli() {
     local type=${ARR[i*4+3]}
     local cli_arg=false
     declare -u V=${sw}
-    local y=$(sed '/.*:/d' "${type}")
-    local cond="${!y^^}"
+    local y=$(sed 's/.*://' <<< "${type}")
+    local cond0="${y^^}"
+    local cond
+    [ -n "${cond0}" ] && cond="${!cond0}"
 
-    # debug_mode should be placed on top of ARR
+    # Do not use ${} directly as true/false without [...] in this function and the above.
+    # as Boolean variables may not all be set yet.
 
     if [ -n "${!V}" ]
     then
-        "${DEBUG_MODE}" && logger -s "[CLI] ${desc} = ${!V}" | sed 's/\\t //'
+        [ "${DEBUG_MODE}" = "true" ] && eval ${LOG} "[CLI] ${desc} = ${!V}" | sed 's/\\t //'
 
         # checking on types among values found on commandline
 
         case "${type}" in
             b)  if  [ "${!V}" != "true" ] && [ "${!V}" != "false" ]
                 then
-                    logger -s "[ERR] ${sw} is Boolean: specify its value as \
+                    eval ${LOG} "[ERR] ${sw} is Boolean: specify its value as \
 either 'false' or 'true' on command line"
                     exit -1
                 fi
                 ;;
             d)  [ ! -d "${!V}" ] \
-                    && { logger -s "[ERR] ${sw}=... must be an existing \
+                    && { eval ${LOG} "[ERR] ${sw}=... must be an existing \
 directory."
-                    exit -1; } ;;
+                         exit -1; }
+                ;;
             e)  [ test_email "${!V}" != 0 ] \
-                   && { logger -s "[ERR] ${sw}=... must be a valid email address"
-                    exit -1; } ;;
+                   && { eval ${LOG} "[ERR] ${sw}=... must be a valid email address"
+                        exit -1; }
+                ;;
             f)  [ ! -f "${!V}" ] \
-                    && { logger -s "[ERR] ${sw}=... must be an existing file."
+                    && { eval ${LOG} "[ERR] ${sw}=... must be an existing file."
                     exit -1;} ;;
             n)  [ test_numeric "${!V}" != 0 ] \
-                    && { logger -s "[ERR] ${sw}=... is not numeric."
-                    exit -1; } ;;
+                    && { eval ${LOG} "[ERR] ${sw}=... is not numeric."
+                         exit -1; }
+                ;;
             o)  [ "${!V}" != "on" ] && [ "${!V}" != "off" ] \
-                   && { logger -s "[ERR] ${sw}=on or ${sw}=off are the only two \
+                   && { eval ${LOG} "[ERR] ${sw}=on or ${sw}=off are the only two \
 possible values."
-                    exit -1; } ;;
+                        exit -1; }
+                ;;
             u)  [ test_URL "${!V}" != 0 ] \
-                    && { logger -s "[ERR] ${sw}=... must be a valid URL"
-                         exit -1; } ;;
+                    && { eval ${LOG} "[ERR] ${sw}=... must be a valid URL"
+                         exit -1; }
+                ;;
+            vm)  [ "${VM}" = "false" ] && VM=""
+                 ;;
 
             # conditional types of the form e/f/s:...
 
@@ -376,13 +433,13 @@ possible values."
                  then
                      if [ -z "${cond}" ]
                      then
-                         logger -s "[ERR] Execution cannot proceed without \
+                         eval ${LOG} "[ERR] Execution cannot proceed without \
 specifying an explicit value for ${y}=..."
                      else
-                         logger -s "[ERR] Execution cannot proceed as option
-values for ${y}=false and ${dw}=${!V} are incompatible."
+                         eval ${LOG} "[ERR] Execution cannot proceed as option
+values for ${y}=false and ${sw}=${!V} are incompatible."
                      fi
-                     logger -s "[ERR] Fatal. Exiting..."
+                     eval ${LOG} "[ERR] Fatal. Exiting..."
                      exit -1
                  fi
 
@@ -394,9 +451,9 @@ values for ${y}=false and ${dw}=${!V} are incompatible."
         if [ "${cond}" = "true" ] || { [ "${cond}" != "false" ] \
                                            &&  [ -n "${cond}" ]; }
         then
-            logger -s "[ERR] Execution cannot proceed without an explicit value \
- for ${dw}=... as ${y}=${cond}"
-            logger -s "[ERR] Fatal. Exiting..."
+            eval ${LOG} "[ERR] Execution cannot proceed without an explicit value \
+ for ${sw}=... as ${y}=${cond}"
+            eval ${LOG} "[ERR] Fatal. Exiting..."
             exit -1
         fi
 
@@ -406,31 +463,31 @@ values for ${y}=false and ${dw}=${!V} are incompatible."
 
         if [ "${type}" = "s" ] && [ -z "${default}" ]
         then
-            logger -s "[ERR] Execution cannot proceed without explit value for \
-${dw}"
-            if "${interactive}"
+            eval ${LOG} "[ERR] Execution cannot proceed without explit value for \
+${sw}"
+            if "${INTERACTIVE}"
             then
                 local reply=""
                 while [ -z ${reply} ]
                 do
-                    logger -s "[MSG] Please enter value: "
+                    eval ${LOG} "[MSG] Please enter value: "
                     read reply
                     eval "${V}"="${reply}"
                 done
             else
-                logger -s "[ERR] Fatal. Exiting..."
+                eval ${LOG} "[ERR] Fatal. Exiting..."
                 exit -1
             fi
         fi
 
-        "${DEBUG_MODE}" \
-            && logger -s "[CLI] Default: ${desc} = ${default}" | sed 's/\\t //'
+       [ "${DEBUG_MODE}" = "true" ] \
+            && eval ${LOG} "[CLI] Default: ${desc} = ${default}" | sed 's/\\t //'
         eval "${V}"="\"${default}\""
     fi
 
     # exporting is made necessary by usage in companion scripts.
 
-    "${DEBUG_MODE}" && logger -s "[MSG] Export: ${V}"
+    [ "${DEBUG_MODE}" = "true" ] && eval ${LOG} "[MSG] Export: ${V}"
     export "${V}"
 }
 
@@ -445,7 +502,7 @@ test_cli_post() {
     # ruling out incompatible options
 
     "${DOWNLOAD}" && ! "${CREATE_SQUASHFS}" \
-                  && { logger -s "[ERR][CLI] You cannot set \
+                  && { eval ${LOG} "[ERR][CLI] You cannot set \
 create_squashfs=false with download=true"
                   exit -1; }
 
@@ -453,19 +510,19 @@ create_squashfs=false with download=true"
            || { "${FROM_VM}" && "${FROM_DEVICE}"; } \
            || { "${FROM_ISO}" && "${FROM_VM}"; }
     then
-            logger -s "[ERR][CLI] Only one of the three options from_iso, \
+            eval ${LOG} "[ERR][CLI] Only one of the three options from_iso, \
 from_device or from_vm may be specified on commandline."
             exit -1
     fi
     "${FROM_ISO}" && "${CREATE_ISO}" \
-         && { logger -s "[ERR][CLI] You cannot specify an ISO output and input \
+         && { eval ${LOG} "[ERR][CLI] You cannot specify an ISO output and input \
 on commandline at the same time."
          exit -1; }
 
-    "${FROM_ISO}" && "${USB_DEVICE}" \
-         && { logger -s "[ERR][CLI] Recovering OS directly to device from \
+    "${FROM_ISO}" && "${EXT_DEVICE}" \
+         && { eval ${LOG} "[ERR][CLI] Recovering OS directly to device from \
 Clonezilla image is not supported."
-         logger -s "[ERR][CLI] Burn ISO to install medium (DVD or USB strick) \
+         eval ${LOG} "[ERR][CLI] Burn ISO to install medium (DVD or USB strick) \
 and install to device with it."
          exit -1; }
 
@@ -490,7 +547,7 @@ and install to device with it."
     "${CREATE_ISO}" && ISOVM="${VM}_ISO"
 
     "${FROM_VM}" && [ ! -f "${VM}.vdi" ] \
-        && { logger -s "[ERR] Virtual machine \
+        && { eval ${LOG} "[ERR] Virtual machine \
 disk ${VMPATH}/${VM}.vdi was not found"
         exit -1; }
 
@@ -505,11 +562,11 @@ disk ${VMPATH}/${VM}.vdi was not found"
     then
         "${GUI}" && read -p "[MSG] Enter email password: " EMAIL_PASSWD
         [ -z "${EMAIL_PASSWD}" ] \
-            && logger -s "[WAR] No email password, aborting sendmail."
-        logger -s "[INF] Sending warning email to ${EMAIL}"
-        logger -s "[WAR] Gmail and other providers request user to activate \
+            && eval ${LOG} "[WAR] No email password, aborting sendmail."
+        eval ${LOG} "[INF] Sending warning email to ${EMAIL}"
+        eval ${LOG} "[WAR] Gmail and other providers request user to activate \
 third-party applications for this mail to be sent."
-        logger -s "[WAR] You will not receive any mail otherwise."
+        eval ${LOG} "[WAR] You will not receive any mail otherwise."
     fi
 
     "${GUI}" && VMTYPE="gui" || VMTYPE="headless"
@@ -541,7 +598,7 @@ fetch_livecd() {
         "${CLONEZILLA_INSTALL}" && ISO="${CLONEZILLACD}"
     else
         [ -f "clonezilla.iso" ] && CLONEZILLACD="clonezilla.iso" \
-        || { logger -s "[ERR] CloneZilla ISO has not been cached. \
+        || { eval ${LOG} "[ERR] CloneZilla ISO has not been cached. \
 Run with download=true" ; exit -1; }
     fi
     if ! "${DOWNLOAD}"
@@ -549,10 +606,10 @@ Run with download=true" ; exit -1; }
         if  "${CREATE_SQUASHFS}"
         then
             [ -f ${CACHED_ISO} ] \
-                && { logger -s "[INF] Uncaching ${ISO} from ${CACHED_ISO}"
+                && { eval ${LOG} "[INF] Uncaching ${ISO} from ${CACHED_ISO}"
                 cp -f ${CACHED_ISO} ${ISO}; }
         else
-            logger -s "[ERR] No ISO file was found, please rerun with \
+            eval ${LOG} "[ERR] No ISO file was found, please rerun with \
 download=true"
             exit -1
         fi
@@ -577,46 +634,46 @@ fetch_stage3() {
     "${VERBOSE}" && verb2="-v"
     if "${DOWNLOAD_ARCH}"
     then
-        logger -s "[INF] Cleaning up stage3 data..."
+        eval ${LOG} "[INF] Cleaning up stage3 data..."
         [ -f latest-stage3*.txt* ] && rm ${verb2} -f latest-stage3*.txt*
-        logger -s "[INF] Downloading stage3 data..."
-        logger -s <<< $(curl -L -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/\
+        eval ${LOG} "[INF] Downloading stage3 data..."
+        eval ${LOG} <<< $(curl -L -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/\
 latest-stage3-${PROCESSOR}.txt" ${verb1} 2>&1 | xargs echo "[INF]")
         [ $? != 0 ] \
-            && { logger -s "[ERR] Could not download stage3 from mirrors: \
+            && { eval ${LOG} "[ERR] Could not download stage3 from mirrors: \
 ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
             exit -1; }
     else
         [ ! -f latest-stage3-${PROCESSOR}.txt ] \
-            && { logger -s "[ERR] No stage 3 download information available!"
-            logger -s "[ERR] Rerun with download_stage3=true"
+            && { eval ${LOG} "[ERR] No stage 3 download information available!"
+            eval ${LOG} "[ERR] Rerun with download_stage3=true"
             exit -1; }
     fi
     local current=$(cat latest-stage3-${PROCESSOR}.txt | \
                         grep "stage3-${PROCESSOR}".*.tar.xz | cut -f 1 -d' ')
     if "${DOWNLOAD_ARCH}"
     then
-        logger -s "[INF] Cleaning up stage3 archives(s)..."
+        eval ${LOG} "[INF] Cleaning up stage3 archives(s)..."
         [ -f "stage3-${PROCESSOR}"-*tar.xz* ] \
             && rm ${verb2} -f "stage3-${PROCESSOR}"-*tar.xz*
         [ -f ${STAGE3} ] && rm ${verb2} -f ${STAGE3}
-        logger -s "[INF] Downloading ${current}..."
-        logger -s <<< $(curl -L -O "${MIRROR}/releases/${PROCESSOR}/\
+        eval ${LOG} "[INF] Downloading ${current}..."
+        eval ${LOG} <<< $(curl -L -O "${MIRROR}/releases/${PROCESSOR}/\
 autobuilds/${current}" ${verb1} 2>&1 | xargs echo "[INF]")
         [ $? != 0 ] \
-            && { logger -s "[ERR] Could not download stage3 tarball from mirror:\
+            && { eval ${LOG} "[ERR] Could not download stage3 tarball from mirror:\
  ${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
             exit -1; }
         ! ${DISABLE_MD5_CHECK} && check_md5sum $(basename ${current})
-        logger -s "[INF] Caching ${current} to ${CACHED_STAGE3}"
+        eval ${LOG} "[INF] Caching ${current} to ${CACHED_STAGE3}"
         cp ${verb2} -f $(echo -s ${current} \
                              | sed 's/.*stage3/stage3/')  ${CACHED_STAGE3}
     fi
     [ ! -f "${CACHED_STAGE3}" ] \
-        && { logger -s "[ERR] No stage3 tarball!"
-        logger -s "[ERR] Rerun with download_stage3=true"
+        && { eval ${LOG} "[ERR] No stage3 tarball!"
+        eval ${LOG} "[ERR] Rerun with download_stage3=true"
         exit -1; }
-    logger -s "[INF] Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}"
+    eval ${LOG} "[INF] Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}"
     cp ${verb2} -f ${CACHED_STAGE3} ${STAGE3}
 }
 
@@ -632,20 +689,20 @@ autobuilds/${current}" ${verb1} 2>&1 | xargs echo "[INF]")
 
 make_boot_from_livecd() {
     if [ ! -f ${ISO} ]; then
-        logger -s "[ERR] No active ISO file in current directory!"
+        eval ${LOG} "[ERR] No active ISO file in current directory!"
         exit -1
     fi
     if ! "${CREATE_SQUASHFS}"
     then
-        logger -s "[MSG] Reusing ${ISO} which was previously created... \
+        eval ${LOG} "[MSG] Reusing ${ISO} which was previously created... \
 use this option with care if only you have run mkgentoo before."
-        logger -s "[MSG] create_squashfs should be left at 'true' (default) \
+        eval ${LOG} "[MSG] create_squashfs should be left at 'true' (default) \
 if mkvm.sh or mkvm_chroot.sh have been altered"
-        logger -s "[MSG] or the kernel config file, the global variables, \
+        eval ${LOG} "[MSG] or the kernel config file, the global variables, \
 the boot config files, the stage3 archive or the ebuild list."
-        logger -s "[MSG] It can be set at 'false' if the install ISO file and \
+        eval ${LOG} "[MSG] It can be set at 'false' if the install ISO file and \
 stage3 archive are cached in the directory after prior downloads"
-        logger -s "[MSG] with no other changes in the above set of files."
+        eval ${LOG} "[MSG] with no other changes in the above set of files."
         return 0
     fi
 
@@ -657,13 +714,13 @@ stage3 archive are cached in the directory after prior downloads"
     [ -d mnt ] && rm -rf mnt
     mkdir mnt
     mount -oloop ${ISO} mnt/  2>/dev/null
-    ! mountpoint -q mnt && logger -s "[ERR] ISO not mounted!" && exit -1
+    ! mountpoint -q mnt && eval ${LOG} "[ERR] ISO not mounted!" && exit -1
 
     # get a copy with write access
 
     [ -d mnt2 ] && rm -rf mnt2/
     mkdir mnt2/
-    "${VERBOSE}" && logger -s "[INF] Syncing mnt2 with ISO mountpoint..."
+    "${VERBOSE}" && eval ${LOG} "[INF] Syncing mnt2 with ISO mountpoint..."
     rsync -a ${verb} mnt/ mnt2
 
     # parameter adjustment to account for Gentoo/CloneZilla differences
@@ -692,10 +749,10 @@ stage3 archive are cached in the directory after prior downloads"
     # now unsquashfs the liveCD filesystem
 
     cd "${ROOT_LIVE}"
-    "${VERBOSE}" && logger -s "[INF] Unsquashing filesystem..." \
+    "${VERBOSE}" && eval ${LOG} "[INF] Unsquashing filesystem..." \
                  && unsquashfs ${SQUASHFS_FILESYSTEM}  \
                  ||  unsquashfs -q  ${SQUASHFS_FILESYSTEM} 2>&1 >/dev/null
-    [ $? != 0 ] && logger -s "[ERR] unsquashfs failed !" && exit -1
+    [ $? != 0 ] && eval ${LOG} "[ERR] unsquashfs failed !" && exit -1
 
     # we stick to the official mount point /mnt/gentoo
 
@@ -707,41 +764,41 @@ stage3 archive are cached in the directory after prior downloads"
     # /root/.bashrc
 
     cd "${VMPATH}"
-    [ ! -f scripts/mkvm.sh ] && { logger -s "[ERR] No mkvm.sh script!"
+    [ ! -f scripts/mkvm.sh ] && { eval ${LOG} "[ERR] No mkvm.sh script!"
                                   exit -1;}
     [ ! -f scripts/mkvm_chroot.sh ] \
-        && { logger -s "[ERR] No mkvm_chroot.sh script!";  exit -1; }
+        && { eval ${LOG} "[ERR] No mkvm_chroot.sh script!";  exit -1; }
     "${MINIMAL}" && cp ${verb} -f "${ELIST}.minimal" "${ELIST}"  \
                  || cp ${verb} -f "${ELIST}.complete" "${ELIST}"
     [ ! -f "${ELIST}" ] || [ ! -f "${ELIST}.use" ] \
         || [ ! -f "${ELIST}.accept_keywords" ] \
-        && { logger -s "[ERR] No ebuild list!"
+        && { eval ${LOG} "[ERR] No ebuild list!"
         exit -1; }
-    [ ! -f "${STAGE3}" ] && { logger -s "[ERR] No stage3 archive!"; exit -1; }
+    [ ! -f "${STAGE3}" ] && { eval ${LOG} "[ERR] No stage3 archive!"; exit -1; }
     [ ! -f "${KERNEL_CONFIG}" ] \
-        && { logger -s "[ERR] No kernel configuration file!"; exit -1; }
+        && { eval ${LOG} "[ERR] No kernel configuration file!"; exit -1; }
     local sqrt="${ROOT_LIVE}/squashfs-root/root/"
-    mv ${verb} -f "${STAGE3}" ${sqrt}                  | logger -s
-    cp ${verb} -f scripts/mkvm.sh ${sqrt}              | logger -s
-    chmod +x ${sqrt}mkvm.sh                            | logger -s
-    cp ${verb} -f scripts/mkvm_chroot.sh ${sqrt}       | logger -s
-    chmod +x ${sqrt}mkvm_chroot.sh                     | logger -s
+    mv ${verb} -f "${STAGE3}" ${sqrt}                  | eval ${LOG}
+    cp ${verb} -f scripts/mkvm.sh ${sqrt}              | eval ${LOG}
+    chmod +x ${sqrt}mkvm.sh                            | eval ${LOG}
+    cp ${verb} -f scripts/mkvm_chroot.sh ${sqrt}       | eval ${LOG}
+    chmod +x ${sqrt}mkvm_chroot.sh                     | eval ${LOG}
     cp ${verb} -f "${ELIST}" "${ELIST}.use" "${ELIST}.accept_keywords" ${sqrt} \
-        | logger -s
-    cp ${verb} -f "${KERNEL_CONFIG}" ${sqrt}           | logger -s
+        | eval ${LOG}
+    cp ${verb} -f "${KERNEL_CONFIG}" ${sqrt}           | eval ${LOG}
     cd ${sqrt}
 
     # now prepare the .bashrc file by exporting the environment
     # this will be placed under /root in the VM
 
     rc=".bashrc"
-    cp ${verb} -f /etc/bash.bashrc ${rc}                | logger -s
+    cp ${verb} -f /etc/bash.bashrc ${rc}                | eval ${LOG}
     declare -i i
     for ((i=0; i<ARRAY_LENGTH; i++))
     do
         local  capname=${ARR[i*4]^^}
         local  expstring="export ${capname}=\"${!capname}\""
-        "${VERBOSE}" && logger -s "${expstring}"
+        "${VERBOSE}" && eval ${LOG} "${expstring}"
         echo "${expstring}" >> ${rc}
     done
 
@@ -754,17 +811,17 @@ stage3 archive are cached in the directory after prior downloads"
     # restore the squashfs filesystem
 
     cd ../..
-    rm ${verb} -f ${SQUASHFS_FILESYSTEM}                | logger -s
+    rm ${verb} -f ${SQUASHFS_FILESYSTEM}                | eval ${LOG}
     local verb2="-quiet"
-    mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM} ${verb2}   | logger -s
-    rm -rf squashfs-root/                               | logger -s
+    mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM} ${verb2}   | eval ${LOG}
+    rm -rf squashfs-root/                               | eval ${LOG}
 
     # restore the ISO in bootable format
 
     cd "${VMPATH}"
     "${VERBOSE}" &&  verb2="-v"
 
-    recreate_liveCD_ISO mnt2/                           | logger -s
+    recreate_liveCD_ISO mnt2/                           | eval ${LOG}
 
     # cleanup by default
 
@@ -795,19 +852,19 @@ deep_clean() {
 
     ! "${FORCE}" && return 0
 
-    logger -s "[INF] Cleaning up hard disks in config file because of \
+    eval ${LOG} "[INF] Cleaning up hard disks in config file because of \
 inconsistencies in VM settings"
     local registry="/root/.config/VirtualBox/VirtualBox.xml"
     if grep -q "${VM}.vdi" ${registry}
     then
-        logger -s "[MSG] Disk ${VM}.vdi is already registered and needs to be \
+        eval ${LOG} "[MSG] Disk ${VM}.vdi is already registered and needs to be \
 wiped out of the registry"
-        logger -s "[MSG] Otherwise issues may arise with UUIDS and data \
+        eval ${LOG} "[MSG] Otherwise issues may arise with UUIDS and data \
 integrity"
-        logger -s "[WAR] Stopping VirtualBox server. You need to stop/snapshot \
+        eval ${LOG} "[WAR] Stopping VirtualBox server. You need to stop/snapshot \
 your running VMs."
-        logger -s "[WAR] Enter Y when this is done or another key to exit."
-        logger -s "[WAR] In which case ${VM}.vdi might not be properly attached \
+        eval ${LOG} "[WAR] Enter Y when this is done or another key to exit."
+        eval ${LOG} "[WAR] In which case ${VM}.vdi might not be properly attached \
 to virtual machine ${VM}"
         [ "$1" != "ISO_STAGE" ] \
             &&   read -p "Enter Y to continue or another key to skip deep \
@@ -847,22 +904,22 @@ delete_vm() {
 
     if test_vm_running "$1"
     then
-        logger -s "[INF] Powering off $1"
-        VBoxManage controlvm "$1" poweroff 2>&1 | logger -s
+        eval ${LOG} "[INF] Powering off $1"
+        VBoxManage controlvm "$1" poweroff 2>&1 | eval ${LOG}
     fi
     if test_vm_running "$1"
     then
-        logger -s "[INF] Emergency stop for $1"
-        VBoxManage startvm $1 --type emergencystop 2>&1 | logger -s
+        eval ${LOG} "[INF] Emergency stop for $1"
+        VBoxManage startvm $1 --type emergencystop 2>&1 | eval ${LOG}
     fi
-    logger -s "[INF] Closing medium $1.$2"
+    eval ${LOG} "[INF] Closing medium $1.$2"
     if VBoxManage showmediuminfo "${VMPATH}/$1.$2" 2>/dev/null 1>/dev/null
     then
         VBoxManage storageattach "$1" \
                    --storagectl "SATA Controller"\
                    --port 0 \
-                   --medium none 2>&1 | logger -s
-        VBoxManage closemedium  disk "${VMPATH}/$1.$2" --delete 2>&1 | logger -s
+                   --medium none 2>&1 | eval ${LOG}
+        VBoxManage closemedium  disk "${VMPATH}/$1.$2" --delete 2>&1 | eval ${LOG}
     fi
 
     local res=$?
@@ -883,19 +940,19 @@ delete_vm() {
     fi
     if [ -n "$(VBoxManage list vms | grep \"$1\")" ]
     then
-        logger -s "[MSF] Current virtual machine: $(VBoxManage list vms \
+        eval ${LOG} "[MSF] Current virtual machine: $(VBoxManage list vms \
 | grep \"$1\"))"
-        logger -s "[INF] Removing SATA controller"
+        eval ${LOG} "[INF] Removing SATA controller"
         VBoxManage storagectl "$1" \
                    --name "SATA Controller" \
-                   --remove 2>&1 | logger -s
-        logger -s "[INF] Removing IDE controller"
+                   --remove 2>&1 | eval ${LOG}
+        eval ${LOG} "[INF] Removing IDE controller"
         VBoxManage storagectl "$1" \
                    --name "IDE Controller" \
-                   --remove  2>&1 | logger -s
-        logger -s "[INF] Unregistering $1"
+                   --remove  2>&1 | eval ${LOG}
+        eval ${LOG} "[INF] Unregistering $1"
         VBoxManage unregistervm "$1" \
-                   --delete 2>&1 | logger -s
+                   --delete 2>&1 | eval ${LOG}
     fi
 
     # the following is overall unnecessary except for issues with
@@ -904,13 +961,13 @@ delete_vm() {
     if [ "$3" != "ISO_STAGE" ]
     then
         [ -d "${VMPATH}/$1" ] \
-            && logger -s "Force removing $1" \
+            && eval ${LOG} "Force removing $1" \
             && rm -rf  "${VMPATH}/$1"
 
         # same for disk registration
 
         [ -n "$2" ] && [ -f "${VMPATH}/$1.$2" ] \
-            && logger -s "Force removing $1.$2" \
+            && eval ${LOG} "Force removing $1.$2" \
             && rm -f   "${VMPATH}/$1.$2"
     fi
 
@@ -942,7 +999,7 @@ create_vm() {
 
     # create and register VM
 
-    logger -s <<< $(VBoxManage createvm --name "${VM}" \
+    eval ${LOG} <<< $(VBoxManage createvm --name "${VM}" \
                                       --ostype ${OSTYPE}  \
                                       --register \
                                       --basefolder "${VMPATH}"  2>&1 \
@@ -954,7 +1011,7 @@ create_vm() {
     # By default the VB processor configuration is lower-grade
     # all other parameters are listed on commandline options with default values
 
-    logger -s <<< $(VBoxManage modifyvm "${VM}" \
+    eval ${LOG} <<< $(VBoxManage modifyvm "${VM}" \
                              --cpus ${NCPUS} \
                              --cpu-profile host \
                              --memory ${MEM} \
@@ -982,13 +1039,13 @@ create_vm() {
     if [ ! -f  "${VM}.vdi" ] || "${FORCE}"
     then
 
-        logger -s <<< $(VBoxManage createmedium --filename "${VM}.vdi" \
+        eval ${LOG} <<< $(VBoxManage createmedium --filename "${VM}.vdi" \
                                    --size ${SIZE} \
                                    --variant Standard 2>&1 | xargs echo "[MSG]")
     else
-        logger -s "[MSG] Using again old VDI disk: ${VM}.vdi, \
+        eval ${LOG} "[MSG] Using again old VDI disk: ${VM}.vdi, \
 UUID: ${MEDIUM_UUID}"
-        logger -s "[WAR] Hopefully size and caracteristics are correct."
+        eval ${LOG} "[WAR] Hopefully size and caracteristics are correct."
     fi
 
     # set disk UUID once and for all to avoid serious debugging issues
@@ -996,16 +1053,16 @@ UUID: ${MEDIUM_UUID}"
     # same-name disks floating around with different UUIDs and
     # registration issues
 
-    logger -s <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" \
+    eval ${LOG} <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" \
                                ${MEDIUM_UUID} 2>&1 | xargs echo "[MSG]")
 
     # add storage controllers
 
-    logger -s <<< $(VBoxManage storagectl "${VM}" \
+    eval ${LOG} <<< $(VBoxManage storagectl "${VM}" \
                              --name "IDE Controller"  \
                              --add ide 2>&1 \
                              | xargs echo "[MSG]")
-    logger -s <<< $(VBoxManage storagectl "${VM}" \
+    eval ${LOG} <<< $(VBoxManage storagectl "${VM}" \
                              --name "SATA Controller" \
                              --add sata \
                              --bootable on 2>&1 \
@@ -1017,7 +1074,7 @@ UUID: ${MEDIUM_UUID}"
     # Only one port/device is necessary
     # use --tempeject on for live CD
 
-    logger -s <<< $(VBoxManage storageattach "${VM}" \
+    eval ${LOG} <<< $(VBoxManage storageattach "${VM}" \
                              --storagectl "IDE Controller"  \
                              --port 0 \
                              --device 0  \
@@ -1025,7 +1082,7 @@ UUID: ${MEDIUM_UUID}"
                              --medium ${LIVECD} \
                              --tempeject on  2>&1 | xargs echo "[MSG]")
 
-    logger -s <<< $(VBoxManage storageattach "${VM}" \
+    eval ${LOG} <<< $(VBoxManage storageattach "${VM}" \
                              --storagectl "SATA Controller" \
                              --medium "${VM}.vdi" \
                              --port 0 \
@@ -1040,7 +1097,7 @@ UUID: ${MEDIUM_UUID}"
     # clean is in order (see below).  Attaching empty drives may
     # potentially be useful (e.g. when installing guest additions)
 
-    logger -s <<< $(VBoxManage storageattach "${VM}" \
+    eval ${LOG} <<< $(VBoxManage storageattach "${VM}" \
                              --storagectl "IDE Controller" \
                              --port 0 \
                              --device 1 \
@@ -1050,13 +1107,13 @@ UUID: ${MEDIUM_UUID}"
 
     # Starting VM
 
-    logger -s <<< $(VBoxManage startvm "${VM}" --type ${VMTYPE} 2>&1 \
+    eval ${LOG} <<< $(VBoxManage startvm "${VM}" --type ${VMTYPE} 2>&1 \
                                | xargs echo "[MSG]")
 
     # Sync with VM: this is a VBox bug workaround
 
     "${CLONEZILLA_INSTALL}" || ! "${GUI}" && sleep 90 \
-            && logger -s <<< $(VBoxManage controlvm "${VM}" \
+            && eval ${LOG} <<< $(VBoxManage controlvm "${VM}" \
                                keyboardputscancode 1c 2>&1 | xargs echo "[MSG]")
 
     # VM is created in a separate process
@@ -1065,12 +1122,12 @@ UUID: ${MEDIUM_UUID}"
 
     while test_vm_running ${VM}
     do
-        logger -s "[MSG] ${VM} running. Disk size: " $(du -hal "${VM}.vdi")
+        eval ${LOG} "[MSG] ${VM} running. Disk size: " $(du -hal "${VM}.vdi")
         sleep 60
     done
-    logger -s "[MSG] ${VM} has stopped"
-    logger -s "[INF] Compacting VM..."
-    logger -s <<< $(VBoxManage modifyhd "${VM}.vdi" --compact 2>&1 \
+    eval ${LOG} "[MSG] ${VM} has stopped"
+    eval ${LOG} "[INF] Compacting VM..."
+    eval ${LOG} <<< $(VBoxManage modifyhd "${VM}.vdi" --compact 2>&1 \
                         | xargs echo "[MSG]")
 }
 
@@ -1088,7 +1145,7 @@ clonezilla_to_iso() {
     cd "${VMPATH}"
 
     [ ! -d "$2" ] \
-        && { logger -s "[ERR] Directory $2 was not found under ${VMPATH}"
+        && { eval ${LOG} "[ERR] Directory $2 was not found under ${VMPATH}"
         exit -1; }
 
     local verb=""
@@ -1105,7 +1162,7 @@ clonezilla_to_iso() {
             -e boot/grub/efi.img \
             -no-emul-boot   -isohybrid-gpt-basdat   -o "$1"  "$2"
     [ $? = 0 ] && return 0 || {
-            logger -s "[ERR] Could not create ISO image from ISO package \
+            eval ${LOG} "[ERR] Could not create ISO image from ISO package \
 creation directory"
             exit -1; }
 }
@@ -1142,7 +1199,7 @@ process_clonezilla_iso() {
         rm ${verb} -rf ISOFILES
         mkdir -p ISOFILES/home/partimag
         "${VERBOSE}" \
-            && logger -s "[INF] Now copying CloneZilla files to temporary \
+            && eval ${LOG} "[INF] Now copying CloneZilla files to temporary \
 folder ISOFILES"
         rsync ${verb} -a mnt2/ ISOFILES
         cp ${verb} -f clonezilla/savedisk/isolinux.cfg mnt2/syslinux/
@@ -1277,14 +1334,14 @@ create_iso_vm() {
 
     # creating ISO VM
 
-    logger -s <<< $(VBoxManage createvm \
+    eval ${LOG} <<< $(VBoxManage createvm \
                --name "${ISOVM}" \
                --ostype Ubuntu_64 \
                --register \
                --basefolder "${VMPATH}"  2>&1 \
                 | xargs echo "[MSG]")
 
-    logger -s <<< $(VBoxManage modifyvm "${ISOVM}" \
+    eval ${LOG} <<< $(VBoxManage modifyvm "${ISOVM}" \
                --cpus ${NCPUS} \
                --cpu-profile host \
                --memory ${MEM} \
@@ -1301,7 +1358,7 @@ create_iso_vm() {
                --firmware ${FIRMWARE} 2>&1 \
                 | xargs echo "[MSG]")
 
-    logger -s <<< $(VBoxManage storagectl "${ISOVM}" \
+    eval ${LOG} <<< $(VBoxManage storagectl "${ISOVM}" \
                --name "SATA Controller" \
                --add sata \
                --bootable on 2>&1 \
@@ -1314,19 +1371,19 @@ create_iso_vm() {
 
     if [ -z ${MEDIUM_UUID} ]
     then
-        "${FROM_VM}" && logger -s "[MSG] Setting new UUID for VDI disk." \
-        || logger -s "[WAR] Could not use again VDI uuid. Setting a new one."
+        "${FROM_VM}" && eval ${LOG} "[MSG] Setting new UUID for VDI disk." \
+        || eval ${LOG} "[WAR] Could not use again VDI uuid. Setting a new one."
 
         local MEDIUM_UUID=$(VBoxManage showmediuminfo "${VM}.vdi"  \
                             | head -n1 | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
 
-        logger -s <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" \
+        eval ${LOG} <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" \
                                ${MEDIUM_UUID} 2>&1 | xargs echo "[MSG]")
     else
-        logger -s "[MSG] UUID of ${VM}.vdi will be used again: ${MEDIUM_UUID}"
+        eval ${LOG} "[MSG] UUID of ${VM}.vdi will be used again: ${MEDIUM_UUID}"
     fi
 
-    logger -s <<< $(VBoxManage storageattach "${ISOVM}" \
+    eval ${LOG} <<< $(VBoxManage storageattach "${ISOVM}" \
                --storagectl "SATA Controller" \
                --medium "${VM}.vdi" \
                --port 0 \
@@ -1334,12 +1391,12 @@ create_iso_vm() {
                --type hdd 2>&1 \
                 | xargs echo "[MSG]")
 
-    logger -s <<< $(VBoxManage storagectl "${ISOVM}" \
+    eval ${LOG} <<< $(VBoxManage storagectl "${ISOVM}" \
                --name "IDE Controller" \
                --add ide 2>&1 \
                 | xargs echo "[MSG]")
 
-    logger -s <<< $(VBoxManage storageattach "${ISOVM}" \
+    eval ${LOG} <<< $(VBoxManage storageattach "${ISOVM}" \
                --storagectl "IDE Controller" \
                --port 0 \
                --device 0 \
@@ -1348,7 +1405,7 @@ create_iso_vm() {
                --tempeject on 2>&1 \
                 | xargs echo "[MSG]")
 
-    logger -s <<< $(VBoxManage storageattach "${ISOVM}" \
+    eval ${LOG} <<< $(VBoxManage storageattach "${ISOVM}" \
                --storagectl "IDE Controller" \
                --port 0 \
                --device 1 \
@@ -1356,19 +1413,19 @@ create_iso_vm() {
                --medium emptydrive 2>&1 \
                 | xargs echo "[MSG]")
 
-    logger -s <<< $(VBoxManage sharedfolder add "${ISOVM}" \
+    eval ${LOG} <<< $(VBoxManage sharedfolder add "${ISOVM}" \
                                --name shared \
                                --hostpath "${VMPATH}/ISOFILES/home/partimag" \
                                --automount \
                                --auto-mount-point "/home/partimag"  2>&1 \
                         | xargs echo "[MSG]")
 
-    logger -s <<< $(VBoxManage startvm "${ISOVM}" \
+    eval ${LOG} <<< $(VBoxManage startvm "${ISOVM}" \
                     --type ${VMTYPE} 2>&1 | xargs echo "[MSG]")
 
     while test_vm_running ${ISOVM}
     do
-        logger -s "[MSG] ${ISOVM} running..."
+        eval ${LOG} "[MSG] ${ISOVM} running..."
         sleep 60
     done
 }
@@ -1383,22 +1440,22 @@ create_iso_vm() {
 
 clone_vm_to_device() {
 
-    # Test whether USB_DEVICE is a mountpoint or a block device label
+    # Test whether EXT_DEVICE is a mountpoint or a block device label
 
-    USB_DEVICE=$(get_device ${USB_DEVICE})
+    EXT_DEVICE=$(get_device ${EXT_DEVICE})
 
     # Should not occur, only for paranoia
 
-    [ -z "${USB_DEVICE}" ] \
-        && { logger -s "[ERR] Could not set USB device ${USB_DEVICE}"
+    [ -z "${EXT_DEVICE}" ] \
+        && { eval ${LOG} "[ERR] Could not set USB device ${EXT_DEVICE}"
              exit -1; }
     bin/vbox-img compact --filename "${VMPATH}/${VM}.vdi"
     bin/vbox-img convert --srcfilename "${VMPATH}/${VM}.vdi" \
                          --stdout \
                          --dstformat RAW | \
-                         dd of=/dev/${USB_DEVICE} bs=4M status=progress
+                         dd of=/dev/${EXT_DEVICE} bs=4M status=progress
     [ $? = 0 ] && sync && return 0
-    logger -s "[ERR] Could not convert dynamic virtual disk to raw USB device!"
+    eval ${LOG} "[ERR] Could not convert dynamic virtual disk to raw USB device!"
     exit -1
 }
 
@@ -1420,20 +1477,20 @@ clone_vm_to_raw() {
 dd_to_usb() {
     "[INF] Bare metal copy of RAW disk to USB device..."
 
-    # Test whether USB_DEVICE is a mountpoint or a block device label
+    # Test whether EXT_DEVICE is a mountpoint or a block device label
 
-    USB_DEVICE=$(get_device ${USB_DEVICE})
+    EXT_DEVICE=$(get_device ${EXT_DEVICE})
 
     # Should not occur, only for paranoia
 
-    [ -z "${USB_DEVICE}" ] \
-        && { logger -s "[ERR] Could not set USB device ${USB_DEVICE}"
+    [ -z "${EXT_DEVICE}" ] \
+        && { eval ${LOG} "[ERR] Could not set USB device ${EXT_DEVICE}"
              exit -1; }
-    dd if="${VMPATH}/tmpdisk.raw" of=/dev/${USB_DEVICE} bs=4M status=progress
+    dd if="${VMPATH}/tmpdisk.raw" of=/dev/${EXT_DEVICE} bs=4M status=progress
     local res=$?
     if  ${res}
     then
-        logger -s "[INF] Removing temporary RAW disk..."
+        eval ${LOG} "[INF] Removing temporary RAW disk..."
         rm -f ${VMPATH}/tmpdisk.raw
     fi
     return ${res}
@@ -1450,68 +1507,68 @@ clonezilla_device_to_image() {
     find_ocs_sr=`which ocs-sr`
     if [ -z "$find_ocs_sr" ]
     then
-        logger -s "[ERR] Could not find ocs_sr !"
-        logger -s "[MSG] Install Clonezilla in a standard path or rerun \
+        eval ${LOG} "[ERR] Could not find ocs_sr !"
+        eval ${LOG} "[MSG] Install Clonezilla in a standard path or rerun \
  after adding its parth to the PATH environment variable"
-        logger -s "[MSG] Note: Debian-based distributions provide a handy \
+        eval ${LOG} "[MSG] Note: Debian-based distributions provide a handy \
 `clonezilla` package."
         exit -1
     fi
 
-    # At this stage USB_DEVICE can no longer be a mountpoint as it has
+    # At this stage EXT_DEVICE can no longer be a mountpoint as it has
     # been previously converted to device label
 
-    findmnt /dev/${USB_DEVICE}  \
-        && { logger -s "[MSG] Device ${USB_DEVICE} is mounted to: \
-$(get_mountpoint /dev/${USB_DEVICE})"
-        logger -s "[WAR] The external USB device should not be mounted"
-        logger -s "[INF] Trying to unmount..."
-        umount -l /dev/${USB_DEVICE}; }
+    findmnt /dev/${EXT_DEVICE}  \
+        && { eval ${LOG} "[MSG] Device ${EXT_DEVICE} is mounted to: \
+$(get_mountpoint /dev/${EXT_DEVICE})"
+        eval ${LOG} "[WAR] The external USB device should not be mounted"
+        eval ${LOG} "[INF] Trying to unmount..."
+        umount -l /dev/${EXT_DEVICE}; }
     if  [ $? = 0 ]
     then
-        logger -s "[MSG] Managed to unmount /dev/${USB_DEVICE}"
+        eval ${LOG} "[MSG] Managed to unmount /dev/${EXT_DEVICE}"
     else
-        logger -s "[ERR] Could not manage to unmount external USB device"
-        logger -s "[MSG] Unmount it manually and rerun."
+        eval ${LOG} "[ERR] Could not manage to unmount external USB device"
+        eval ${LOG} "[MSG] Unmount it manually and rerun."
         exit -1
     fi
 
     # double check
 
-    [ `findmnt /dev/${USB_DEVICE}` ] \
-        && { logger -s "[ERR] Impossible to unmount device ${USB_DEVICE}"
+    [ `findmnt /dev/${EXT_DEVICE}` ] \
+        && { eval ${LOG} "[ERR] Impossible to unmount device ${EXT_DEVICE}"
              exit -1; }
     if [ -d /home/partimag ]
     then
-        logger -s "[WAR] /home/partimag needs to be wiped out..."
-        logger -s "[INF] Trying with user rights..."
+        eval ${LOG} "[WAR] /home/partimag needs to be wiped out..."
+        eval ${LOG} "[INF] Trying with user rights..."
         rm -rf /home/partimag
         if [ $? != 0 ]
         then
-            logger -s "[WAR] Directory /home/partimag needs elevated rights..."
+            eval ${LOG} "[WAR] Directory /home/partimag needs elevated rights..."
             rm -rf /home/partimag
             [ $? != 0 ] \
-                && { logger -s "[ERR] Could not fix /home/partimag issue."
+                && { eval ${LOG} "[ERR] Could not fix /home/partimag issue."
                 exit -1; }
         fi
     fi
     if "${CLEANUP}"
     then
-        logger -s "[INF] Erasing virtual disk and virtual machine to save \
+        eval ${LOG} "[INF] Erasing virtual disk and virtual machine to save \
 disk space..."
         [ -f "${VMPATH}/${VM}.vdi" ] && rm -f "${VMPATH}/${VM}.vdi"
         [ -d "${VMPATH}/${VM}" ] && rm -rf "${VMPATH}/${VM}"
     fi
     rm -rf ISOFILES/home/partimag/image/*
-    [ $? != 0 ] && { logger -s "[ERR] Could not remove old Clonezilla image"
+    [ $? != 0 ] && { eval ${LOG} "[ERR] Could not remove old Clonezilla image"
                      exit -1; }
     ln -s  ${VMPATH}/ISOFILES/home/partimag/image  /home/partimag
     /usr/sbin/ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5 \
                      -i 40960000000 -fsck -senc -p poweroff \
-                     savedisk gentoo.img ${USB_DEVICE}
+                     savedisk gentoo.img ${EXT_DEVICE}
     [ $? = 0 ] && [ -f /home/partimag/gentoo.img ] \
-                     && logger -s "[MSG] Cloning succeeded!" \
-                     || { logger -s "[ERR] Cloning failed!"; exit -1; }
+                     && eval ${LOG} "[MSG] Cloning succeeded!" \
+                     || { eval ${LOG} "[ERR] Cloning failed!"; exit -1; }
     return 0
 }
 
@@ -1534,8 +1591,8 @@ vbox_img_works() {
     return 1
 }
 
-## @fn create_usb_system()
-## @brief Clone VDI virtual disk to external device (like a USB stick)
+## @fn create_device_system()
+## @brief Clone VDI virtual disk to external device (USB device or hard drive)
 ## @details Two options are available. If vbox-img (patched) is functional
 ## after building VirtualBox from source, then use it and clone VDI directly
 ## to external device. Otherwise create a temporary RAW file and bare-metal copy
@@ -1543,28 +1600,31 @@ vbox_img_works() {
 ## @retval In the first case, the exit code of #clone_vm_to_device
 ## @retval In the second case, the exit code of #dd_to_usb following
 ##         #clone_vm_to_raw
+## @note Requires @b hot_install on command line to be activated.
+##       This function performs what a live CD does to a target disk, yet using
+##       the currently running operating system.
 ## @ingroup createInstaller
 
-create_usb_system() {
+create_device_system() {
     { ! vbox_img_works || ${BUILD_VIRTUALBOX}; } && build_virtualbox
     if  vbox_img_works
     then
-        logger -s "[INF] Cloning virtual disk to USB device ${USB_DEVICE} ..."
+        eval ${LOG} "[INF] Cloning virtual disk to USB device ${EXT_DEVICE} ..."
         clone_vm_to_device
         [ $? != 0 ] \
-            && { logger -s "[ERR] Cloning VDI disk to USB deice failed !"
+            && { eval ${LOG} "[ERR] Cloning VDI disk to USB deice failed !"
                  exit -1; }
     else
-        logger -s "[INF] Cloning virtual disk to raw..."
+        eval ${LOG} "[INF] Cloning virtual disk to raw..."
         clone_vm_to_raw
         [ $? != 0 ] \
-            && { logger -s "[ERR] Cloning VDI disk to RAW failed !"; exit -1; }
-        logger -s "[INF] Copying to USB stick..."
+            && { eval ${LOG} "[ERR] Cloning VDI disk to RAW failed !"; exit -1; }
+        eval ${LOG} "[INF] Copying to USB stick..."
         dd_to_usb
         if [ $? != 0 ]
         then
-            logger -s "[INF] Copying raw file to USB device failed!"
-            logger -s "[WAR] Check that your USB device has at least 50 GiB \
+            eval ${LOG} "[INF] Copying raw file to USB device failed!"
+            eval ${LOG} "[WAR] Check that your USB device has at least 50 GiB \
 of reachable space"
             exit -1
         fi
@@ -1586,7 +1646,7 @@ cleanup() {
     rm ${verb} -f *.txt
     rm ${verb} -rf ISOFILES/ mnt2/
     mountpoint mnt && umount -l mnt/
-    [ -d mnt ]  && rmdir ${verb} -rf mnt
+    [ -d mnt ]  && rm ${verb} -rf mnt
     [ -d mnt2 ] && rm ${verb} -rf mnt2
     [ -d "${VM}" ] && rm ${verb} -rf "${VM}"
     [ -d "${VM}_ISO" ] && rm ${verb} -rf "${VM}_ISO"
@@ -1599,24 +1659,24 @@ cleanup() {
 ## @ingroup createInstaller
 
 generate_Gentoo() {
-    logger -s "[INF] Fetching live CD..."
+    eval ${LOG} "[INF] Fetching live CD..."
     fetch_livecd
-    logger -s "[INF] Fetching stage3 tarball..."
+    eval ${LOG} "[INF] Fetching stage3 tarball..."
     fetch_stage3
-    logger -s "[INF] Tweaking live CD..."
+    eval ${LOG} "[INF] Tweaking live CD..."
     make_boot_from_livecd
-    logger -s "[INF] Creating VM"
+    eval ${LOG} "[INF] Creating VM"
     if ! create_vm; then
-        logger -s "[ERR] VM failed to be created!"
+        eval ${LOG} "[ERR] VM failed to be created!"
         exit -1
     fi
 
     # Now on to OS on external device
 
-    if [ -n "${USB_DEVICE}" ]
+    if [ -n "${EXT_DEVICE}" ]
     then
-        logger -s "[INF] Creating OS on device ${USB_DEVICE}..."
-        create_usb_system
+        eval ${LOG} "[INF] Creating OS on device ${EXT_DEVICE}..."
+        create_device_system
     fi
 }
 
@@ -1651,7 +1711,10 @@ source scripts/fetch_clonezilla_iso.sh
 # if an Gentoo has already been built into an ISO image or on an external device
 # skip generating it; otherwise go and build the Gentoo virtual machine
 
-! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}" && generate_Gentoo
+# you can bypass generation by setting vm= on commandline
+
+[ -n "${VM}" ] && ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}" \
+    && generate_Gentoo
 
 # process the virtual disk into a clonezilla image
 
@@ -1660,14 +1723,14 @@ then
     # Now create a new VM from clonezilla ISO to retrieve
     # Gentoo filesystem from the VDI virtual disk.
 
-    logger -s "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM..."
+    eval ${LOG} "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM..."
     "${VERBOSE}" \
-        && logger -s "[INF] These are necessary to activate folder sharing."
+        && eval ${LOG} "[INF] These are necessary to activate folder sharing."
     process_clonezilla_iso
 
     # And launch the corresponding VM
 
-    logger -s "[INF] Launching Clonezilla VM to convert virtual disk to \
+    eval ${LOG} "[INF] Launching Clonezilla VM to convert virtual disk to \
 clonezilla image..."
     create_iso_vm
 fi
@@ -1677,7 +1740,7 @@ fi
 if "${CREATE_ISO}"
 then
     [ "${FROM_DEVICE}" = "true" ] && clonezilla_device_to_image
-    logger -s "[INF] Creating Clonezilla bootable ISO..."
+    eval ${LOG} "[INF] Creating Clonezilla bootable ISO..."
 
     # this second ISO image is the "restore" one: from clonezilla image
     # to target disk.
@@ -1690,26 +1753,26 @@ then
     clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
     if [ $? = 0 ]
     then
-        logger -s "[MSG] Done."
+        eval ${LOG} "[MSG] Done."
         [ -f "${ISO_OUTPUT}" ] \
-            && logger -s "[MSG] ISO install medium was created here:\
+            && eval ${LOG} "[MSG] ISO install medium was created here:\
  ${ISO_OUTPUT}"  \
-            || logger -s "[ERR] ISO install medium failed to be created."
+            || eval ${LOG} "[ERR] ISO install medium failed to be created."
     else
-        logger -s "[ERR] ISO install medium failed to be created!"
+        eval ${LOG} "[ERR] ISO install medium failed to be created!"
         exit -1
     fi
 fi
-[ -n "${DEVICE_INSTALLER}" ] && create_install_usb_device
+[ -n "${DEVICE_INSTALLER}" ] && create_install_ext_device
 
 # optional disc burning
 
 "${BURN}" \
-    &&  loggers -s <<< $(burn_iso 2>&1 | xargs echo "[INF] Now burning disk: ")
+    &&  eval ${LOG}  <<< $(burn_iso 2>&1 | xargs echo "[INF] Now burning disk: ")
 
 # default cleanup
 
-logger -s <<< $(cleanup 2>&1 | xargs echo "[INF] Cleaning up: ")
+eval ${LOG} <<< $(cleanup 2>&1 | xargs echo "[INF] Cleaning up: ")
 
 # send mail
 
@@ -1720,10 +1783,10 @@ then
 
     [ -n "${EMAIL_PASSWD}" ] \
         && [ -n "${EMAIL}" ] && [ -n "${SMTP_URL}" ] \
-        && logger -s <<< $(send_mail 2>&1 | xargs echo "[INF] Sending mail: ")
+        && eval ${LOG} <<< $(send_mail 2>&1 | xargs echo "[INF] Sending mail: ")
 fi
 
-logger -s "[MSG] Gentoo building process ended."
+eval ${LOG} "[MSG] Gentoo building process ended."
 exit 0
 }
 

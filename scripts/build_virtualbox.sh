@@ -1,14 +1,17 @@
 #!/bin/bash
-if [ -z ${CLONEZILLACD} ] || [ -z ${VMPATH} ]
+
+CLONEZILLACD=clonezilla-live-20200703-focal-amd64.iso
+export VMPATH=$PWD/..
+
+if [ ! -f "${VMPATH}/${CLONEZILLACD}" ] || [ ! -d "${VMPATH}" ]
 then
-    logger "Export the CLONEZILLACD and VMPATH variables \
-before running this script."
+    eval ${LOG} "Export the CLONEZILLACD and VMPATH variables before running \
+this script."
     exit -1
 fi
 
-export VMPATH=$PWD/..
 export DOWNLOAD_CLONEZILLA="true"
-/bin/bash fetch_clonezilla_iso.sh
+source fetch_clonezilla_iso.sh
 
 fetch_clonezilla_iso
 cd ${VMPATH}

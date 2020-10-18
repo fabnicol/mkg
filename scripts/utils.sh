@@ -52,7 +52,7 @@ check_md5sum() {
     local ref=$(cat MD5SUMS | grep "$1" | cut -f 1 -d' ')
     downloaded=$(md5sum $1 | cut -f 1 -d' ')
     [ ${downloaded} = ${ref} ] && return 0
-    logger -s "[ERR] MD5 checkum for $1 is not correct. \
+    eval ${LOG} "[ERR] MD5 checkum for $1 is not correct. \
 Please download manually..."
     exit -1
 }
@@ -117,10 +117,10 @@ is_block_device() {
 get_mountpoint() {
     if is_block_device "$1"
     then
-        logger -s "[ERR] $1  is not a block device!"
-        logger -s "[MSG] Device labels should be in the following \
+        eval ${LOG} "[ERR] $1  is not a block device!"
+        eval ${LOG} "[MSG] Device labels should be in the following \
 list:"
-        logger -s $(list_block_devices)
+        eval ${LOG} $(list_block_devices)
         exit -1
     fi
     echo $(findmnt --raw --first -a -n -c "$1" | cut -f1 -d' ')
@@ -137,7 +137,7 @@ get_device() {
         echo ${device}
     else
         is_block_device "$1" && echo "$1" \
-            || { logger -s "[ERR] $1 is neither a mountpoint nor a \
+            || { eval ${LOG} "[ERR] $1 is neither a mountpoint nor a \
 block device"; exit -1; }
     fi
 }
@@ -152,16 +152,17 @@ block device"; exit -1; }
 ## modify \b cdrecord rights using: @code
 ## chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord
 ## @endcode
-## @retval 0 on success otherwise exits -1 on failure.
+## @retval 0 on success otherwise -1 on failure.
 ## @ingroup auxiliaryFunctions
 
 test_cdrecord() {
-    logger -s "[MSG] cdrecord scanbus: "
-    ${CDRECORD} -scanbus
-    [ $? != 0 ] \
-        && { logger -s "[ERR] cdrecord version is not functional"
-        logger -s "[MSG] Try reinstalling cdrecord"
-        exit -1; }
+    eval ${LOG} "[MSG] cdrecord scanbus test."
+    if ! "${CDRECORD}" -scanbus 2>&1 1>/dev/null
+    then
+        eval ${LOG} "[ERR] cdrecord version is not functional"
+        eval ${LOG} "[MSG] Try reinstalling cdrecord"
+        return -1
+    fi
     return 0
 }
 
@@ -188,7 +189,7 @@ recreate_liveCD_ISO() {
 # mkisofs almost never fails but if it does, hard stop here.
 
     [ $? != 0 ] && {
-        logger -s "[ERR] mkisofs could not recreate the ISO file to \
+        eval ${LOG} "[ERR] mkisofs could not recreate the ISO file to \
 boot virtual machine ${VM} from directory $1"
         exit -1; }
 }
@@ -202,16 +203,16 @@ boot virtual machine ${VM} from directory $1"
 burn_iso() {
     if [ -z "${CDRECORD}" ]
     then
-        if $(which cdrecord)
+        if which cdrecord
         then
-             logger -s "[ERR] Could not find cdrecord"
-             logger -s "[ERR] Please install cdrtools in your PATH or \
+             eval ${LOG} "[ERR] Could not find cdrecord"
+             eval ${LOG} "[ERR] Please install cdrtools in your PATH or \
  specify cdrecord full filepath on commandline:"
-             logger -s "      burn=true \
+             eval ${LOG} "      burn=true \
 cdrecord=/path/to/cdrecord/executable"
              return -1
          else
-             CDRECORD=$(which cdrecord)
+             CDRECORD="$(which cdrecord)"
              test_cdrecord
          fi
     else
@@ -220,20 +221,30 @@ cdrecord=/path/to/cdrecord/executable"
     "${BLANK}" && BLANK='blank=fast' || BLANK=""
     [ -z "${SCSI_ADDRESS}" ] && OPT="-eject ${BLANK}" \
             || OPT="-eject ${BLANK} dev=${SCSI_ADDRESS}"
-    logger -s "[INF] Burning installation medium to optical disc..."
-    "${CDRECORD}" "${OPT}" "${ISO_OUTPUT}"
+    export OPT
+    [ ! -f "${ISO_OUTPUT}" ] \
+          && { eval ${LOG} "[ERR] No such files as ${ISO_OUTPUT}"
+               return -1; }
+    eval ${LOG} "[INF] Burning installation medium ${ISO_OUTPUT} \
+to optical disc..."
+    "${VERBOSE}" && eval ${LOG} "[MSG] ${CDRECORD} ${OPT} ${ISO_OUTPUT}"
+
+    # caution: do not quote ${OPT} below:
+
+    "${CDRECORD}" ${OPT} "${ISO_OUTPUT}"
 }
 
-## @fn create_install_usb_device()
+## @fn create_install_ext_device()
 ## @brief Create USB-stick (or any external device) Gentoo clonezilla
 ##        installer
-## @warning Use with care, check your USB_DEVICE variable.
+## @warning Use with care, check your EXT_DEVICE variable.
+## @retval  Return value of `sync`exit code
 ## @ingroup createInstaller
 
-create_install_usb_device() {
+create_install_ext_device() {
     res=0
-    logger -s "[INF] Creating inetall device under /dev/${DEVICE_INSTALLER}"
+    eval ${LOG} "[INF] Creating install device under \
+/dev/${DEVICE_INSTALLER}"
     dd if="${ISO_OUTPUT}" of="/dev/${DEVICE_INSTALLER}" bs=4M status=progress
-    res=$?
     sync
 }

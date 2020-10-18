@@ -56,7 +56,7 @@ setup_network() {
     fi
     res=$?
     [ ${res} = 0 ] && touch setup_network || {
-        logger -s "[ERR] Could not fix internet access!"
+        eval ${LOG} "[ERR] Could not fix internet access!"
         "${GUI}" && exit -1 || shutdown -h now
     }
 }
@@ -141,16 +141,16 @@ partition() {
         echo "mkswap exit code: ${res3}"    >> partition
         echo "swapon exit code: ${res4}"    >> partition
         echo "mount exit code:  ${res5}"    >> partition
-        logger -s "Failed to cleanly partition main disk"
+        eval ${LOG} "Failed to cleanly partition main disk"
         sleep 10
         if [ $((${res1} | ${res2} | ${res3} | ${res5})) != 0 ]
         then
-            logger -s  "[ERR] Critical errors while partitioning"
+            eval ${LOG}  "[ERR] Critical errors while partitioning"
             swapoff -a
             findmnt /dev/sda4 && umount -l /dev/sda4
             "${GUI}" && return -1 || shutdown -h now
         else
-            logger -s "[WAR] Parted issue but mkfs and mount OK. Going on..."
+            eval ${LOG} "[WAR] Parted issue but mkfs and mount OK. Going on..."
             return -1
         fi
     fi
@@ -187,7 +187,7 @@ install_stage3() {
     tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
     if [ $? != 0 ]
     then
-        logger -s "[ERR] stage3 tarball could not be extracted"
+        eval ${LOG} "[ERR] stage3 tarball could not be extracted"
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
@@ -238,12 +238,12 @@ bh-luxi"' >> ${m_conf}
     then
         touch stage3
     else
-        logger -s "mounting proc exit code: ${res0}"         > stage3
-        logger -s "mounting sys exit code: ${res1}"         >> stage3
-        logger -s "rslave sys exit code: ${res2}"           >> stage3
-        logger -s "mounting dev dev exit code: ${res3}"     >> stage3
-        logger -s "rslave dev exit code exit code: ${res4}" >> stage3
-        logger -s "Failed to bind liveCD to main disk"
+        eval ${LOG} "mounting proc exit code: ${res0}"         > stage3
+        eval ${LOG} "mounting sys exit code: ${res1}"         >> stage3
+        eval ${LOG} "rslave sys exit code: ${res2}"           >> stage3
+        eval ${LOG} "mounting dev dev exit code: ${res3}"     >> stage3
+        eval ${LOG} "rslave dev exit code exit code: ${res4}" >> stage3
+        eval ${LOG} "Failed to bind liveCD to main disk"
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
@@ -275,7 +275,7 @@ finalize() {
 setup_network  2>&1 | tee setup_network.log
 if ! partition
 then
-    logger -s "[WAR] Second try at partitioning..."
+    eval ${LOG} "[WAR] Second try at partitioning..."
     findmnt /dev/sda2 && umount -l /dev/sda2
     findmnt /dev/sda4 && umount -l /dev/sda4
     swapoff -a

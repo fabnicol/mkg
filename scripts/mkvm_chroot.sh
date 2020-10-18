@@ -99,7 +99,7 @@ adjust_environment() {
 
     USE='-qt5' emerge -1 cmake
     [ $? != 0 ] \
-        && { logger -s "emerge cmake failed!" | tee emerge.build
+        && { eval ${LOG} "emerge cmake failed!" | tee emerge.build
         return -1; }
 
     # add logger. However it will not be usable for now,
@@ -112,7 +112,7 @@ adjust_environment() {
     # dependency for newer linux kernels.
 
     emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
-    [ $? != 0 ] && logger -s "[ERR] emerge netifrs/pcmiautils failed!"\
+    [ $? != 0 ] && eval ${LOG} "[ERR] emerge netifrs/pcmiautils failed!"\
             | tee emerge.build
 
     # Now on to updating @world set. Be patient and wait for about
@@ -121,7 +121,7 @@ adjust_environment() {
 
     emerge -uDN @world 2>&1 | tee emerge.build
     [ $? != 0 ] && {
-        logger -s "[ERR] emerge @world failed!"  | tee emerge.build
+        eval ${LOG} "[ERR] emerge @world failed!"  | tee emerge.build
         return -1; }
 
     # Networking in the new environment
@@ -182,16 +182,16 @@ build_kernel() {
     make -s -j${NCPUS}   2>&1 | tee kernel.log
     make modules_install 2>&1 | tee kernel.log
     make install         2>&1 | tee kernel.log
-    [ $? != 0 ] && { logger -s "[ERR] Kernel building failed!"
+    [ $? != 0 ] && { eval ${LOG} "[ERR] Kernel building failed!"
                      return -1; }
     genkernel --install initramfs
     emerge sys-kernel/linux-firmware
     make clean
-    [ -f /boot/vmlinu* ] && logger -s "[ERR] Kernel was built" \
-            || { logger -s "[ERR] Kernel compilation failed!"
+    [ -f /boot/vmlinu* ] && eval ${LOG} "[ERR] Kernel was built" \
+            || { eval ${LOG} "[ERR] Kernel compilation failed!"
                  return -1; }
-    [ -f /boot/initr*.img ] && logger -s "[ERR] initramfs was built" \
-                  || { logger -s "[ERR] initramfs compilation failed!"
+    [ -f /boot/initr*.img ] && eval ${LOG} "[ERR] initramfs was built" \
+                  || { eval ${LOG} "[ERR] initramfs compilation failed!"
                        return -1; }
 }
 
@@ -227,7 +227,7 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN ${packages}  2>&1 | tee log_install_software.log
-    [ $? != 0 ] && { logger -s "[ERR] Main package build step failed" \
+    [ $? != 0 ] && { eval ${LOG} "[ERR] Main package build step failed" \
                          | tee log_install_software.log; return -1; }
 
     echo 'install.packages(c("data.table", "dplyr", "ggplot2",\
@@ -243,15 +243,15 @@ install_software() {
 
     # optionally build RStudio and R dependencies (TODO)
 
-    ! "${DOWNLOAD_RSTUDIO}" && { logger -s "[MSG] No RStudio build" \
+    ! "${DOWNLOAD_RSTUDIO}" && { eval ${LOG} "[MSG] No RStudio build" \
          | tee log_install_software.log; return -1; }
 
     mkdir /Build
     cd /Build
     wget ${GITHUBPATH}${RSTUDIO}.zip
-    [ $? != 0 ] && { logger -s "[ERR] RStudio download failed!" \
+    [ $? != 0 ] && { eval ${LOG} "[ERR] RStudio download failed!" \
                 | tee log_install_software.log; return -1; }
-    logger -s "[INF] Building RStudio" | tee log_install_software.log
+    eval ${LOG} "[INF] Building RStudio" | tee log_install_software.log
     unzip *.zip
     cd rstudio*
     mkdir build
@@ -294,7 +294,7 @@ install_software() {
 ## @ingroup mkFileSystem
 
 global_config() {
-    logger -s "Cleaning up a bit aggressively before cloning..." \
+    eval ${LOG} "Cleaning up a bit aggressively before cloning..." \
         | tee log_uninstall_software.log
     eclean -d packages 2>&1 | tee log_uninstall_software.log
     rm -rf /var/tmp/*
@@ -313,7 +313,7 @@ global_config() {
     # cp -f /boot/config* .config make syncconfig make modules_prepare
     # for the sake of ebuilds requesting prepared kernel sources
     # TODO: test ocs-run
-    # post_run commands.  Also for usb_installer=... *alone* the above
+    # post_run commands.  Also for device_installer=... *alone* the above
     # code could be deactivated.  But then a later from_vm call would
     # have to clean sources to lighten the resulting ISO clonezilla
     # image.
@@ -394,7 +394,7 @@ global_config
 [ $? = 0 ] || res=$((res | 8))
 finalize
 [ $? = 0 ] || res=$((res | 16))
-logger -s "[MSG] Exiting with code: ${res}" 2>&1 | tee res.log
+eval ${LOG} "[MSG] Exiting with code: ${res}" 2>&1 | tee res.log
 exit ${res}
 
 # note: return code will be 0 if all went smoothly
