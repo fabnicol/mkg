@@ -1,14 +1,14 @@
 ##
 # Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
 #
-# This file is part of mkgentoo.
+# This file is part of gentoolize.
 #
-# mkgentoo is free software; you can redistribute it and/or
+# gentoolize is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 3 of the License, or (at your option) any later version.
 #
-# mkgentoo is distributed in the hope that it will be useful,
+# gentoolize is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
@@ -49,12 +49,13 @@ create_options_array() {
 ## @ingroup auxiliaryFunctions
 
 check_md5sum() {
+    check_tool "md5sum"
     local ref=$(cat MD5SUMS | grep "$1" | cut -f 1 -d' ')
     downloaded=$(md5sum $1 | cut -f 1 -d' ')
     [ ${downloaded} = ${ref} ] && return 0
-    eval ${LOG} "[ERR] MD5 checkum for $1 is not correct. \
+    ${LOG[*]} "[ERR] MD5 checkum for $1 is not correct. \
 Please download manually..."
-    exit -1
+    exit 1
 }
 
 ## @fn test_numeric()
@@ -115,13 +116,13 @@ is_block_device() {
 ## @ingroup auxiliaryFunctions
 
 get_mountpoint() {
-    if is_block_device "$1"
+    if ! is_block_device "$1"
     then
-        eval ${LOG} "[ERR] $1  is not a block device!"
-        eval ${LOG} "[MSG] Device labels should be in the following \
+        ${LOG[*]} "[ERR] $1  is not a block device!"
+        ${LOG[*]} "[MSG] Device labels should be in the following \
 list:"
-        eval ${LOG} $(list_block_devices)
-        exit -1
+        ${LOG[*]} $(list_block_devices)
+        exit 1
     fi
     echo $(findmnt --raw --first -a -n -c "$1" | cut -f1 -d' ')
 }
@@ -137,8 +138,8 @@ get_device() {
         echo ${device}
     else
         is_block_device "$1" && echo "$1" \
-            || { eval ${LOG} "[ERR] $1 is neither a mountpoint nor a \
-block device"; exit -1; }
+            || { ${LOG[*]} "[ERR] $1 is neither a mountpoint nor a \
+block device"; exit 1; }
     fi
 }
 
@@ -156,11 +157,11 @@ block device"; exit -1; }
 ## @ingroup auxiliaryFunctions
 
 test_cdrecord() {
-    eval ${LOG} "[MSG] cdrecord scanbus test."
+    ${LOG[*]} "[MSG] cdrecord scanbus test."
     if ! "${CDRECORD}" -scanbus 2>&1 1>/dev/null
     then
-        eval ${LOG} "[ERR] cdrecord version is not functional"
-        eval ${LOG} "[MSG] Try reinstalling cdrecord"
+        ${LOG[*]} "[ERR] cdrecord version is not functional"
+        ${LOG[*]} "[MSG] Try reinstalling cdrecord"
         return -1
     fi
     return 0
@@ -174,24 +175,36 @@ test_cdrecord() {
 
 recreate_liveCD_ISO() {
 
-    "${VERBOSE}" \
-         &&  mkisofs -v -J -R -o  "${ISO}" \
-            -b ${ISOLINUX_DIR}/isolinux.bin \
-            -c ${ISOLINUX_DIR}/boot.cat -no-emul-boot \
-            -boot-load-size 4 \
-            -boot-info-table "$1" \
-         ||  mkisofs -J -R -o  "${ISO}" \
-                         -b ${ISOLINUX_DIR}/isolinux.bin \
-                         -c ${ISOLINUX_DIR}/boot.cat -no-emul-boot \
-                         -boot-load-size 4 \
-                         -boot-info-table "$1" 2>/dev/null 1>/dev/null
+    check_tool "mkisofs"
+    check_files "${ISO}"\
+                "$1${ISOLINUX_DIR}/isolinux.bin" \
+                "$1${ISOLINUX_DIR}/boot.cat"
+    echo "\n[MSG] checking: $(ls  $1${ISOLINUX_DIR})"
+    sleep 5
+    check_dir "$1${ISOLINUX_DIR}"
+#    if  "${DEBUG_MODE}"
+#    then
+#    fi
+
+    if "${VERBOSE}"
+    then
+        mkisofs -v -J -R -o  "${ISO}" \
+                -b ${ISOLINUX_DIR}/isolinux.bin \
+                -c ${ISOLINUX_DIR}/boot.cat -no-emul-boot \
+                -boot-load-size 4 \
+                -boot-info-table "$1"
+    else
+        mkisofs -J -R -o  "${ISO}" \
+                -b ${ISOLINUX_DIR}/isolinux.bin \
+                -c ${ISOLINUX_DIR}/boot.cat -no-emul-boot \
+                -boot-load-size 4 \
+                -boot-info-table "$1" 2>/dev/null 1>/dev/null
+    fi
 
 # mkisofs almost never fails but if it does, hard stop here.
 
-    [ $? != 0 ] && {
-        eval ${LOG} "[ERR] mkisofs could not recreate the ISO file to \
+ if_fails $?  "[ERR] mkisofs could not recreate the ISO file to \
 boot virtual machine ${VM} from directory $1"
-        exit -1; }
 }
 
 ## @fn burn_iso()
@@ -203,12 +216,12 @@ boot virtual machine ${VM} from directory $1"
 burn_iso() {
     if [ -z "${CDRECORD}" ]
     then
-        if which cdrecord
+        if ! which cdrecord
         then
-             eval ${LOG} "[ERR] Could not find cdrecord"
-             eval ${LOG} "[ERR] Please install cdrtools in your PATH or \
+             ${LOG[*]} "[ERR] Could not find cdrecord"
+             ${LOG[*]} "[ERR] Please install cdrtools in your PATH or \
  specify cdrecord full filepath on commandline:"
-             eval ${LOG} "      burn=true \
+             ${LOG[*]} "      burn=true \
 cdrecord=/path/to/cdrecord/executable"
              return -1
          else
@@ -219,19 +232,20 @@ cdrecord=/path/to/cdrecord/executable"
          test_cdrecord
     fi
     "${BLANK}" && BLANK='blank=fast' || BLANK=""
-    [ -z "${SCSI_ADDRESS}" ] && OPT="-eject ${BLANK}" \
-            || OPT="-eject ${BLANK} dev=${SCSI_ADDRESS}"
-    export OPT
+    [ -z "${SCSI_ADDRESS}" ] && OPT=("-eject" "${BLANK}") \
+            || OPT=("-eject" "${BLANK}" "dev=${SCSI_ADDRESS}")
     [ ! -f "${ISO_OUTPUT}" ] \
-          && { eval ${LOG} "[ERR] No such files as ${ISO_OUTPUT}"
+        && { ${LOG[*]} "[ERR] No such files as ${ISO_OUTPUT}"
                return -1; }
-    eval ${LOG} "[INF] Burning installation medium ${ISO_OUTPUT} \
+    ${LOG[*]} "[INF] Burning installation medium ${ISO_OUTPUT} \
 to optical disc..."
-    "${VERBOSE}" && eval ${LOG} "[MSG] ${CDRECORD} ${OPT} ${ISO_OUTPUT}"
+    "${VERBOSE}" && ${LOG[*]} "[MSG] ${CDRECORD} ${OPT[*]} ${ISO_OUTPUT}"
 
-    # caution: do not quote ${OPT} below:
+    # do not quote OPT
 
-    "${CDRECORD}" ${OPT} "${ISO_OUTPUT}"
+    ${CDRECORD} ${OPT[*]} ${ISO_OUTPUT}
+
+    if_fails $? "[ERR] Could not burn ${ISO_OUTPUT}"
 }
 
 ## @fn create_install_ext_device()
@@ -243,8 +257,70 @@ to optical disc..."
 
 create_install_ext_device() {
     res=0
-    eval ${LOG} "[INF] Creating install device under \
+    check_file "${ISO_OUTPUT}" "[ERR] File ${ISO_OUTPUT} was not found."
+    is_block_device "/dev/${DEVICE_INSTALLER}"
+    ${LOG[*]} "[INF] Creating install device under \
 /dev/${DEVICE_INSTALLER}"
     dd if="${ISO_OUTPUT}" of="/dev/${DEVICE_INSTALLER}" bs=4M status=progress
     sync
+    if_fails $? "[ERR] Could not install device ${DEVICE_INSTALLER}"
+}
+
+check_dir() {
+    while [ -n "$1" ]
+    do
+        if  ! [ -d "$1" ]
+        then
+            ${LOG[*]} "[ERR] Directory *$1* not found"
+            exit 2
+        fi
+        shift
+    done
+}
+
+check_file() {
+    if ! [ -f "$1" ]
+    then
+        shift
+        until [ -z "$1" ]
+        do
+            ${LOG[*]} "$1"
+            shift
+        done
+        exit 3
+    fi
+}
+
+check_files() {
+    while [ -n "$1" ]
+    do
+        if ! [ -f "$1" ]
+        then
+            ${LOG[*]} "[ERR] File *$1* not found"
+            exit 3
+        fi
+        shift
+
+    done
+}
+
+check_tool() {
+    while [ -n "$1" ]
+    do
+        if [ -z "$(whereis $1)" ]
+        then
+            ${LOG[*]} "[ERR] You should first install $1, \
+which is used by this program."
+            exit 1;
+        fi
+        shift
+    done
+}
+
+if_fails() {
+    if [ $1 != 0 ]
+    then
+        ${LOG[*]} "$2"
+        exit 1
+    fi
 }

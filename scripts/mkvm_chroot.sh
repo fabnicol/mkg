@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # * Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>.
-# * This file is part of mkgentoo.
-# * mkgentoo is free software; you can
+# * This file is part of gentoolize.
+# * gentoolize is free software; you can
 # * redistribute it and/or modify it under the terms of the GNU Lesser
 # * General Public License as published by the Free Software
 # * Foundation; either version 3 of the License, or (at your option)
@@ -99,7 +99,7 @@ adjust_environment() {
 
     USE='-qt5' emerge -1 cmake
     [ $? != 0 ] \
-        && { eval ${LOG} "emerge cmake failed!" | tee emerge.build
+        && { ${LOG[*]} "emerge cmake failed!" | tee emerge.build
         return -1; }
 
     # add logger. However it will not be usable for now,
@@ -112,7 +112,7 @@ adjust_environment() {
     # dependency for newer linux kernels.
 
     emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
-    [ $? != 0 ] && eval ${LOG} "[ERR] emerge netifrs/pcmiautils failed!"\
+    [ $? != 0 ] && ${LOG[*]} "[ERR] emerge netifrs/pcmiautils failed!"\
             | tee emerge.build
 
     # Now on to updating @world set. Be patient and wait for about
@@ -121,15 +121,15 @@ adjust_environment() {
 
     emerge -uDN @world 2>&1 | tee emerge.build
     [ $? != 0 ] && {
-        eval ${LOG} "[ERR] emerge @world failed!"  | tee emerge.build
+        ${LOG[*]} "[ERR] emerge @world failed!"  | tee emerge.build
         return -1; }
 
     # Networking in the new environment
 
     echo hostname=${NONROOT_USER}pc > /etc/conf.d/hostname
-    cd /etc/init.d
+    cd /etc/init.d || exit 2
     ln -s net.lo net.${iface}
-    cd -
+    cd - || exit 2
     rc-update add net.${iface} default
 
     # Set keymaps and time
@@ -174,7 +174,7 @@ build_kernel() {
 
     mount /dev/sda2 /boot
     cp -vf .config /usr/src/linux
-    cd /usr/src/linux
+    cd /usr/src/linux || exit 2
 
     # kernel config issue here
 
@@ -182,16 +182,16 @@ build_kernel() {
     make -s -j${NCPUS}   2>&1 | tee kernel.log
     make modules_install 2>&1 | tee kernel.log
     make install         2>&1 | tee kernel.log
-    [ $? != 0 ] && { eval ${LOG} "[ERR] Kernel building failed!"
+    [ $? != 0 ] && { ${LOG[*]} "[ERR] Kernel building failed!"
                      return -1; }
     genkernel --install initramfs
     emerge sys-kernel/linux-firmware
     make clean
-    [ -f /boot/vmlinu* ] && eval ${LOG} "[ERR] Kernel was built" \
-            || { eval ${LOG} "[ERR] Kernel compilation failed!"
+    [ -f /boot/vmlinu* ] && ${LOG[*]} "[ERR] Kernel was built" \
+            || { ${LOG[*]} "[ERR] Kernel compilation failed!"
                  return -1; }
-    [ -f /boot/initr*.img ] && eval ${LOG} "[ERR] initramfs was built" \
-                  || { eval ${LOG} "[ERR] initramfs compilation failed!"
+    [ -f /boot/initr*.img ] && ${LOG[*]} "[ERR] initramfs was built" \
+                  || { ${LOG[*]} "[ERR] initramfs compilation failed!"
                        return -1; }
 }
 
@@ -209,7 +209,7 @@ install_software() {
     # to avoid corruption cases of ebuild list
     # caused by Windows editing
 
-    cd /
+    cd / || exit 2
     emerge dos2unix  | tee log_install_software.log
     chown root ${ELIST}
     chmod +rw ${ELIST}
@@ -227,7 +227,7 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN ${packages}  2>&1 | tee log_install_software.log
-    [ $? != 0 ] && { eval ${LOG} "[ERR] Main package build step failed" \
+    [ $? != 0 ] && { ${LOG[*]} "[ERR] Main package build step failed" \
                          | tee log_install_software.log; return -1; }
 
     echo 'install.packages(c("data.table", "dplyr", "ggplot2",\
@@ -243,24 +243,24 @@ install_software() {
 
     # optionally build RStudio and R dependencies (TODO)
 
-    ! "${DOWNLOAD_RSTUDIO}" && { eval ${LOG} "[MSG] No RStudio build" \
+    ! "${DOWNLOAD_RSTUDIO}" && { ${LOG[*]} "[MSG] No RStudio build" \
          | tee log_install_software.log; return -1; }
 
     mkdir /Build
-    cd /Build
+    cd /Build || exit 2
     wget ${GITHUBPATH}${RSTUDIO}.zip
-    [ $? != 0 ] && { eval ${LOG} "[ERR] RStudio download failed!" \
+    [ $? != 0 ] && { ${LOG[*]} "[ERR] RStudio download failed!" \
                 | tee log_install_software.log; return -1; }
-    eval ${LOG} "[INF] Building RStudio" | tee log_install_software.log
+    ${LOG[*]} "[INF] Building RStudio" | tee log_install_software.log
     unzip *.zip
-    cd rstudio*
+    cd rstudio* || return 2
     mkdir build
-    cd dependencies/common
+    cd dependencies/common  || return 2
     ./install-mathjax
     ./install-dictionaries
     ./install-pandoc
-    cd -
-    cd build
+    cd - || return 2
+    cd build || return 2
     cmake .. -DRSTUDIO_TARGET=Desktop \
           -DCMAKE_BUILD_TYPE=Release \
           -DRSTUDIO_USE_SYSTEM_BOOST=1 \
@@ -269,7 +269,7 @@ install_software() {
     make -j${NCPUS} 2>&1 | tee log_install_software.log
     make -k install 2>&1 | tee log_install_software.log
     res=$?
-    cd /
+    cd / || return 2
     ! "${DEBUG_MODE}" && rm -rf /Build
 
     # if DEBUG_MODE is true, would return 1, undesirably.
@@ -294,7 +294,7 @@ install_software() {
 ## @ingroup mkFileSystem
 
 global_config() {
-    eval ${LOG} "Cleaning up a bit aggressively before cloning..." \
+    ${LOG[*]} "Cleaning up a bit aggressively before cloning..." \
         | tee log_uninstall_software.log
     eclean -d packages 2>&1 | tee log_uninstall_software.log
     rm -rf /var/tmp/*
@@ -394,7 +394,7 @@ global_config
 [ $? = 0 ] || res=$((res | 8))
 finalize
 [ $? = 0 ] || res=$((res | 16))
-eval ${LOG} "[MSG] Exiting with code: ${res}" 2>&1 | tee res.log
+echo "[MSG] Exiting with code: ${res}" 2>&1 | tee res.log
 exit ${res}
 
 # note: return code will be 0 if all went smoothly

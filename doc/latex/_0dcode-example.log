@@ -2,10 +2,10 @@ This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**_0dcode-example.tex _2home_2fab_2_dev_2mkgentoo_2scripts_2mkgentoo_8sh-exampl
+**_0dcode-example.tex _2home_2fab_2_dev_2gentoolize_2scripts_2gentoolize_8sh-exampl
 e.tex bug.tex build__virtualbox_8sh.tex examples.tex fetch__clonezilla__iso_8sh
 .tex files.tex group__auxiliary_functions.tex group__create_installer.tex group
-__mk_file_system.tex index.tex mkgentoo_8sh.tex mkvm_8sh.tex mkvm__chroot_8sh.t
+__mk_file_system.tex index.tex gentoolize_8sh.tex mkvm_8sh.tex mkvm__chroot_8sh.t
 ex modules.tex refman.tex todo.tex tt-example.tex utils_8sh.tex a.pdf
 (./_0dcode-example.tex
 LaTeX2e <2020-02-02> patch level 2
@@ -49,12 +49,12 @@ l.1 \hypertarget{_0dcode-example}{}\doxysection
                                                {@code}
 ? 
 ! Undefined control sequence.
-l.2 mkgentoo language=fr minimal=true debug\+
+l.2 gentoolize language=fr minimal=true debug\+
                                              \_\+mode=true ncpus=8 nonroot\+...
 
 ? 
 ! Undefined control sequence.
-l.2 mkgentoo language=fr minimal=true debug\+\_\+
+l.2 gentoolize language=fr minimal=true debug\+\_\+
                                                  mode=true ncpus=8 nonroot\+...
 
 ? 

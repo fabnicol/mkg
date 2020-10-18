@@ -3,9 +3,9 @@
 # *
 # * Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
 # *
-# * This file is part of mkgentoo.
+# * This file is part of gentoolize.
 # *
-# * mkgentoo is free software; you can redistribute it and/or
+# * gentoolize is free software; you can redistribute it and/or
 # * modify it under the terms of the GNU Lesser General Public
 # * License as published by the Free Software Foundation; either
 # * version 3 of the License, or (at your option) any later version.
@@ -23,7 +23,7 @@
 ## @fn setup_network()
 ## @brief Call net-setup and dhcpcd to enable networking
 ## @details Create file \b setup_network on success for debugging purposes
-## @retval Otherwise exit -1 on failure
+## @retval Otherwise exit 1 on failure
 ## @ingroup mkFileSystem
 
 setup_network() {
@@ -46,7 +46,7 @@ setup_network() {
         else
 
             # Workaround a VirtualBox bug, you need a keyboard input here of
-            # some sort.  This is why we wait some time in mkgentoo.sh
+            # some sort.  This is why we wait some time in gentoolize.sh
 
             read -p "[MSG] Waiting for keyboard input..."  input_str
             echo "[MSG] Got input string: $input_str" | tee setup_network.log
@@ -56,8 +56,8 @@ setup_network() {
     fi
     res=$?
     [ ${res} = 0 ] && touch setup_network || {
-        eval ${LOG} "[ERR] Could not fix internet access!"
-        "${GUI}" && exit -1 || shutdown -h now
+        ${LOG[*]} "[ERR] Could not fix internet access!"
+        "${GUI}" && exit 1 || shutdown -h now
     }
 }
 
@@ -141,16 +141,16 @@ partition() {
         echo "mkswap exit code: ${res3}"    >> partition
         echo "swapon exit code: ${res4}"    >> partition
         echo "mount exit code:  ${res5}"    >> partition
-        eval ${LOG} "Failed to cleanly partition main disk"
+        ${LOG[*]} "Failed to cleanly partition main disk"
         sleep 10
         if [ $((${res1} | ${res2} | ${res3} | ${res5})) != 0 ]
         then
-            eval ${LOG}  "[ERR] Critical errors while partitioning"
+            ${LOG[*]}  "[ERR] Critical errors while partitioning"
             swapoff -a
             findmnt /dev/sda4 && umount -l /dev/sda4
             "${GUI}" && return -1 || shutdown -h now
         else
-            eval ${LOG} "[WAR] Parted issue but mkfs and mount OK. Going on..."
+            ${LOG[*]} "[WAR] Parted issue but mkfs and mount OK. Going on..."
             return -1
         fi
     fi
@@ -182,16 +182,16 @@ install_stage3() {
 
     # cd to target OS and extract stage3 archive
 
-    cd /mnt/gentoo
+    cd /mnt/gentoo || exit 2
     head -n -1 -q bashrc_temp > temp_bashrc && rm bashrc_temp
     tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
     if [ $? != 0 ]
     then
-        eval ${LOG} "[ERR] stage3 tarball could not be extracted"
+        ${LOG[*]} "[ERR] stage3 tarball could not be extracted"
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
-        "${GUI}" && exit -1 || shutdown -h now
+        "${GUI}" && exit 1 || shutdown -h now
     fi
     cat temp_bashrc >> .bashrc
     rm temp_bashrc
@@ -238,18 +238,18 @@ bh-luxi"' >> ${m_conf}
     then
         touch stage3
     else
-        eval ${LOG} "mounting proc exit code: ${res0}"         > stage3
-        eval ${LOG} "mounting sys exit code: ${res1}"         >> stage3
-        eval ${LOG} "rslave sys exit code: ${res2}"           >> stage3
-        eval ${LOG} "mounting dev dev exit code: ${res3}"     >> stage3
-        eval ${LOG} "rslave dev exit code exit code: ${res4}" >> stage3
-        eval ${LOG} "Failed to bind liveCD to main disk"
+        ${LOG[*]} "mounting proc exit code: ${res0}"         > stage3
+        ${LOG[*]} "mounting sys exit code: ${res1}"         >> stage3
+        ${LOG[*]} "rslave sys exit code: ${res2}"           >> stage3
+        ${LOG[*]} "mounting dev dev exit code: ${res3}"     >> stage3
+        ${LOG[*]} "rslave dev exit code exit code: ${res4}" >> stage3
+        ${LOG[*]} "Failed to bind liveCD to main disk"
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
-        "${GUI}" && exit -1 || shutdown -h now
+        "${GUI}" && exit 1 || shutdown -h now
     fi
-    cd ~
+    cd ~ || exit 2
     chroot /mnt/gentoo /bin/bash mkvm_chroot.sh
 }
 
@@ -275,7 +275,7 @@ finalize() {
 setup_network  2>&1 | tee setup_network.log
 if ! partition
 then
-    eval ${LOG} "[WAR] Second try at partitioning..."
+    ${LOG[*]} "[WAR] Second try at partitioning..."
     findmnt /dev/sda2 && umount -l /dev/sda2
     findmnt /dev/sda4 && umount -l /dev/sda4
     swapoff -a

@@ -8,20 +8,25 @@
 # 4 columns are used.
 # Type is in:"b", "f", "d", "o", "u", "s", "n", "e", "vm" (see Doxygen Doc)
 # Conditional type is of the form "x:y":  [ -z "$x" ] <=> { [ "$y" = "false" ] ||  [ -z "$y" ]; } && [ "$y" != "true" ]
+# debug_mode and verbose should be placed on top so that they are set by default earlier in function test_cli()
 
 #    "Option name"        "Description"                                                                                  "Default value" "Type"
 
-     "debug_mode"         "Do not clean up mkgentoo custom logs at root of gentoo system files before VM shutdown. Boolean."     "false" "b"
+     "debug_mode"         "Do not clean up gentoolize custom logs at root of gentoo system files before VM shutdown. Boolean."     "false" "b"
+     "verbose"            "Increase verbosity"                                                                                   "false" "b"
+     "bios"           "Type of bootloader: bios or efi. Use only 'bios', tweaking not supported but might be at later stages."    "true" "b"
      "blank"              "Blank rewritable optical disk before burning installation image."                                     "false" "b"
-     "build_virtualbox"   "Download code source and automatically build virtualbox and tools."                                   "false" "b"
+     "build_virtualbox"   "Download code source and automatically build virtualbox and tools. Yields VirtualBox and vbox-img executables under main directory and subdirectory virtualbox with the build, including documentation."                                   "false" "b"
      "burn"               "Burn to optical disc. Boolean."                                                                       "false" "b"
      "cdrecord"           "cdrecord full path. Automatically determined if left unspecified."                        "$(which cdrecord)" "f:burn"
+     "compact"            "Compact virtual disk after VM building. Caution: this may impede hot_install and ext_device."         "false" "b"
      "cflags"             "GCC CFLAGS options for ebuilds"                                                           "-march=native -O2" ""
      "cleanup"            "Clean up archives, temporary images and virtual machine after successful completion. Boolean."         "true" "b"
+     "remove_vdi"         "Full clean-up: also remove VDI disks"                                                                "false"  "b"
      "clonezilla_install" "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false" "b"
      "cpuexecutioncap"    "Maximum percentage of CPU per core (0 to 100)"                                                          "100" "n"
      "create_squashfs"    "(Re)create the squashfs filesystem. Boolean."                                                          "true" "b"
-     "device_installer"   "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer."  "" "s"
+     "device_installer"   "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb, hdb), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer."  "" ""
      "disable_md5_check"  "Disable MD5 checkums verification after downloads. Boolean."                                           "true" "b"
      "download"           "Download install ISO image from Gentoo mirror. Boolean."                                               "true" "b"
      "download_clonezilla""Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean"                    "true" "b"
@@ -32,12 +37,11 @@
      "email"              "Email address to send warning to when Gentoo has been created."                                            "" "e"
      "email_passwd"       "Email password"                                                                                            "" "s:email"
      "emirrors"           "Mirror sites for downloading ebuilds"                       "http://gentoo.mirrors.ovh.net/gentoo-distfiles/" "u"
-     "ext_device"         "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb1, hdb1), or a mountpoint directory (if mounted), or a few consecutive letters of the model (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such. Requires *hot_install* on commandline."    "" "s:hot_install"
+     "ext_device"         "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb, hdb), or a mountpoint directory (if mounted), or a few consecutive letters of the model (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such. Requires *hot_install* on commandline."    "" "s:hot_install"
 
-     "bios"           "Type of bootloader: bios or efi. Use only 'bios', tweaking not supported but might be at later stages."    "true" "b"
      "force"              "Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running." "true" "b"
      "from_device"        "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean.""false" "b"
-     "from_iso"           "Do not generate Gentoo but use the bootable ISO given on commandline. Boolean."                       "false" "b"
+     "from_iso"           "Do not generate Gentoo but use the bootable ISO given on commandline by iso_output=...iso. Boolean."  "false" "b"
      "from_vm"            "Do not generate Gentoo but use the VM ${VM}. Boolean."                                                "false" "b"
      "githubpath"         "RStudio Github path to zip: path right before version.zip"     "https://github.com/rstudio/rstudio/archive/v" "u"
      "gui"                "Binary: true corresponds to VBoxManage startvm ... --type=gui, false to --type=headless"               "true" "b"
@@ -46,7 +50,6 @@
      "hwvirtex"           "Activate HWVIRTEX: on/off"                                                                               "on" "o"
      "interactive"        "Allow interaction with user. This may cause deadlock if process is detached from the console (*nohup* or other methods)" "true" "b"
      "ioapic"             "IOAPIC parameter: on or off"                                                                             "on" "o"
-     "iso_output"         "Gentoo bootable ISO when previously authored, to be used for other operations like burning or export to USB device" "" "" 
      "kernel_config"      "Use a custom kernel config file"                                                                 ".config"    "f"
      "language"           "Set default login keyboard layout"                                                               "us"         "s"
      "lineno_patch"       "Line patched against vbox-img.cpp in virtualbox source code"                                     "797"        "n"
@@ -78,5 +81,4 @@
      "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.14a"  "s"
      "vbpath"             "Path to VirtualBox directory"                                                                      "/usr/bin" "d"
      "vmpath"             "Path to VM base directory"                                                                         "$PWD"     "d"
-     "verbose"            "Increase verbosity"                                                                                "false"    "b"
      "vtxvpid"            "Activate VTXVPID: on/off"                                                                          "on"       "o"

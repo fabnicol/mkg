@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>mkgentoo: /home/fab/Dev/mkgentoo/scripts/mkgentoo.sh</title>
+<title>gentoolize: /home/fab/Dev/gentoolize/scripts/gentoolize.sh</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="gentoo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">mkgentoo
+   <div id="projectname">gentoolize
    &#160;<span id="projectnumber">1.0</span>
    </div>
    <div id="projectbrief">Gentoo distribution creator</div>
@@ -65,16 +65,16 @@ $(function() {
 
 <div class="header">
   <div class="headertitle">
-<div class="title">/home/fab/Dev/mkgentoo/scripts/mkgentoo.sh</div>  </div>
+<div class="title">/home/fab/Dev/gentoolize/scripts/gentoolize.sh</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line">mkgentoo language=fr minimal=<span class="keyword">true</span> debug_mode=<span class="keyword">true</span> ncpus=8 nonroot_user=ken passwd=<span class="stringliteral">&#39;util!Hx&amp;32F&#39;</span> rootpasswd=<span class="stringliteral">&#39;Hk_32!_CD&#39;</span> cleanup=<span class="keyword">false</span></div>
+<div class="fragment"><div class="line">gentoolize language=fr minimal=<span class="keyword">true</span> debug_mode=<span class="keyword">true</span> ncpus=8 nonroot_user=ken passwd=<span class="stringliteral">&#39;util!Hx&amp;32F&#39;</span> rootpasswd=<span class="stringliteral">&#39;Hk_32!_CD&#39;</span> cleanup=<span class="keyword">false</span></div>
 </div><!-- fragment --><div class="fragment"><div class="line"><span class="preprocessor">##</span></div>
 <div class="line"><span class="preprocessor"># Copyright (c) 2020 Fabrice Nicol &lt;fabrnicol@gmail.com&gt;</span></div>
 <div class="line"><span class="preprocessor">#</span></div>
-<div class="line"><span class="preprocessor"># This file is part of mkgentoo.</span></div>
+<div class="line"><span class="preprocessor"># This file is part of gentoolize.</span></div>
 <div class="line"><span class="preprocessor">#</span></div>
-<div class="line"><span class="preprocessor"># mkgentoo is free software; you can redistribute it and/or</span></div>
+<div class="line"><span class="preprocessor"># gentoolize is free software; you can redistribute it and/or</span></div>
 <div class="line"><span class="preprocessor"># modify it under the terms of the GNU Lesser General Public</span></div>
 <div class="line"><span class="preprocessor"># License as published by the Free Software Foundation; either</span></div>
 <div class="line"><span class="preprocessor"># version 3 of the License, or (at your option) any later version.</span></div>
@@ -91,7 +91,7 @@ $(function() {
 <div class="line"> </div>
 <div class="line"><span class="preprocessor">#!/bin/bash</span></div>
 <div class="line"> </div>
-<div class="line"><span class="preprocessor">## @file mkgentoo.sh</span></div>
+<div class="line"><span class="preprocessor">## @file gentoolize.sh</span></div>
 <div class="line"><span class="preprocessor">## @author Fabrice Nicol &lt;fabrnicol@gmail.com&gt;</span></div>
 <div class="line"><span class="preprocessor">## @copyright GPL v.3</span></div>
 <div class="line"><span class="preprocessor">## @brief Process options, create Gentoo VirtualBox machine and optionally create clonezilla install medium</span></div>
@@ -99,16 +99,16 @@ $(function() {
 <div class="line"><span class="preprocessor">## @defgroup createInstaller Create Gentoo linux image and installer.</span></div>
 <div class="line"><span class="preprocessor">## @par USAGE</span></div>
 <div class="line"><span class="preprocessor">## @code</span></div>
-<div class="line"><span class="preprocessor">## mkgentoo  [[switch=argument]...]  filename.iso  [1]</span></div>
-<div class="line"><span class="preprocessor">## mkgentoo  [[switch=argument]...]                [2]</span></div>
-<div class="line"><span class="preprocessor">## mkgentoo  help[=md]                             [3]</span></div>
+<div class="line"><span class="preprocessor">## gentoolize  [[switch=argument]...]  filename.iso  [1]</span></div>
+<div class="line"><span class="preprocessor">## gentoolize  [[switch=argument]...]                [2]</span></div>
+<div class="line"><span class="preprocessor">## gentoolize  help[=md]                             [3]</span></div>
 <div class="line"><span class="preprocessor">## @endcode</span></div>
 <div class="line"><span class="preprocessor">## @par</span></div>
 <div class="line"><span class="preprocessor">## Usage [1] creates a bootable ISO output file with a current Gentoo distribution.   @n</span></div>
 <div class="line"><span class="preprocessor">## Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo.   @n</span></div>
 <div class="line"><span class="preprocessor">## Usage [3] prints this help, in markdown form if argument &#39;md&#39; is specified.  @n</span></div>
 <div class="line"><span class="preprocessor">## @par</span></div>
-<div class="line"><span class="preprocessor">## Run: @code mkgentoo help @endcode to print a list of possible switches and arguments.</span></div>
+<div class="line"><span class="preprocessor">## Run: @code gentoolize help @endcode to print a list of possible switches and arguments.</span></div>
 <div class="line"><span class="preprocessor">##</span></div>
 <div class="line"><span class="preprocessor">## @warning you should have at least 55 GB of free disk space in the current directory or in vmpath if specified.</span></div>
 <div class="line"><span class="preprocessor">## Boolean values are either &#39;true&#39; or &#39;false&#39;. For example, to build a minimal distribution,</span></div>
@@ -116,16 +116,16 @@ $(function() {
 <div class="line"><span class="preprocessor">##</span></div>
 <div class="line"><span class="preprocessor">## @example</span></div>
 <div class="line"><span class="preprocessor">## @code</span></div>
-<div class="line"><span class="preprocessor">## mkgentoo language=fr minimal=true debug_mode=true ncpus=8 nonroot_user=ken passwd=&#39;util!Hx&amp;32F&#39; rootpasswd=&#39;Hk_32!_CD&#39; cleanup=false</span></div>
+<div class="line"><span class="preprocessor">## gentoolize language=fr minimal=true debug_mode=true ncpus=8 nonroot_user=ken passwd=&#39;util!Hx&amp;32F&#39; rootpasswd=&#39;Hk_32!_CD&#39; cleanup=false</span></div>
 <div class="line"><span class="preprocessor">## @endcode</span></div>
 <div class="line"> </div>
 <div class="line">cd ..</div>
 <div class="line"> </div>
 <div class="line">CLI=<span class="stringliteral">&quot;$*&quot;</span></div>
 <div class="line"> </div>
-<div class="line">declare -a <a name="a0"></a><a class="code" href="mkgentoo_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a></div>
+<div class="line">declare -a <a name="a0"></a><a class="code" href="gentoolize_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a></div>
 <div class="line"> </div>
-<div class="line"><a class="code" href="mkgentoo_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>=(<span class="stringliteral">&quot;minimal&quot;</span>     <span class="stringliteral">&quot;Remove *libreoffice* and *data science tools* from default list of installed software&quot;</span>  <span class="stringliteral">&quot;false&quot;</span></div>
+<div class="line"><a class="code" href="gentoolize_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>=(<span class="stringliteral">&quot;minimal&quot;</span>     <span class="stringliteral">&quot;Remove *libreoffice* and *data science tools* from default list of installed software&quot;</span>  <span class="stringliteral">&quot;false&quot;</span></div>
 <div class="line">     <span class="stringliteral">&quot;elist&quot;</span>       <span class="stringliteral">&quot;\t File containing a list of Gentoo ebuilds to add to the VM on top of stage3&quot;</span> <span class="stringliteral">&quot;ebuilds.list&quot;</span></div>
 <div class="line">     <span class="stringliteral">&quot;vm&quot;</span>          <span class="stringliteral">&quot;\t Virtual Machine name&quot;</span>                                             <span class="stringliteral">&quot;Gentoo&quot;</span></div>
 <div class="line">     <span class="stringliteral">&quot;vbpath&quot;</span>      <span class="stringliteral">&quot;Path to VirtualBox directory&quot;</span>                                        <span class="stringliteral">&quot;/usr/bin&quot;</span></div>
@@ -164,12 +164,12 @@ $(function() {
 <div class="line">     <span class="stringliteral">&quot;usb_installer&quot;</span> <span class="stringliteral">&quot;Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb2, hdb2), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer.&quot;</span>  <span class="stringliteral">&quot;&quot;</span></div>
 <div class="line">     <span class="stringliteral">&quot;disable_md5_check&quot;</span> <span class="stringliteral">&quot;Disable MD5 checkums verification after downloads&quot;</span>             <span class="stringliteral">&quot;true&quot;</span></div>
 <div class="line">     <span class="stringliteral">&quot;cleanup&quot;</span>       <span class="stringliteral">&quot;Clean up archives, temporary images and virtual machine after successful completion&quot;</span>  <span class="stringliteral">&quot;true&quot;</span></div>
-<div class="line">     <span class="stringliteral">&quot;debug_mode&quot;</span>  <span class="stringliteral">&quot;Do not clean up mkgentoo custom logs at root of gentoo system files before VM shutdown&quot;</span>  <span class="stringliteral">&quot;false&quot;</span></div>
+<div class="line">     <span class="stringliteral">&quot;debug_mode&quot;</span>  <span class="stringliteral">&quot;Do not clean up gentoolize custom logs at root of gentoo system files before VM shutdown&quot;</span>  <span class="stringliteral">&quot;false&quot;</span></div>
 <div class="line">     <span class="stringliteral">&quot;help&quot;</span>          <span class="stringliteral">&quot;\t This help&quot;</span>                                                         <span class="stringliteral">&quot;&quot;</span></div>
 <div class="line"> </div>
 <div class="line">    )</div>
 <div class="line"> </div>
-<div class="line">ARRAY_LENGTH=$((${#<a class="code" href="mkgentoo_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[*]}/3))</div>
+<div class="line">ARRAY_LENGTH=$((${#<a class="code" href="gentoolize_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[*]}/3))</div>
 <div class="line"> </div>
 <div class="line">ISO=<span class="stringliteral">&quot;downloaded.iso&quot;</span></div>
 <div class="line"> </div>
@@ -193,9 +193,9 @@ $(function() {
 <div class="line">       echo <span class="stringliteral">&quot;Please update and reinstall&quot;</span></div>
 <div class="line">       exit -1</div>
 <div class="line">   fi</div>
-<div class="line">   local sw=${<a class="code" href="mkgentoo_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[$(($1 * 3))]}</div>
-<div class="line">   local desc=${<a class="code" href="mkgentoo_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[$(($1 * 3 + 1))]}</div>
-<div class="line">   local <span class="keywordflow">default</span>=${<a class="code" href="mkgentoo_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[$(($1 * 3 + 2))]}</div>
+<div class="line">   local sw=${<a class="code" href="gentoolize_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[$(($1 * 3))]}</div>
+<div class="line">   local desc=${<a class="code" href="gentoolize_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[$(($1 * 3 + 1))]}</div>
+<div class="line">   local <span class="keywordflow">default</span>=${<a class="code" href="gentoolize_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[$(($1 * 3 + 2))]}</div>
 <div class="line">   local vm_arg=$(echo ${CLI} | sed -E <span class="stringliteral">&quot;s/(^${sw}|.* ${sw})=([^ ]+).*/\2/&quot;</span>)</div>
 <div class="line">   ISO_OUTPUT=$(echo ${CLI} | sed -E <span class="stringliteral">&#39;s/.*(\b\w+)\.(iso|ISO)/\1\.iso/&#39;</span>)</div>
 <div class="line">   <span class="keywordflow">if</span> test <span class="stringliteral">&quot;${ISO_OUTPUT}&quot;</span> != <span class="stringliteral">&quot;&quot;</span> -a <span class="stringliteral">&quot;${ISO_OUTPUT}&quot;</span> != <span class="stringliteral">&quot;${CLI}&quot;</span>; then</div>
@@ -238,9 +238,9 @@ $(function() {
 <div class="line"> </div>
 <div class="line"><span class="keyword">function</span> help_md {</div>
 <div class="line">   echo <span class="stringliteral">&quot;**USAGE:**  &quot;</span></div>
-<div class="line">   echo <span class="stringliteral">&quot;**mkgentoo**  [[switch=argument]...]  filename.iso  [1]  &quot;</span></div>
-<div class="line">   echo <span class="stringliteral">&quot;**mkgentoo**  [[switch=argument]...]                [2]  &quot;</span></div>
-<div class="line">   echo <span class="stringliteral">&quot;**mkgentoo**  help[=md]                             [3]  &quot;</span></div>
+<div class="line">   echo <span class="stringliteral">&quot;**gentoolize**  [[switch=argument]...]  filename.iso  [1]  &quot;</span></div>
+<div class="line">   echo <span class="stringliteral">&quot;**gentoolize**  [[switch=argument]...]                [2]  &quot;</span></div>
+<div class="line">   echo <span class="stringliteral">&quot;**gentoolize**  help[=md]                             [3]  &quot;</span></div>
 <div class="line">   echo <span class="stringliteral">&quot;  &quot;</span></div>
 <div class="line">   echo <span class="stringliteral">&quot;Usage [1] creates a bootable ISO output file with a current Gentoo distribution.  &quot;</span></div>
 <div class="line">   echo <span class="stringliteral">&quot;Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo.  &quot;</span></div>
@@ -450,7 +450,7 @@ $(function() {
 <div class="line">   rc=<span class="stringliteral">&quot;.bashrc&quot;</span></div>
 <div class="line">   cp -vf /etc/bash.bashrc ${rc}</div>
 <div class="line">   <span class="keywordflow">for</span> ((i=0; i&lt;ARRAY_LENGTH; i++)); <span class="keywordflow">do</span></div>
-<div class="line">       local  capname=${<a class="code" href="mkgentoo_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[$((i * 3))]^^}</div>
+<div class="line">       local  capname=${<a class="code" href="gentoolize_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a>[$((i * 3))]^^}</div>
 <div class="line">       local  expstring=<span class="stringliteral">&quot;export ${capname}=\&quot;${!capname}\&quot;&quot;</span></div>
 <div class="line">       echo <span class="stringliteral">&quot;${expstring}&quot;</span></div>
 <div class="line">       echo <span class="stringliteral">&quot;${expstring}&quot;</span> &gt;&gt; ${rc}</div>
@@ -514,10 +514,10 @@ $(function() {
 <div class="line">   <span class="keywordflow">return</span> ${res}</div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line"><span class="preprocessor"># mkvm.sh should be adjacent to mkgentoo.sh</span></div>
+<div class="line"><span class="preprocessor"># mkvm.sh should be adjacent to gentoolize.sh</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">function</span> create_vm {</div>
-<div class="line">   export <a name="a1"></a><a class="code" href="mkgentoo_8sh.html#ad1451b50408769582d8f5bd4254fe7b1">PATH</a>=${<a class="code" href="mkgentoo_8sh.html#ad1451b50408769582d8f5bd4254fe7b1">PATH</a>}:${VBPATH}</div>
+<div class="line">   export <a name="a1"></a><a class="code" href="gentoolize_8sh.html#ad1451b50408769582d8f5bd4254fe7b1">PATH</a>=${<a class="code" href="gentoolize_8sh.html#ad1451b50408769582d8f5bd4254fe7b1">PATH</a>}:${VBPATH}</div>
 <div class="line">   cd ${<a name="a2"></a><a class="code" href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">VMPATH</a>}</div>
 <div class="line">   delete_vm ${VM} <span class="stringliteral">&quot;vdi&quot;</span></div>
 <div class="line">   VBoxManage createvm --name <span class="stringliteral">&quot;${VM}&quot;</span> --ostype gentoo_64  --<span class="keyword">register</span>  --basefolder <span class="stringliteral">&quot;${VMPATH}&quot;</span></div>
@@ -923,8 +923,8 @@ $(function() {
 <div class="line"><span class="comment">fi</span></div>
 <div class="line"><span class="comment">cleanup</span></div>
 </div><!-- fragment --> </div><!-- contents -->
-<div class="ttc" id="amkgentoo_8sh_html_ad1451b50408769582d8f5bd4254fe7b1"><div class="ttname"><a href="mkgentoo_8sh.html#ad1451b50408769582d8f5bd4254fe7b1">PATH</a></div><div class="ttdeci">Exported String PATH</div><div class="ttdef"><b>Definition:</b> <a href="mkgentoo_8sh_source.html#l00449">mkgentoo.sh:449</a></div></div>
-<div class="ttc" id="amkgentoo_8sh_html_a214cb10953cb8efbb6a2092fdb4ff6fd"><div class="ttname"><a href="mkgentoo_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a></div><div class="ttdeci">String Array ARR</div><div class="ttdef"><b>Definition:</b> <a href="mkgentoo_8sh_source.html#l00055">mkgentoo.sh:55</a></div></div>
+<div class="ttc" id="agentoolize_8sh_html_ad1451b50408769582d8f5bd4254fe7b1"><div class="ttname"><a href="gentoolize_8sh.html#ad1451b50408769582d8f5bd4254fe7b1">PATH</a></div><div class="ttdeci">Exported String PATH</div><div class="ttdef"><b>Definition:</b> <a href="gentoolize_8sh_source.html#l00449">gentoolize.sh:449</a></div></div>
+<div class="ttc" id="agentoolize_8sh_html_a214cb10953cb8efbb6a2092fdb4ff6fd"><div class="ttname"><a href="gentoolize_8sh.html#a214cb10953cb8efbb6a2092fdb4ff6fd">ARR</a></div><div class="ttdeci">String Array ARR</div><div class="ttdef"><b>Definition:</b> <a href="gentoolize_8sh_source.html#l00055">gentoolize.sh:55</a></div></div>
 <div class="ttc" id="abuild__virtualbox_8sh_html_a62ad76d689932a98f7cc9667b6fa903d"><div class="ttname"><a href="build__virtualbox_8sh.html#a62ad76d689932a98f7cc9667b6fa903d">VMPATH</a></div><div class="ttdeci">Exported String VMPATH</div><div class="ttdef"><b>Definition:</b> <a href="build__virtualbox_8sh_source.html#l00002">build_virtualbox.sh:2</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

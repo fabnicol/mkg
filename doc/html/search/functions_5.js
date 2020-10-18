@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['generate_5fgentoo_105',['generate_Gentoo',['../group__create_installer.html#ga4a96ee0336af9e52512585ceec9ca3a4',1,'mkgentoo.sh']]],
+  ['generate_5fgentoo_105',['generate_Gentoo',['../group__create_installer.html#ga4a96ee0336af9e52512585ceec9ca3a4',1,'gentoolize.sh']]],
   ['get_5fcache_5fclonezilla_5fiso_106',['get_cache_clonezilla_iso',['../group__create_installer.html#ga88760889d494c075588ae3a9931a702f',1,'fetch_clonezilla_iso.sh']]],
   ['get_5fclonezilla_5fiso_107',['get_clonezilla_iso',['../group__create_installer.html#gaf6d91960d323e1fcb1c142a3850970f6',1,'fetch_clonezilla_iso.sh']]],
   ['get_5fdevice_108',['get_device',['../group__auxiliary_functions.html#gab53bde930eb12adf7c84b549b7a4e241',1,'utils.sh']]],

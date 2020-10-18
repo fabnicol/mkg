@@ -1,8 +1,8 @@
-.TH "mkgentoo.sh" 3 "Fri Oct 16 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "gentoolize.sh" 3 "Fri Oct 16 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally create clonezilla install medium\&.  
+gentoolize.sh \- Process options, create Gentoo VirtualBox machine and optionally create clonezilla install medium\&.  
 
 .SH SYNOPSIS
 .br
@@ -168,9 +168,9 @@ This file is not included into the clonezilla ISO liveCD\&.
 
 .PP
 .nf
-mkgentoo  [[switch=argument]\&.\&.\&.]  filename\&.iso  [1]
-mkgentoo  [[switch=argument]\&.\&.\&.]                [2]
-mkgentoo  help[=md]                             [3]
+gentoolize  [[switch=argument]\&.\&.\&.]  filename\&.iso  [1]
+gentoolize  [[switch=argument]\&.\&.\&.]                [2]
+gentoolize  help[=md]                             [3]
 
 .fi
 .PP
@@ -192,7 +192,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified\&.
 Run:
 .PP
 .nf
-mkgentoo help 
+gentoolize help 
 
 .fi
 .PP
@@ -213,7 +213,7 @@ you should have at least 55 GB of free disk space in the current directory or in
 Only create the VM and virtual disk, in debug mode, without R or RStudio and set new passwords, for a French-language platform\&. Use 8 cores\&. 
 .PP
 .nf
- mkgentoo language=fr minimal debug_mode ncpus=8
+ gentoolize language=fr minimal debug_mode ncpus=8
 nonroot_user=ken passwd='util!Hx&32F' rootpasswd='Hk_32!_CD' cleanup=false
 
 .fi
@@ -233,21 +233,21 @@ mkgento burn usb_device="PNY" usb_installer="Sams" my_gentoo_image\&.iso
 .PP
 
 .PP
-Definition in file \fBmkgentoo\&.sh\fP\&.
+Definition in file \fBgentoolize\&.sh\fP\&.
 .SH "Variable Documentation"
 .PP 
 .SS "Exported String CREATE_ISO = true"
 
 .PP
-Definition at line 248 of file mkgentoo\&.sh\&.
+Definition at line 248 of file gentoolize\&.sh\&.
 .SS "Exported String ISOLINUX_DIR = isolinux"
 
 .PP
-Definition at line 591 of file mkgentoo\&.sh\&.
+Definition at line 591 of file gentoolize\&.sh\&.
 .SS "Exported String PATH = ${PATH}:${VBPATH}"
 
 .PP
-Definition at line 855 of file mkgentoo\&.sh\&.
+Definition at line 855 of file gentoolize\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for gentoo-creator from the source code\&.
