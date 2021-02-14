@@ -69,10 +69,9 @@ declare -i ARRAY_LENGTH
 
 create_options_array() {
     IFS=';'
-
     read -r -a A <<< $(awk -F"\"" \
-     '{if ( ! match($1, "#")  && $1 != "") printf "%s;%s;%s;%s;",$2,$4,$6,$8}' \
-       options)
+    '/^\s*$/ {next;}  {if ( ! match($1, "#"))  printf "%s;%s;%s;%s;",$2,$4,$6,$8}' \
+       "$1")
     ARR=(${A[@]})
     ARRAY_LENGTH=$((${#ARR[*]}/4))
     export ARR

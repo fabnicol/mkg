@@ -124,17 +124,22 @@ declare -x CREATE_ISO=false
 
 help_md() {
 
+    Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo.
+    Usage [3] prints this help, in markdown form if argument 'md' is specified.
+    Warning: you should have at least 55 GB of free disk space in the current directory or in vmpath if specified.
     local count=$(($(nproc --all)/3))
     echo "**USAGE:**  "
-    echo "**mkg**  [[switch=argument]...]  filename.iso  [1]  "
-    echo "**mkg**  [[switch=argument]...]                [2]  "
-    echo "**mkg**  help[=md]                             [3]  "
+    echo "**mkg**                                        [1]  "
+    echo "**mkg**  [[switch=argument]...]  filename.iso  [2]  "
+    echo "**mkg**  [[switch=argument]...]                [3]  "
+    echo "**mkg**  help[=md]                             [4]  "
     echo "  "
-    echo "Usage [1] creates a bootable ISO output file with a current Gentoo"
-    echo "distribution.  "
-    echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine"
+    echo "Usage [1] and [2] create a bootable ISO output file with a current"
+    echo "Gentoo distribution.  "
+    echo "For [1], implicit ISO output name is `gentoo.iso`  "
+    echo "Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine"
     echo "with name Gentoo.  "
-    echo "Usage [3] prints this help, in markdown form if argument 'md' is"
+    echo "Usage [4] prints this help, in markdown form if argument 'md' is"
     echo "specified.  "
     echo "Warning: you should have at least 55 GB of free disk space in the"
     echo "current directory or in vmpath if specified.  "
@@ -222,6 +227,13 @@ get_options() {
     [ -n "${LOGGER0}" ] && LOGGER_VERBOSE_OPTION="-s" || LOGGER0="${ECHO}"
     LOG=("${LOGGER0}" "${LOGGER_VERBOSE_OPTION}")
     export LOG
+
+    if [ $# = 0 ]
+    then
+        ISO_OUTPUT="gentoo.iso"
+        CREATE_ISO=true
+        return 0
+    fi
 
     while (( "$#" ))
     do
@@ -374,10 +386,6 @@ package."; do_exit=true; }
                 ${LOG[*]} "[MSG] Using previously built ISO"
             fi
         fi
-    else
-        [ "${VERBOSE}" = "true" ] &&
-            ${LOG[*]} "[WAR] You did not indicate an ISO output file, \
-gentoo.iso will be used."
     fi
 
     [ -n "${VM}" ] && [ "${VM}" != "false" ] && [ ${FROM_VM} != "true" ] \
@@ -498,9 +506,9 @@ values for ${y}=false and ${sw}=${!V} are incompatible."
         # replacing by default in any case, except if type == "s"
         # and default empty. This is the case e.g. for passwds.
 
-        if [ "${type}" = "s" ] && [ -z "${default}" ]
+        if [ "${type}" = "s" ] && [ -z "${default}" ] && [ "${sw}" != "dep" ]
         then
-            ${LOG[*]} "[ERR] Execution cannot proceed without explit value \
+            ${LOG[*]} "[ERR] Execution cannot proceed without explicit value \
 for ${sw}"
             if [ "${INTERACTIVE}" = "true" ]
             then
@@ -517,7 +525,7 @@ for ${sw}"
             fi
         fi
         [ "${DEBUG_MODE}" = "true" ] \
-            && ${LOG[*]} "[CLI] Default: ${desc}=${default}"
+            && ${LOG[*]} "[CLI] Desc/default: ${desc}=${default}"
         eval "${V}"=\""${default}"\"
     fi
 
@@ -603,13 +611,14 @@ third-party applications for this mail to be sent."
         CLEANUP=false
         ${LOG[*]} "[MSG] Deactivated cleanup"
     fi
-    if  "${HOT_INSTALL}" || [ -n "${EXT_DEVICE}" ] \
+    if  "${HOT_INSTALL}" || ([ -n "${EXT_DEVICE}" ] \
+                             && [ "${EXT_DEVICE}" != "dep" ])\
                          || [ -n "${DEVICE_INSTALLER}" ]
     then
         read -p "[WAR] All data will be wiped out on device(s): ${EXT_DEVICE} \
 ${DEVICE_INSTALLER}. Please confirm by entering uppercase Y: " reply
         [ ${reply} != "Y" ] && exit 0
-        read -p "[WAR] Once again. \n\
+        read -p "[WAR] Once again. \
 All data will be wiped out on device(s): ${EXT_DEVICE} \
 ${DEVICE_INSTALLER}. Please confirm by entering uppercase Y: " reply
         [ ${reply} != "Y" ] && exit 0
@@ -1602,10 +1611,10 @@ EOF
 
 bind_mount_clonezilla_iso() {
 
-    if ! "${CREATE_ISO}" && ! "${FROM_DEVICE}"
+    if ! "${CREATE_ISO}" && ! "${FROM_DEVICE}" && ! "${FROM_VM}"
     then
-        ${LOG[*]} <<< "[ERR] CloneZilla ISO should only be mounted to create\
-an ISO installer or to back-up a device"
+        ${LOG[*]} <<< "[ERR] CloneZilla ISO should only be mounted to create \
+an ISO installer or to back up a device"
         exit 4
     fi
 
@@ -1793,14 +1802,23 @@ main() {
 
     # Using a temporary writable array A so that
     # ARR will not be writable later on
-
-    create_options_array
-
     # Help cases: bail out
 
-    grep -q 'help=md' <<< "$@" && { help_md; exit 0; }
-    grep -q 'help'    <<< "$@" && { help_;   exit 0; }
-
+    if grep -q 'help=md' <<< "$@"
+    then
+        create_options_array options
+        help_md
+        exit 0
+    else
+        if grep -q 'help'    <<< "$@"
+        then
+            create_options_array options
+            help_
+            exit 0
+        else
+            create_options_array options2
+        fi
+    fi
     # parse command line. All arguments must be in the form a=true/false except
     # for help, file.iso. But 'a' can be used as shorthand for 'a=true'
 
@@ -1831,7 +1849,9 @@ main() {
 
     # process the virtual disk into a clonezilla image
 
-    if [ -f "${VM}.vdi" ] && "${CREATE_ISO}"  && ! "${FROM_DEVICE}"
+    if [ -f "${VM}.vdi" ] \
+       && ("${CREATE_ISO}" || "${FROM_VM}") \
+       && ! "${FROM_DEVICE}"
     then
         # Now create a new VM from clonezilla ISO to retrieve
         # Gentoo filesystem from the VDI virtual disk.
@@ -1870,7 +1890,7 @@ clonezilla image..."
             ${LOG[*]} "[MSG] Done."
             [ -f "${ISO_OUTPUT}" ] \
                 && ${LOG[*]} "[MSG] ISO install medium was created here:\
- ${ISO_OUTPUT}"  \
+                       ${ISO_OUTPUT}"  \
                     || ${LOG[*]} "[ERR] ISO install medium failed to be created."
         else
             ${LOG[*]} "[ERR] ISO install medium failed to be created!"
