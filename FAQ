@@ -111,7 +111,7 @@ You should not be running the platform (so-called *hot backups* are not
 supported). Supposing your Gentoo platform to be backed up is under **dev/sdX**,
 strike:
 
-`# ./mkg from_device ext_device=/dev/sdX`   
+`# ./mkg hot_install from_device ext_device=/dev/sdX`   
 
 This will create an iso file named gentoo.iso which can automatically reinstall
 your Gentoo OS in a target PC. 
