@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['res_144',['res',['../mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106',1,'mkvm_chroot.sh']]]
+  ['res_163',['res',['../mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106',1,'mkvm_chroot.sh']]]
 ];

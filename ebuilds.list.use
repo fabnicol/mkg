@@ -20,4 +20,5 @@ sys-auth/polkit  introspection nls pam
 >=dev-qt/qtprintsupport-5.14.2 cups
 app-text/xmlto text
 >=kde-frameworks/kitemmodels-5.74.0 qml
- app-editors/emacs athena Xaw3d
+app-editors/emacs athena Xaw3d
+>=kde-frameworks/prison-5.77.0 qml

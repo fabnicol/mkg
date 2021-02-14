@@ -90,6 +90,25 @@ test_email() {
     grep -E "[a-z]+@[a-z]+\.[a-z]+" <<< "$1"
 }
 
+## @fn send_mail()
+## @brief Send an email to $EMAIL at $SMTP_URL to warn about end of processing.
+## @warning Email password is entered in clear using $EMAIL_PASSWD which is not
+##          safe if mkgentoo is run on any other platform than the user's own.
+##          Use with care in a private context.
+## @return Return value of `curl' command.
+## @ingroup auxiliaryFunctions
+
+send_mail() {
+
+    curl --url ${SMTP_URL} \
+         --ssl-reqd \
+         --mail-from ${EMAIL} \
+         --mail-rcpt ${EMAIL} \
+         --user ${EMAIL}:${EMAIL_PASSWD} -T \
+         <(echo -e  "From: ${EMAIL}\nTo: ${EMAIL}\nSubject: ${VM} now ready!\n\
+\n${VM} finished building at " $(date -Im))
+}
+
 ## @fn list_block_devices()
 ## @brief List all non-loop block devices
 ## @ingroup auxiliaryFunctions
@@ -172,6 +191,7 @@ test_cdrecord() {
 ## @param dir Directory containing all files
 ## @return 0 on success or exits -1 on failure.
 ## @note An alternative xorriso solution could be considered
+## @ingroup auxiliaryFunctions
 
 recreate_liveCD_ISO() {
 
@@ -253,7 +273,7 @@ to optical disc..."
 ##        installer
 ## @warning Use with care, check your EXT_DEVICE variable.
 ## @retval  Return value of `sync`exit code
-## @ingroup createInstaller
+## @ingroup auxiliaryFunctions
 
 create_install_ext_device() {
     res=0
@@ -266,6 +286,13 @@ create_install_ext_device() {
     if_fails $? "[ERR] Could not install device ${DEVICE_INSTALLER}"
 }
 
+## @fn check_dir()
+## @brief   Checks existence of directories.
+## @param   dirs Successive paths (relative or absolute) to directories.
+## @warning Paths should be separated by spaces and quoted.
+## @retval  Undefined or exit 2 if string is not a directory path
+## @ingroup auxiliaryFunctions
+
 check_dir() {
     while [ -n "$1" ]
     do
@@ -277,6 +304,15 @@ check_dir() {
         shift
     done
 }
+
+## @fn check_file()
+## @brief   Checks existence of file.
+## @param   filepath Relative or absolute path to file to be checked
+##          for existence.
+## @param   msgs  Successive message strings to be echoed if file not found.
+## @warning Paths should be separated by spaces and quoted.
+## @retval  Undefined or exit 3 if string is not a file path
+## @ingroup auxiliaryFunctions
 
 check_file() {
     if ! [ -f "$1" ]
@@ -291,6 +327,13 @@ check_file() {
     fi
 }
 
+## @fn check_files()
+## @brief   Checks existence of files.
+## @param   files Successive paths (relative or absolute) to files.
+## @warning Paths should be separated by spaces and quoted.
+## @retval  Undefined or exit 3 if any string is not a file path
+## @ingroup auxiliaryFunctions
+
 check_files() {
     while [ -n "$1" ]
     do
@@ -304,6 +347,13 @@ check_files() {
     done
 }
 
+## @fn check_tool()
+## @brief   Checks existence of auxiliary tools.
+## @param   dirs Successive paths (relative or absolute) to helper binaries.
+## @warning Paths should be separated by spaces and quoted.
+## @retval  Undefined or exit 1 if binary not found.
+## @ingroup auxiliaryFunctions
+
 check_tool() {
     while [ -n "$1" ]
     do
@@ -316,6 +366,14 @@ which is used by this program."
         shift
     done
 }
+
+## @fn if_fails()
+## @brief   Echoes a message and exit in case of previous command failure.
+## @param   ret Return value of command to be tested.
+## @parama  msg Message to be echoed inc case of a failure.
+## @note    Command success is presumed to be identified by $? == 0.
+## @retval  Undefined or exit 1 if $? != 0.
+## @ingroup auxiliaryFunctions
 
 if_fails() {
     if [ $1 != 0 ]

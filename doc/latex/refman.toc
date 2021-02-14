@@ -1,0 +1,109 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\contentsline {chapter}{\numberline {1}Usage}{1}{chapter.1}%
+\contentsline {chapter}{\numberline {2}Todo List}{3}{chapter.2}%
+\contentsline {chapter}{\numberline {3}Bug List}{5}{chapter.3}%
+\contentsline {chapter}{\numberline {4}Module Index}{7}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Modules}{7}{section.4.1}%
+\contentsline {chapter}{\numberline {5}File Index}{9}{chapter.5}%
+\contentsline {section}{\numberline {5.1}File List}{9}{section.5.1}%
+\contentsline {chapter}{\numberline {6}Module Documentation}{11}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Create Gentoo linux image and installer.}{11}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Detailed Description}{12}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Function Documentation}{12}{subsection.6.1.2}%
+\contentsline {subsubsection}{\numberline {6.1.2.1}build\_virtualbox()}{13}{subsubsection.6.1.2.1}%
+\contentsline {subsubsection}{\numberline {6.1.2.2}cleanup()}{13}{subsubsection.6.1.2.2}%
+\contentsline {subsubsection}{\numberline {6.1.2.3}clone\_vm\_to\_device()}{13}{subsubsection.6.1.2.3}%
+\contentsline {subsubsection}{\numberline {6.1.2.4}clone\_vm\_to\_raw()}{13}{subsubsection.6.1.2.4}%
+\contentsline {subsubsection}{\numberline {6.1.2.5}clonezilla\_device\_to\_image()}{13}{subsubsection.6.1.2.5}%
+\contentsline {subsubsection}{\numberline {6.1.2.6}clonezilla\_to\_iso()}{14}{subsubsection.6.1.2.6}%
+\contentsline {subsubsection}{\numberline {6.1.2.7}create\_device\_system()}{14}{subsubsection.6.1.2.7}%
+\contentsline {subsubsection}{\numberline {6.1.2.8}create\_iso\_vm()}{15}{subsubsection.6.1.2.8}%
+\contentsline {subsubsection}{\numberline {6.1.2.9}create\_vm()}{15}{subsubsection.6.1.2.9}%
+\contentsline {subsubsection}{\numberline {6.1.2.10}dd\_to\_usb()}{16}{subsubsection.6.1.2.10}%
+\contentsline {subsubsection}{\numberline {6.1.2.11}deep\_clean()}{16}{subsubsection.6.1.2.11}%
+\contentsline {subsubsection}{\numberline {6.1.2.12}delete\_vm()}{16}{subsubsection.6.1.2.12}%
+\contentsline {subsubsection}{\numberline {6.1.2.13}fetch\_clonezilla\_iso()}{17}{subsubsection.6.1.2.13}%
+\contentsline {subsubsection}{\numberline {6.1.2.14}fetch\_livecd()}{17}{subsubsection.6.1.2.14}%
+\contentsline {subsubsection}{\numberline {6.1.2.15}fetch\_stage3()}{17}{subsubsection.6.1.2.15}%
+\contentsline {subsubsection}{\numberline {6.1.2.16}generate\_Gentoo()}{18}{subsubsection.6.1.2.16}%
+\contentsline {subsubsection}{\numberline {6.1.2.17}get\_cache\_clonezilla\_iso()}{18}{subsubsection.6.1.2.17}%
+\contentsline {subsubsection}{\numberline {6.1.2.18}get\_clonezilla\_iso()}{18}{subsubsection.6.1.2.18}%
+\contentsline {subsubsection}{\numberline {6.1.2.19}get\_gentoo\_install\_iso()}{18}{subsubsection.6.1.2.19}%
+\contentsline {subsubsection}{\numberline {6.1.2.20}help\_()}{18}{subsubsection.6.1.2.20}%
+\contentsline {subsubsection}{\numberline {6.1.2.21}help\_md()}{19}{subsubsection.6.1.2.21}%
+\contentsline {subsubsection}{\numberline {6.1.2.22}main()}{19}{subsubsection.6.1.2.22}%
+\contentsline {subsubsection}{\numberline {6.1.2.23}make\_boot\_from\_livecd()}{19}{subsubsection.6.1.2.23}%
+\contentsline {subsubsection}{\numberline {6.1.2.24}mount\_live\_cd()}{19}{subsubsection.6.1.2.24}%
+\contentsline {subsubsection}{\numberline {6.1.2.25}process\_clonezilla\_iso()}{20}{subsubsection.6.1.2.25}%
+\contentsline {subsubsection}{\numberline {6.1.2.26}test\_cli()}{20}{subsubsection.6.1.2.26}%
+\contentsline {subsubsection}{\numberline {6.1.2.27}test\_cli\_post()}{21}{subsubsection.6.1.2.27}%
+\contentsline {subsubsection}{\numberline {6.1.2.28}test\_cli\_pre()}{21}{subsubsection.6.1.2.28}%
+\contentsline {subsubsection}{\numberline {6.1.2.29}test\_vm\_running()}{21}{subsubsection.6.1.2.29}%
+\contentsline {subsubsection}{\numberline {6.1.2.30}vbox\_img\_works()}{22}{subsubsection.6.1.2.30}%
+\contentsline {subsection}{\numberline {6.1.3}Variable Documentation}{22}{subsection.6.1.3}%
+\contentsline {subsubsection}{\numberline {6.1.3.1}ARR}{22}{subsubsection.6.1.3.1}%
+\contentsline {subsubsection}{\numberline {6.1.3.2}ARRAY\_LENGTH}{23}{subsubsection.6.1.3.2}%
+\contentsline {subsubsection}{\numberline {6.1.3.3}ISO}{23}{subsubsection.6.1.3.3}%
+\contentsline {section}{\numberline {6.2}Create Gentoo linux filesystem on VM disk}{24}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Detailed Description}{24}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Function Documentation}{24}{subsection.6.2.2}%
+\contentsline {subsubsection}{\numberline {6.2.2.1}adjust\_environment()}{24}{subsubsection.6.2.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2.2}build\_kernel()}{25}{subsubsection.6.2.2.2}%
+\contentsline {subsubsection}{\numberline {6.2.2.3}finalize()}{25}{subsubsection.6.2.2.3}%
+\contentsline {subsubsection}{\numberline {6.2.2.4}global\_config()}{25}{subsubsection.6.2.2.4}%
+\contentsline {subsubsection}{\numberline {6.2.2.5}install\_software()}{26}{subsubsection.6.2.2.5}%
+\contentsline {subsubsection}{\numberline {6.2.2.6}install\_stage3()}{26}{subsubsection.6.2.2.6}%
+\contentsline {subsubsection}{\numberline {6.2.2.7}partition()}{27}{subsubsection.6.2.2.7}%
+\contentsline {subsubsection}{\numberline {6.2.2.8}setup\_network()}{27}{subsubsection.6.2.2.8}%
+\contentsline {section}{\numberline {6.3}Auxiliary functions to check}{28}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Detailed Description}{28}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Function Documentation}{29}{subsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.2.1}burn\_iso()}{29}{subsubsection.6.3.2.1}%
+\contentsline {subsubsection}{\numberline {6.3.2.2}check\_dir()}{29}{subsubsection.6.3.2.2}%
+\contentsline {subsubsection}{\numberline {6.3.2.3}check\_file()}{29}{subsubsection.6.3.2.3}%
+\contentsline {subsubsection}{\numberline {6.3.2.4}check\_files()}{30}{subsubsection.6.3.2.4}%
+\contentsline {subsubsection}{\numberline {6.3.2.5}check\_md5sum()}{30}{subsubsection.6.3.2.5}%
+\contentsline {subsubsection}{\numberline {6.3.2.6}check\_tool()}{31}{subsubsection.6.3.2.6}%
+\contentsline {subsubsection}{\numberline {6.3.2.7}create\_install\_ext\_device()}{31}{subsubsection.6.3.2.7}%
+\contentsline {subsubsection}{\numberline {6.3.2.8}create\_options\_array()}{32}{subsubsection.6.3.2.8}%
+\contentsline {subsubsection}{\numberline {6.3.2.9}get\_device()}{32}{subsubsection.6.3.2.9}%
+\contentsline {subsubsection}{\numberline {6.3.2.10}get\_mountpoint()}{32}{subsubsection.6.3.2.10}%
+\contentsline {subsubsection}{\numberline {6.3.2.11}if\_fails()}{32}{subsubsection.6.3.2.11}%
+\contentsline {subsubsection}{\numberline {6.3.2.12}is\_block\_device()}{33}{subsubsection.6.3.2.12}%
+\contentsline {subsubsection}{\numberline {6.3.2.13}list\_block\_devices()}{33}{subsubsection.6.3.2.13}%
+\contentsline {subsubsection}{\numberline {6.3.2.14}recreate\_liveCD\_ISO()}{33}{subsubsection.6.3.2.14}%
+\contentsline {subsubsection}{\numberline {6.3.2.15}send\_mail()}{34}{subsubsection.6.3.2.15}%
+\contentsline {subsubsection}{\numberline {6.3.2.16}test\_cdrecord()}{34}{subsubsection.6.3.2.16}%
+\contentsline {subsubsection}{\numberline {6.3.2.17}test\_email()}{35}{subsubsection.6.3.2.17}%
+\contentsline {subsubsection}{\numberline {6.3.2.18}test\_numeric()}{35}{subsubsection.6.3.2.18}%
+\contentsline {subsubsection}{\numberline {6.3.2.19}test\_URL()}{36}{subsubsection.6.3.2.19}%
+\contentsline {subsubsection}{\numberline {6.3.2.20}validate\_option()}{36}{subsubsection.6.3.2.20}%
+\contentsline {chapter}{\numberline {7}File Documentation}{37}{chapter.7}%
+\contentsline {section}{\numberline {7.1}build\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}virtualbox.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{37}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}Variable Documentation}{37}{subsection.7.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.1.1}DOWNLOAD\_CLONEZILLA}{37}{subsubsection.7.1.1.1}%
+\contentsline {section}{\numberline {7.2}fetch\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}clonezilla\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}iso.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{37}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}Variable Documentation}{38}{subsection.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.1.1}CLONEZILLACD}{38}{subsubsection.7.2.1.1}%
+\contentsline {subsubsection}{\numberline {7.2.1.2}LIVECD}{38}{subsubsection.7.2.1.2}%
+\contentsline {section}{\numberline {7.3}mkgentoo.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{38}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Variable Documentation}{40}{subsection.7.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.1.1}CREATE\_ISO}{40}{subsubsection.7.3.1.1}%
+\contentsline {subsubsection}{\numberline {7.3.1.2}DEBIAN\_FRONTEND}{40}{subsubsection.7.3.1.2}%
+\contentsline {subsubsection}{\numberline {7.3.1.3}ISOLINUX\_DIR}{40}{subsubsection.7.3.1.3}%
+\contentsline {subsubsection}{\numberline {7.3.1.4}LD\_LIBRARY\_PATH}{40}{subsubsection.7.3.1.4}%
+\contentsline {subsubsection}{\numberline {7.3.1.5}LOG}{40}{subsubsection.7.3.1.5}%
+\contentsline {subsubsection}{\numberline {7.3.1.6}PATH}{41}{subsubsection.7.3.1.6}%
+\contentsline {section}{\numberline {7.4}mkvm.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{41}{section.7.4}%
+\contentsline {section}{\numberline {7.5}mkvm\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}chroot.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{41}{section.7.5}%
+\contentsline {subsection}{\numberline {7.5.1}Detailed Description}{41}{subsection.7.5.1}%
+\contentsline {subsection}{\numberline {7.5.2}Function Documentation}{42}{subsection.7.5.2}%
+\contentsline {subsubsection}{\numberline {7.5.2.1}finalize()}{42}{subsubsection.7.5.2.1}%
+\contentsline {subsection}{\numberline {7.5.3}Variable Documentation}{42}{subsection.7.5.3}%
+\contentsline {subsubsection}{\numberline {7.5.3.1}res}{42}{subsubsection.7.5.3.1}%
+\contentsline {section}{\numberline {7.6}test.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{42}{section.7.6}%
+\contentsline {section}{\numberline {7.7}utils.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{42}{section.7.7}%
+\contentsline {subsection}{\numberline {7.7.1}Detailed Description}{43}{subsection.7.7.1}%
+\contentsline {subsection}{\numberline {7.7.2}Variable Documentation}{43}{subsection.7.7.2}%
+\contentsline {subsubsection}{\numberline {7.7.2.1}A}{43}{subsubsection.7.7.2.1}%
+\contentsline {chapter}{Index}{45}{section*.15}%

@@ -164,6 +164,7 @@ minimal distribution, specify:  "
 
 ## @fn help_()
 ## @brief Print usage to stdout
+## @private
 ## @ingroup createInstaller
 
 help_() {
@@ -712,6 +713,11 @@ autobuilds/${current} ${verb1} 2>&1 | xargs echo '[INF]')"
     cp ${verb2} -f ${CACHED_STAGE3} "${STAGE3}"
 }
 
+## @fn mount_live_cd()
+## @brief Mount Gentoo/Clonezilla live CD and unsquashfs the GNU/linux system.
+## @note  live CD is mounted under $VMPATH/mnt and rsync'd to $VMPATH/mnt2
+## @ingroup createInstaller
+
 mount_live_cd() {
 
     check_file "${ISO}" "[ERR] No active ISO file in current directory!"
@@ -995,17 +1001,21 @@ delete_vm() {
         ${LOG[*]} <<< $(VBoxManage startvm $1 --type emergencystop 2>&1 \
                             | xargs echo "[INF]")
     fi
-    ${LOG[*]} "[INF] Closing medium $1.$2"
-    if VBoxManage showmediuminfo "${VMPATH}/$1.$2" 2>/dev/null 1>/dev/null
+
+    if [ -f "${VMPATH}/$1.$2" ]
     then
-        ${LOG[*]} <<< $(VBoxManage storageattach "$1" \
-                                   --storagectl "SATA Controller" \
-                                   --port 0 \
-                                   --medium none 2>&1 \
-                            | xargs echo "[INF]")
-        ${LOG[*]} <<< $(VBoxManage closemedium  disk "${VMPATH}/$1.$2" \
-                                   --delete 2>&1 \
-                            | xargs echo "[INF]")
+        ${LOG[*]} "[INF] Closing medium $1.$2"
+        if VBoxManage showmediuminfo "${VMPATH}/$1.$2" 2>/dev/null 1>/dev/null
+        then
+            ${LOG[*]} <<< $(VBoxManage storageattach "$1" \
+                                       --storagectl "SATA Controller" \
+                                       --port 0 \
+                                       --medium none 2>&1 \
+                                | xargs echo "[INF]")
+            ${LOG[*]} <<< $(VBoxManage closemedium  disk "${VMPATH}/$1.$2" \
+                                       --delete 2>&1 \
+                                | xargs echo "[INF]")
+        fi
     fi
 
     local res=$?
@@ -1118,13 +1128,9 @@ create_vm() {
 
     # create virtual VDI disk, if it does not exist
 
-    MEDIUM_UUID=$(VBoxManage showmediuminfo "${VM}.vdi"  | head -n1 \
-                      | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
-
-    [ -z "${MEDIUM_UUID}" ] && MEDIUM_UUID=`uuid`
-
     if [ ! -f  "${VM}.vdi" ] || "${FORCE}"
     then
+        [ -f "${VM}.vdi" ] && rm -f "${VM}.vdi"
         ${LOG[*]} <<< $(VBoxManage createmedium --filename "${VM}.vdi" \
                                    --size ${SIZE} \
                                    --variant Standard 2>&1 | xargs echo '[MSG]')
@@ -1133,6 +1139,11 @@ create_vm() {
 UUID: ${MEDIUM_UUID}"
         ${LOG[*]} "[WAR] Hopefully size and caracteristics are correct."
     fi
+
+    MEDIUM_UUID=$(VBoxManage showmediuminfo "${VM}.vdi"  | head -n1 \
+                      | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
+
+    [ -z "${MEDIUM_UUID}" ] && MEDIUM_UUID=`uuid`
 
     # set disk UUID once and for all to avoid serious debugging issues
     # whilst several VMS are around, some in zombie state, with
@@ -1887,18 +1898,6 @@ generate_Gentoo() {
         exit 1
     fi
 }
-
-send_mail() {
-
-    curl --url ${SMTP_URL} \
-         --ssl-reqd \
-         --mail-from ${EMAIL} \
-         --mail-rcpt ${EMAIL} \
-         --user ${EMAIL}:${EMAIL_PASSWD} -T \
-         <(echo -e  "From: ${EMAIL}\nTo: ${EMAIL}\nSubject: ${VM} now ready!\n\
-\n${VM} finished building at " $(date -Im))
-}
-
 
 ## @fn main()
 ## @brief Main function launching routines

@@ -98,9 +98,11 @@ adjust_environment() {
     # otherwise dependencies cannot be resolved.
 
     USE='-qt5' emerge -1 cmake
-    [ $? != 0 ] \
-        && { ${LOG[*]} "emerge cmake failed!" | tee emerge.build
-        return -1; }
+    if [ $? != 0 ]
+    then
+        echo "emerge cmake failed!" | tee emerge.build
+        return -1
+    fi
 
     # add logger. However it will not be usable for now,
     # this is why we are using custom logs and tee's.
@@ -112,8 +114,12 @@ adjust_environment() {
     # dependency for newer linux kernels.
 
     emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
-    [ $? != 0 ] && ${LOG[*]} "[ERR] emerge netifrs/pcmiautils failed!"\
-            | tee emerge.build
+
+    if [ $? != 0 ]
+    then
+       echo "[ERR] emerge netifrs/pcmiautils failed!" | tee emerge.build
+       return 1
+    fi
 
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours
@@ -121,7 +127,7 @@ adjust_environment() {
 
     emerge -uDN @world 2>&1 | tee emerge.build
     [ $? != 0 ] && {
-        ${LOG[*]} "[ERR] emerge @world failed!"  | tee emerge.build
+        echo "[ERR] emerge @world failed!"  | tee emerge.build
         return -1; }
 
     # Networking in the new environment
@@ -182,17 +188,31 @@ build_kernel() {
     make -s -j${NCPUS}   2>&1 | tee kernel.log
     make modules_install 2>&1 | tee kernel.log
     make install         2>&1 | tee kernel.log
-    [ $? != 0 ] && { ${LOG[*]} "[ERR] Kernel building failed!"
-                     return -1; }
+    if  [ $? != 0 ]
+    then
+        echo "[ERR] Kernel building failed!" | tee  kernel.log
+        return -1
+    fi
+
     genkernel --install initramfs
     emerge sys-kernel/linux-firmware
     make clean
-    [ -f /boot/vmlinu* ] && ${LOG[*]} "[ERR] Kernel was built" \
-            || { ${LOG[*]} "[ERR] Kernel compilation failed!"
-                 return -1; }
-    [ -f /boot/initr*.img ] && ${LOG[*]} "[ERR] initramfs was built" \
-                  || { ${LOG[*]} "[ERR] initramfs compilation failed!"
-                       return -1; }
+
+    if [ -f /boot/vmlinu* ]
+    then
+        echo "[ERR] Kernel was built" | tee kernel.log
+    else
+        echo "[ERR] Kernel compilation failed!"  | tee  kernel.log
+        return -1
+    fi
+
+    if [ -f /boot/initr*.img ]
+    then
+        echo "[ERR] initramfs was built" | tee  kernel.log
+    else
+        echo "[ERR] initramfs compilation failed!" | tee  kernel.log
+        return -1
+    fi
 }
 
 ## @fn install_software()
@@ -227,8 +247,12 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN ${packages}  2>&1 | tee log_install_software.log
-    [ $? != 0 ] && { ${LOG[*]} "[ERR] Main package build step failed" \
-                         | tee log_install_software.log; return -1; }
+    if [ $? != 0 ]
+    then
+        echo "[ERR] Main package build step failed" \
+            | tee log_install_software.log
+        return -1
+    fi
 
     echo 'install.packages(c("data.table", "dplyr", "ggplot2",\
 "bit64", "devtools", "rmarkdown"))' > libs.R
@@ -243,15 +267,23 @@ install_software() {
 
     # optionally build RStudio and R dependencies (TODO)
 
-    ! "${DOWNLOAD_RSTUDIO}" && { ${LOG[*]} "[MSG] No RStudio build" \
-         | tee log_install_software.log; return -1; }
+    if ! "${DOWNLOAD_RSTUDIO}"
+    then
+        echo "[MSG] No RStudio build" \
+            | tee log_install_software.log
+        return 1
+    fi
 
     mkdir /Build
     cd /Build || exit 2
     wget ${GITHUBPATH}${RSTUDIO}.zip
-    [ $? != 0 ] && { ${LOG[*]} "[ERR] RStudio download failed!" \
-                | tee log_install_software.log; return -1; }
-    ${LOG[*]} "[INF] Building RStudio" | tee log_install_software.log
+    if [ $? != 0 ]
+    then
+        echo "[ERR] RStudio download failed!" \
+                | tee log_install_software.log
+        return 1
+    fi
+    echo "[INF] Building RStudio" | tee log_install_software.log
     unzip *.zip
     cd rstudio* || return 2
     mkdir build
@@ -294,7 +326,7 @@ install_software() {
 ## @ingroup mkFileSystem
 
 global_config() {
-    ${LOG[*]} "Cleaning up a bit aggressively before cloning..." \
+    echo "Cleaning up a bit aggressively before cloning..." \
         | tee log_uninstall_software.log
     eclean -d packages 2>&1 | tee log_uninstall_software.log
     rm -rf /var/tmp/*

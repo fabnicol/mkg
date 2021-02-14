@@ -1,4 +1,4 @@
-.TH "auxiliaryFunctions" 3 "Fri Oct 16 2020" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "auxiliaryFunctions" 3 "Sun Feb 14 2021" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -35,6 +35,10 @@ auxiliaryFunctions \- lines, files, devices and burn disk\&.
 .br
 .RI "Test whether the input value is a valid email address\&. "
 .ti -1c
+.RI "\fBsend_mail\fP ()"
+.br
+.RI "Send an email to $EMAIL at $SMTP_URL to warn about end of processing\&. "
+.ti -1c
 .RI "\fBlist_block_devices\fP ()"
 .br
 .RI "List all non-loop block devices\&. "
@@ -55,9 +59,37 @@ auxiliaryFunctions \- lines, files, devices and burn disk\&.
 .br
 .RI "Test whether \fBcdrecord\fP is functional\&. "
 .ti -1c
+.RI "\fBrecreate_liveCD_ISO\fP (dir)"
+.br
+.RI "Create ISO of liveCD out of directory\&. "
+.ti -1c
 .RI "\fBburn_iso\fP ()"
 .br
 .RI "Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&. "
+.ti -1c
+.RI "\fBcreate_install_ext_device\fP ()"
+.br
+.RI "Create USB-stick (or any external device) Gentoo clonezilla installer\&. "
+.ti -1c
+.RI "\fBcheck_dir\fP ()"
+.br
+.RI "Checks existence of directories\&. "
+.ti -1c
+.RI "\fBcheck_file\fP ()"
+.br
+.RI "Checks existence of file\&. "
+.ti -1c
+.RI "\fBcheck_files\fP ()"
+.br
+.RI "Checks existence of files\&. "
+.ti -1c
+.RI "\fBcheck_tool\fP ()"
+.br
+.RI "Checks existence of auxiliary tools\&. "
+.ti -1c
+.RI "\fBif_fails\fP ()"
+.br
+.RI "Echoes a message and exit in case of previous command failure\&. "
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -83,7 +115,78 @@ Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&.
 .PP
 
 .PP
-Definition at line 200 of file utils\&.sh\&.
+Definition at line 236 of file utils\&.sh\&.
+.SS "check_dir ()"
+
+.PP
+Checks existence of directories\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdirs\fP Successive paths (relative or absolute) to directories\&. 
+.RE
+.PP
+\fBWarning\fP
+.RS 4
+Paths should be separated by spaces and quoted\&. 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIUndefined\fP or exit 2 if string is not a directory path 
+.RE
+.PP
+
+.PP
+Definition at line 296 of file utils\&.sh\&.
+.SS "check_file ()"
+
+.PP
+Checks existence of file\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIfilepath\fP Relative or absolute path to file to be checked for existence\&. 
+.br
+\fImsgs\fP Successive message strings to be echoed if file not found\&. 
+.RE
+.PP
+\fBWarning\fP
+.RS 4
+Paths should be separated by spaces and quoted\&. 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIUndefined\fP or exit 3 if string is not a file path 
+.RE
+.PP
+
+.PP
+Definition at line 317 of file utils\&.sh\&.
+.SS "check_files ()"
+
+.PP
+Checks existence of files\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIfiles\fP Successive paths (relative or absolute) to files\&. 
+.RE
+.PP
+\fBWarning\fP
+.RS 4
+Paths should be separated by spaces and quoted\&. 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIUndefined\fP or exit 3 if any string is not a file path 
+.RE
+.PP
+
+.PP
+Definition at line 337 of file utils\&.sh\&.
 .SS "check_md5sum (filename)"
 
 .PP
@@ -101,7 +204,48 @@ Check md5sums in file MD5SUMS\&.
 .PP
 
 .PP
-Definition at line 49 of file utils\&.sh\&.
+Definition at line 51 of file utils\&.sh\&.
+.SS "check_tool ()"
+
+.PP
+Checks existence of auxiliary tools\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdirs\fP Successive paths (relative or absolute) to helper binaries\&. 
+.RE
+.PP
+\fBWarning\fP
+.RS 4
+Paths should be separated by spaces and quoted\&. 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIUndefined\fP or exit 1 if binary not found\&. 
+.RE
+.PP
+
+.PP
+Definition at line 357 of file utils\&.sh\&.
+.SS "create_install_ext_device ()"
+
+.PP
+Create USB-stick (or any external device) Gentoo clonezilla installer\&. 
+.PP
+\fBWarning\fP
+.RS 4
+Use with care, check your EXT_DEVICE variable\&. 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIReturn\fP value of \fCsync\fPexit code 
+.RE
+.PP
+
+.PP
+Definition at line 278 of file utils\&.sh\&.
 .SS "create_options_array ()"
 
 .PP
@@ -113,13 +257,36 @@ Definition at line 37 of file utils\&.sh\&.
 .PP
 Give device from mount folder input\&. 
 .PP
-Definition at line 131 of file utils\&.sh\&.
+Definition at line 153 of file utils\&.sh\&.
 .SS "get_mountpoint ()"
 
 .PP
 Gives mount folder from device label input\&. 
 .PP
-Definition at line 115 of file utils\&.sh\&.
+Definition at line 137 of file utils\&.sh\&.
+.SS "if_fails ()"
+
+.PP
+Echoes a message and exit in case of previous command failure\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIret\fP Return value of command to be tested\&. @parama msg Message to be echoed inc case of a failure\&. 
+.RE
+.PP
+\fBNote\fP
+.RS 4
+Command success is presumed to be identified by $? == 0\&. 
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fIUndefined\fP or exit 1 if $? != 0\&. 
+.RE
+.PP
+
+.PP
+Definition at line 378 of file utils\&.sh\&.
 .SS "is_block_device (label)"
 
 .PP
@@ -137,13 +304,54 @@ Test if argument is non-loop block device\&.
 .PP
 
 .PP
-Definition at line 105 of file utils\&.sh\&.
+Definition at line 127 of file utils\&.sh\&.
 .SS "list_block_devices ()"
 
 .PP
 List all non-loop block devices\&. 
 .PP
-Definition at line 94 of file utils\&.sh\&.
+Definition at line 116 of file utils\&.sh\&.
+.SS "recreate_liveCD_ISO (dir)"
+
+.PP
+Create ISO of liveCD out of directory\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdir\fP Directory containing all files 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+0 on success or exits -1 on failure\&. 
+.RE
+.PP
+\fBNote\fP
+.RS 4
+An alternative xorriso solution could be considered 
+.RE
+.PP
+
+.PP
+Definition at line 196 of file utils\&.sh\&.
+.SS "send_mail ()"
+
+.PP
+Send an email to $EMAIL at $SMTP_URL to warn about end of processing\&. 
+.PP
+\fBWarning\fP
+.RS 4
+Email password is entered in clear under $EMAIL_PASSWD which is not safe if mkgentoo is run on any other platform than the user's own\&. Use with care in a private context\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Return value of `curl' command\&. 
+.RE
+.PP
+
+.PP
+Definition at line 101 of file utils\&.sh\&.
 .SS "test_cdrecord ()"
 
 .PP
@@ -165,12 +373,12 @@ chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord
 .PP
 \fBReturn values\fP
 .RS 4
-\fI0\fP on success otherwise exits -1 on failure\&. 
+\fI0\fP on success otherwise -1 on failure\&. 
 .RE
 .PP
 
 .PP
-Definition at line 156 of file utils\&.sh\&.
+Definition at line 178 of file utils\&.sh\&.
 .SS "test_email (Email)"
 
 .PP
@@ -188,7 +396,7 @@ grep value against input string
 .PP
 
 .PP
-Definition at line 86 of file utils\&.sh\&.
+Definition at line 89 of file utils\&.sh\&.
 .SS "test_numeric (number)"
 
 .PP
@@ -206,7 +414,7 @@ grep value against input string
 .PP
 
 .PP
-Definition at line 64 of file utils\&.sh\&.
+Definition at line 67 of file utils\&.sh\&.
 .SS "test_URL (Internet)"
 
 .PP
@@ -224,7 +432,7 @@ grep value against input string
 .PP
 
 .PP
-Definition at line 74 of file utils\&.sh\&.
+Definition at line 77 of file utils\&.sh\&.
 .SS "validate_option (option)"
 
 .PP
@@ -242,7 +450,7 @@ true if legitimate option otherwise false\&.
 .PP
 
 .PP
-Definition at line 124 of file gentoolize\&.sh\&.
+Definition at line 181 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for gentoo-creator from the source code\&.

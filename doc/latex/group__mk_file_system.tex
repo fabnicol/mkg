@@ -41,8 +41,7 @@ and emerge software.
 \begin{DoxyItemize}
 \item Set {\bfseries{/etc/fstab}}, sync portage tree, select desktop profile ~\newline
 \item Set a set of per-\/package use files and keywords ~\newline
-\item Oneshot emerge of {\bfseries{cmake}} and {\bfseries{lz4}}, prerequisites to {\ttfamily  world } update. \item Update {\ttfamily  world }. Log into emerge.\+build. Exit on error. ~\newline
-\item Set keymaps, localization and time \begin{DoxyRefDesc}{Todo}
+\item Oneshot emerge of {\bfseries{cmake}} and {\bfseries{lz4}}, prerequisites to {\ttfamily  world } update. \item Update {\ttfamily  world }. Log into emerge.\+build. Exit on error. \item Set keymaps, localization and time \begin{DoxyRefDesc}{Todo}
 \item[\mbox{\hyperlink{todo__todo000003}{Todo}}]Add more regional options by parametrization of commandline \end{DoxyRefDesc}
 
 \begin{DoxyRetVals}{Return values}
@@ -69,7 +68,7 @@ Definition at line 40 of file mkvm\+\_\+chroot.\+sh.
 \end{DoxyItemize}
 
 
-Definition at line 158 of file mkvm\+\_\+chroot.\+sh.
+Definition at line 172 of file mkvm\+\_\+chroot.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_ga9caaa1f5ea6177e55f13ebe7dec2bd60}\label{group__mk_file_system_ga9caaa1f5ea6177e55f13ebe7dec2bd60}} 
 \index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!finalize@{finalize}}
@@ -85,7 +84,7 @@ Unmount chrooted system, restore user rights and shutdown VM.
 \item Cleanup {\bfseries{}}.bashrc \item Cleanup other files except for logs if debug mode is on. \item Write zeros as much as possible to prepare for compacting. \end{DoxyItemize}
 
 
-Definition at line 247 of file mkvm.\+sh.
+Definition at line 307 of file mkvm.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_ga30f3fc39fcff53af9710fea740f38109}\label{group__mk_file_system_ga30f3fc39fcff53af9710fea740f38109}} 
 \index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!global\_config@{global\_config}}
@@ -100,7 +99,7 @@ Fix {\bfseries{sddm}} startup keyboard issue using {\ttfamily  setxkbmap}
 \end{DoxyItemize}
 
 
-Definition at line 266 of file mkvm\+\_\+chroot.\+sh.
+Definition at line 328 of file mkvm\+\_\+chroot.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_gab693423f511d21225dbc60b2782190c3}\label{group__mk_file_system_gab693423f511d21225dbc60b2782190c3}} 
 \index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!install\_software@{install\_software}}
@@ -119,7 +118,7 @@ Definition at line 266 of file mkvm\+\_\+chroot.\+sh.
 \end{DoxyItemize}
 
 
-Definition at line 194 of file mkvm\+\_\+chroot.\+sh.
+Definition at line 227 of file mkvm\+\_\+chroot.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_ga57eb97a585b6daafed0d93e57b96cca3}\label{group__mk_file_system_ga57eb97a585b6daafed0d93e57b96cca3}} 
 \index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!install\_stage3@{install\_stage3}}
@@ -131,7 +130,7 @@ Definition at line 194 of file mkvm\+\_\+chroot.\+sh.
 \item Copy stage3 archive, ebuild list, kernel config and \mbox{\hyperlink{mkvm__chroot_8sh}{mkvm\+\_\+chroot.\+sh}} to /mnt/gentoo \item Extract it, fix basic make.\+conf options \item Install repos.\+conf from live\+CD (networking parameters) \item Mount live\+CD proc/sys/dev files into new filesystem \item On failure, print error codes into file {\bfseries{partition}} \item On success, create empty file {\bfseries{partition}} \item {\ttfamily  chroot } into new system \end{DoxyItemize}
 
 
-Definition at line 159 of file mkvm.\+sh.
+Definition at line 181 of file mkvm.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_gaa9952b2711fe0413d7a0bc6639c7f5a5}\label{group__mk_file_system_gaa9952b2711fe0413d7a0bc6639c7f5a5}} 
 \index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!partition@{partition}}
@@ -151,13 +150,13 @@ The VM needs time to recognize /dev/sda in some cases, for unclear reasons. This
 \begin{DoxyRefDesc}{Bug}
 \item[\mbox{\hyperlink{bug__bug000001}{Bug}}]Same issue with mkswap and swapon. Cleaning V\+Box config/settings, syncing and a bit of sleep fixed these issues for the {\itshape net-\/setup} method. 
 
-However if vm type is {\itshape \textquotesingle{}headless\textquotesingle{}} the {\itshape dhcpcd} method is consistently hampered by a V\+Box bug, which is tentatively circumvented by sending a {\ttfamily controlvm keyboardputscancode 1c} instruction. Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a {\ttfamily read}command, all falls back into place. This is why using the net-\/setup script, which forces user input, circumvents the issue. This may be caused by an aging kernel and/or incompatibilities with virtualization. Using a Clone\+Zilla CD as a replacement solved the issue completely yet would need a redraft of much of the code. It might be better to use a beefed-\/up Gentoo install CD. \end{DoxyRefDesc}
+However if vm type is {\itshape \textquotesingle{}headless\textquotesingle{}} the {\itshape dhcpcd} method is consistently hampered by a V\+Box bug, which is tentatively circumvented by sending a {\ttfamily controlvm keyboardputscancode 1c} instruction. Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a {\ttfamily read}command, all falls back into place. This is why using the net-\/setup script, which forces user input, circumvents the issue. This may be caused by an aging kernel and/or incompatibilities with virtualization. Using a Clone\+Zilla CD as a replacement solved the issue completely. It might be better to use a beefed-\/up Gentoo install CD. \end{DoxyRefDesc}
 \begin{DoxyNote}{Note}
 It might be necessary with older machines to increase the amount of sleep. 
 \end{DoxyNote}
 
 
-Definition at line 85 of file mkvm.\+sh.
+Definition at line 96 of file mkvm.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_ga4315b3877c965059c7db8593870066ba}\label{group__mk_file_system_ga4315b3877c965059c7db8593870066ba}} 
 \index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!setup\_network@{setup\_network}}
@@ -171,7 +170,7 @@ Call net-\/setup and dhcpcd to enable networking.
 
 Create file {\bfseries{setup\+\_\+network}} on success for debugging purposes 
 \begin{DoxyRetVals}{Return values}
-{\em Otherwise} & exit -\/1 on failure \\
+{\em Otherwise} & exit 1 on failure \\
 \hline
 \end{DoxyRetVals}
 

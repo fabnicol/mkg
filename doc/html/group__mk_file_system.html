@@ -119,8 +119,7 @@ Functions</h2></td></tr>
 <li>Set a set of per-package use files and keywords <br  />
 </li>
 <li>Oneshot emerge of <b>cmake</b> and <b>lz4</b>, prerequisites to <code> world </code> update. </li>
-<li>Update <code> world </code>. Log into emerge.build. Exit on error. <br  />
-</li>
+<li>Update <code> world </code>. Log into emerge.build. Exit on error. </li>
 <li>Set keymaps, localization and time <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>Add more regional options by parametrization of commandline </dd></dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
@@ -161,7 +160,7 @@ Functions</h2></td></tr>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkvm__chroot_8sh_source.html#l00158">158</a> of file <a class="el" href="mkvm__chroot_8sh_source.html">mkvm_chroot.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm__chroot_8sh_source.html#l00172">172</a> of file <a class="el" href="mkvm__chroot_8sh_source.html">mkvm_chroot.sh</a>.</p>
 
 </div>
 </div>
@@ -187,7 +186,7 @@ Functions</h2></td></tr>
 <li>Write zeros as much as possible to prepare for compacting. </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00247">247</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00307">307</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
 
 </div>
 </div>
@@ -217,7 +216,7 @@ Functions</h2></td></tr>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkvm__chroot_8sh_source.html#l00266">266</a> of file <a class="el" href="mkvm__chroot_8sh_source.html">mkvm_chroot.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm__chroot_8sh_source.html#l00328">328</a> of file <a class="el" href="mkvm__chroot_8sh_source.html">mkvm_chroot.sh</a>.</p>
 
 </div>
 </div>
@@ -247,7 +246,7 @@ Functions</h2></td></tr>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkvm__chroot_8sh_source.html#l00194">194</a> of file <a class="el" href="mkvm__chroot_8sh_source.html">mkvm_chroot.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm__chroot_8sh_source.html#l00227">227</a> of file <a class="el" href="mkvm__chroot_8sh_source.html">mkvm_chroot.sh</a>.</p>
 
 </div>
 </div>
@@ -275,7 +274,7 @@ Functions</h2></td></tr>
 <li><code> chroot </code> into new system </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00159">159</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00181">181</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
 
 </div>
 </div>
@@ -299,11 +298,11 @@ Functions</h2></td></tr>
  On error, fill this file with successive exit codes of commands and exit.<br  />
  On success, just create empty file. </p><dl class="section warning"><dt>Warning</dt><dd>The VM needs time to recognize /dev/sda in some cases, for unclear reasons. This may be a kernel issue or a VirtualBox issue. </dd></dl>
 <dl class="bug"><dt><b><a class="el" href="bug.html#_bug000001">Bug:</a></b></dt><dd><p class="startdd">Same issue with mkswap and swapon. Cleaning VBox config/settings, syncing and a bit of sleep fixed these issues for the <em>net-setup</em> method. </p>
-<p class="enddd">However if vm type is <em>'headless'</em> the <em>dhcpcd</em> method is consistently hampered by a VBox bug, which is tentatively circumvented by sending a <code>controlvm keyboardputscancode 1c</code> instruction. Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a <code>read</code>command, all falls back into place. This is why using the net-setup script, which forces user input, circumvents the issue. This may be caused by an aging kernel and/or incompatibilities with virtualization. Using a CloneZilla CD as a replacement solved the issue completely yet would need a redraft of much of the code. It might be better to use a beefed-up Gentoo install CD. </p>
+<p class="enddd">However if vm type is <em>'headless'</em> the <em>dhcpcd</em> method is consistently hampered by a VBox bug, which is tentatively circumvented by sending a <code>controlvm keyboardputscancode 1c</code> instruction. Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a <code>read</code>command, all falls back into place. This is why using the net-setup script, which forces user input, circumvents the issue. This may be caused by an aging kernel and/or incompatibilities with virtualization. Using a CloneZilla CD as a replacement solved the issue completely. It might be better to use a beefed-up Gentoo install CD. </p>
 </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>It might be necessary with older machines to increase the amount of sleep. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00085">85</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkvm_8sh_source.html#l00096">96</a> of file <a class="el" href="mkvm_8sh_source.html">mkvm.sh</a>.</p>
 
 </div>
 </div>
@@ -325,7 +324,7 @@ Functions</h2></td></tr>
 <p>Call net-setup and dhcpcd to enable networking. </p>
 <p>Create file <b>setup_network</b> on success for debugging purposes </p><dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">Otherwise</td><td>exit -1 on failure </td></tr>
+    <tr><td class="paramname">Otherwise</td><td>exit 1 on failure </td></tr>
   </table>
   </dd>
 </dl>

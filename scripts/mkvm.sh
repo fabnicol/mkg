@@ -27,6 +27,7 @@
 ## @ingroup mkFileSystem
 
 setup_network() {
+
     [ -f setup_network ] && return
     local res=0
     if "${GUI}"
@@ -56,7 +57,7 @@ setup_network() {
     fi
     res=$?
     [ ${res} = 0 ] && touch setup_network || {
-        ${LOG[*]} "[ERR] Could not fix internet access!"
+        echo  "[ERR] Could not fix internet access!" | tee setup_network.log
         "${GUI}" && exit 1 || shutdown -h now
     }
 }
@@ -93,6 +94,7 @@ setup_network() {
 ## @ingroup mkFileSystem
 
 partition() {
+
     [ -f partition ] && [ ! -s partition ] && return 0
     sleep 5
     parted --script \
@@ -134,24 +136,33 @@ partition() {
     if [ ${res} = 0 ]
     then
         touch partition
+        echo "[MSG] Partioned /dev/sda4 correctly."
     else
-        echo "parted exit code: ${res0}"    > partition
-        echo "mkfs.fat exit code: ${res1}"  >> partition
-        echo "mkfs.ext4 exit code: ${res2}" >> partition
-        echo "mkswap exit code: ${res3}"    >> partition
-        echo "swapon exit code: ${res4}"    >> partition
-        echo "mount exit code:  ${res5}"    >> partition
-        ${LOG[*]} "Failed to cleanly partition main disk"
+        echo "[ERR] parted exit code: ${res0}"    | tee partition.log
+        echo "[ERR] mkfs.fat exit code: ${res1}"  | tee partition.log
+        echo "[ERR] mkfs.ext4 exit code: ${res2}" | tee partition.log
+        echo "[ERR] mkswap exit code: ${res3}"    | tee partition.log
+        echo "[ERR] swapon exit code: ${res4}"    | tee partition.log
+        echo "[ERR] mount exit code:  ${res5}"    | tee partition.log
+        echo "[ERR] Failed to cleanly partition main disk" | tee partition.log
         sleep 10
         if [ $((${res1} | ${res2} | ${res3} | ${res5})) != 0 ]
         then
-            ${LOG[*]}  "[ERR] Critical errors while partitioning"
+            echo  "[ERR] Critical errors while partitioning" | tee partition.log
             swapoff -a
             findmnt /dev/sda4 && umount -l /dev/sda4
-            "${GUI}" && return -1 || shutdown -h now
+            if "${GUI}"
+            then
+                return 1
+            else
+                echo "[ERR] Shutting down in 5 seconds..."
+                sleep 5
+                shutdown -h now
+            fi
         else
-            ${LOG[*]} "[WAR] Parted issue but mkfs and mount OK. Going on..."
-            return -1
+            echo "[WAR] Parted issue but mkfs and mount OK. Going on..." \
+                 | tee partition.log
+            return 1
         fi
     fi
 }
@@ -168,9 +179,12 @@ partition() {
 ## @ingroup mkFileSystem
 
 install_stage3() {
-    [ -f stage3 ] && return 0
 
+    [ -f stage3 ] && return 0
+    echo "[INF] Installing stage 3..." | tee stage3.log
     # move or copy system files to target OS
+
+    ! [ -d /mnt/gentoo ] && mkdir -p /mnt/gentoo
 
     mv -vf "${STAGE3}" \
        "${ELIST}" \
@@ -182,12 +196,22 @@ install_stage3() {
 
     # cd to target OS and extract stage3 archive
 
-    cd /mnt/gentoo || exit 2
-    head -n -1 -q bashrc_temp > temp_bashrc && rm bashrc_temp
-    tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
+    cd /mnt/gentoo
+
     if [ $? != 0 ]
     then
-        ${LOG[*]} "[ERR] stage3 tarball could not be extracted"
+        echo "[ERR] Could not cd to /mnt/gentoo"   | tee stage3.log
+        echo "[ERR] Shutting down in 5 seconds..." | tee stage3.log
+        sleep 5
+        shutdown -h now
+    fi
+
+    head -n -1 -q bashrc_temp > temp_bashrc && rm bashrc_temp
+    tar xpJf ${STAGE3} --xattrs-include='*.*' --numeric-owner
+
+    if [ $? != 0 ]
+    then
+        echo "[ERR] stage3 tarball could not be extracted" | tee stage3.log
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
@@ -237,20 +261,43 @@ bh-luxi"' >> ${m_conf}
     if [ ${res} = 0 ]
     then
         touch stage3
+        echo "[MSG] Installed stage3 correctly."    | tee stage3.log
     else
-        ${LOG[*]} "mounting proc exit code: ${res0}"         > stage3
-        ${LOG[*]} "mounting sys exit code: ${res1}"         >> stage3
-        ${LOG[*]} "rslave sys exit code: ${res2}"           >> stage3
-        ${LOG[*]} "mounting dev dev exit code: ${res3}"     >> stage3
-        ${LOG[*]} "rslave dev exit code exit code: ${res4}" >> stage3
-        ${LOG[*]} "Failed to bind liveCD to main disk"
+        echo "mounting proc exit code: ${res0}"     | tee stage3.log
+        echo "mounting sys exit code: ${res1}"      | tee stage3.log
+        echo "rslave sys exit code: ${res2}"        | tee stage3.log
+        echo "mounting dev dev exit code: ${res3}"     | tee stage3.log
+        echo "rslave dev exit code exit code: ${res4}" | tee stage3.log
+        echo "Failed to bind liveCD to main disk"  | tee stage3.log
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
-        "${GUI}" && exit 1 || shutdown -h now
+        if "${GUI}"
+        then
+            exit 1
+        else
+            echo "[INF] Shutting down in 5 seconds..."
+            sleep 5
+            shutdown -h now
+        fi
     fi
-    cd ~ || exit 2
+
+    cd ~
+    if [ $? != 0 ]
+    then
+        echo "[ERR] Could not cd to $HOME" | tee stage3.log
+        exit 2
+    fi
+
     chroot /mnt/gentoo /bin/bash mkvm_chroot.sh
+
+    if [ $? != 0 ]
+    then
+        echo "[ERR] Could not chroot to /mnt/gentoo" | tee stage3.log
+        echo "[INF] Shutting down in 5 seconds" | tee stage3.log
+        sleep 5
+        exit 2
+    fi
 }
 
 ## @fn finalize()
@@ -258,6 +305,7 @@ bh-luxi"' >> ${m_conf}
 ## @ingroup mkFileSystem
 
 finalize() {
+
     umount -l /mnt/gentoo/dev{/shm,/pts,}
     umount /mnt/gentoo/run
     umount /mnt/gentoo/proc
@@ -266,6 +314,8 @@ finalize() {
     chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}
     umount -l /dev/sda4
     fsck -AR -y
+    echo "[INF] Shutting down in 5 seconds..."
+    sleep 5
     shutdown -h now
 }
 
@@ -275,11 +325,11 @@ finalize() {
 setup_network  2>&1 | tee setup_network.log
 if ! partition
 then
-    ${LOG[*]} "[WAR] Second try at partitioning..."
+    echo "[WAR] Second try at partitioning..." | tee partion.log
     findmnt /dev/sda2 && umount -l /dev/sda2
     findmnt /dev/sda4 && umount -l /dev/sda4
     swapoff -a
     partition
 fi
-install_stage3 2>&1 | tee install_stage3.log
+install_stage3 2>&1 | tee stage3.log
 finalize       2>&1 | tee finalize.log

@@ -1,0 +1,156 @@
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{11}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!build\_virtualbox@{build\_virtualbox}|hyperpage}{12}
+\indexentry{build\_virtualbox@{build\_virtualbox}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{12}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!cleanup@{cleanup}|hyperpage}{13}
+\indexentry{cleanup@{cleanup}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{13}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!clone\_vm\_to\_device@{clone\_vm\_to\_device}|hyperpage}{13}
+\indexentry{clone\_vm\_to\_device@{clone\_vm\_to\_device}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{13}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!clone\_vm\_to\_raw@{clone\_vm\_to\_raw}|hyperpage}{13}
+\indexentry{clone\_vm\_to\_raw@{clone\_vm\_to\_raw}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{13}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!clonezilla\_device\_to\_image@{clonezilla\_device\_to\_image}|hyperpage}{13}
+\indexentry{clonezilla\_device\_to\_image@{clonezilla\_device\_to\_image}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{13}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!clonezilla\_to\_iso@{clonezilla\_to\_iso}|hyperpage}{14}
+\indexentry{clonezilla\_to\_iso@{clonezilla\_to\_iso}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{14}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!create\_device\_system@{create\_device\_system}|hyperpage}{14}
+\indexentry{create\_device\_system@{create\_device\_system}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{14}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!create\_iso\_vm@{create\_iso\_vm}|hyperpage}{15}
+\indexentry{create\_iso\_vm@{create\_iso\_vm}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{15}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!create\_vm@{create\_vm}|hyperpage}{15}
+\indexentry{create\_vm@{create\_vm}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{15}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!dd\_to\_usb@{dd\_to\_usb}|hyperpage}{15}
+\indexentry{dd\_to\_usb@{dd\_to\_usb}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{15}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!deep\_clean@{deep\_clean}|hyperpage}{16}
+\indexentry{deep\_clean@{deep\_clean}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{16}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!delete\_vm@{delete\_vm}|hyperpage}{16}
+\indexentry{delete\_vm@{delete\_vm}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{16}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!fetch\_clonezilla\_iso@{fetch\_clonezilla\_iso}|hyperpage}{16}
+\indexentry{fetch\_clonezilla\_iso@{fetch\_clonezilla\_iso}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{16}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!fetch\_livecd@{fetch\_livecd}|hyperpage}{17}
+\indexentry{fetch\_livecd@{fetch\_livecd}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{17}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!fetch\_stage3@{fetch\_stage3}|hyperpage}{17}
+\indexentry{fetch\_stage3@{fetch\_stage3}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{17}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!generate\_Gentoo@{generate\_Gentoo}|hyperpage}{17}
+\indexentry{generate\_Gentoo@{generate\_Gentoo}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{17}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!get\_cache\_clonezilla\_iso@{get\_cache\_clonezilla\_iso}|hyperpage}{18}
+\indexentry{get\_cache\_clonezilla\_iso@{get\_cache\_clonezilla\_iso}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{18}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!get\_clonezilla\_iso@{get\_clonezilla\_iso}|hyperpage}{18}
+\indexentry{get\_clonezilla\_iso@{get\_clonezilla\_iso}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{18}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!get\_gentoo\_install\_iso@{get\_gentoo\_install\_iso}|hyperpage}{18}
+\indexentry{get\_gentoo\_install\_iso@{get\_gentoo\_install\_iso}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{18}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!help\_@{help\_}|hyperpage}{18}
+\indexentry{help\_@{help\_}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{18}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!help\_md@{help\_md}|hyperpage}{18}
+\indexentry{help\_md@{help\_md}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{18}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!main@{main}|hyperpage}{19}
+\indexentry{main@{main}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{19}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!make\_boot\_from\_livecd@{make\_boot\_from\_livecd}|hyperpage}{19}
+\indexentry{make\_boot\_from\_livecd@{make\_boot\_from\_livecd}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{19}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!mount\_live\_cd@{mount\_live\_cd}|hyperpage}{19}
+\indexentry{mount\_live\_cd@{mount\_live\_cd}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{19}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!process\_clonezilla\_iso@{process\_clonezilla\_iso}|hyperpage}{20}
+\indexentry{process\_clonezilla\_iso@{process\_clonezilla\_iso}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{20}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!test\_cli@{test\_cli}|hyperpage}{20}
+\indexentry{test\_cli@{test\_cli}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{20}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!test\_cli\_post@{test\_cli\_post}|hyperpage}{20}
+\indexentry{test\_cli\_post@{test\_cli\_post}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{20}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!test\_cli\_pre@{test\_cli\_pre}|hyperpage}{21}
+\indexentry{test\_cli\_pre@{test\_cli\_pre}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{21}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!test\_vm\_running@{test\_vm\_running}|hyperpage}{21}
+\indexentry{test\_vm\_running@{test\_vm\_running}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{21}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!vbox\_img\_works@{vbox\_img\_works}|hyperpage}{21}
+\indexentry{vbox\_img\_works@{vbox\_img\_works}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{21}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!ARR@{ARR}|hyperpage}{22}
+\indexentry{ARR@{ARR}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{22}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!ARRAY\_LENGTH@{ARRAY\_LENGTH}|hyperpage}{22}
+\indexentry{ARRAY\_LENGTH@{ARRAY\_LENGTH}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{22}
+\indexentry{Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}!ISO@{ISO}|hyperpage}{23}
+\indexentry{ISO@{ISO}!Create Gentoo linux image and installer.@{Create Gentoo linux image and installer.}|hyperpage}{23}
+\indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{24}
+\indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!adjust\_environment@{adjust\_environment}|hyperpage}{24}
+\indexentry{adjust\_environment@{adjust\_environment}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{24}
+\indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!build\_kernel@{build\_kernel}|hyperpage}{25}
+\indexentry{build\_kernel@{build\_kernel}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{25}
+\indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!finalize@{finalize}|hyperpage}{25}
+\indexentry{finalize@{finalize}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{25}
+\indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!global\_config@{global\_config}|hyperpage}{25}
+\indexentry{global\_config@{global\_config}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{25}
+\indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!install\_software@{install\_software}|hyperpage}{26}
+\indexentry{install\_software@{install\_software}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{26}
+\indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!install\_stage3@{install\_stage3}|hyperpage}{26}
+\indexentry{install\_stage3@{install\_stage3}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{26}
+\indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!partition@{partition}|hyperpage}{26}
+\indexentry{partition@{partition}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{26}
+\indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!setup\_network@{setup\_network}|hyperpage}{27}
+\indexentry{setup\_network@{setup\_network}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{27}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{28}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!burn\_iso@{burn\_iso}|hyperpage}{29}
+\indexentry{burn\_iso@{burn\_iso}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{29}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_dir@{check\_dir}|hyperpage}{29}
+\indexentry{check\_dir@{check\_dir}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{29}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_file@{check\_file}|hyperpage}{29}
+\indexentry{check\_file@{check\_file}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{29}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_files@{check\_files}|hyperpage}{30}
+\indexentry{check\_files@{check\_files}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{30}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_md5sum@{check\_md5sum}|hyperpage}{30}
+\indexentry{check\_md5sum@{check\_md5sum}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{30}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_tool@{check\_tool}|hyperpage}{31}
+\indexentry{check\_tool@{check\_tool}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{31}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!create\_install\_ext\_device@{create\_install\_ext\_device}|hyperpage}{31}
+\indexentry{create\_install\_ext\_device@{create\_install\_ext\_device}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{31}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!create\_options\_array@{create\_options\_array}|hyperpage}{32}
+\indexentry{create\_options\_array@{create\_options\_array}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{32}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!get\_device@{get\_device}|hyperpage}{32}
+\indexentry{get\_device@{get\_device}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{32}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!get\_mountpoint@{get\_mountpoint}|hyperpage}{32}
+\indexentry{get\_mountpoint@{get\_mountpoint}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{32}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!if\_fails@{if\_fails}|hyperpage}{32}
+\indexentry{if\_fails@{if\_fails}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{32}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!is\_block\_device@{is\_block\_device}|hyperpage}{33}
+\indexentry{is\_block\_device@{is\_block\_device}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{33}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!list\_block\_devices@{list\_block\_devices}|hyperpage}{33}
+\indexentry{list\_block\_devices@{list\_block\_devices}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{33}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}|hyperpage}{33}
+\indexentry{recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{33}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!send\_mail@{send\_mail}|hyperpage}{34}
+\indexentry{send\_mail@{send\_mail}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{34}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_cdrecord@{test\_cdrecord}|hyperpage}{34}
+\indexentry{test\_cdrecord@{test\_cdrecord}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{34}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_email@{test\_email}|hyperpage}{35}
+\indexentry{test\_email@{test\_email}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{35}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_numeric@{test\_numeric}|hyperpage}{35}
+\indexentry{test\_numeric@{test\_numeric}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{35}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_URL@{test\_URL}|hyperpage}{35}
+\indexentry{test\_URL@{test\_URL}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{35}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!validate\_option@{validate\_option}|hyperpage}{36}
+\indexentry{validate\_option@{validate\_option}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{36}
+\indexentry{build\_virtualbox.sh@{build\_virtualbox.sh}|hyperpage}{37}
+\indexentry{build\_virtualbox.sh@{build\_virtualbox.sh}!DOWNLOAD\_CLONEZILLA@{DOWNLOAD\_CLONEZILLA}|hyperpage}{37}
+\indexentry{DOWNLOAD\_CLONEZILLA@{DOWNLOAD\_CLONEZILLA}!build\_virtualbox.sh@{build\_virtualbox.sh}|hyperpage}{37}
+\indexentry{fetch\_clonezilla\_iso.sh@{fetch\_clonezilla\_iso.sh}|hyperpage}{37}
+\indexentry{fetch\_clonezilla\_iso.sh@{fetch\_clonezilla\_iso.sh}!CLONEZILLACD@{CLONEZILLACD}|hyperpage}{38}
+\indexentry{CLONEZILLACD@{CLONEZILLACD}!fetch\_clonezilla\_iso.sh@{fetch\_clonezilla\_iso.sh}|hyperpage}{38}
+\indexentry{fetch\_clonezilla\_iso.sh@{fetch\_clonezilla\_iso.sh}!LIVECD@{LIVECD}|hyperpage}{38}
+\indexentry{LIVECD@{LIVECD}!fetch\_clonezilla\_iso.sh@{fetch\_clonezilla\_iso.sh}|hyperpage}{38}
+\indexentry{mkgentoo.sh@{mkgentoo.sh}|hyperpage}{38}
+\indexentry{mkgentoo.sh@{mkgentoo.sh}!CREATE\_ISO@{CREATE\_ISO}|hyperpage}{40}
+\indexentry{CREATE\_ISO@{CREATE\_ISO}!mkgentoo.sh@{mkgentoo.sh}|hyperpage}{40}
+\indexentry{mkgentoo.sh@{mkgentoo.sh}!DEBIAN\_FRONTEND@{DEBIAN\_FRONTEND}|hyperpage}{40}
+\indexentry{DEBIAN\_FRONTEND@{DEBIAN\_FRONTEND}!mkgentoo.sh@{mkgentoo.sh}|hyperpage}{40}
+\indexentry{mkgentoo.sh@{mkgentoo.sh}!ISOLINUX\_DIR@{ISOLINUX\_DIR}|hyperpage}{40}
+\indexentry{ISOLINUX\_DIR@{ISOLINUX\_DIR}!mkgentoo.sh@{mkgentoo.sh}|hyperpage}{40}
+\indexentry{mkgentoo.sh@{mkgentoo.sh}!LD\_LIBRARY\_PATH@{LD\_LIBRARY\_PATH}|hyperpage}{40}
+\indexentry{LD\_LIBRARY\_PATH@{LD\_LIBRARY\_PATH}!mkgentoo.sh@{mkgentoo.sh}|hyperpage}{40}
+\indexentry{mkgentoo.sh@{mkgentoo.sh}!LOG@{LOG}|hyperpage}{40}
+\indexentry{LOG@{LOG}!mkgentoo.sh@{mkgentoo.sh}|hyperpage}{40}
+\indexentry{mkgentoo.sh@{mkgentoo.sh}!PATH@{PATH}|hyperpage}{40}
+\indexentry{PATH@{PATH}!mkgentoo.sh@{mkgentoo.sh}|hyperpage}{40}
+\indexentry{mkvm.sh@{mkvm.sh}|hyperpage}{41}
+\indexentry{mkvm\_chroot.sh@{mkvm\_chroot.sh}|hyperpage}{41}
+\indexentry{mkvm\_chroot.sh@{mkvm\_chroot.sh}!finalize@{finalize}|hyperpage}{42}
+\indexentry{finalize@{finalize}!mkvm\_chroot.sh@{mkvm\_chroot.sh}|hyperpage}{42}
+\indexentry{mkvm\_chroot.sh@{mkvm\_chroot.sh}!res@{res}|hyperpage}{42}
+\indexentry{res@{res}!mkvm\_chroot.sh@{mkvm\_chroot.sh}|hyperpage}{42}
+\indexentry{test.sh@{test.sh}|hyperpage}{42}
+\indexentry{utils.sh@{utils.sh}|hyperpage}{42}
+\indexentry{utils.sh@{utils.sh}!A@{A}|hyperpage}{43}
+\indexentry{A@{A}!utils.sh@{utils.sh}|hyperpage}{43}
