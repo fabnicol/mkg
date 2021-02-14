@@ -3,9 +3,9 @@
 # *
 # * Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
 # *
-# * This file is part of gentoolize.
+# * This file is part of mkg.
 # *
-# * gentoolize is free software; you can redistribute it and/or
+# * mkg is free software; you can redistribute it and/or
 # * modify it under the terms of the GNU Lesser General Public
 # * License as published by the Free Software Foundation; either
 # * version 3 of the License, or (at your option) any later version.
@@ -47,7 +47,7 @@ setup_network() {
         else
 
             # Workaround a VirtualBox bug, you need a keyboard input here of
-            # some sort.  This is why we wait some time in gentoolize.sh
+            # some sort.  This is why we wait some time in mkgentoo.sh
 
             read -p "[MSG] Waiting for keyboard input..."  input_str
             echo "[MSG] Got input string: $input_str" | tee setup_network.log

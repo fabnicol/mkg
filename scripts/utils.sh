@@ -1,14 +1,14 @@
 ##
 # Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
 #
-# This file is part of gentoolize.
+# This file is part of mkg.
 #
-# gentoolize is free software; you can redistribute it and/or
+# mkg is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 3 of the License, or (at your option) any later version.
 #
-# gentoolize is distributed in the hope that it will be useful,
+# mkg is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # Lesser General Public License for more details.
@@ -93,7 +93,7 @@ test_email() {
 ## @fn send_mail()
 ## @brief Send an email to $EMAIL at $SMTP_URL to warn about end of processing.
 ## @warning Email password is entered in clear using $EMAIL_PASSWD which is not
-##          safe if mkgentoo is run on any other platform than the user's own.
+##          safe if mkg is run on any other platform than the user's own.
 ##          Use with care in a private context.
 ## @return Return value of `curl' command.
 ## @ingroup auxiliaryFunctions

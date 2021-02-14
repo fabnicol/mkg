@@ -3,9 +3,9 @@
 ##
 # Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
 #
-# This file is part of gentoolize.
+# This file is part of mkg.
 #
-# gentoolize is free software; you can redistribute it and/or
+# mkg is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
 # License as published by the Free Software Foundation; either
 # version 3 of the License, or (at your option) any later version.
@@ -23,7 +23,7 @@
 ## @mainpage Usage
 ## @brief In a nutshell
 ## @n
-## @code ./gentoolize [command=argument] ... [command=argument]  [file.iso]
+## @code ./mkg [command=argument] ... [command=argument]  [file.iso]
 ## @endcode
 ## @n
 ## @details
@@ -35,7 +35,7 @@
 ## @copyright This software is licensed under the terms of the
 ## <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><b>GPL v3</b></a>
 
-## @file gentoolize.sh
+## @file mkgentoo.sh
 ## @author Fabrice Nicol <fabrnicol@gmail.com>
 ## @copyright GPL v.3
 ## @brief Process options, create Gentoo VirtualBox machine and optionally
@@ -43,9 +43,9 @@
 ## @note This file is not included into the clonezilla ISO liveCD.
 ## @par USAGE
 ## @code
-## gentoolize  [[switch=argument]...]  filename.iso  [1]
-## gentoolize  [[switch=argument]...]                [2]
-## gentoolize  help[=md]                             [3]
+## mkg  [[switch=argument]...]  filename.iso  [1]
+## mkg  [[switch=argument]...]                [2]
+## mkg  help[=md]                             [3]
 ## @endcode
 ## @par
 ## Usage [1] creates a bootable ISO output file with a current Gentoo
@@ -55,7 +55,7 @@
 ## Usage [3] prints this help, in markdown form if argument 'md' is specified.
 ## @n
 ## @par
-## Run: @code gentoolize help @endcode to print a list of possible switches and
+## Run: @code mkg help @endcode to print a list of possible switches and
 ## arguments.
 ## @warning you should have at least 55 GB of free disk space in the current
 ## directory or in vmpath
@@ -69,7 +69,7 @@
 ## @li Only create the VM and virtual disk, in debug mode,
 ## without R or RStudio and set new passwords, for a French-language platform.
 ## Use 8 cores.
-## @code gentoolize language=fr minimal debug_mode ncpus=8
+## @code mkg language=fr minimal debug_mode ncpus=8
 ## nonroot_user=ken passwd='util!Hx&32F' rootpasswd='Hk_32!_CD' cleanup=false
 ## @endcode
 ## @li Create ISO clonezilla image of Gentoo linux, burn it to DVD, create an
@@ -129,9 +129,9 @@ declare -i -r ARRAY_LENGTH=$((${#ARR[*]}/4))
 
 help_md() {
     echo "**USAGE:**  "
-    echo "**gentoolize**  [[switch=argument]...]  filename.iso  [1]  "
-    echo "**gentoolize**  [[switch=argument]...]                [2]  "
-    echo "**gentoolize**  help[=md]                             [3]  "
+    echo "**mkg**  [[switch=argument]...]  filename.iso  [1]  "
+    echo "**mkg**  [[switch=argument]...]                [2]  "
+    echo "**mkg**  help[=md]                             [3]  "
     echo "  "
     echo "Usage [1] creates a bootable ISO output file with a current Gentoo \
 distribution.  "
@@ -192,7 +192,7 @@ validate_option() {
 
 # Help cases: bail out
 
-grep -q 'help_md' <<< "$@" && { help_md; exit 0; }
+grep -q 'help=md' <<< "$@" && { help_md; exit 0; }
 grep -q 'help'    <<< "$@" && { help_;   exit 0; }
 
 # default value is false
@@ -724,7 +724,7 @@ mount_live_cd() {
     if ! "${CREATE_SQUASHFS}"
     then
         ${LOG[*]} "[MSG] Reusing ${ISO} which was previously created... \
-use this option with care if only you have run gentoolize before."
+use this option with care if only you have run mkg before."
         ${LOG[*]} "[MSG] create_squashfs should be left at 'true' (default) \
 if mkvm.sh or mkvm_chroot.sh have been altered"
         ${LOG[*]} "[MSG] or the kernel config file, the global variables, \
@@ -1820,7 +1820,7 @@ vbox_img_works() {
 ##       the currently running operating system.
 ## @ingroup createInstaller
 
-# guestfish --progress-bars  --ro -a /home/fab/Dev/gentoolize/Gentoo.vdi run : download /dev/sda /dev/sdf
+# guestfish --progress-bars  --ro -a /home/fab/Dev/mkg/Gentoo.vdi run : download /dev/sda /dev/sdf
 
 create_device_system() {
 
@@ -1902,7 +1902,7 @@ generate_Gentoo() {
 ## @fn main()
 ## @brief Main function launching routines
 ## @todo Daemonize the part below generate_Gentoo when #VMTYPE is `headless`
-## so that the script can be detached completely with `nohup gentoolize ...  &`
+## so that the script can be detached completely with `nohup mkgentoo..  &`
 ## @ingroup createInstaller
 
 main() {
