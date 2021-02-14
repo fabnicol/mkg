@@ -59,13 +59,13 @@
 ## @ingroup createInstaller
 ## @note `debug_mode` should be place up front in the array
 
-declare -a -r ARR
+declare -a ARR
 
 ## @var ARRAY_LENGTH
 ## @brief Number of switches (true length of array divided by 4)
 ## @ingroup createInstaller
 
-declare -i -r ARRAY_LENGTH
+declare -i ARRAY_LENGTH
 
 create_options_array() {
     IFS=';'

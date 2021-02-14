@@ -187,7 +187,7 @@ clonezilla-live-20200703-focal-amd64.iso/download  "
 ## @ingroup createInstaller
 
 help_() {
-    help_md | sed 's/[\*\|\>]//g'
+    help_md | sed 's/[\*\|\>]//g' | grep -v -E "(Option *Desc.*|:--.*)"
 }
 
 # ---------------------------------------------------------------------------- #
@@ -603,7 +603,7 @@ third-party applications for this mail to be sent."
         CLEANUP=false
         ${LOG[*]} "[MSG] Deactivated cleanup"
     fi
-    if  "${HOT_INSTALL}" || [ -n "${EXT_DEVICE}" ]
+    if  "${HOT_INSTALL}" || [ -n "${EXT_DEVICE}" ] \
                          || [ -n "${DEVICE_INSTALLER}" ]
     then
         read -p "[WAR] All data will be wiped out on device(s): ${EXT_DEVICE} \
@@ -1791,22 +1791,22 @@ did not find grentoo.img"
 
 main() {
 
-    # Help cases: bail out
-
-    grep -q 'help=md' <<< "$@" && { help_md; exit 0; }
-    grep -q 'help'    <<< "$@" && { help_;   exit 0; }
-
     # Using a temporary writable array A so that
     # ARR will not be writable later on
 
     create_options_array
+
+    # Help cases: bail out
+
+    grep -q 'help=md' <<< "$@" && { help_md; exit 0; }
+    grep -q 'help'    <<< "$@" && { help_;   exit 0; }
 
     # parse command line. All arguments must be in the form a=true/false except
     # for help, file.iso. But 'a' can be used as shorthand for 'a=true'
 
     # Analyse commandline and source auxiliary files
 
-    get_options
+    get_options $@
 
     check_tool "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
                "VBoxManage" "curl" "grep" "lsblk" "awk"
