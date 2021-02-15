@@ -24,6 +24,7 @@
      "cleanup"            "Clean up archives, temporary images and virtual machine after successful completion. Boolean."         "true" "b"
      "remove_vdi"         "Full clean-up: also remove VDI disks"                                                                "false"  "b"
      "clonezilla_install" "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false" "b"
+     "cloning_method"     "Method used by hot_install ext_device=... to intall Gentoo to disk. One of: 'guestfish' (default), 'with-raw-buffer' (slower) or 'vbox-img' (currently unavailable)" "guestfish"  "s:ext_device"
      "cpuexecutioncap"    "Maximum percentage of CPU per core (0 to 100)"                                                          "100" "n"
      "create_squashfs"    "(Re)create the squashfs filesystem. Boolean."                                                          "true" "b"
      "device_installer"   "Create Gentoo clone installer on external device. Argument is either a device label (e.g. sdb, hdb), or a mountpoint directory (if mounted), or a few consecutive letters of the model, if there is just one such. If unspecified, **usb_device** value will be used. OS Gentoo will be replaced by Clonezilla installer."  "" ""

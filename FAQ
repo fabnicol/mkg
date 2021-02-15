@@ -1,0 +1,130 @@
+#  Frequently Asked Questions (FAQ)
+
+### On which platforms does MKG work?
+
+`mkg` has been developed under GNU/Linux (Ubuntu 20.10).   
+It should run on all GNU/Linux platforms with appropriate installation of
+dependencies.   
+It should be portable to the BSD family of *nix platforms (including MacOs) with
+some amendments. A port should use GNU versions of common tools like `sed` and
+`grep` for example and so relink such tools.    
+
+### How to create a bootable ISO to install Gentoo to main PC disk?
+
+Simply run:
+
+`# ./mkg`  
+      
+with admininstrative rights.  
+You will need a working internet connexion and a handful of dependencies.  
+
+### What dependencies should be installed?   
+
+You can run `mkg` and wait for it to complain about missing dependencies in the
+first stages of the run.
+If you prefer to avoid any dependency issue, you should check that your platform
+has a GNU version of the following tools:  
+
++ `bash` (any recent version)
++ `curl`
++ `findmnt`
++ `grep`
++ `mkisofs` (from cdrtools)
++ `mksquashfs`
++ `mountpoint`
++ `rsync`
++ `sed`
++ `xorriso`
++ `tar` 
++ `VBoxManage` (from virtualbox)
++ `xz`   
+
+and optionally:   
+
++ `cdrecord` (from cdrtools)  
++ `guestfish`  
++ `md5sum`  
+
+To back up an existing partition into a Gentoo ISO installer, it is preferable
+to have the CloneZilla suite (`ocs-sr` and `drbl` notably) previously
+installed on the platform. Otherwise `mkg` will try its best but this may fail
+more easily.   
+
+### Is `mkg` safe for my platform?
+
+`mkg` builds a Gentoo image using a VirtualBox VM. So most of the potential
+hazards are encapsulated within a virtual disk away from your OS system files.
+However care should be taken when on installing Gentoo to a device. Check that
+your device is free or may be overwritten without loss. It is a common user
+responsability to check this. `mkg` will request two confirmations in a
+row. You have been warned.  
+
+### How much time does it take to build Gentoo?
+
+It obviously depends on your hardware. A full platform builds in 15 to
+22 hours on my Core-i7 (Haswell) x86_64 platform. You should not shut down or
+hibernate your platform in the meantime.
+
+### Waow, 22 hours is a lot of time. Can I somehow be kept informed of job
+completion?  
+
+Yes, you can, just add, for example:
+
+`# (...) email=john.smith@emailprovider.domain email_passwd="my_password"`  
+
+to your command line. Password is not encrypted, so you should not do this in
+unsafe environments like PCs connected to a public network. This is however
+reasonably safe for a home-made build. 
+    
+### How much RAM and disk space will I need?
+
+Building Gentoo comes at a price: you will need a minimum of 7GB of available
+RAM  and 55 GB of free disk space (twice this amount if you directly install to
+a  device using the safe-and-slow option `cloning_mode=with-raw-buffer`).   
+
+### Building Gentoo sometimes runs into failures. Will `mkg` complete its build?
+
+`mkg` is routinely tested and comes with a `minimal` option that builds a lighter
+version of Gentoo, which may help if a recent ebuild tree breaks something in
+the full build.  
+In case of a build failure, please file a Github issue.  
+
+### Do you provide prebuilt Gentoo ISO installers?
+
+ISO installers will be provided either in the **Release** section of this Github
+site or (if need be) in an Amazon S3 repository.  
+Currently, builds are restricted to the x86_64 platform for processors that
+support the AVX2 register.  
+
+### How to... 
+
++ directly install Gentoo to my high-tranfer rate USB stick or external disk?
+
+`# ./mkg hot_install ext_device=/dev/sdX`    
+
+where /dev/sdX is your external device (check `fdisk -l` or `blkid` to make
+sure). 
+
++ create an Gentoo ISO installer out of my existing Gentoo platform?
+
+You should not be running the platform (so-called *hot backups* are not
+supported). Supposing your Gentoo platform to be backed up is under **dev/sdX**,
+strike:
+
+`# ./mkg from_device ext_device=/dev/sdX`   
+
+This will create an iso file named gentoo.iso which can automatically reinstall
+your Gentoo OS in a target PC. 
+Important note: The target partition **will always be /dev/sda**
+
+### I have limited CPU power. What can I do?
+
+You can still use `mkg`, provided that you have enough RAM. To keep allocated
+resources low, add the following to your command line (you may adjust parameters
+depending on your needs):   
+
+`# (...) ncpus=1 cpuexecutioncap=50`   
+
+This will force `mkg` to run on just 50% of one processor core.  
+
+

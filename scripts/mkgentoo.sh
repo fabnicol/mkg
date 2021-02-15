@@ -1292,36 +1292,7 @@ creation directory"
 
 process_clonezilla_iso() {
 
-    fetch_clonezilla_iso
-
-    local verb=""
-    "${VERBOSE}" && verb="-v"
-
-    # copy to ISOFILES as a skeletteon for ISO recovery image authoring
-
-    if "${CREATE_ISO}"
-    then
-        [ -d ISOFILES ] && rm ${verb} -rf ISOFILES
-        mkdir -p ISOFILES/home/partimag
-        check_dir ISOFILES/home/partimag
-        check_dir mnt2
-        "${VERBOSE}" \
-            && ${LOG[*]} "[INF] Now copying CloneZilla files to temporary \
-folder ISOFILES"
-        rsync ${verb} -a mnt2/ ISOFILES
-        check_dir mnt2/syslinux
-        check_file clonezilla/savedisk/isolinux.cfg
-        cp ${verb} -f clonezilla/savedisk/isolinux.cfg mnt2/syslinux/
-        check_dir mnt2/live
-        cd mnt2/live
-    fi
-
-    # prepare chroot in clonezilla filesystem
-
-    for i in proc sys dev run; do mount -B /$i squashfs-root/$i; done
-
-    if_fails $? "[ERR] Could not bind-mount squashfs-root"
-    # add update script to clonezilla filesystem. Do not indent!
+    bind_mount_clonezilla_iso
 
     cat > squashfs-root/update_clonezilla.sh << EOF
 #!/bin/bash
@@ -1373,6 +1344,65 @@ EOF
     cp -vf --dereference squashfs-root/boot/vmlinuz vmlinuz
     cp -vf --dereference squashfs-root/boot/initrd.img  initrd.img
 
+    unmount_clonezilla_iso
+
+    [ -f "${CLONEZILLACD}" ] && rm -vf "${CLONEZILLACD}"
+
+    # this first ISO image is a "save" one: from virtual disk to clonezilla
+    # image
+
+    clonezilla_to_iso "${CLONEZILLACD}" "mnt2"
+}
+
+bind_mount_clonezilla_iso() {
+
+    if ! "${CREATE_ISO}" && ! "${FROM_DEVICE}"
+    then
+        ${LOG[*]} <<< "[ERR] CloneZilla ISO should only be mounted to create\
+an ISO installer or to back-up a device"
+        exit 4
+    fi
+
+    cd ${VMPATH}
+    if_fails $? "[ERR] Could not cd to ${VMPATH}"
+
+    fetch_clonezilla_iso
+
+    if_fails $? "[ERR] Could not fetch CloneZilla ISO file"
+
+    local verb=""
+    "${VERBOSE}" && verb="-v"
+
+    # copy to ISOFILES as a skeletteon for ISO recovery image authoring
+
+    [ -d ISOFILES ] && rm ${verb} -rf ISOFILES
+    mkdir -p ISOFILES/home/partimag
+    check_dir ISOFILES/home/partimag
+    check_dir mnt2
+    "${VERBOSE}" \
+        && ${LOG[*]} "[INF] Now copying CloneZilla files to temporary \
+folder ISOFILES"
+    rsync ${verb} -a mnt2/ ISOFILES
+    check_dir mnt2/syslinux
+    if "${CREATE_ISO}"
+    then
+        check_file clonezilla/savedisk/isolinux.cfg
+        cp ${verb} -f clonezilla/savedisk/isolinux.cfg mnt2/syslinux/
+    fi
+    check_dir mnt2/live
+
+    cd mnt2/live
+
+    # prepare chroot in clonezilla filesystem
+
+    for i in proc sys dev run; do mount -B /$i squashfs-root/$i; done
+
+    if_fails $? "[ERR] Could not bind-mount squashfs-root"
+    # add update script to clonezilla filesystem. Do not indent!
+}
+
+unmount_clonezilla_iso() {
+
     # clean up and restore squashfs back
 
     rm -vf filesystem.squashfs
@@ -1382,15 +1412,8 @@ EOF
     mksquashfs squashfs-root filesystem.squashfs
     if_fails $? "[ERR] Could not recreate squashfs filesystem"
 
-    # add 'savedisk' config file and create ISO
-
-    cd "${VMPATH}" || exit 2
-    [ -f "${CLONEZILLACD}" ] && rm -vf "${CLONEZILLACD}"
-
-    # this first ISO image is a "save" one: from virtual disk to clonezilla
-    # image
-
-    clonezilla_to_iso "${CLONEZILLACD}" "mnt2"
+    cd "${VMPATH}"
+    if_fails $? "[ERR] Could not cd to ${VMPATH}"
 }
 
 ## @fn build_virtualbox()
@@ -1520,7 +1543,11 @@ EOF
 
 create_iso_vm() {
 
-    cd "${VMPATH}" || exit 2
+    cd "${VMPATH}"
+    if_fails $? "[ERR] Could not cd to ${VMPATH}"
+
+    check_file "${VM}.vdi" \
+               "[ERR] A VDI disk with a Gentoo system was not found."
 
     # adding user to group vboxusers is recommended although not strictly
     # necessary here
@@ -1541,9 +1568,10 @@ create_iso_vm() {
                                  --basefolder "${VMPATH}"  2>&1 \
                           | xargs echo [MSG])
 
+    if_fails $? "[ERR] Failed to create VM *${ISOVM}*"
 
     ${LOG[*]} <<< $(VBoxManage modifyvm "${ISOVM}" \
-                                 --cpus ${NCPUS} \
+               --cpus ${NCPUS} \
                --cpu-profile host \
                --memory ${MEM} \
                --vram 128 \
@@ -1559,14 +1587,19 @@ create_iso_vm() {
                --firmware ${FIRMWARE} 2>&1 \
                 | xargs echo [MSG])
 
+    if_fails $? "[ERR] Failed to set parameters of VM *${ISOVM}*"
+
     ${LOG[*]} <<< $(VBoxManage storagectl "${ISOVM}" \
                --name 'SATA Controller' \
                --add sata \
                --bootable on 2>&1 \
                 | xargs echo [MSG])
 
+    if_fails $? \
+             "[ERR] Failed to attach storage SATA controller to VM *${ISOVM}*"
+
     # set disk UUID once and for all to avoid serious debugging issues
-    # whils several VMS are around, some in zombie state, with
+    # whilst several VMS are around, some in zombie state, with
     # same-name disks floating around with different UUIDs and
     # registration issues
 
@@ -1577,9 +1610,6 @@ create_iso_vm() {
 
         local MEDIUM_UUID=$(VBoxManage showmediuminfo "${VM}.vdi"  \
                             | head -n1 | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
-
-        ${LOG[*]} <<< $(VBoxManage internalcommands sethduuid ${VM}.vdi \
-                                 ${MEDIUM_UUID} 2>&1 | xargs echo [MSG])
     else
         ${LOG[*]} "[MSG] UUID of ${VM}.vdi will be used again: ${MEDIUM_UUID}"
     fi
@@ -1592,10 +1622,14 @@ create_iso_vm() {
                --type hdd 2>&1 \
                 | xargs echo [MSG])
 
+    if_fails $? "[ERR] Failed to attach storage ${VM}.vdi to VM *${ISOVM}*"
+
     ${LOG[*]} <<< $(VBoxManage storagectl "${ISOVM}" \
                --name "IDE Controller" \
                --add ide 2>&1 \
                 | xargs echo [MSG])
+
+    if_fails $? "[ERR] Failed to attach IDE storage controller to VM *${ISOVM}*"
 
     ${LOG[*]} <<< $(VBoxManage storageattach "${ISOVM}" \
                --storagectl 'IDE Controller' \
@@ -1606,6 +1640,8 @@ create_iso_vm() {
                --tempeject on 2>&1 \
                 | xargs echo [MSG])
 
+    if_fails $? "[ERR] Failed to attach clonezilla live CD to VM *${ISOVM}*"
+
     ${LOG[*]} <<< $(VBoxManage storageattach "${ISOVM}" \
                --storagectl 'IDE Controller' \
                --port 0 \
@@ -1614,6 +1650,8 @@ create_iso_vm() {
                --medium emptydrive 2>&1 \
                 | xargs echo [MSG])
 
+    if_fails $? "[ERR] Failed to attach IDE storage controller to VM *${ISOVM}*"
+
     ${LOG[*]} <<< $(VBoxManage sharedfolder add "${ISOVM}" \
                                --name shared \
                                --hostpath "${VMPATH}/ISOFILES/home/partimag" \
@@ -1621,8 +1659,11 @@ create_iso_vm() {
                                --auto-mount-point '/home/partimag'  2>&1 \
                         | xargs echo [MSG])
 
+    if_fails $? "[ERR] Failed to attach shared folder \
+${VMPATH}/ISOFILES/home/partimag"
+
     ${LOG[*]} <<< $(VBoxManage startvm "${ISOVM}" \
-                                 --type ${VMTYPE} 2>&1 | xargs echo [MSG])
+                               --type ${VMTYPE} 2>&1 | xargs echo [MSG])
 
     while test_vm_running "${ISOVM}"
     do
@@ -1633,10 +1674,10 @@ create_iso_vm() {
 
 ## @fn clone_vm_to_device()
 ## @brief Directly clone Gentoo VM to USB stick (or any using block device)
+## @param mode Either "vbox-img" or "guestfish"
 ## @warning Requests the \e patched version of \b vbox-img on account of
-## Oracle source code bug (ticket #19901)
-## @note Either build it beforehand or specify on commandline:
-## @code build_virtualbox=true @endcode
+## Oracle source code bug (ticket #19901) or \b  guestfish
+## @note build vbox-img beforehand.
 ## @ingroup createInstaller
 
 clone_vm_to_device() {
@@ -1652,11 +1693,29 @@ clone_vm_to_device() {
     [ -z "${EXT_DEVICE}" ] \
         && { ${LOG[*]} "[ERR] Could not find external device ${EXT_DEVICE}"
              exit 1; }
-    echo "${VBOX_IMG_PREFIX}/vbox-img convert"
-    ${VBOX_IMG_PREFIX}/vbox-img convert --srcfilename "${VM}.vdi" \
-                         --stdout \
-                         --dstformat RAW | \
-        dd of=/dev/${EXT_DEVICE} bs=4M status=progress
+
+    if [ "$1" = "vbox-img" ]
+    then
+        VBOX_IMG_PREFIX="bin"
+        echo "Using ${VBOX_IMG_PREFIX}/vbox-img convert"
+        ${VBOX_IMG_PREFIX}/vbox-img convert --srcfilename "${VM}.vdi" \
+                          --stdout \
+                          --dstformat RAW | \
+            dd of=/dev/${EXT_DEVICE} bs=4M status=progress
+    else
+        if [ "$1" = "guestfish" ]
+        then
+            echo "Using guestfish"
+            check_tool guestfish
+
+            guestfish --progress-bars  --ro -a  "${VM}.vdi" run : \
+                      download /dev/sda /dev/${EXT_DEVICE}
+        else
+            echo "[ERR] Mode is either vbox-img or guestfish."
+            exit 1
+        fi
+    fi
+
     sync
     if_fails $? "[ERR] Could not convert dynamic virtual disk to raw USB device!"
     return 0
@@ -1705,17 +1764,45 @@ dd_to_usb() {
 ## @ingroup createInstaller
 
 clonezilla_device_to_image() {
+
     find_ocs_sr=`which ocs-sr`
+
+    # if no platform-installed ocs-sr, try to bootstrap it from clonezill iso
+
     if [ -z "$find_ocs_sr" ]
     then
-        ${LOG[*]} "[ERR] Could not find ocs_sr !"
-        ${LOG[*]} "[MSG] Install Clonezilla in a standard path or rerun \
- after adding its parth to the PATH environment variable"
-        ${LOG[*]} "[MSG] Note: Debian-based distributions provide a handy \
+        bind_mount_clonezilla_iso
+
+        # now under mnt2/live
+
+        if_fails $? "[ERR] Could not remount and bind CloneZilla ISO file"
+
+        local CLONEZILLA_MOUNTED=true
+        local PATH0=${PATH}
+        local LD0=${LD_LIBRARY_PATH}
+        PATH=$PATH:squashfs-root/sbin:squashfs-root/bin:squashfs-root/usr/bin:\
+squashfs-root/usr/sbin
+        LD_LIBRARY_PATH=${LDO}:squashfs-root/lib:squashfs-root/lib64:\
+squashfs-root/lib32:squashfs-root/usr/lib:squashfs-root/usr/lib64:\
+squashfs-root/usr/lib32
+        find_ocs_sr=`which ocs-sr`
+        if [ -z "$find_ocs_sr" ]
+        then
+            # local mount did not work
+
+            ${LOG[*]} "[ERR] Could not find ocs_sr !"
+            ${LOG[*]} "[MSG] Install Clonezilla in a standard path or rerun \
+ after adding its path to the PATH environment variable"
+            ${LOG[*]} "[MSG] Note: Debian-based distributions provide a handy \
 `clonezilla` package."
-        exit 1
+            unmount_clonezilla_iso
+            PATH=${PATH0}
+            LD_LIBRARY_PATH=${LD0}
+            exit 1
+        fi
     fi
 
+    # now ocs-sr is an available tool
     # At this stage EXT_DEVICE can no longer be a mountpoint as it has
     # been previously converted to device label
 
@@ -1776,6 +1863,13 @@ disk space..."
     check_file /home/partimag/gentoo.img "[ERR] Cloning failed: \
 did not find grentoo.img"
     ${LOG[*]} "[MSG] Cloning succeeded!"
+
+    if "${CLONEZILLA_MOUNTED}"
+    then
+        unmount_clonezilla_iso
+        PATH=${PATH0}
+        LD_LIBRARY_PATH=${LD0}
+    fi
     return 0
 }
 
@@ -1785,6 +1879,9 @@ did not find grentoo.img"
 ##           which is a soft link to the VirtuaBox patched build.
 ## @retval 0 if vbox-img --version is non-empty
 ## @retval 1 otherwise
+## @note Currently vbox-img is broken for --stdout.
+##       Using guestfish as an alternative.
+##       This test is there for when vbox-img is fixed.
 ## @ingroup createInstaller
 
 vbox_img_works() {
@@ -1797,12 +1894,6 @@ vbox_img_works() {
     then
         ${LOG[*]} "[MSG] bin/vbox-img works for this platform."
         return 0
-    else
-        ${LOG[*]} "[MSG] bin/vbox-img (patched) does not work for this platform."
-        ${LOG[*]} "[INF] Trying to build it."
-
-        BUILD_VIRTUALBOX=true
-        return 1
     fi
 }
 
@@ -1812,26 +1903,29 @@ vbox_img_works() {
 ## after building VirtualBox from source, then use it and clone VDI directly
 ## to external device. Otherwise create a temporary RAW file and bare-metal copy
 ## this file to external device.
-## @retval In the first case, the exit code of #clone_vm_to_device
-## @retval In the second case, the exit code of #dd_to_usb following
+## @param Mode Mode must be vbox-img, guestfish or with-raw-buffer
+## @retval In the first two cases, the exit code of #clone_vm_to_device
+## @retval In the last case, the exit code of #dd_to_usb following
 ##         #clone_vm_to_raw
-## @note Requires @b hot_install on command line to be activated.
+## @note Requires @b hot_install on command line to be activated as a security
+##       confirmation.
 ##       This function performs what a live CD does to a target disk, yet using
 ##       the currently running operating system.
 ## @ingroup createInstaller
 
-# guestfish --progress-bars  --ro -a /home/fab/Dev/mkg/Gentoo.vdi run : download /dev/sda /dev/sdf
-
 create_device_system() {
 
-    VBOX_IMG_PREFIX="bin"
-    if  ! vbox_img_works || "${BUILD_VIRTUALBOX}"
+    if  [ "$1" = "guestfish" ] || [ "$1" = "vbox-img" ]
     then
-        build_virtualbox
-        VBOX_IMG_PREFIX="."
-        if  ! vbox_img_works
+        ${LOG[*]} "[INF] Cloning virtual disk to ${EXT_DEVICE} ..."
+        if ! clone_vm_to_device "$1"
         then
-            ${LOG[*]} "[ERR] Could not get a working vbox-img"
+            ${LOG[*]} "[ERR] Cloning VDI disk to external device failed !"
+            return 1
+        fi
+    else
+        if [ "$1" = "with-raw-buffer" ]
+        then
             ${LOG[*]} "[INF] Cloning virtual disk to raw..."
             if ! clone_vm_to_raw
             then
@@ -1846,14 +1940,9 @@ create_device_system() {
 of reachable space"
                 exit 1
             fi
-        fi
-    else
-        VBOX_IMG_PREFIX="bin"
-        ${LOG[*]} "[INF] Cloning virtual disk to ${EXT_DEVICE} ..."
-        if ! clone_vm_to_device
-        then
-            ${LOG[*]} "[ERR] Cloning VDI disk to external device failed !"
-            return 1
+        else
+            echo "[ERR] Mode must be vbox-img, guestfish or with-raw-buffer"
+            exit 1
         fi
     fi
 }
@@ -1948,11 +2037,12 @@ clonezilla image..."
     create_iso_vm
 fi
 
+"${FROM_DEVICE}" && clonezilla_device_to_image
+
 # Now convert the clonezilla xz image image into a bootable ISO
 
 if "${CREATE_ISO}"
 then
-    [ "${FROM_DEVICE}" = "true" ] && clonezilla_device_to_image
     ${LOG[*]} "[INF] Creating Clonezilla bootable ISO..."
 
     # this second ISO image is the "restore" one: from clonezilla image
@@ -1990,7 +2080,7 @@ fi
 if "${HOT_INSTALL}" && [ -n "${EXT_DEVICE}" ]
 then
     ${LOG[*]} "[INF] Creating OS on device ${EXT_DEVICE}..."
-    create_device_system
+    create_device_system "${CLONING_METHOD}"
 fi
 
 # default cleanup

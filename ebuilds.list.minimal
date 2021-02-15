@@ -12,7 +12,6 @@
  dev-libs/re2
  gentoolkit
  sys-boot/grub:2
- dev-vcs/git
  dev-java/ant
  x11-apps/xdm
  x11-misc/sddm 

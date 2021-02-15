@@ -113,6 +113,7 @@ adjust_environment() {
     # other core sysapps to be merged first. LZ4 is a kernel
     # dependency for newer linux kernels.
 
+    emerge -u net/misc/wget
     emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
 
     if [ $? != 0 ]
@@ -234,6 +235,21 @@ install_software() {
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
+
+    # Owing to a bug in git ebuild we build git from source
+
+    wget https://github.com/git/git/archive/master.zip
+    if ! [ -f master.zip ]
+    then
+        echo "[ERR] Could not download git from github" \
+            | tee log_install_software.log
+    else
+        unzip master.zip
+        cd git-master
+        make prefix=/usr
+        make prefix=/usr install
+        cd -
+    fi
 
     # TODO: develop several options wrt to package set.
 
