@@ -226,12 +226,12 @@ install_stage3() {
     local m_conf="etc/portage/make.conf"
     sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS='${CFLAGS} -pipe'/g"  ${m_conf}
     echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
-    echo 'L10N="fr en"'    >> ${m_conf}
-    echo 'LINGUAS="fr en"' >> ${m_conf}
+    echo "L10N=\"${LANGUAGE} en\""    >> ${m_conf}
+    echo "LINGUAS=\"${LANGUAGE} en\"" >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
     echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager \
-elogind -consolekit -systemd dbus X"' >>  ${m_conf}
-    echo "GENTOO_MIRRORS=${EMIRRORS}"  >> ${m_conf}
+elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
+    echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
     # note linux-fw-redistributable no-source-code for genkernel
     # note bh-luxi for font-bh-* requested by xorg-x11
@@ -311,7 +311,6 @@ finalize() {
     umount /mnt/gentoo/proc
     umount /mnt/gentoo/sys
     umount -R -l  /mnt/gentoo
-    chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}
     umount -l /dev/sda4
     fsck -AR -y
     echo "[INF] Shutting down in 5 seconds..."

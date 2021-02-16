@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##
-# Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
+# Copyright (c) 2020-2021 Fabrice Nicol <fabrnicol@gmail.com>
 #
 # This file is part of mkg.
 #
@@ -17,8 +17,18 @@
 #
 # You should have received a copy of the GNU Lesser General Public
 # License along with FFmpeg; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+# Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301
 ##
+
+# ------------------------------------------------------------------ #
+# etags note
+# ----------
+#
+# Owing to a bug in the Emacs etags program
+# Use instead "Exuberant ctags" with option -e to create file TAGS
+#
+# ------------------------------------------------------------------ #
 
 ## @mainpage Usage
 ## @brief In a nutshell
@@ -33,7 +43,8 @@
 ## @n
 ## @author Fabrice Nicol 2020
 ## @copyright This software is licensed under the terms of the
-## <a href="https://www.gnu.org/licenses/gpl-3.0.en.html"><b>GPL v3</b></a>
+## <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">
+## <b>GPL v3</b></a>
 
 ## @file mkgentoo.sh
 ## @author Fabrice Nicol <fabrnicol@gmail.com>
@@ -84,72 +95,72 @@
 
 source scripts/utils.sh
 
-# Using a temporary writable array A so that
-# ARR will not be writable later on
+# ---------------------------------------------------------------------------- #
+# Global declarations
+#
 
-create_options_array
-
-## @var ARR
-## @brief global string array of switches and default values
-## @details Structure is as follows: @code
-## {{"Commandline option", "Description", "Default value", "Type"}, {...},...}
-## @endcode
-## 'Type' is among the following values:
-## @li @b b  Boolean, 'false' or 'true'
-## @li @b d  An existing directory
-## @li @b e  Email address: regexp "[a-z]+@[a-z]+\.[a-z]+"
-## @li @b f  An existing file
-## @li @b n  Numeric value
-## @li @b o  'on' or 'off', a VBoxManage custom Boolean
-## @li @b s  Non-empty string. Corresponding defaults may be empty however.
-##           This is the notably case for passwords. For such options, explicit
-##           commandline value after '=' is requested.
-## @li @b u  Url
-## @li @b x:y Conditional type x: one of the above, with [ -z "$x" ]
-##            <=> { [ "$y" = "false" ] ||  [ -z "$y" ]; } && [ "$y" != "true" ]
-## @li @b vm Restricted to the <tt>vm</tt> option:
-##           can be set to @ code <tt>false</tt> to bypass OS building and only
-##           perform burning/external device operations.
-## A double-entry array will be simulated using indexes.
-## @ingroup createInstaller
-## @note `debug_mode` should be place up front in the array
-
-declare -a -r ARR=(${A[@]})
-unset A
-
-## @var ARRAY_LENGTH
-## @brief Number of switches (true length of array divided by 4)
+## @var ISO
+## @brief Name of downloaded clonezilla ISO file
 ## @ingroup createInstaller
 
-declare -i -r ARRAY_LENGTH=$((${#ARR[*]}/4))
+declare -x ISO="downloaded.iso"
+
+## @var CREATE_ISO
+## @brief Custom name of ISO output. Default value is false
+##        Can be reversed by a name of type filename.iso on command line,
+##        previously created and reused to burn or dd to device installer.
+## @ingroup createInstaller
+
+declare -x CREATE_ISO=false
+
+# ---------------------------------------------------------------------------- #
+# Helper functions
+#
 
 ## @fn help_md()
 ## @brief Print usage in markdown format
+## @note white space at end of echoes is there for markdown in post-processing
 ## @ingroup createInstaller
 
 help_md() {
+
+    local count=$(($(nproc --all)/3))
     echo "**USAGE:**  "
     echo "**mkg**  [[switch=argument]...]  filename.iso  [1]  "
     echo "**mkg**  [[switch=argument]...]                [2]  "
     echo "**mkg**  help[=md]                             [3]  "
     echo "  "
-    echo "Usage [1] creates a bootable ISO output file with a current Gentoo \
-distribution.  "
-    echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine \
-with name Gentoo.  "
-    echo "Usage [3] prints this help, in markdown form if argument 'md' is \
-specified.  "
-    echo "Warning: you should have at least 55 GB of free disk space in the \
-current directory or in vmpath if specified.  "
+    echo "Usage [1] creates a bootable ISO output file with a current Gentoo"
+    echo "distribution.  "
+    echo "Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine"
+    echo "with name Gentoo.  "
+    echo "Usage [3] prints this help, in markdown form if argument 'md' is"
+    echo "specified.  "
+    echo "Warning: you should have at least 55 GB of free disk space in the"
+    echo "current directory or in vmpath if specified.  "
     echo "  "
     echo "**Switches:**  "
     echo "  "
-    echo "Boolean values are either 'true' or 'false'. For example, to build a \
-minimal distribution, specify:  "
+    echo "Boolean values are either 'true' or 'false'. For example, to build"
+    echo "a minimal distribution, specify:  "
     echo ">  minimal=true  "
     echo "  "
     echo "on command line.  "
     echo "  "
+    echo "Type Conventions:  "
+    echo "b: true/false Boolean  "
+    echo "o: on/off Boolean  "
+    echo "n: Integer  "
+    echo "f: Filepath  "
+    echo "d: Directory path  "
+    echo "e: Email address  "
+    echo "s: String  "
+    echo "u: URL  "
+    echo
+    echo "When a field depends on another, a colon separates the type and"
+    echo "the name of the dependency."
+    echo "   "
+    echo "   "
     echo " | Option | Description | Default value |  "
     echo " |:-----:|:--------:|:-----:|:---------:|  "
     declare -i i
@@ -160,6 +171,14 @@ minimal distribution, specify:  "
         declare -i type=i*4+3
         echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [${ARR[def]}] | ${ARR[type]}|"
     done
+    echo "  "
+    echo "  "
+    echo  "**path1:**  https://sourceforge.net/projects/clonezilla/files/\
+clonezilla_live_alternative/20200703-focal/\
+clonezilla-live-20200703-focal-amd64.iso/download  "
+    echo  "**path2:**  https://github.com/rstudio/rstudio/archive/v  "
+    echo  "**path3:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/  "
+    echo  "**count:** nproc --all / 3  "
 }
 
 ## @fn help_()
@@ -171,12 +190,16 @@ help_() {
     help_md | sed 's/[\*\|\>]//g'
 }
 
+# ---------------------------------------------------------------------------- #
+# Option parsing
+#
+
 ## @fn validate_option()
 ## @brief Check if argument is part of array #ARR as a legitimate commandline
 ##        option.
 ## @param option  String of option.
 ## @return true if legitimate option otherwise false.
-## @ingroup auxiliaryFunctions
+## @ingroup createInstaller
 
 validate_option() {
 
@@ -187,85 +210,69 @@ validate_option() {
     return 1
 }
 
-# parse command line. All arguments must be in the form a=true/false except
-# for help, file.iso. But 'a' can be used as shorthand for 'a=true'
-
-# Help cases: bail out
-
-grep -q 'help=md' <<< "$@" && { help_md; exit 0; }
-grep -q 'help'    <<< "$@" && { help_;   exit 0; }
-
-# default value is false
-# Can be reversed by a name of type filename.iso on command line,
-# previously created and reused to burn or dd to device installer
-
-export CREATE_ISO=false
-
-# temporarily define LOG as logger -s, but this may be changed on
-# commandline dynamically
-
-LOGGING="true"
-LOGGER0="$(which logger)"
-ECHO="$(which echo)"
-[ -n "${LOGGER0}" ] && LOGGER_VERBOSE_OPTION="-s" || LOGGER0="${ECHO}"
-LOG=("${LOGGER0}" "${LOGGER_VERBOSE_OPTION}")
-export LOG
-
-while (( "$#" ))
-do
-    if grep '=' <<< "$1" 2>/dev/null 1>/dev/null
-    then
-        left=$(sed -E 's/(.*)=(.*)/\1/'  <<< "$1")
-        right=$(sed -E 's/(.*)=(.*)/\2/' <<< "$1")
-        if validate_option "${left}"
-        then
-            declare -u VAR=${left}
-            eval "${VAR}"=\"${right}\"
-            if [ "${VERBOSE}" = "true" ]
-            then
-               ${LOG[*]} "[CLI] Assign: ${VAR}=${!VAR}"
-            fi
-        fi
-    else
-        if  grep "\.iso"  <<< "$1" 2>/dev/null 1>/dev/null
-        then
-            ISO_OUTPUT="$1"
-            CREATE_ISO=true
-        else
-            if validate_option "$1"
-            then
-                declare -u VAR="$1"
-                eval "${VAR}"=true
-                [ "${VERBOSE}" = "true" ] \
-                    && ${LOG[*]} "[CLI] Assign: ${VAR}=true"
-            fi
-        fi
-    fi
-    if [ "${LOGGING}" = "true" ]
-    then
-        LOGGER="${LOGGER0}"
-    else
-        LOGGER="${ECHO}"
-        LOGGER_VERBOSE_OPTION=""
-    fi
-
-    # fallback
-
-    [ -z "${LOGGER}" ] && LOGGER="${ECHO}"
-    if [ "${QUIET}" = "true" ]
-    then
-        LOGGER_VERBOSE_OPTION=""
-    fi
-
-    LOG=("${LOGGER}" "${LOGGER_VERBOSE_OPTION}")
-    shift
-done
-
-## @var ISO
-## @brief Name of downloaded clonezilla ISO file
+## @fn get_options()
+## @brief Parse command line
 ## @ingroup createInstaller
 
-export ISO="downloaded.iso"
+get_options() {
+
+    local LOGGING="true"
+    local LOGGER0="$(which logger)"
+    local ECHO="$(which echo)"
+    [ -n "${LOGGER0}" ] && LOGGER_VERBOSE_OPTION="-s" || LOGGER0="${ECHO}"
+    LOG=("${LOGGER0}" "${LOGGER_VERBOSE_OPTION}")
+    export LOG
+
+    while (( "$#" ))
+    do
+        if grep '=' <<< "$1" 2>/dev/null 1>/dev/null
+        then
+            left=$(sed -E 's/(.*)=(.*)/\1/'  <<< "$1")
+            right=$(sed -E 's/(.*)=(.*)/\2/' <<< "$1")
+            if validate_option "${left}"
+            then
+                declare -u VAR=${left}
+                eval "${VAR}"=\"${right}\"
+                if [ "${VERBOSE}" = "true" ]
+                then
+                    ${LOG[*]} "[CLI] Assign: ${VAR}=${!VAR}"
+                fi
+            fi
+        else
+            if  grep "\.iso"  <<< "$1" 2>/dev/null 1>/dev/null
+            then
+                ISO_OUTPUT="$1"
+                CREATE_ISO=true
+            else
+                if validate_option "$1"
+                then
+                    declare -u VAR="$1"
+                    eval "${VAR}"=true
+                    [ "${VERBOSE}" = "true" ] \
+                        && ${LOG[*]} "[CLI] Assign: ${VAR}=true"
+                fi
+            fi
+        fi
+        if [ "${LOGGING}" = "true" ]
+        then
+            LOGGER="${LOGGER0}"
+        else
+            LOGGER="${ECHO}"
+            LOGGER_VERBOSE_OPTION=""
+        fi
+
+        # fallback
+
+        [ -z "${LOGGER}" ] && LOGGER="${ECHO}"
+        if [ "${QUIET_MODE}" = "true" ]
+        then
+            LOGGER_VERBOSE_OPTION=""
+        fi
+
+        LOG=("${LOGGER}" "${LOGGER_VERBOSE_OPTION}")
+        shift
+    done
+}
 
 ## @fn test_cli_pre()
 ## @brief Check VirtualBox version and prepare commandline analysis
@@ -275,7 +282,7 @@ export ISO="downloaded.iso"
 test_cli_pre() {
 
     { [ "${VERBOSE}" = "true" ] || [ "${DEBUG_MODE}" = "true" ]; } \
-        && [ "${QUIET}" = "true" ] \
+        && [ "${QUIET_MODE}" = "true" ] \
         && { ${LOG[*]} "[ERR] You cannot have 'quiet' and verbose modes at \
 the same time"
              exit 1; }
@@ -321,7 +328,7 @@ package."; do_exit=true; }
                                    do_exit=true; }
     [ -z "$(which xorriso)" ] \
         && { ${LOG[*]} "[ERR] Did not find xorriso (libburnia project)"
-          do_exit=true; }
+             do_exit=true; }
 
     # Check VirtualBox version
 
@@ -368,13 +375,13 @@ package."; do_exit=true; }
             fi
         fi
     else
-        [ "${VERBOSE}" = "true" ] && ${LOG[*]} \
-            "[WAR] You did not indicate an ISO output file, \
+        [ "${VERBOSE}" = "true" ] &&
+            ${LOG[*]} "[WAR] You did not indicate an ISO output file, \
 gentoo.iso will be used."
     fi
 
     [ -n "${VM}" ] && [ "${VM}" != "false" ] && [ ${FROM_VM} != "true" ] \
-       && ${LOG[*]} "[MSG] A Virtual machine will be created with name ${VM}"
+        && ${LOG[*]} "[MSG] A Virtual machine will be created with name ${VM}"
 
     return 0
 }
@@ -428,21 +435,21 @@ directory."
                          exit 1; }
                 ;;
             e)  [ test_email "${!V}" != 0 ] \
-                   && { ${LOG[*]} "[ERR] ${sw}=... must be a valid email \
+                    && { ${LOG[*]} "[ERR] ${sw}=... must be a valid email \
 address"
-                        exit 1; }
+                         exit 1; }
                 ;;
             f)  [ ! -f "${!V}" ] \
                     && { ${LOG[*]} "[ERR] ${sw}=... must be an existing file."
-                    exit 1;} ;;
+                         exit 1;} ;;
             n)  [ test_numeric "${!V}" != 0 ] \
                     && { ${LOG[*]} "[ERR] ${sw}=... is not numeric."
                          exit 1; }
                 ;;
             o)  [ "${!V}" != "on" ] && [ "${!V}" != "off" ] \
-                   && { ${LOG[*]} "[ERR] ${sw}=on or ${sw}=off are the only \
+                    && { ${LOG[*]} "[ERR] ${sw}=on or ${sw}=off are the only \
  two possible values."
-                        exit 1; }
+                         exit 1; }
                 ;;
             u)  [ test_URL "${!V}" != 0 ] \
                     && { ${LOG[*]} "[ERR] ${sw}=... must be a valid URL"
@@ -454,23 +461,23 @@ address"
             # conditional types of the form e/f/s:...
 
             *:*)
-                 if [ "${cond}" != "true" ] && { [ "${cond}" = "false" ] \
-                                                     || [ -z "${cond}" ]; }
-                 then
-                     if [ -z "${cond}" ]
-                     then
-                         ${LOG[*]} "[ERR] Execution cannot proceed without \
+                if [ "${cond}" != "true" ] && { [ "${cond}" = "false" ] \
+                                                    || [ -z "${cond}" ]; }
+                then
+                    if [ -z "${cond}" ]
+                    then
+                        ${LOG[*]} "[ERR] Execution cannot proceed without \
 specifying an explicit value for ${y}=..."
-                     else
-                         ${LOG[*]} "[ERR] Execution cannot proceed as option \
+                    else
+                        ${LOG[*]} "[ERR] Execution cannot proceed as option \
 values for ${y}=false and ${sw}=${!V} are incompatible."
-                     fi
-                     ${LOG[*]} "[ERR] Fatal. Exiting..."
-                     exit 1
-                 fi
+                    fi
+                    ${LOG[*]} "[ERR] Fatal. Exiting..."
+                    exit 1
+                fi
 
-        # [ -z "${!V}" ] <=> { [ "${cond}" = "false" ]
-                 # ||  [ -z "${cond}" ]; } && [ "${cond}" != "true" ]
+                # [ -z "${!V}" ] <=> { [ "${cond}" = "false" ]
+                # ||  [ -z "${cond}" ]; } && [ "${cond}" != "true" ]
 
         esac
     else
@@ -509,7 +516,7 @@ for ${sw}"
                 exit 1
             fi
         fi
-       [ "${DEBUG_MODE}" = "true" ] \
+        [ "${DEBUG_MODE}" = "true" ] \
             && ${LOG[*]} "[CLI] Default: ${desc}=${default}"
         eval "${V}"=\""${default}"\"
     fi
@@ -519,7 +526,6 @@ for ${sw}"
     [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} "[MSG] Export: ${V}=${!V}"
     export "${V}"
 }
-
 
 ## @fn test_cli_post()
 ## @brief Check commanline coherence and incompatibilities
@@ -531,17 +537,17 @@ test_cli_post() {
     # ruling out incompatible options
 
     "${DOWNLOAD}" && ! "${CREATE_SQUASHFS}" \
-                  && { ${LOG[*]} "[ERR][CLI] You cannot set \
+        && { ${LOG[*]} "[ERR][CLI] You cannot set \
 create_squashfs=false with download=true"
-                  exit 1; }
+             exit 1; }
 
     if { "${FROM_ISO}" && "${FROM_DEVICE}"; } \
            || { "${FROM_VM}" && "${FROM_DEVICE}"; } \
            || { "${FROM_ISO}" && "${FROM_VM}"; }
     then
-            ${LOG[*]} "[ERR] Only one of the three options from_iso, \
+        ${LOG[*]} "[ERR] Only one of the three options from_iso, \
 from_device or from_vm may be specified on commandline."
-            exit 1
+        exit 1
     fi
 
     # align debug_mode and verbose
@@ -567,7 +573,7 @@ from_device or from_vm may be specified on commandline."
     "${FROM_VM}" && [ ! -f "${VM}.vdi" ] \
         && { ${LOG[*]} "[ERR] Virtual machine \
 disk ${VMPATH}/${VM}.vdi was not found"
-        exit 1; }
+             exit 1; }
 
     # other accept_keywords can be manually added to file
     # ${ELIST}.accept_keywords defaulting to ebuilds.list.accept_keywords
@@ -597,121 +603,22 @@ third-party applications for this mail to be sent."
         CLEANUP=false
         ${LOG[*]} "[MSG] Deactivated cleanup"
     fi
-    if  "${HOT_INSTALL}" || [ -n "${EXT_DEVICE}" ] || [ -n "${DEVICE_INSTALLER}" ]
+    if  "${HOT_INSTALL}" || [ -n "${EXT_DEVICE}" ]
+                         || [ -n "${DEVICE_INSTALLER}" ]
     then
         read -p "[WAR] All data will be wiped out on device(s): ${EXT_DEVICE} \
+${DEVICE_INSTALLER}. Please confirm by entering uppercase Y: " reply
+        [ ${reply} != "Y" ] && exit 0
+        read -p "[WAR] Once again. \n\
+All data will be wiped out on device(s): ${EXT_DEVICE} \
 ${DEVICE_INSTALLER}. Please confirm by entering uppercase Y: " reply
         [ ${reply} != "Y" ] && exit 0
     fi
 }
 
-## @fn fetch_livecd()
-## @brief Downloads Gentoo install CD
-## @details Caches it as ${ISO}
-## @retval Returns 0 on success or -1 on exit
-## @ingroup createInstaller
-
-fetch_livecd() {
-    cd "${VMPATH}"
-    local CACHED_ISO="install-${PROCESSOR}-minimal.iso"
-
-    # Use clonezilla ISO for headless VM and Gentoo minimal install ISO for gui
-    # VM
-
-    if  "${CLONEZILLA_INSTALL}"
-    then
-        DOWNLOAD_CLONEZILLA="${DOWNLOAD}"
-        CACHED_ISO=clonezilla.iso
-    else
-        "${DOWNLOAD}" && get_gentoo_install_iso
-    fi
-    if "${DOWNLOAD_CLONEZILLA}"
-    then
-        get_clonezilla_iso
-        "${CLONEZILLA_INSTALL}" && ISO="${CLONEZILLACD}"
-    else
-        [ -f "clonezilla.iso" ] && CLONEZILLACD="clonezilla.iso" \
-        || { ${LOG[*]} "[ERR] CloneZilla ISO has not been cached. \
-Run with download=true" ; exit 1; }
-    fi
-    if ! "${DOWNLOAD}"
-    then
-        if  "${CREATE_SQUASHFS}"
-        then
-            [ -f ${CACHED_ISO} ] \
-                && { ${LOG[*]} "[INF] Uncaching ${ISO} from ${CACHED_ISO}"
-                cp -f ${CACHED_ISO} "${ISO}"; }
-        else
-            ${LOG[*]} "[ERR] No ISO file was found, please rerun with \
-download=true"
-            exit 1
-        fi
-        LIVECD="${ISO}"
-    fi
-    return 0
-}
-
-## @fn fetch_stage3()
-## @brief Downloads a fresh stage3 Gentoo archive
-## @details Caches it as ${STAGE3}
-## @ingroup createInstaller
-
-fetch_stage3() {
-
-    # Fetching stage3 tarball
-
-    local CACHED_STAGE3="stage3-${PROCESSOR}.tar.xz"
-    local verb1=""
-    local verb2=""
-    ! "${VERBOSE}" && verb1="-s"
-    "${VERBOSE}" && verb2="-v"
-    if "${DOWNLOAD_ARCH}"
-    then
-        ${LOG[*]} "[INF] Cleaning up stage3 data..."
-        for file in latest-stage3*.txt*
-        do
-            [ -f "${file}" ] && rm ${verb2} -f "${file}"
-        done
-        ${LOG[*]} "[INF] Downloading stage3 data..."
-        ${LOG[*]} <<< "$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/\
-latest-stage3-${PROCESSOR}.txt ${verb1} 2>&1 | xargs echo '[INF]')"
-        if_fails $? "[ERR] Could not download stage3 from mirrors: \
-${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
-    else
-        check_file latest-stage3-${PROCESSOR}.txt \
-            "[ERR] No stage 3 download information available!" \
-            "[ERR] Rerun with download_stage3=true"
-    fi
-
-    local current=$(cat latest-stage3-${PROCESSOR}.txt | \
-                        grep "stage3-${PROCESSOR}".*.tar.xz | cut -f 1 -d' ')
-
-    if "${DOWNLOAD_ARCH}"
-    then
-        ${LOG[*]} "[INF] Cleaning up stage3 archives(s)..."
-        for file in "stage3-${PROCESSOR}"-*tar.xz*
-        do
-            [ -f ${file} ] && rm ${verb2} -f "${file}"
-        done
-
-        [ -f ${STAGE3} ] && rm ${verb2} -f ${STAGE3}
-        ${LOG[*]} "[INF] Downloading ${current}..."
-        ${LOG[*]} <<< "$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/\
-autobuilds/${current} ${verb1} 2>&1 | xargs echo '[INF]')"
-        if_fails $? "[ERR] Could not download stage3 tarball from mirror:\
- ${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
-
-        ! ${DISABLE_MD5_CHECK} && check_md5sum $(basename ${current})
-        ${LOG[*]} "[INF] Caching ${current} to ${CACHED_STAGE3}"
-        cp ${verb2} -f "$(echo -s ${current} \
-                             | sed s/.*stage3/stage3/)"  "${CACHED_STAGE3}"
-    fi
-
-    check_file "${CACHED_STAGE3}"  "[ERR] No stage3 tarball!" \
-                                   "[ERR] Rerun with download_stage3=true"
-    ${LOG[*]} "[INF] Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}"
-    cp ${verb2} -f ${CACHED_STAGE3} "${STAGE3}"
-}
+# ---------------------------------------------------------------------------- #
+# SQUASHFS/UNSQUASHFS operations
+#
 
 ## @fn mount_live_cd()
 ## @brief Mount Gentoo/Clonezilla live CD and unsquashfs the GNU/linux system.
@@ -784,12 +691,11 @@ stage3 archive are cached in the directory after prior downloads"
     cd "${ROOT_LIVE}"
 
     "${VERBOSE}" && ${LOG[*]} "[INF] Unsquashing filesystem..." \
-                 && unsquashfs "${SQUASHFS_FILESYSTEM}"  \
-                 ||  unsquashfs -q  "${SQUASHFS_FILESYSTEM}" 2>&1 >/dev/null
+        && unsquashfs "${SQUASHFS_FILESYSTEM}"  \
+            ||  unsquashfs -q  "${SQUASHFS_FILESYSTEM}" 2>&1 >/dev/null
 
     if_fails $? "[ERR] unsquashfs failed !"
 }
-
 
 ## @fn make_boot_from_livecd()
 ## @brief Tweak the Gentoo minimal install CD so that the custom-
@@ -803,9 +709,9 @@ stage3 archive are cached in the directory after prior downloads"
 
 make_boot_from_livecd() {
 
-# ---------------------------------------------------------------------------- #
-# Monting live CD and requirement checks
-#
+    # ------------------------------------- #
+    # Monting live CD and requirement checks
+    #
 
     mount_live_cd
 
@@ -836,9 +742,9 @@ make_boot_from_livecd() {
     check_file "${STAGE3}"  "[ERR] No stage3 archive!"
     check_file "${KERNEL_CONFIG}" "[ERR] No kernel configuration file!"
 
-# ---------------------------------------------------------------------------- #
-# Moving platform building scripts to unsquashed live CD
-#
+    # ------------------------------------------------------ #
+    # Moving platform building scripts to unsquashed live CD
+    #
 
     local sqrt="${ROOT_LIVE}/squashfs-root/root/"
     local verb
@@ -887,24 +793,26 @@ make_boot_from_livecd() {
 
     echo  "/bin/bash mkvm.sh"  >> ${rc}
 
-# ---------------------------------------------------------------------------- #
-#  Now restore the squashfs filesystem to recreate a new live CD
-#
+    # -------------------------------------------------------------- #
+    #  Now restore the squashfs filesystem to recreate a new live CD
+    #
 
     cd ../.. || exit 2
     ${LOG[*]} <<< $(rm ${verb} -f "${SQUASHFS_FILESYSTEM}" 2>&1 \
-                         | xargs echo "[INF] Removing ${SQUASHFS_FILESYSTEM}")
+                        | xargs echo "[INF] Removing ${SQUASHFS_FILESYSTEM}")
     local verb2="-quiet"
     ${LOG[*]} <<< $(mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM} \
-                       ${verb2} 2>&1 | xargs echo "[INF] Created ${SQUASHFS_FILESYSTEM}")
+                     ${verb2} 2>&1 | \
+                        xargs echo "[INF] Created ${SQUASHFS_FILESYSTEM}")
     ${LOG[*]} <<< $(rm -rf squashfs-root/ 2>&1 \
-                       | xargs echo "[INF] Removing squashfs-root")
+                        | xargs echo "[INF] Removing squashfs-root")
 
     # restore the ISO in bootable format
 
     cd "${VMPATH}" || exit 2
 
-    ${LOG[*]} <<< $(recreate_liveCD_ISO "${VMPATH}/mnt2/" | xargs echo "[INF] Recreating ISO")
+    ${LOG[*]} <<< $(recreate_liveCD_ISO "${VMPATH}/mnt2/" | \
+                        xargs echo "[INF] Recreating ISO")
 
     # cleanup by default
 
@@ -916,6 +824,10 @@ make_boot_from_livecd() {
     fi
     return 0
 }
+
+# ---------------------------------------------------------------------------- #
+# Virtual machine processing
+#
 
 ## @fn test_vm_running()
 ## @brief Check if VM as first named argument exists and is running
@@ -972,7 +884,6 @@ clean: " reply || reply="Y"
     sleep 5
     /etc/init.d/virtualbox start
 }
-
 
 ## @fn delete_vm()
 ## @param vm VM name
@@ -1097,10 +1008,10 @@ create_vm() {
     # create and register VM
 
     ${LOG[*]} <<< $(VBoxManage createvm --name "${VM}" \
-                                      --ostype ${OSTYPE}  \
-                                      --register \
-                                      --basefolder "${VMPATH}"  2>&1 \
-                                      | xargs echo "[INF]")
+                               --ostype ${OSTYPE}  \
+                               --register \
+                               --basefolder "${VMPATH}"  2>&1 \
+                        | xargs echo "[INF]")
 
     # add reasonably optimal options. Note: without --cpu-profile host,
     # building issues have arisen for qtsensors
@@ -1109,22 +1020,22 @@ create_vm() {
     # all other parameters are listed on commandline options with default values
 
     ${LOG[*]} <<< $(VBoxManage modifyvm "${VM}" \
-                             --cpus ${NCPUS} \
-                             --cpu-profile host \
-                             --memory ${MEM} \
-                             --vram 128 \
-                             --ioapic ${IOAPIC} \
-                             --usbxhci ${USBXHCI} \
-                             --usbehci ${USBEHCI} \
-                             --hwvirtex ${HWVIRTEX} \
-                             --pae ${PAE} \
-                             --cpuexecutioncap ${CPUEXECUTIONCAP} \
-                             --ostype ${OSTYPE} \
-                             --vtxvpid ${VTXVPID} \
-                             --paravirtprovider ${PARAVIRTPROVIDER} \
-                             --rtcuseutc ${RTCUSEUTC} \
-                             --firmware ${FIRMWARE} 2>&1 \
-                             | xargs echo "[MSG]")
+                               --cpus ${NCPUS} \
+                               --cpu-profile host \
+                               --memory ${MEM} \
+                               --vram 128 \
+                               --ioapic ${IOAPIC} \
+                               --usbxhci ${USBXHCI} \
+                               --usbehci ${USBEHCI} \
+                               --hwvirtex ${HWVIRTEX} \
+                               --pae ${PAE} \
+                               --cpuexecutioncap ${CPUEXECUTIONCAP} \
+                               --ostype ${OSTYPE} \
+                               --vtxvpid ${VTXVPID} \
+                               --paravirtprovider ${PARAVIRTPROVIDER} \
+                               --rtcuseutc ${RTCUSEUTC} \
+                               --firmware ${FIRMWARE} 2>&1 \
+                        | xargs echo "[MSG]")
 
     # create virtual VDI disk, if it does not exist
 
@@ -1151,19 +1062,19 @@ UUID: ${MEDIUM_UUID}"
     # registration issues
 
     ${LOG[*]} <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" \
-                                 ${MEDIUM_UUID} 2>&1 | xargs echo '[MSG]')
+                               ${MEDIUM_UUID} 2>&1 | xargs echo '[MSG]')
 
     # add storage controllers
 
     ${LOG[*]} <<< $(VBoxManage storagectl "${VM}" \
-                             --name 'IDE Controller'  \
-                             --add ide 2>&1 \
-                             | xargs echo [MSG])
+                               --name 'IDE Controller'  \
+                               --add ide 2>&1 \
+                        | xargs echo [MSG])
     ${LOG[*]} <<< $(VBoxManage storagectl "${VM}" \
-                             --name 'SATA Controller' \
-                             --add sata \
-                             --bootable on 2>&1 \
-                             | xargs echo [MSG])
+                               --name 'SATA Controller' \
+                               --add sata \
+                               --bootable on 2>&1 \
+                        | xargs echo [MSG])
 
     # attach media to controllers and double check that the attached
     # UUID is the right one as there have been occasional issues of
@@ -1172,20 +1083,20 @@ UUID: ${MEDIUM_UUID}"
     # use --tempeject on for live CD
 
     ${LOG[*]} <<< $(VBoxManage storageattach "${VM}" \
-                             --storagectl 'IDE Controller'  \
-                             --port 0 \
-                             --device 0  \
-                             --type dvddrive \
-                             --medium ${LIVECD} \
-                             --tempeject on  2>&1 | xargs echo [MSG])
+                               --storagectl 'IDE Controller'  \
+                               --port 0 \
+                               --device 0  \
+                               --type dvddrive \
+                               --medium ${LIVECD} \
+                               --tempeject on  2>&1 | xargs echo [MSG])
 
     ${LOG[*]} <<< $(VBoxManage storageattach "${VM}" \
-                             --storagectl 'SATA Controller' \
-                             --medium "${VM}.vdi" \
-                             --port 0 \
-                             --device 0 \
-                             --type hdd \
-                             --setuuid ${MEDIUM_UUID} 2>&1| xargs echo [MSG])
+                               --storagectl 'SATA Controller' \
+                               --medium "${VM}.vdi" \
+                               --port 0 \
+                               --device 0 \
+                               --type hdd \
+                               --setuuid ${MEDIUM_UUID} 2>&1| xargs echo [MSG])
 
     # note: forcing UUID will potentially cause issues with
     # registration if a prior run with the same disk has set a prior
@@ -1195,24 +1106,25 @@ UUID: ${MEDIUM_UUID}"
     # potentially be useful (e.g. when installing guest additions)
 
     ${LOG[*]} <<< $(VBoxManage storageattach "${VM}" \
-                             --storagectl 'IDE Controller' \
-                             --port 0 \
-                             --device 1 \
-                             --type dvddrive \
-                             --medium emptydrive  2>&1 \
-                             | xargs echo [MSG])
+                               --storagectl 'IDE Controller' \
+                               --port 0 \
+                               --device 1 \
+                               --type dvddrive \
+                               --medium emptydrive  2>&1 \
+                        | xargs echo [MSG])
 
     # Starting VM
 
     ${LOG[*]} <<< $(VBoxManage startvm "${VM}" \
-                                 --type ${VMTYPE} 2>&1 \
-                               | xargs echo [MSG])
+                               --type ${VMTYPE} 2>&1 \
+                        | xargs echo [MSG])
 
     # Sync with VM: this is a VBox bug workaround
 
     "${CLONEZILLA_INSTALL}" || ! "${GUI}" && sleep 90 \
             && ${LOG[*]} <<< $(VBoxManage controlvm "${VM}" \
-                               keyboardputscancode 1c 2>&1 | xargs echo [MSG])
+                                   keyboardputscancode 1c 2>&1 \
+                                   | xargs echo [MSG])
 
     # VM is created in a separate process
     # Wait for it to come to end
@@ -1221,302 +1133,16 @@ UUID: ${MEDIUM_UUID}"
     while test_vm_running ${VM}
     do
         ${LOG[*]} "[MSG] ${VM} running. Disk size: " \
-             $(du -hal "${VM}.vdi")
+                  $(du -hal "${VM}.vdi")
         sleep 60
     done
     ${LOG[*]} "[MSG] ${VM} has stopped"
     if "${COMPACT}"
     then
         ${LOG[*]} "[INF] Compacting VM..."
-        ${LOG[*]} <<< $(VBoxManage modifyhd "${VM}.vdi" --compact 2>&1 \
-                        | xargs echo [MSG])
+        ${LOG[*]} <<< $(VBoxManage modifymedium "${VM}.vdi" --compact 2>&1 \
+                            | xargs echo [MSG])
     fi
-}
-
-## @fn clonezilla_to_iso()
-## @brief Create Gentoo linux clonezilla ISO installer out of a clonezilla
-## directory structure and an clonezilla image.
-## @param iso ISO output
-## @param dir Directory to be transformed into ISO output
-## @note ISO can be burned to DVD or used to create a bootable USB stick
-## using dd on *nix platforms or Rufus (on Windows).
-## @ingroup createInstaller
-
-clonezilla_to_iso() {
-
-    check_dir "${VMPATH}"
-    check_dir "$2"
-
-    cd "${VMPATH}"
-
-    local verb=""
-    "${VERBOSE}" && verb="-v"
-
-    rm ${verb} -rf "$2/live/squashfs-root/"
-
-    [ ! -f "$2/syslinux/isohdpfx.bin" ] \
-         && cp ${verb} -f "clonezilla/syslinux/isohdpfx.bin" "$2/syslinux"
-
-    xorriso -as mkisofs   -isohybrid-mbr "$2/syslinux/isohdpfx.bin"  \
-            -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
-            -boot-load-size 4   -boot-info-table   -eltorito-alt-boot  \
-            -e boot/grub/efi.img \
-            -no-emul-boot   -isohybrid-gpt-basdat   -o "$1"  "$2"
-
-    if_fails $? "[ERR] Could not create ISO image from ISO package \
-creation directory"
-    return 0
-}
-
-## @fn process_clonezilla_iso()
-## @brief Download clonezilla ISO or recover it from cache calling
-## #fetch_clonezilla_iso. @n
-## Upgrade it with virtualbox guest additions.
-## @details Chroot into the clonezilla Ubuntu GNU/Linux distribution and runs
-## apt to build
-## kernel modules
-## and install the VirtualBox guest additions ISO image. @n
-## Upgrade clonezilla kernel consequently
-## Recreates the quashfs system after exiting chroot.
-## Copy the new \b isolinux.cfg parameter file: automates and silences
-## clonezilla behaviour
-## on disk recovery.
-## Calls #clonezilla_to_iso
-## @note Installing the guest additions is a prerequisite to folder sharing
-## between the ISO VM
-## and the host.
-## Folder sharing is necessary to recover a compressed clonezilla image of
-## the VDI virtual disk
-## into the directory ISOFILES/home/partimag/image
-## @ingroup createInstaller
-
-process_clonezilla_iso() {
-
-    bind_mount_clonezilla_iso
-
-    cat > squashfs-root/update_clonezilla.sh << EOF
-#!/bin/bash
-mkdir -p  /boot
-apt update -yq
-apt upgrade -yq <<< 'N'
-
-# We take the oldest supported 5.x linux headers, modules and images
-# Sometimes the most recent ones are not aligned with VB wrt. building.
-# Sometimes current CloneZilla kernel has no corresponding apt headers
-# So replacing with common base for which headers are available and
-# compilation issues probably lesser
-
-headers="\$(apt-cache search ^linux-headers-[5-9]\.[0-9]+.*generic \
-| head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
-kernel="\$(apt-cache  search ^linux-image-[5-9]\.[0-9]+.*generic   \
-| head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
-modules="\$(apt-cache search ^linux-modules-[5-9]\.[0-9]+.*generic \
-| head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
-apt install -qy "\${headers}"
-apt install -qy "\${kernel}"
-apt install -qy "\${modules}"
-apt install -qy build-essential gcc <<< "N"
-apt install -qy virtualbox virtualbox-modules virtualbox-dkms
-apt install -qy virtualbox-guest-additions-iso
-mount -oloop /usr/share/virtualbox/VBoxGuestAdditions.iso /mnt
-cd /mnt || exit 2
-/bin/bash VBoxLinuxAdditions.run
-/sbin/rcvboxadd quicksetup all
-cd / || exit 2
-mkdir -p /home/partimag/image
-umount /mnt
-apt autoremove -y -q
-exit
-EOF
-
-#  apt remove -y -q "\${headers}" build-essential gcc
-#  virtualbox-guest-additions-iso virtualbox
-
-    chmod +x squashfs-root/update_clonezilla.sh
-
-    # now chroot and run update script
-
-    chroot squashfs-root /bin/bash update_clonezilla.sh
-
-    # after exit now back under live/. Update linux kernel:
-
-    check_files squashfs-root/boot/vmlinuz squashfs-root/boot/initrd.img
-    cp -vf --dereference squashfs-root/boot/vmlinuz vmlinuz
-    cp -vf --dereference squashfs-root/boot/initrd.img  initrd.img
-
-    unmount_clonezilla_iso
-
-    [ -f "${CLONEZILLACD}" ] && rm -vf "${CLONEZILLACD}"
-
-    # this first ISO image is a "save" one: from virtual disk to clonezilla
-    # image
-
-    clonezilla_to_iso "${CLONEZILLACD}" "mnt2"
-}
-
-bind_mount_clonezilla_iso() {
-
-    if ! "${CREATE_ISO}" && ! "${FROM_DEVICE}"
-    then
-        ${LOG[*]} <<< "[ERR] CloneZilla ISO should only be mounted to create\
-an ISO installer or to back-up a device"
-        exit 4
-    fi
-
-    cd ${VMPATH}
-    if_fails $? "[ERR] Could not cd to ${VMPATH}"
-
-    fetch_clonezilla_iso
-
-    if_fails $? "[ERR] Could not fetch CloneZilla ISO file"
-
-    local verb=""
-    "${VERBOSE}" && verb="-v"
-
-    # copy to ISOFILES as a skeletteon for ISO recovery image authoring
-
-    [ -d ISOFILES ] && rm ${verb} -rf ISOFILES
-    mkdir -p ISOFILES/home/partimag
-    check_dir ISOFILES/home/partimag
-    check_dir mnt2
-    "${VERBOSE}" \
-        && ${LOG[*]} "[INF] Now copying CloneZilla files to temporary \
-folder ISOFILES"
-    rsync ${verb} -a mnt2/ ISOFILES
-    check_dir mnt2/syslinux
-    if "${CREATE_ISO}"
-    then
-        check_file clonezilla/savedisk/isolinux.cfg
-        cp ${verb} -f clonezilla/savedisk/isolinux.cfg mnt2/syslinux/
-    fi
-    check_dir mnt2/live
-
-    cd mnt2/live
-
-    # prepare chroot in clonezilla filesystem
-
-    for i in proc sys dev run; do mount -B /$i squashfs-root/$i; done
-
-    if_fails $? "[ERR] Could not bind-mount squashfs-root"
-    # add update script to clonezilla filesystem. Do not indent!
-}
-
-unmount_clonezilla_iso() {
-
-    # clean up and restore squashfs back
-
-    rm -vf filesystem.squashfs
-    for i in proc sys dev run; do umount squashfs-root/$i; done
-    if_fails $? "[ERR] Could not unmount squashfs-root"
-
-    mksquashfs squashfs-root filesystem.squashfs
-    if_fails $? "[ERR] Could not recreate squashfs filesystem"
-
-    cd "${VMPATH}"
-    if_fails $? "[ERR] Could not cd to ${VMPATH}"
-}
-
-## @fn build_virtualbox()
-## @brief Build VirtualBox from source using an unsquashed clonezilla CD as a
-##        chrooted environment.
-## @details Build scripts are copied from \b clonezilla/build
-## @note This stage is only necessay if \b vbox-img is to be used to directly
-##       convert the VDI virtual disk into a block device, on account of a bug
-##       in Oracle source code (ticket #19901). @n
-## This is only needed to reduce disk space requirements and avoid a temporary
-## RAW file on disk of about 50 GB.
-## Otherwise it is simpler to use the distribution stock version.
-## @ingroup createInstaller
-
-build_virtualbox() {
-
-    cd "${VMPATH}" || exit 2
-    ${LOG[*]} "[INF] Fetching live CD..."
-    CLONEZILLA_INSTALL=true
-    fetch_livecd
-    mount_live_cd
-    ${LOG[*]} "[MSG] VERSION: ${VBOX_VERSION_FULL}"
-    cp -vf /etc/resolv.conf squashfs-root/etc
-    for i in proc sys dev run; do mount -B "/$i" "squashfs-root/$i"; done
-    cat > run.sh << EOF
-#!/bin/bash
-export DEBIAN_FRONTEND=noninteractive
-apt update -yq
-apt upgrade -yq <<< 'N'
-apt install -yq  build-essential gcc <<< 'N'
-apt-get -yq install acpica-tools chrpath doxygen g++-multilib libasound2-dev \
-libcap-dev libcurl4-openssl-dev libdevmapper-dev libidl-dev libopus-dev \
-libpam0g-dev libpulse-dev libqt5opengl5-dev libqt5x11extras5-dev libsdl1.2-dev \
-libsdl-ttf2.0-dev libssl-dev libvpx-dev libxcursor-dev libxinerama-dev \
-libxml2-dev libxml2-utils libxmu-dev libxrandr-dev make nasm python3-dev \
-python-dev qttools5-dev-tools texlive texlive-fonts-extra texlive-latex-extra \
-unzip xsltproc default-jdk libstdc++5 libxslt1-dev linux-kernel-headers \
-makeself mesa-common-dev subversion yasm zlib1g-dev lib32z1 libc6-dev-i386 \
-lib32gcc1 lib32stdc++6
-ln -s libX11.so.6    /usr/lib32/libX11.so
-ln -s libXTrap.so.6  /usr/lib32/libXTrap.so
-ln -s libXt.so.6     /usr/lib32/libXt.so
-ln -s libXtst.so.6   /usr/lib32/libXtst.so
-ln -s libXmu.so.6    /usr/lib32/libXmu.so
-ln -s libXext.so.6   /usr/lib32/libXext.so
-wget https://download.virtualbox.org/virtualbox/${VBOX_VERSION}/\
-VirtualBox-${VBOX_VERSION_FULL}.tar.bz2
-tar xjf VirtualBox-${VBOX_VERSION_FULL}.tar.bz2
-rm -f VirtualBox*bz2
-mv VirtualBox-${VBOX_VERSION} VirtualBox
-apt install -qy \$(apt-cache search linux-headers-.*generic | grep -v unsigned \
-| head -n1 | cut -f 1 -d' ')
-apt install -qy \$(apt-cache search linux-image-.*generic   | grep -v unsigned \
-| head -n1 | cut -f 1 -d' ')
-apt install -qy \$(apt-cache search linux-modules.*generic   | grep -v unsigned \
-| head -n1 | cut -f 1 -d' ')
-apt install -qy docbook docbook-xml
-cd VirtualBox || exit 2
-./configure --disable-hardening
-chmod +x ./env.sh
-source ./env.sh
-sed -i "${LINENO_PATCH}d" src/VBox/Storage/testcase/vbox-img.cpp
-echo Building...Please wait...
-kmk all >/dev/null 2>&1
-echo Packing...
-kmk packing >/dev/null 2>&1
-cd out/linux.amd64/release/bin/src/
-KV=\$(apt-cache search linux-headers-.*generic | grep -v unsigned \
-| head -n1 | cut -f 1 -d' ' | sed 's/linux-headers-//')
-make KERN_VER=\${KV}
-make KERN_VER=\${KV} install
-cd ../.. || exit 2
-rm -rf obj/
-exit 0
-EOF
-    chmod +x run.sh
-    cp -vf run.sh squashfs-root/
-    chroot squashfs-root ./run.sh
-    for i in proc sys dev run; do umount -l squashfs-root/$i; done
-    cd "${VMPATH}" || exit 2
-    [ -d virtualbox ] && rm -rf virtualbox
-    mkdir virtualbox
-    rsync -aH mnt2/live/squashfs-root/ virtualbox
-    chown -R $USER virtualbox
-    rm -rf mnt2/live/squashfs-root
-    rm VirtualBox
-    cat > VirtualBox << EOF
-#!/bin/bash
-export LD_LIBRARY_PATH="virtualbox/VirtualBox/out/linux.amd64/release/bin/\
-:virtualbox/lib:virtualbox/lib32:virtualbox/lib64"
-modprobe vboxdrv
-./virtualbox/VirtualBox/out/linux.amd64/release/bin/VirtualBox \$*
-EOF
-    chmod +x VirtualBox
-    chown $USER VirtualBox
-    cat > vbox-img << EOF
-#!/bin/bash
-export LD_LIBRARY_PATH="virtualbox/VirtualBox/out/linux.amd64/release/bin/\
-:virtualbox/lib:virtualbox/lib32:virtualbox/lib64"
-./virtualbox/VirtualBox/out/linux.amd64/release/bin/vbox-img \$*
-EOF
-    chmod +x vbox-img
-    chown $USER vbox-img
 }
 
 ## @fn create_iso_vm()
@@ -1535,7 +1161,7 @@ EOF
 ## A new VM is necessary as the first VM used to build the Gentoo filesystem
 ## does not contain clonezilla or the VirtualBox guest additions (requested for
 ## sharing folders with host).
-## Calls #process_clonezilla_iso to satisfy these requirements.
+## Calls #add_guest_additions_to_clonezilla_iso to satisfy these requirements.
 ## @warning the \b sharedfolder command may fail vith older version of
 ## VirtualBox or not be implemented. It is transient, so it disappears on
 ## shutdown and requests prior startup of VM to be activated.
@@ -1562,38 +1188,38 @@ create_iso_vm() {
     # creating ISO VM
 
     ${LOG[*]} <<< $(VBoxManage createvm \
-                                 --name "${ISOVM}" \
-                                 --ostype Ubuntu_64 \
-                                 --register \
-                                 --basefolder "${VMPATH}"  2>&1 \
-                          | xargs echo [MSG])
+                               --name "${ISOVM}" \
+                               --ostype Ubuntu_64 \
+                               --register \
+                               --basefolder "${VMPATH}"  2>&1 \
+                        | xargs echo [MSG])
 
     if_fails $? "[ERR] Failed to create VM *${ISOVM}*"
 
     ${LOG[*]} <<< $(VBoxManage modifyvm "${ISOVM}" \
-               --cpus ${NCPUS} \
-               --cpu-profile host \
-               --memory ${MEM} \
-               --vram 128 \
-               --ioapic ${IOAPIC} \
-               --usbxhci ${USBXHCI} \
-               --usbehci ${USBEHCI} \
-               --hwvirtex ${HWVIRTEX} \
-               --pae ${PAE} \
-               --cpuexecutioncap ${CPUEXECUTIONCAP} \
-               --vtxvpid ${VTXVPID} \
-               --paravirtprovider ${PARAVIRTPROVIDER} \
-               --rtcuseutc ${RTCUSEUTC} \
-               --firmware ${FIRMWARE} 2>&1 \
-                | xargs echo [MSG])
+                               --cpus ${NCPUS} \
+                               --cpu-profile host \
+                               --memory ${MEM} \
+                               --vram 128 \
+                               --ioapic ${IOAPIC} \
+                               --usbxhci ${USBXHCI} \
+                               --usbehci ${USBEHCI} \
+                               --hwvirtex ${HWVIRTEX} \
+                               --pae ${PAE} \
+                               --cpuexecutioncap ${CPUEXECUTIONCAP} \
+                               --vtxvpid ${VTXVPID} \
+                               --paravirtprovider ${PARAVIRTPROVIDER} \
+                               --rtcuseutc ${RTCUSEUTC} \
+                               --firmware ${FIRMWARE} 2>&1 \
+                        | xargs echo [MSG])
 
     if_fails $? "[ERR] Failed to set parameters of VM *${ISOVM}*"
 
     ${LOG[*]} <<< $(VBoxManage storagectl "${ISOVM}" \
-               --name 'SATA Controller' \
-               --add sata \
-               --bootable on 2>&1 \
-                | xargs echo [MSG])
+                               --name 'SATA Controller' \
+                               --add sata \
+                               --bootable on 2>&1 \
+                        | xargs echo [MSG])
 
     if_fails $? \
              "[ERR] Failed to attach storage SATA controller to VM *${ISOVM}*"
@@ -1606,49 +1232,50 @@ create_iso_vm() {
     if [ -z ${MEDIUM_UUID} ]
     then
         "${FROM_VM}" && ${LOG[*]} "[MSG] Setting new UUID for VDI disk." \
-        || ${LOG[*]} "[WAR] Could not use again VDI uuid. Setting a new one."
+          || ${LOG[*]} "[WAR] Could not use again VDI uuid. Setting a new one."
 
         local MEDIUM_UUID=$(VBoxManage showmediuminfo "${VM}.vdi"  \
-                            | head -n1 | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
+                                | head -n1 \
+                                | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
     else
         ${LOG[*]} "[MSG] UUID of ${VM}.vdi will be used again: ${MEDIUM_UUID}"
     fi
 
     ${LOG[*]} <<< $(VBoxManage storageattach "${ISOVM}" \
-               --storagectl 'SATA Controller' \
-               --medium "${VM}.vdi" \
-               --port 0 \
-               --device 0 \
-               --type hdd 2>&1 \
-                | xargs echo [MSG])
+                               --storagectl 'SATA Controller' \
+                               --medium "${VM}.vdi" \
+                               --port 0 \
+                               --device 0 \
+                               --type hdd 2>&1 \
+                        | xargs echo [MSG])
 
     if_fails $? "[ERR] Failed to attach storage ${VM}.vdi to VM *${ISOVM}*"
 
     ${LOG[*]} <<< $(VBoxManage storagectl "${ISOVM}" \
-               --name "IDE Controller" \
-               --add ide 2>&1 \
-                | xargs echo [MSG])
+                               --name "IDE Controller" \
+                               --add ide 2>&1 \
+                        | xargs echo [MSG])
 
     if_fails $? "[ERR] Failed to attach IDE storage controller to VM *${ISOVM}*"
 
     ${LOG[*]} <<< $(VBoxManage storageattach "${ISOVM}" \
-               --storagectl 'IDE Controller' \
-               --port 0 \
-               --device 0 \
-               --type dvddrive \
-               --medium "${CLONEZILLACD}" \
-               --tempeject on 2>&1 \
-                | xargs echo [MSG])
+                               --storagectl 'IDE Controller' \
+                               --port 0 \
+                               --device 0 \
+                               --type dvddrive \
+                               --medium "${CLONEZILLACD}" \
+                               --tempeject on 2>&1 \
+                        | xargs echo [MSG])
 
     if_fails $? "[ERR] Failed to attach clonezilla live CD to VM *${ISOVM}*"
 
     ${LOG[*]} <<< $(VBoxManage storageattach "${ISOVM}" \
-               --storagectl 'IDE Controller' \
-               --port 0 \
-               --device 1 \
-               --type dvddrive \
-               --medium emptydrive 2>&1 \
-                | xargs echo [MSG])
+                               --storagectl 'IDE Controller' \
+                               --port 0 \
+                               --device 1 \
+                               --type dvddrive \
+                               --medium emptydrive 2>&1 \
+                        | xargs echo [MSG])
 
     if_fails $? "[ERR] Failed to attach IDE storage controller to VM *${ISOVM}*"
 
@@ -1710,6 +1337,7 @@ clone_vm_to_device() {
 
             guestfish --progress-bars  --ro -a  "${VM}.vdi" run : \
                       download /dev/sda /dev/${EXT_DEVICE}
+	        sync
         else
             echo "[ERR] Mode is either vbox-img or guestfish."
             exit 1
@@ -1756,6 +1384,284 @@ dd_to_usb() {
     fi
 }
 
+## @fn vbox_img_works()
+## @brief Test if \b vbox-img is functional
+## @details \b vbox-img is a script; it refers to \b vbox-img.bin,
+##           which is a soft link to the VirtuaBox patched build.
+## @retval 0 if vbox-img --version is non-empty
+## @retval 1 otherwise
+## @note Currently vbox-img is broken for --stdout.
+##       Using guestfish as an alternative.
+##       This test is there for when vbox-img is fixed.
+## @ingroup createInstaller
+
+vbox_img_works() {
+    cd "${VMPATH}" || exit 2
+
+    # Using the custom-patched version of the vbox-img utility:
+
+    if "${VBOX_IMG_PREFIX}/vbox-img" --version >/dev/null 2>&1
+    then
+        ${LOG[*]} "[MSG] bin/vbox-img works for this platform."
+        return 0
+    fi
+}
+
+## @fn create_device_system()
+## @brief Clone VDI virtual disk to external device (USB device or hard drive)
+## @details Two options are available. If vbox-img (patched) is functional
+## after building VirtualBox from source, then use it and clone VDI directly
+## to external device. Otherwise create a temporary RAW file and bare-metal copy
+## this file to external device.
+## @param Mode Mode must be vbox-img, guestfish or with-raw-buffer
+## @retval In the first two cases, the exit code of #clone_vm_to_device
+## @retval In the last case, the exit code of #dd_to_usb following
+##         #clone_vm_to_raw
+## @note Requires @b hot_install on command line to be activated as a security
+##       confirmation.
+##       This function performs what a live CD does to a target disk, yet using
+##       the currently running operating system.
+## @ingroup createInstaller
+
+create_device_system() {
+
+    if  [ "$1" = "guestfish" ] || [ "$1" = "vbox-img" ]
+    then
+        ${LOG[*]} "[INF] Cloning virtual disk to ${EXT_DEVICE} ..."
+        if ! clone_vm_to_device "$1"
+        then
+            ${LOG[*]} "[ERR] Cloning VDI disk to external device failed !"
+            return 1
+        fi
+    else
+        if [ "$1" = "with-raw-buffer" ]
+        then
+            ${LOG[*]} "[INF] Cloning virtual disk to raw..."
+            if ! clone_vm_to_raw
+            then
+                ${LOG[*]} "[ERR] Cloning VDI disk to RAW failed !"
+                return 1
+            fi
+            ${LOG[*]} "[INF] Copying to external device..."
+            if ! dd_to_usb
+            then
+                ${LOG[*]} "[INF] Copying raw file to external device failed!"
+                ${LOG[*]} "[WAR] Check that your external device has \
+at least 50 GiB of reachable space"
+                exit 1
+            fi
+        else
+            echo "[ERR] Mode must be vbox-img, guestfish or with-raw-buffer"
+            exit 1
+        fi
+    fi
+}
+
+## @fn generate_Gentoo()
+## @brief Launch routines: fetch install IO, starge3 archive, create VM
+## @ingroup createInstaller
+
+generate_Gentoo() {
+    ${LOG[*]} "[INF] Fetching live CD..."
+    fetch_livecd
+    ${LOG[*]} "[INF] Fetching stage3 tarball..."
+    fetch_stage3
+    ${LOG[*]} "[INF] Tweaking live CD..."
+    make_boot_from_livecd
+    ${LOG[*]} "[INF] Creating VM"
+    if ! create_vm; then
+        ${LOG[*]} "[ERR] VM failed to be created!"
+        exit 1
+    fi
+}
+
+# ---------------------------------------------------------------------------- #
+# CloneZilla processing
+#
+
+## @fn clonezilla_to_iso()
+## @brief Create Gentoo linux clonezilla ISO installer out of a clonezilla
+## directory structure and an clonezilla image.
+## @param iso ISO output
+## @param dir Directory to be transformed into ISO output
+## @note ISO can be burned to DVD or used to create a bootable USB stick
+## using dd on *nix platforms or Rufus (on Windows).
+## @ingroup createInstaller
+
+clonezilla_to_iso() {
+
+    check_dir "${VMPATH}"
+    check_dir "$2"
+
+    cd "${VMPATH}"
+
+    local verb=""
+    "${VERBOSE}" && verb="-v"
+
+    rm ${verb} -rf "$2/live/squashfs-root/"
+
+    [ ! -f "$2/syslinux/isohdpfx.bin" ] \
+        && cp ${verb} -f "clonezilla/syslinux/isohdpfx.bin" "$2/syslinux"
+
+    xorriso -as mkisofs   -isohybrid-mbr "$2/syslinux/isohdpfx.bin"  \
+            -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
+            -boot-load-size 4   -boot-info-table   -eltorito-alt-boot  \
+            -e boot/grub/efi.img \
+            -no-emul-boot   -isohybrid-gpt-basdat   -o "$1"  "$2"
+
+    if_fails $? "[ERR] Could not create ISO image from ISO package \
+creation directory"
+    return 0
+}
+
+## @fn add_guest_additions_to_clonezilla_iso()
+## @brief Download clonezilla ISO or recover it from cache calling
+## #fetch_process_clonezilla_iso. @n
+## Upgrade it with virtualbox guest additions.
+## @details Chroot into the clonezilla Ubuntu GNU/Linux distribution and runs
+## apt to build
+## kernel modules
+## and install the VirtualBox guest additions ISO image. @n
+## Upgrade clonezilla kernel consequently
+## Recreates the quashfs system after exiting chroot.
+## Copy the new \b isolinux.cfg parameter file: automates and silences
+## clonezilla behaviour
+## on disk recovery.
+## Calls #clonezilla_to_iso
+## @note Installing the guest additions is a prerequisite to folder sharing
+## between the ISO VM
+## and the host.
+## Folder sharing is necessary to recover a compressed clonezilla image of
+## the VDI virtual disk
+## into the directory ISOFILES/home/partimag/image
+## @ingroup createInstaller
+
+add_guest_additions_to_clonezilla_iso() {
+
+    bind_mount_clonezilla_iso
+
+    cat > squashfs-root/update_clonezilla.sh << EOF
+#!/bin/bash
+mkdir -p  /boot
+apt update -yq
+apt upgrade -yq <<< 'N'
+
+# We take the oldest supported 5.x linux headers, modules and images
+# Sometimes the most recent ones are not aligned with VB wrt. building.
+# Sometimes current CloneZilla kernel has no corresponding apt headers
+# So replacing with common base for which headers are available and
+# compilation issues probably lesser
+
+headers="\$(apt-cache search ^linux-headers-[5-9]\.[0-9]+.*generic \
+| head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
+kernel="\$(apt-cache  search ^linux-image-[5-9]\.[0-9]+.*generic   \
+| head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
+modules="\$(apt-cache search ^linux-modules-[5-9]\.[0-9]+.*generic \
+| head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
+apt install -qy "\${headers}"
+apt install -qy "\${kernel}"
+apt install -qy "\${modules}"
+apt install -qy build-essential gcc <<< "N"
+apt install -qy virtualbox virtualbox-modules virtualbox-dkms
+apt install -qy virtualbox-guest-additions-iso
+mount -oloop /usr/share/virtualbox/VBoxGuestAdditions.iso /mnt
+cd /mnt || exit 2
+/bin/bash VBoxLinuxAdditions.run
+/sbin/rcvboxadd quicksetup all
+cd / || exit 2
+mkdir -p /home/partimag/image
+umount /mnt
+apt autoremove -y -q
+exit
+EOF
+
+    #  apt remove -y -q "\${headers}" build-essential gcc
+    #  virtualbox-guest-additions-iso virtualbox
+
+    chmod +x squashfs-root/update_clonezilla.sh
+
+    # now chroot and run update script
+
+    chroot squashfs-root /bin/bash update_clonezilla.sh
+
+    # after exit now back under live/. Update linux kernel:
+
+    check_files squashfs-root/boot/vmlinuz squashfs-root/boot/initrd.img
+    cp -vf --dereference squashfs-root/boot/vmlinuz vmlinuz
+    cp -vf --dereference squashfs-root/boot/initrd.img  initrd.img
+
+    unmount_clonezilla_iso
+
+    [ -f "${CLONEZILLACD}" ] && rm -vf "${CLONEZILLACD}"
+
+    # this first ISO image is a "save" one: from virtual disk to clonezilla
+    # image
+
+    clonezilla_to_iso "${CLONEZILLACD}" "mnt2"
+}
+
+bind_mount_clonezilla_iso() {
+
+    if ! "${CREATE_ISO}" && ! "${FROM_DEVICE}"
+    then
+        ${LOG[*]} <<< "[ERR] CloneZilla ISO should only be mounted to create\
+an ISO installer or to back-up a device"
+        exit 4
+    fi
+
+    cd ${VMPATH}
+    if_fails $? "[ERR] Could not cd to ${VMPATH}"
+
+    fetch_process_clonezilla_iso
+
+    if_fails $? "[ERR] Could not fetch CloneZilla ISO file"
+
+    local verb=""
+    "${VERBOSE}" && verb="-v"
+
+    # copy to ISOFILES as a skeletteon for ISO recovery image authoring
+
+    [ -d ISOFILES ] && rm ${verb} -rf ISOFILES
+    mkdir -p ISOFILES/home/partimag
+    check_dir ISOFILES/home/partimag
+    check_dir mnt2
+    "${VERBOSE}" \
+        && ${LOG[*]} "[INF] Now copying CloneZilla files to temporary \
+folder ISOFILES"
+    rsync ${verb} -a mnt2/ ISOFILES
+    check_dir mnt2/syslinux
+    if "${CREATE_ISO}"
+    then
+        check_file clonezilla/savedisk/isolinux.cfg
+        cp ${verb} -f clonezilla/savedisk/isolinux.cfg mnt2/syslinux/
+    fi
+    check_dir mnt2/live
+
+    cd mnt2/live
+
+    # prepare chroot in clonezilla filesystem
+
+    for i in proc sys dev run; do mount -B /$i squashfs-root/$i; done
+
+    if_fails $? "[ERR] Could not bind-mount squashfs-root"
+    # add update script to clonezilla filesystem. Do not indent!
+}
+
+unmount_clonezilla_iso() {
+
+    # clean up and restore squashfs back
+
+    rm -vf filesystem.squashfs
+    for i in proc sys dev run; do umount squashfs-root/$i; done
+    if_fails $? "[ERR] Could not unmount squashfs-root"
+
+    mksquashfs squashfs-root filesystem.squashfs
+    if_fails $? "[ERR] Could not recreate squashfs filesystem"
+
+    cd "${VMPATH}"
+    if_fails $? "[ERR] Could not cd to ${VMPATH}"
+}
+
 ## @fn clonezilla_device_to_image()
 ## @brief Create CloneZilla xz-compressed image out of an external block device
 ##        (like a USB stick)
@@ -1778,14 +1684,14 @@ clonezilla_device_to_image() {
         if_fails $? "[ERR] Could not remount and bind CloneZilla ISO file"
 
         local CLONEZILLA_MOUNTED=true
-        local PATH0=${PATH}
-        local LD0=${LD_LIBRARY_PATH}
-        PATH=$PATH:squashfs-root/sbin:squashfs-root/bin:squashfs-root/usr/bin:\
-squashfs-root/usr/sbin
-        LD_LIBRARY_PATH=${LDO}:squashfs-root/lib:squashfs-root/lib64:\
+        local PATH0="${PATH}"
+        local LD0="${LD_LIBRARY_PATH}"
+        PATH="${PATH}":squashfs-root/sbin:squashfs-root/bin:\
+squashfs-root/usr/bin:squashfs-root/usr/sbin
+        LD_LIBRARY_PATH="${LDO}":squashfs-root/lib:squashfs-root/lib64:\
 squashfs-root/lib32:squashfs-root/usr/lib:squashfs-root/usr/lib64:\
 squashfs-root/usr/lib32
-        find_ocs_sr=`which ocs-sr`
+        find_ocs_sr=$(which ocs-sr)
         if [ -z "$find_ocs_sr" ]
         then
             # local mount did not work
@@ -1794,10 +1700,10 @@ squashfs-root/usr/lib32
             ${LOG[*]} "[MSG] Install Clonezilla in a standard path or rerun \
  after adding its path to the PATH environment variable"
             ${LOG[*]} "[MSG] Note: Debian-based distributions provide a handy \
-`clonezilla` package."
+CloneZilla package."
             unmount_clonezilla_iso
-            PATH=${PATH0}
-            LD_LIBRARY_PATH=${LD0}
+            PATH="${PATH0}"
+            LD_LIBRARY_PATH="${LD0}"
             exit 1
         fi
     fi
@@ -1867,126 +1773,15 @@ did not find grentoo.img"
     if "${CLONEZILLA_MOUNTED}"
     then
         unmount_clonezilla_iso
-        PATH=${PATH0}
-        LD_LIBRARY_PATH=${LD0}
+        PATH="${PATH0}"
+        LD_LIBRARY_PATH="${LD0}"
     fi
     return 0
 }
 
-## @fn vbox_img_works()
-## @brief Test if \b vbox-img is functional
-## @details \b vbox-img is a script; it refers to \b vbox-img.bin,
-##           which is a soft link to the VirtuaBox patched build.
-## @retval 0 if vbox-img --version is non-empty
-## @retval 1 otherwise
-## @note Currently vbox-img is broken for --stdout.
-##       Using guestfish as an alternative.
-##       This test is there for when vbox-img is fixed.
-## @ingroup createInstaller
-
-vbox_img_works() {
-
-    cd "${VMPATH}" || exit 2
-
-    # Using the custom-patched version of the vbox-img utility:
-
-    if "${VBOX_IMG_PREFIX}/vbox-img" --version >/dev/null 2>&1
-    then
-        ${LOG[*]} "[MSG] bin/vbox-img works for this platform."
-        return 0
-    fi
-}
-
-## @fn create_device_system()
-## @brief Clone VDI virtual disk to external device (USB device or hard drive)
-## @details Two options are available. If vbox-img (patched) is functional
-## after building VirtualBox from source, then use it and clone VDI directly
-## to external device. Otherwise create a temporary RAW file and bare-metal copy
-## this file to external device.
-## @param Mode Mode must be vbox-img, guestfish or with-raw-buffer
-## @retval In the first two cases, the exit code of #clone_vm_to_device
-## @retval In the last case, the exit code of #dd_to_usb following
-##         #clone_vm_to_raw
-## @note Requires @b hot_install on command line to be activated as a security
-##       confirmation.
-##       This function performs what a live CD does to a target disk, yet using
-##       the currently running operating system.
-## @ingroup createInstaller
-
-create_device_system() {
-
-    if  [ "$1" = "guestfish" ] || [ "$1" = "vbox-img" ]
-    then
-        ${LOG[*]} "[INF] Cloning virtual disk to ${EXT_DEVICE} ..."
-        if ! clone_vm_to_device "$1"
-        then
-            ${LOG[*]} "[ERR] Cloning VDI disk to external device failed !"
-            return 1
-        fi
-    else
-        if [ "$1" = "with-raw-buffer" ]
-        then
-            ${LOG[*]} "[INF] Cloning virtual disk to raw..."
-            if ! clone_vm_to_raw
-            then
-                ${LOG[*]} "[ERR] Cloning VDI disk to RAW failed !"
-                return 1
-            fi
-            ${LOG[*]} "[INF] Copying to external device..."
-            if ! dd_to_usb
-            then
-                ${LOG[*]} "[INF] Copying raw file to external device failed!"
-                ${LOG[*]} "[WAR] Check that your external device has at least 50 GiB \
-of reachable space"
-                exit 1
-            fi
-        else
-            echo "[ERR] Mode must be vbox-img, guestfish or with-raw-buffer"
-            exit 1
-        fi
-    fi
-}
-
-## @fn cleanup()
-## @brief Clean up all temporary files and directpries (except for VirtualBox
-##        build)
-## @ingroup createInstaller
-
-cleanup() {
-
-    ! "${CLEANUP}" && return 0
-    local verb=""
-    ${VERBOSE} && verb="-v"
-    cd "${VMPATH}" || exit 2
-    rm ${verb} -f *.xz
-    rm ${verb} -f *.txt
-    rm ${verb} -rf ISOFILES/ mnt2/
-    [ -d mnt ]  && mountpoint mnt && umount -l mnt/
-    [ -d mnt ]  && rm ${verb} -rf mnt
-    [ -d mnt2 ] && rm ${verb} -rf mnt2
-    [ -d "${VM}" ] && rm ${verb} -rf "${VM}"
-    [ -d "${VM}_ISO" ] && rm ${verb} -rf "${VM}_ISO"
-    "${REMOVE_VDI}" && [ -f "${VM}.vdi" ] && rm ${verb} -f "${VM}.vdi"
-    return 0
-}
-
-## @fn generate_Gentoo()
-## @brief Launch routines: fetch install IO, starge3 archive, create VM
-## @ingroup createInstaller
-
-generate_Gentoo() {
-    ${LOG[*]} "[INF] Fetching live CD..."
-    fetch_livecd
-    ${LOG[*]} "[INF] Fetching stage3 tarball..."
-    fetch_stage3
-    ${LOG[*]} "[INF] Tweaking live CD..."
-    make_boot_from_livecd
-    ${LOG[*]} "[INF] Creating VM"
-    if ! create_vm; then
-        ${LOG[*]} "[ERR] VM failed to be created!"
-        exit 1
-    fi
-}
+# ---------------------------------------------------------------------------- #
+# Core program
+#
 
 ## @fn main()
 ## @brief Main function launching routines
@@ -1996,113 +1791,128 @@ generate_Gentoo() {
 
 main() {
 
-# Analyse commandline and source auxiliary files
+    # Help cases: bail out
 
-check_tool "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" "VBoxManage" \
-           "curl" "grep" "lsblk" "awk"
-test_cli_pre
-for ((i=0; i<ARRAY_LENGTH; i++)); do test_cli $i; done
-test_cli_post
-cd ${VMPATH}
-source scripts/fetch_clonezilla_iso.sh
+    grep -q 'help=md' <<< "$@" && { help_md; exit 0; }
+    grep -q 'help'    <<< "$@" && { help_;   exit 0; }
 
-# optional VirtualBox build
+    # Using a temporary writable array A so that
+    # ARR will not be writable later on
 
-"${BUILD_VIRTUALBOX}" && { build_virtualbox; exit 0; }
+    create_options_array
 
-# if Gentoo has already been built into an ISO image or on an external device
-# skip generating it; otherwise go and build the Gentoo virtual machine
+    # parse command line. All arguments must be in the form a=true/false except
+    # for help, file.iso. But 'a' can be used as shorthand for 'a=true'
 
-# you can bypass generation by setting vm= on commandline
+    # Analyse commandline and source auxiliary files
 
-[ -n "${VM}" ] && ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}" \
-    && generate_Gentoo
+    get_options
 
-# process the virtual disk into a clonezilla image
+    check_tool "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
+               "VBoxManage" "curl" "grep" "lsblk" "awk"
+    test_cli_pre
+    for ((i=0; i<ARRAY_LENGTH; i++)); do test_cli $i; done
+    test_cli_post
+    cd ${VMPATH}
+    source scripts/fetch_functions.sh
+    source scripts/build_virtualbox.sh
 
-if [ -f "${VM}.vdi" ] && "${CREATE_ISO}"  && ! "${FROM_DEVICE}"
-then
-    # Now create a new VM from clonezilla ISO to retrieve
-    # Gentoo filesystem from the VDI virtual disk.
+    # optional VirtualBox build
 
-    ${LOG[*]} "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM..."
-    "${VERBOSE}" \
-        && ${LOG[*]} "[INF] These are necessary to activate folder sharing."
-    process_clonezilla_iso
+    "${BUILD_VIRTUALBOX}" && { build_virtualbox; exit 0; }
 
-    # And launch the corresponding VM
+    # if Gentoo has already been built into an ISO image or on an external device
+    # skip generating it; otherwise go and build the Gentoo virtual machine
 
-    ${LOG[*]} "[INF] Launching Clonezilla VM to convert virtual disk to \
-clonezilla image..."
-    create_iso_vm
-fi
+    # you can bypass generation by setting vm= on commandline
 
-"${FROM_DEVICE}" && clonezilla_device_to_image
+    [ -n "${VM}" ] && ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}" \
+        && generate_Gentoo
 
-# Now convert the clonezilla xz image image into a bootable ISO
+    # process the virtual disk into a clonezilla image
 
-if "${CREATE_ISO}"
-then
-    ${LOG[*]} "[INF] Creating Clonezilla bootable ISO..."
-
-    # this second ISO image is the "restore" one: from clonezilla image
-    # to target disk.
-    # Now replacing the older "save" (from virtual disk to clonezilla image)
-    # config file by the opposite "restore" one (from clonezilla image
-    # to target disk)
-
-    cp ${verb} -f clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux
-
-    if clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
+    if [ -f "${VM}.vdi" ] && "${CREATE_ISO}"  && ! "${FROM_DEVICE}"
     then
-        ${LOG[*]} "[MSG] Done."
-        [ -f "${ISO_OUTPUT}" ] \
-            && ${LOG[*]} "[MSG] ISO install medium was created here:\
- ${ISO_OUTPUT}"  \
-            || ${LOG[*]} "[ERR] ISO install medium failed to be created."
-    else
-        ${LOG[*]} "[ERR] ISO install medium failed to be created!"
-        exit 1
+        # Now create a new VM from clonezilla ISO to retrieve
+        # Gentoo filesystem from the VDI virtual disk.
+
+        ${LOG[*]} "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM."
+        "${VERBOSE}" \
+            && ${LOG[*]} "[INF] These are necessary to activate folder sharing."
+
+        add_guest_additions_to_clonezilla_iso
+
+        # And launch the corresponding VM
+
+        ${LOG[*]} "[INF] Launching Clonezilla VM to convert virtual disk to \
+clonezilla image..."
+        create_iso_vm
     fi
-fi
 
-# exporting ISO bootable image to external device (like USB stick)
+    "${FROM_DEVICE}" && clonezilla_device_to_image
 
-[ -n "${DEVICE_INSTALLER}" ] && create_install_ext_device
+    # Now convert the clonezilla xz image image into a bootable ISO
 
-# optional disc burning
+    if "${CREATE_ISO}"
+    then
+        ${LOG[*]} "[INF] Creating Clonezilla bootable ISO..."
 
-"${BURN}" \
-   &&  ${LOG[*]}  <<< $(burn_iso 2>&1 | xargs echo '[INF] Now burning disk: ')
+        # this second ISO image is the "restore" one: from clonezilla image
+        # to target disk.
+        # Now replacing the older "save" (from virtual disk to clonezilla image)
+        # config file by the opposite "restore" one (from clonezilla image
+        # to target disk)
 
-# optional "hot install" on external device
+        cp ${verb} -f clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux
 
-if "${HOT_INSTALL}" && [ -n "${EXT_DEVICE}" ]
-then
-    ${LOG[*]} "[INF] Creating OS on device ${EXT_DEVICE}..."
-    create_device_system "${CLONING_METHOD}"
-fi
+        if clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
+        then
+            ${LOG[*]} "[MSG] Done."
+            [ -f "${ISO_OUTPUT}" ] \
+                && ${LOG[*]} "[MSG] ISO install medium was created here:\
+ ${ISO_OUTPUT}"  \
+                    || ${LOG[*]} "[ERR] ISO install medium failed to be created."
+        else
+            ${LOG[*]} "[ERR] ISO install medium failed to be created!"
+            exit 1
+        fi
+    fi
 
-# default cleanup
+    # exporting ISO bootable image to external device (like USB stick)
 
-"${CLEANUP}" &&
-    ${LOG[*]} <<< $(cleanup 2>&1 | xargs echo '[INF] Cleaning up: ')
+    [ -n "${DEVICE_INSTALLER}" ] && create_install_ext_device
 
-# send wake-up call
+    # optional disc burning
 
-if [ -n "${EMAIL}" ] && [ -n "${SMTP_URL}" ]
-then
+    "${BURN}" \
+       && ${LOG[*]} <<< $(burn_iso 2>&1 | xargs echo '[INF] Now burning disk: ')
 
-# optional email end-of-job warning
+    # optional "hot install" on external device
 
-    [ -n "${EMAIL_PASSWD}" ] \
-        && [ -n "${EMAIL}" ] \
-        && [ -n "${SMTP_URL}" ] \
-        && ${LOG[*]} <<< $(send_mail 2>&1 | xargs echo '[INF] Sending mail: ')
-fi
+    if "${HOT_INSTALL}" && [ -n "${EXT_DEVICE}" ]
+    then
+        ${LOG[*]} "[INF] Creating OS on device ${EXT_DEVICE}..."
+        create_device_system "${CLONING_METHOD}"
+    fi
 
-${LOG[*]} "[MSG] Gentoo building process ended."
-exit 0
+    # default cleanup
+
+    "${CLEANUP}" &&
+        ${LOG[*]} <<< $(cleanup 2>&1 | xargs echo '[INF] Cleaning up: ')
+
+    # send wake-up call
+
+    if [ -n "${EMAIL}" ] && [ -n "${SMTP_URL}" ]
+    then
+
+        # optional email end-of-job warning
+
+        [ -n "${EMAIL_PASSWD}" ] \
+            && [ -n "${EMAIL}" ] \
+            && [ -n "${SMTP_URL}" ] \
+            && ${LOG[*]} <<< $(send_mail 2>&1 |xargs echo '[INF] Sending mail: ')
+    fi
+
+    ${LOG[*]} "[MSG] Gentoo building process ended."
+    exit 0
 }
-
-main

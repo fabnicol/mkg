@@ -34,13 +34,52 @@
 ## @details Later on A initializes the read-only array #ARR
 ## @ingroup auxiliaryFunctions
 
+## @var ARR
+## @brief global string array of switches and default values
+## @details Structure is as follows: @code
+## {{"Commandline option", "Description", "Default value", "Type"}, {...},...}
+## @endcode
+## 'Type' is among the following values:
+## @li @b b  Boolean, 'false' or 'true'
+## @li @b d  An existing directory
+## @li @b e  Email address: regexp "[a-z]+@[a-z]+\.[a-z]+"
+## @li @b f  An existing file
+## @li @b n  Numeric value
+## @li @b o  'on' or 'off', a VBoxManage custom Boolean
+## @li @b s  Non-empty string. Corresponding defaults may be empty however.
+##           This is the notably case for passwords. For such options, explicit
+##           commandline value after '=' is requested.
+## @li @b u  Url
+## @li @b x:y Conditional type x: one of the above, with [ -z "$x" ]
+##            <=> { [ "$y" = "false" ] ||  [ -z "$y" ]; } && [ "$y" != "true" ]
+## @li @b vm Restricted to the <tt>vm</tt> option:
+##           can be set to @ code <tt>false</tt> to bypass OS building and only
+##           perform burning/external device operations.
+## A double-entry array will be simulated using indexes.
+## @ingroup createInstaller
+## @note `debug_mode` should be place up front in the array
+
+declare -a -r ARR
+
+## @var ARRAY_LENGTH
+## @brief Number of switches (true length of array divided by 4)
+## @ingroup createInstaller
+
+declare -i -r ARRAY_LENGTH
+
 create_options_array() {
     IFS=';'
+
     read -r -a A <<< $(awk -F"\"" \
      '{if ( ! match($1, "#")  && $1 != "") printf "%s;%s;%s;%s;",$2,$4,$6,$8}' \
        options)
-    export A
+    ARR=(${A[@]})
+    ARRAY_LENGTH=$((${#ARR[*]}/4))
+    export ARR
+    export ARRAY_LENGTH
+    unset A
 }
+
 
 ## @fn check_md5sum()
 ## @param filename Local name of file to be checked for md5sum.
@@ -381,4 +420,27 @@ if_fails() {
         ${LOG[*]} "$2"
         exit 1
     fi
+}
+
+## @fn cleanup()
+## @brief Clean up all temporary files and directpries (except for VirtualBox
+##        build)
+## @ingroup auxiliaryFunctions
+
+cleanup() {
+
+    ! "${CLEANUP}" && return 0
+    local verb=""
+    ${VERBOSE} && verb="-v"
+    cd "${VMPATH}" || exit 2
+    rm ${verb} -f *.xz
+    rm ${verb} -f *.txt
+    rm ${verb} -rf ISOFILES/ mnt2/
+    [ -d mnt ]  && mountpoint mnt && umount -l mnt/
+    [ -d mnt ]  && rm ${verb} -rf mnt
+    [ -d mnt2 ] && rm ${verb} -rf mnt2
+    [ -d "${VM}" ] && rm ${verb} -rf "${VM}"
+    [ -d "${VM}_ISO" ] && rm ${verb} -rf "${VM}_ISO"
+    "${REMOVE_VDI}" && [ -f "${VM}.vdi" ] && rm ${verb} -f "${VM}.vdi"
+    return 0
 }

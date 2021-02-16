@@ -1,6 +1,7 @@
 # System and management
  app-admin/sudo
  app-admin/sysklogd
+ app-portage/gentoolkit
  sys-process/cronie
  sys-apps/mlocate
  sys-fs/e2fsprogs
@@ -13,6 +14,7 @@
  gentoolkit
  sys-boot/grub:2
  dev-java/ant
+ dev-vcs/git
  x11-apps/xdm
  x11-misc/sddm 
  kde-plasma/sddm-kcm

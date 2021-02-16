@@ -181,7 +181,13 @@ build_kernel() {
 
     mount /dev/sda2 /boot
     cp -vf .config /usr/src/linux
-    cd /usr/src/linux || exit 2
+    cd /usr/src/linux
+
+    if [ "$PWD" != "/usr/src/linux" ]
+    then
+        echo "[ERR] Could not cd to /usr/src/linux" | tee kernel.log
+        exit 2
+    fi
 
     # kernel config issue here
 
@@ -231,25 +237,10 @@ install_software() {
     # caused by Windows editing
 
     cd / || exit 2
-    emerge dos2unix  | tee log_install_software.log
+    emerge -u dos2unix  | tee log_install_software.log
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
-
-    # Owing to a bug in git ebuild we build git from source
-
-    wget https://github.com/git/git/archive/master.zip
-    if ! [ -f master.zip ]
-    then
-        echo "[ERR] Could not download git from github" \
-            | tee log_install_software.log
-    else
-        unzip master.zip
-        cd git-master
-        make prefix=/usr
-        make prefix=/usr install
-        cd -
-    fi
 
     # TODO: develop several options wrt to package set.
 
@@ -270,8 +261,10 @@ install_software() {
         return -1
     fi
 
-    echo 'install.packages(c("data.table", "dplyr", "ggplot2",\
-"bit64", "devtools", "rmarkdown"))' > libs.R
+    # do not use \ to continue line below:
+
+    echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
+'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" > libs.R
 
     ! "${MINIMAL}" && { Rscript libs.R 2>&1 | tee Rlibs.log
                         rm -f libs.R; }
@@ -280,50 +273,6 @@ install_software() {
 
     env-update
     source /etc/profile
-
-    # optionally build RStudio and R dependencies (TODO)
-
-    if ! "${DOWNLOAD_RSTUDIO}"
-    then
-        echo "[MSG] No RStudio build" \
-            | tee log_install_software.log
-        return 1
-    fi
-
-    mkdir /Build
-    cd /Build || exit 2
-    wget ${GITHUBPATH}${RSTUDIO}.zip
-    if [ $? != 0 ]
-    then
-        echo "[ERR] RStudio download failed!" \
-                | tee log_install_software.log
-        return 1
-    fi
-    echo "[INF] Building RStudio" | tee log_install_software.log
-    unzip *.zip
-    cd rstudio* || return 2
-    mkdir build
-    cd dependencies/common  || return 2
-    ./install-mathjax
-    ./install-dictionaries
-    ./install-pandoc
-    cd - || return 2
-    cd build || return 2
-    cmake .. -DRSTUDIO_TARGET=Desktop \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DRSTUDIO_USE_SYSTEM_BOOST=1 \
-          -DQT_QMAKE_EXECUTABLE=1  2>&1  \
-        | tee log_install_software.log
-    make -j${NCPUS} 2>&1 | tee log_install_software.log
-    make -k install 2>&1 | tee log_install_software.log
-    res=$?
-    cd / || return 2
-    ! "${DEBUG_MODE}" && rm -rf /Build
-
-    # if DEBUG_MODE is true, would return 1, undesirably.
-    # using $res instead
-
-    return ${res}
 }
 
 
@@ -342,29 +291,6 @@ install_software() {
 ## @ingroup mkFileSystem
 
 global_config() {
-    echo "Cleaning up a bit aggressively before cloning..." \
-        | tee log_uninstall_software.log
-    eclean -d packages 2>&1 | tee log_uninstall_software.log
-    rm -rf /var/tmp/*
-    rm -rf /var/log/*
-    rm -rf /var/cache/distfiles/*
-
-    # kernel sources will have to be reinstalled by user if necessary
-
-    emerge --unmerge gentoo-sources  2>&1 | tee log_uninstall.log
-    emerge --depclean                2>&1 | tee log_uninstall.log
-    rm -rf /usr/src/linux/*               | tee log_uninstall.log
-    eix-update
-
-    # Idealy the installers should do:
-    # emerge gentoo-sources cd /usr/src/linux
-    # cp -f /boot/config* .config make syncconfig make modules_prepare
-    # for the sake of ebuilds requesting prepared kernel sources
-    # TODO: test ocs-run
-    # post_run commands.  Also for device_installer=... *alone* the above
-    # code could be deactivated.  But then a later from_vm call would
-    # have to clean sources to lighten the resulting ISO clonezilla
-    # image.
 
     # Configuration --- sddm
 
@@ -400,6 +326,10 @@ global_config() {
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
     gpasswd -a sddm video
 
+    # normally a non-op (useradd -m), just for paranoia
+
+    chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}
+
     #--- Creating the bootloader
 
     grub-install --target=x86_64-efi --efi-directory=/boot --removable
@@ -425,7 +355,34 @@ finalize() {
 
     ! "${DEBUG_MODE}" &&  rm -f * && sed -i 's/^export .*$//g' .bashrc
 
-    # prepare to compact with vbox-img compact --filename
+    # freeing up some disk space
+
+    echo "Cleaning up a bit aggressively before cloning..." \
+        | tee log_uninstall_software.log
+
+    # MINIMAL_SIZE should only be set for packaging purposes.
+    # and avoided for personal use
+
+    if "${MINIMAL_SIZE}"
+    then
+        emerge --unmerge gentoo-sources  2>&1 | tee log_uninstall.log
+        rm -rf /usr/src/linux/*               | tee log_uninstall.log
+        rm -rf /var/cache/distfiles/*
+    else
+        eclean -d packages 2>&1 | tee log_uninstall_software.log
+    fi
+
+    # kernel sources will have to be reinstalled by user if necessary
+
+    emerge --depclean                2>&1 | tee log_uninstall.log
+    rm -rf /var/tmp/*
+    rm -rf /var/log/*
+    rm -rf ~/.cache/
+    rm /tmp/*
+
+    eix-update
+
+    # prepare to compact with vbox-img comp act --filename
     # ${VMPATH}/${VM}.vdi
 
     cat /dev/zero > zeros ; sync ; rm zeros
