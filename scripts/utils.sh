@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ##
 # Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>
 #
@@ -18,7 +20,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301
 ##
-#!/bin/bash
 
 ## @file utils.sh
 ## @author Fabrice Nicol <fabrnicol@gmail.com>
@@ -78,7 +79,6 @@ create_options_array() {
     export ARRAY_LENGTH
     unset A
 }
-
 
 ## @fn check_md5sum()
 ## @param filename Local name of file to be checked for md5sum.

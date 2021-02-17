@@ -275,7 +275,6 @@ install_software() {
     source /etc/profile
 }
 
-
 ## @fn global_config()
 ## @details @li Cleanup log, distfiles (for deployment),
 ##          kernel build sources and objects

@@ -62,7 +62,6 @@ setup_network() {
     }
 }
 
-
 ## @fn partition()
 ## @brief Create partition table, \b /dev/sda1 (bios_grub), \b /dev/sda2 (boot),
 ##        \b dev/sda3 (swap) and \b /dev/sda4 (system)
