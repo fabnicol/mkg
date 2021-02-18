@@ -331,7 +331,13 @@ global_config() {
 
     #--- Creating the bootloader
 
-    grub-install --target=x86_64-efi --efi-directory=/boot --removable
+    if "${BIOS}"
+    then
+        grub-install /dev/sda
+    else
+        grub-install --target=x86_64-efi --efi-directory=/boot --removable
+    fi
+
     grub-mkconfig -o /boot/grub/grub.cfg
 
     #--- Passwords: take care to use long enough passwds

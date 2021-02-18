@@ -69,6 +69,9 @@ declare -a ARR
 declare -i ARRAY_LENGTH
 
 create_options_array() {
+
+    # language note: IFS is the bash array separator, not awk's
+
     IFS=';'
     read -r -a A <<< $(awk -F"\"" \
     '/^\s*$/ {next;}  {if ( ! match($1, "#"))  printf "%s;%s;%s;%s;",$2,$4,$6,$8}' \
@@ -78,6 +81,7 @@ create_options_array() {
     export ARR
     export ARRAY_LENGTH
     unset A
+    IFS=" "
 }
 
 ## @fn check_md5sum()
@@ -149,10 +153,23 @@ send_mail() {
 
 ## @fn list_block_devices()
 ## @brief List all non-loop block devices
+## @note uses @code lsblk
 ## @ingroup auxiliaryFunctions
 
 list_block_devices() {
     echo  "$(lsblk -a -n -o KNAME | grep -v loop)"
+}
+
+## @fn find_device_by_vendor()
+## @brief Finds the device label sdX associated to a given vendor
+## @note uses @code lsblk
+## @ingroup auxiliaryFunctions
+
+find_device_by_vendor() {
+
+    echo "$(lsblk -a -n -o KNAME,VENDOR \
+| grep -v loop | grep -i $1 | cut -f1 -d' ')"
+
 }
 
 ## @fn is_block_device()
@@ -164,7 +181,7 @@ list_block_devices() {
 
 is_block_device() {
     local devices="$(list_block_devices)"
-    grep -q "$1" <<< ${devices}
+    grep -q "$1" <<< "${devices}"
     return $?
 }
 
@@ -181,22 +198,47 @@ list:"
         ${LOG[*]} $(list_block_devices)
         exit 1
     fi
-    echo $(findmnt --raw --first -a -n -c "$1" | cut -f1 -d' ')
+    local res=$(findmnt --raw --first -a -n -c "$1" | cut -f1 -d' ')
+    echo "${res}"
 }
 
 ## @fn get_device()
-## @brief Give device from mount folder input
+## @param Either a device KNAME (sdX), or a directory mountpoint
+##        or enough letters of the VENDOR for grep to uniquely
+##        identify it in @code lsblk ouput.
+## @brief Give device from mount folder input.
 ## @ingroup auxiliaryFunctions
 
 get_device() {
-    if [ -d "$1" ]
+    if is_block_device "$1"
     then
-        device=$(findmnt --raw --first -a -n -c "$1" | cut -f2 -d' ')
-        echo ${device}
+        echo "$1"
     else
-        is_block_device "$1" && echo "$1" \
-            || { ${LOG[*]} "[ERR] $1 is neither a mountpoint nor a \
-block device"; exit 1; }
+        local res
+        if [ -d "$1" ]
+        then
+            res=$(findmnt --raw --first -a -n -c "$1" | cut -f2 -d' ')
+            res=$(sed -r 's/\/dev\/([a-zA-Z]+)[0-9]+/\1/' <<< "${res}")
+            echo "${res}"
+        else
+            res=$(find_device_by_vendor "$1")
+            if [ -n "${res}" ]
+            then
+                read -p "[WAR] Please confirm there is no error and you wish \
+to create an installer with device /dev/${res}, vendor name $1. Reply with \
+uppercase Y to continue: " reply
+                if [ "${reply}" = "Y" ]
+                then
+                    get_device "${res}"
+                else
+                    exit 0
+                fi
+            else
+            ${LOG[*]} "[ERR] $1 is neither a mountpoint nor a \
+block device"
+            exit 1
+            fi
+        fi
     fi
 }
 
@@ -219,7 +261,7 @@ test_cdrecord() {
     then
         ${LOG[*]} "[ERR] cdrecord version is not functional"
         ${LOG[*]} "[MSG] Try reinstalling cdrecord"
-        return -1
+        exit 1
     fi
     return 0
 }
@@ -281,7 +323,7 @@ burn_iso() {
  specify cdrecord full filepath on commandline:"
              ${LOG[*]} "      burn=true \
 cdrecord=/path/to/cdrecord/executable"
-             return -1
+             exit 1
          else
              CDRECORD="$(which cdrecord)"
              test_cdrecord
@@ -289,20 +331,28 @@ cdrecord=/path/to/cdrecord/executable"
     else
          test_cdrecord
     fi
+
     "${BLANK}" && BLANK='blank=fast' || BLANK=""
-    [ -z "${SCSI_ADDRESS}" ] && OPT=("-eject" "${BLANK}") \
-            || OPT=("-eject" "${BLANK}" "dev=${SCSI_ADDRESS}")
-    [ ! -f "${ISO_OUTPUT}" ] \
-        && { ${LOG[*]} "[ERR] No such files as ${ISO_OUTPUT}"
-               return -1; }
+
+    if [ -z "${SCSI_ADDRESS}" ] || [ "${SCSI_ADDRESS}" = "dep" ]
+    then
+        OPT=("-eject" "${BLANK}")
+    else
+        OPT=("-eject" "${BLANK}" "dev=${SCSI_ADDRESS}")
+    fi
+
+    if [ ! -f "${ISO_OUTPUT}" ]
+    then
+        ${LOG[*]} "[ERR] No such files as ${ISO_OUTPUT}"
+        exit 1
+    fi
     ${LOG[*]} "[INF] Burning installation medium ${ISO_OUTPUT} \
 to optical disc..."
     "${VERBOSE}" && ${LOG[*]} "[MSG] ${CDRECORD} ${OPT[*]} ${ISO_OUTPUT}"
 
     # do not quote OPT
 
-    ${CDRECORD} ${OPT[*]} ${ISO_OUTPUT}
-
+    ${CDRECORD} ${OPT[*]} "${ISO_OUTPUT}"
     if_fails $? "[ERR] Could not burn ${ISO_OUTPUT}"
 }
 
@@ -315,13 +365,23 @@ to optical disc..."
 
 create_install_ext_device() {
     res=0
-    check_file "${ISO_OUTPUT}" "[ERR] File ${ISO_OUTPUT} was not found."
-    is_block_device "/dev/${DEVICE_INSTALLER}"
+    # Test whether EXT_DEVICE is a mountpoint or a block device label
+
+    EXT_DEVICE=$(get_device ${EXT_DEVICE})
+
+    if [ -z "${EXT_DEVICE}" ]
+    then
+        ${LOG[*]} "[ERR] ext_device=... must be specified."
+        exit 1
+    fi
+
+    check_file "${ISO_OUTPUT}" "[ERR] Iso output \"${ISO_OUTPUT}\" was not found."
+    is_block_device "/dev/${EXT_DEVICE}"
     ${LOG[*]} "[INF] Creating install device under \
-/dev/${DEVICE_INSTALLER}"
-    dd if="${ISO_OUTPUT}" of="/dev/${DEVICE_INSTALLER}" bs=4M status=progress
+/dev/${EXT_DEVICE}"
+    dd if="${ISO_OUTPUT}" of="/dev/${EXT_DEVICE}" bs=4M status=progress
     sync
-    if_fails $? "[ERR] Could not install device ${DEVICE_INSTALLER}"
+    if_fails $? "[ERR] Could not install device ${EXT_DEVICE}"
 }
 
 ## @fn check_dir()

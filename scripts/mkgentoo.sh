@@ -78,7 +78,7 @@
 ## on command line.
 ## @par \b Examples:
 ## @li Only create the VM and virtual disk, in debug mode,
-## without R or RStudio and set new passwords, for a French-language platform.
+## without R and set new passwords, for a French-language platform.
 ## Use 8 cores.
 ## @code mkg language=fr minimal debug_mode ncpus=8
 ## nonroot_user=ken passwd='util!Hx&32F' rootpasswd='Hk_32!_CD' cleanup=false
@@ -88,8 +88,8 @@
 ## on a USB stick whose model label starts with \e PNY and finally create a
 ## clonezilla installer
 ## on another USB stick mounted under <tt> /media/ken/AA45E </tt>
-## @code mkgento burn hot_install ext_device="PNY" device_installer="Sams"
-##       my_gentoo_image.iso
+## @code mkgento burn hot_install ext_device="PNY" device_installer
+## ext_device="Sams" my_gentoo_image.iso
 ## @endcode
 ## @defgroup createInstaller Create Gentoo linux image and installer.
 
@@ -124,9 +124,6 @@ declare -x CREATE_ISO=false
 
 help_md() {
 
-    Usage [2] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo.
-    Usage [3] prints this help, in markdown form if argument 'md' is specified.
-    Warning: you should have at least 55 GB of free disk space in the current directory or in vmpath if specified.
     local count=$(($(nproc --all)/3))
     echo "**USAGE:**  "
     echo "**mkg**                                        [1]  "
@@ -136,7 +133,7 @@ help_md() {
     echo "  "
     echo "Usage [1] and [2] create a bootable ISO output file with a current"
     echo "Gentoo distribution.  "
-    echo "For [1], implicit ISO output name is `gentoo.iso`  "
+    echo "For [1], implicit ISO output name is **gentoo.iso**  "
     echo "Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine"
     echo "with name Gentoo.  "
     echo "Usage [4] prints this help, in markdown form if argument 'md' is"
@@ -613,14 +610,14 @@ third-party applications for this mail to be sent."
     fi
     if  "${HOT_INSTALL}" || ([ -n "${EXT_DEVICE}" ] \
                              && [ "${EXT_DEVICE}" != "dep" ])\
-                         || [ -n "${DEVICE_INSTALLER}" ]
+                         ||  "${DEVICE_INSTALLER}"
     then
-        read -p "[WAR] All data will be wiped out on device(s): ${EXT_DEVICE} \
-${DEVICE_INSTALLER}. Please confirm by entering uppercase Y: " reply
+        read -p "[WAR] All data will be wiped out on device(s): ${EXT_DEVICE}. \
+Please confirm by entering uppercase Y: " reply
         [ ${reply} != "Y" ] && exit 0
         read -p "[WAR] Once again. \
-All data will be wiped out on device(s): ${EXT_DEVICE} \
-${DEVICE_INSTALLER}. Please confirm by entering uppercase Y: " reply
+All data will be wiped out on device(s): ${EXT_DEVICE}. \
+Please confirm by entering uppercase Y: " reply
         [ ${reply} != "Y" ] && exit 0
     fi
 }
@@ -1900,12 +1897,15 @@ clonezilla image..."
 
     # exporting ISO bootable image to external device (like USB stick)
 
-    [ -n "${DEVICE_INSTALLER}" ] && create_install_ext_device
+    "${DEVICE_INSTALLER}" && create_install_ext_device
 
     # optional disc burning
 
-    "${BURN}" \
-       && ${LOG[*]} <<< $(burn_iso 2>&1 | xargs echo '[INF] Now burning disk: ')
+    if "${BURN}"
+    then
+       ${LOG[*]}  '[INF] Now burning disk: '
+       burn_iso
+    fi
 
     # optional "hot install" on external device
 
