@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.18"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>gentoo-creator: Auxiliary functions to check</title>
+<title>mkg: Auxiliary functions to check</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -20,9 +20,8 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="gentoo-small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">gentoo-creator
+   <div id="projectname">mkg
    &#160;<span id="projectnumber">1.0</span>
    </div>
    <div id="projectbrief">Gentoo distribution creator</div>
@@ -76,10 +75,7 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga70ccc3a81e02612a86b3a3983bc1c586"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga70ccc3a81e02612a86b3a3983bc1c586">validate_option</a> (option)</td></tr>
-<tr class="memdesc:ga70ccc3a81e02612a86b3a3983bc1c586"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if argument is part of array <a class="el" href="group__create_installer.html#ga2b36d9209dbee6df3e60d878f3e51005" title="global string array of switches and default values">ARR</a> as a legitimate commandline option.  <a href="group__auxiliary_functions.html#ga70ccc3a81e02612a86b3a3983bc1c586">More...</a><br /></td></tr>
-<tr class="separator:ga70ccc3a81e02612a86b3a3983bc1c586"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaca1ddf007bdcce3b29c42e0c5dc41717"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gaca1ddf007bdcce3b29c42e0c5dc41717">create_options_array</a> ()</td></tr>
+<tr class="memitem:gaca1ddf007bdcce3b29c42e0c5dc41717"><td class="memItemLeft" align="right" valign="top">declare i <a class="el" href="utils_8sh.html#a1eff9a1c5942c362f2838b7d69848255">ARRAY_LENGTH</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gaca1ddf007bdcce3b29c42e0c5dc41717">create_options_array</a> ()</td></tr>
 <tr class="memdesc:gaca1ddf007bdcce3b29c42e0c5dc41717"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read file <b>options</b> into a temporary array A which will contain command line specifications.  <a href="group__auxiliary_functions.html#gaca1ddf007bdcce3b29c42e0c5dc41717">More...</a><br /></td></tr>
 <tr class="separator:gaca1ddf007bdcce3b29c42e0c5dc41717"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga913689f9801eab383c4187327367e870"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga913689f9801eab383c4187327367e870">check_md5sum</a> (filename)</td></tr>
@@ -97,21 +93,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ga132042cf80f0610ddde0fdb6fc234a45"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga132042cf80f0610ddde0fdb6fc234a45">send_mail</a> ()</td></tr>
 <tr class="memdesc:ga132042cf80f0610ddde0fdb6fc234a45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an email to $EMAIL at $SMTP_URL to warn about end of processing.  <a href="group__auxiliary_functions.html#ga132042cf80f0610ddde0fdb6fc234a45">More...</a><br /></td></tr>
 <tr class="separator:ga132042cf80f0610ddde0fdb6fc234a45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga25a80837ae3373590d59e5d558c1ab83"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga25a80837ae3373590d59e5d558c1ab83">list_block_devices</a> ()</td></tr>
-<tr class="memdesc:ga25a80837ae3373590d59e5d558c1ab83"><td class="mdescLeft">&#160;</td><td class="mdescRight">List all non-loop block devices.  <a href="group__auxiliary_functions.html#ga25a80837ae3373590d59e5d558c1ab83">More...</a><br /></td></tr>
-<tr class="separator:ga25a80837ae3373590d59e5d558c1ab83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3684c6e188b7eb9eec7fbe851ab7e660"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga3684c6e188b7eb9eec7fbe851ab7e660">is_block_device</a> (label)</td></tr>
-<tr class="memdesc:ga3684c6e188b7eb9eec7fbe851ab7e660"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test if argument is non-loop block device.  <a href="group__auxiliary_functions.html#ga3684c6e188b7eb9eec7fbe851ab7e660">More...</a><br /></td></tr>
-<tr class="separator:ga3684c6e188b7eb9eec7fbe851ab7e660"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa35d741a19132f1ec7a0a699640e6b5a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gaa35d741a19132f1ec7a0a699640e6b5a">get_mountpoint</a> ()</td></tr>
-<tr class="memdesc:gaa35d741a19132f1ec7a0a699640e6b5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gives mount folder from device label input.  <a href="group__auxiliary_functions.html#gaa35d741a19132f1ec7a0a699640e6b5a">More...</a><br /></td></tr>
-<tr class="separator:gaa35d741a19132f1ec7a0a699640e6b5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab53bde930eb12adf7c84b549b7a4e241"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gab53bde930eb12adf7c84b549b7a4e241">get_device</a> ()</td></tr>
-<tr class="memdesc:gab53bde930eb12adf7c84b549b7a4e241"><td class="mdescLeft">&#160;</td><td class="mdescRight">Give device from mount folder input.  <a href="group__auxiliary_functions.html#gab53bde930eb12adf7c84b549b7a4e241">More...</a><br /></td></tr>
-<tr class="separator:gab53bde930eb12adf7c84b549b7a4e241"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga08542b578002f8342cd3e0a5252b5543"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga08542b578002f8342cd3e0a5252b5543">test_cdrecord</a> ()</td></tr>
-<tr class="memdesc:ga08542b578002f8342cd3e0a5252b5543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test whether <b>cdrecord</b> is functional.  <a href="group__auxiliary_functions.html#ga08542b578002f8342cd3e0a5252b5543">More...</a><br /></td></tr>
-<tr class="separator:ga08542b578002f8342cd3e0a5252b5543"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga38ca6200b4d28d4ea8fcadb531533519"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga38ca6200b4d28d4ea8fcadb531533519">recreate_liveCD_ISO</a> (dir)</td></tr>
 <tr class="memdesc:ga38ca6200b4d28d4ea8fcadb531533519"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create ISO of liveCD out of directory.  <a href="group__auxiliary_functions.html#ga38ca6200b4d28d4ea8fcadb531533519">More...</a><br /></td></tr>
 <tr class="separator:ga38ca6200b4d28d4ea8fcadb531533519"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -136,6 +117,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga7b33b974eed52f5a62f278deebd358d3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a> ()</td></tr>
 <tr class="memdesc:ga7b33b974eed52f5a62f278deebd358d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Echoes a message and exit in case of previous command failure.  <a href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">More...</a><br /></td></tr>
 <tr class="separator:ga7b33b974eed52f5a62f278deebd358d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaff07c1d29d6d6a540c726948254a1764"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a> ()</td></tr>
+<tr class="memdesc:gaff07c1d29d6d6a540c726948254a1764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean up all temporary files and directpries (except for VirtualBox build)  <a href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">More...</a><br /></td></tr>
+<tr class="separator:gaff07c1d29d6d6a540c726948254a1764"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>lines, files, devices and burn disk. </p>
@@ -164,7 +148,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00236">236</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00316">316</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -198,7 +182,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00296">296</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00394">394</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -233,7 +217,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00317">317</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00415">415</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -267,7 +251,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00337">337</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00435">435</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -301,7 +285,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00051">51</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00093">93</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -335,7 +319,28 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00357">357</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00455">455</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+
+</div>
+</div>
+<a id="gaff07c1d29d6d6a540c726948254a1764"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaff07c1d29d6d6a540c726948254a1764">&#9670;&nbsp;</a></span>cleanup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">cleanup </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Clean up all temporary files and directpries (except for VirtualBox build) </p>
+
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00489">489</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -363,7 +368,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00278">278</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00366">366</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -385,49 +390,7 @@ Functions</h2></td></tr>
 <p>Read file <b>options</b> into a temporary array A which will contain command line specifications. </p>
 <p>Later on A initializes the read-only array <a class="el" href="group__create_installer.html#ga2b36d9209dbee6df3e60d878f3e51005" title="global string array of switches and default values">ARR</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00037">37</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
-
-</div>
-</div>
-<a id="gab53bde930eb12adf7c84b549b7a4e241"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gab53bde930eb12adf7c84b549b7a4e241">&#9670;&nbsp;</a></span>get_device()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">get_device </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Give device from mount folder input. </p>
-
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00153">153</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
-
-</div>
-</div>
-<a id="gaa35d741a19132f1ec7a0a699640e6b5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaa35d741a19132f1ec7a0a699640e6b5a">&#9670;&nbsp;</a></span>get_mountpoint()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">get_mountpoint </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Gives mount folder from device label input. </p>
-
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00137">137</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00071">71</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -461,62 +424,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00378">378</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
-
-</div>
-</div>
-<a id="ga3684c6e188b7eb9eec7fbe851ab7e660"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3684c6e188b7eb9eec7fbe851ab7e660">&#9670;&nbsp;</a></span>is_block_device()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">is_block_device </td>
-          <td>(</td>
-          <td class="paramtype">label&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Test if argument is non-loop block device. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">label</td><td>Label of potential block device (e.g. <b>sdc</b>) to be tested. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="retval"><dt>Return values</dt><dd>
-  <table class="retval">
-    <tr><td class="paramname">Return</td><td>0 (true) if input is a block device otherwise 1. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00127">127</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
-
-</div>
-</div>
-<a id="ga25a80837ae3373590d59e5d558c1ab83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga25a80837ae3373590d59e5d558c1ab83">&#9670;&nbsp;</a></span>list_block_devices()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">list_block_devices </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>List all non-loop block devices. </p>
-
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00116">116</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00476">476</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -546,7 +454,7 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>0 on success or exits -1 on failure. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>An alternative xorriso solution could be considered </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00196">196</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00276">276</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -566,40 +474,10 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Send an email to $EMAIL at $SMTP_URL to warn about end of processing. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Email password is entered in clear under $EMAIL_PASSWD which is not safe if mkgentoo is run on any other platform than the user's own. Use with care in a private context. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Email password is entered in clear using $EMAIL_PASSWD which is not safe if mkg is run on any other platform than the user's own. Use with care in a private context. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Return value of &lsquo;curl&rsquo; command. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00101">101</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
-
-</div>
-</div>
-<a id="ga08542b578002f8342cd3e0a5252b5543"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga08542b578002f8342cd3e0a5252b5543">&#9670;&nbsp;</a></span>test_cdrecord()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">test_cdrecord </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Test whether <b>cdrecord</b> is functional. </p>
-<p>Try to scan the SCSI bus and exit on error </p><dl class="section warning"><dt>Warning</dt><dd>There may be a rights issue with versions of <b>cdrecord</b> built from original source as they sometimes request elevated rights to perform burning with some hardware configurations. <br  />
-In such an event, either run script with elevated rights or modify <b>cdrecord</b> rights using:<div class="fragment"><div class="line">chown root cdrecord &amp;&amp; chgrp bin cdrecord &amp;&amp; chmod 04755 cdrecord</div>
-</div><!-- fragment --> </dd></dl>
-<dl class="retval"><dt>Return values</dt><dd>
-  <table class="retval">
-    <tr><td class="paramname">0</td><td>on success otherwise -1 on failure. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00178">178</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00143">143</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -628,7 +506,7 @@ In such an event, either run script with elevated rights or modify <b>cdrecord</
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>grep value against input string </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00089">89</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00131">131</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -657,7 +535,7 @@ In such an event, either run script with elevated rights or modify <b>cdrecord</
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>grep value against input string </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00067">67</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00109">109</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -686,36 +564,7 @@ In such an event, either run script with elevated rights or modify <b>cdrecord</
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>grep value against input string </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00077">77</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
-
-</div>
-</div>
-<a id="ga70ccc3a81e02612a86b3a3983bc1c586"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga70ccc3a81e02612a86b3a3983bc1c586">&#9670;&nbsp;</a></span>validate_option()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">validate_option </td>
-          <td>(</td>
-          <td class="paramtype">option&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Check if argument is part of array <a class="el" href="group__create_installer.html#ga2b36d9209dbee6df3e60d878f3e51005" title="global string array of switches and default values">ARR</a> as a legitimate commandline option. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">option</td><td>String of option. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true if legitimate option otherwise false. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00181">181</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00119">119</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>

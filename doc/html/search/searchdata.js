@@ -2,7 +2,7 @@ var indexSectionsWithContent =
 {
   0: "abcdfghilmprstuv",
   1: "bfmtu",
-  2: "abcdfghilmprstv",
+  2: "abcdfghimprstv",
   3: "acdilpr",
   4: "ac",
   5: "btu"

@@ -1,4 +1,4 @@
-.TH "utils.sh" 3 "Sun Feb 14 2021" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "utils.sh" 3 "Thu Feb 18 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -11,7 +11,7 @@ utils.sh \- Auxiliary functions\&.
 
 .in +1c
 .ti -1c
-.RI "\fBcreate_options_array\fP ()"
+.RI "declare i \fBARRAY_LENGTH\fP \fBcreate_options_array\fP ()"
 .br
 .RI "Read file \fBoptions\fP into a temporary array A which will contain command line specifications\&. "
 .ti -1c
@@ -35,25 +35,8 @@ utils.sh \- Auxiliary functions\&.
 .br
 .RI "Send an email to $EMAIL at $SMTP_URL to warn about end of processing\&. "
 .ti -1c
-.RI "\fBlist_block_devices\fP ()"
-.br
-.RI "List all non-loop block devices\&. "
-.ti -1c
-.RI "\fBis_block_device\fP (label)"
-.br
-.RI "Test if argument is non-loop block device\&. "
-.ti -1c
-.RI "\fBget_mountpoint\fP ()"
-.br
-.RI "Gives mount folder from device label input\&. "
-.ti -1c
-.RI "\fBget_device\fP ()"
-.br
-.RI "Give device from mount folder input\&. "
-.ti -1c
 .RI "\fBtest_cdrecord\fP ()"
 .br
-.RI "Test whether \fBcdrecord\fP is functional\&. "
 .ti -1c
 .RI "\fBrecreate_liveCD_ISO\fP (dir)"
 .br
@@ -86,12 +69,20 @@ utils.sh \- Auxiliary functions\&.
 .RI "\fBif_fails\fP ()"
 .br
 .RI "Echoes a message and exit in case of previous command failure\&. "
+.ti -1c
+.RI "\fBcleanup\fP ()"
+.br
+.RI "Clean up all temporary files and directpries (except for VirtualBox build) "
 .in -1c
 .SS "Variables"
 
 .in +1c
 .ti -1c
-.RI "Exported String \fBA\fP"
+.RI "Exported String \fBARR\fP"
+.br
+.RI "global string array of switches and default values "
+.ti -1c
+.RI "Exported String \fBARRAY_LENGTH\fP"
 .br
 .in -1c
 .SH "Detailed Description"
@@ -118,12 +109,18 @@ This file is not included into the clonezilla ISO liveCD\&.
 
 .PP
 Definition in file \fButils\&.sh\fP\&.
-.SH "Variable Documentation"
+.SH "Function Documentation"
 .PP 
-.SS "Exported String A"
+.SS "test_cdrecord ()"
 
 .PP
-Definition at line 42 of file utils\&.sh\&.
+Definition at line 258 of file utils\&.sh\&.
+.SH "Variable Documentation"
+.PP 
+.SS "Exported String ARRAY_LENGTH"
+
+.PP
+Definition at line 82 of file utils\&.sh\&.
 .SH "Author"
 .PP 
-Generated automatically by Doxygen for gentoo-creator from the source code\&.
+Generated automatically by Doxygen for mkg from the source code\&.

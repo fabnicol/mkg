@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['list_5fblock_5fdevices_131',['list_block_devices',['../group__auxiliary_functions.html#ga25a80837ae3373590d59e5d558c1ab83',1,'utils.sh']]]
+  ['main_128',['main',['../group__create_installer.html#ga51af30a60f9f02777c6396b8247e356f',1,'mkgentoo.sh']]],
+  ['make_5fboot_5ffrom_5flivecd_129',['make_boot_from_livecd',['../group__create_installer.html#gac524b24b0add02df542887f9b251eb42',1,'mkgentoo.sh']]],
+  ['mount_5flive_5fcd_130',['mount_live_cd',['../group__create_installer.html#gad29a75dbf76ffa08bf28bf4254f234c7',1,'mkgentoo.sh']]]
 ];

@@ -1,4 +1,4 @@
-.TH "auxiliaryFunctions" 3 "Sun Feb 14 2021" "Version 1.0" "gentoo-creator" \" -*- nroff -*-
+.TH "auxiliaryFunctions" 3 "Thu Feb 18 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -11,11 +11,7 @@ auxiliaryFunctions \- lines, files, devices and burn disk\&.
 
 .in +1c
 .ti -1c
-.RI "\fBvalidate_option\fP (option)"
-.br
-.RI "Check if argument is part of array \fBARR\fP as a legitimate commandline option\&. "
-.ti -1c
-.RI "\fBcreate_options_array\fP ()"
+.RI "declare i \fBARRAY_LENGTH\fP \fBcreate_options_array\fP ()"
 .br
 .RI "Read file \fBoptions\fP into a temporary array A which will contain command line specifications\&. "
 .ti -1c
@@ -38,26 +34,6 @@ auxiliaryFunctions \- lines, files, devices and burn disk\&.
 .RI "\fBsend_mail\fP ()"
 .br
 .RI "Send an email to $EMAIL at $SMTP_URL to warn about end of processing\&. "
-.ti -1c
-.RI "\fBlist_block_devices\fP ()"
-.br
-.RI "List all non-loop block devices\&. "
-.ti -1c
-.RI "\fBis_block_device\fP (label)"
-.br
-.RI "Test if argument is non-loop block device\&. "
-.ti -1c
-.RI "\fBget_mountpoint\fP ()"
-.br
-.RI "Gives mount folder from device label input\&. "
-.ti -1c
-.RI "\fBget_device\fP ()"
-.br
-.RI "Give device from mount folder input\&. "
-.ti -1c
-.RI "\fBtest_cdrecord\fP ()"
-.br
-.RI "Test whether \fBcdrecord\fP is functional\&. "
 .ti -1c
 .RI "\fBrecreate_liveCD_ISO\fP (dir)"
 .br
@@ -90,6 +66,10 @@ auxiliaryFunctions \- lines, files, devices and burn disk\&.
 .RI "\fBif_fails\fP ()"
 .br
 .RI "Echoes a message and exit in case of previous command failure\&. "
+.ti -1c
+.RI "\fBcleanup\fP ()"
+.br
+.RI "Clean up all temporary files and directpries (except for VirtualBox build) "
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -115,7 +95,7 @@ Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&.
 .PP
 
 .PP
-Definition at line 236 of file utils\&.sh\&.
+Definition at line 316 of file utils\&.sh\&.
 .SS "check_dir ()"
 
 .PP
@@ -138,7 +118,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 296 of file utils\&.sh\&.
+Definition at line 394 of file utils\&.sh\&.
 .SS "check_file ()"
 
 .PP
@@ -163,7 +143,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 317 of file utils\&.sh\&.
+Definition at line 415 of file utils\&.sh\&.
 .SS "check_files ()"
 
 .PP
@@ -186,7 +166,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 337 of file utils\&.sh\&.
+Definition at line 435 of file utils\&.sh\&.
 .SS "check_md5sum (filename)"
 
 .PP
@@ -204,7 +184,7 @@ Check md5sums in file MD5SUMS\&.
 .PP
 
 .PP
-Definition at line 51 of file utils\&.sh\&.
+Definition at line 93 of file utils\&.sh\&.
 .SS "check_tool ()"
 
 .PP
@@ -227,7 +207,13 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 357 of file utils\&.sh\&.
+Definition at line 455 of file utils\&.sh\&.
+.SS "cleanup ()"
+
+.PP
+Clean up all temporary files and directpries (except for VirtualBox build) 
+.PP
+Definition at line 489 of file utils\&.sh\&.
 .SS "create_install_ext_device ()"
 
 .PP
@@ -245,25 +231,13 @@ Use with care, check your EXT_DEVICE variable\&.
 .PP
 
 .PP
-Definition at line 278 of file utils\&.sh\&.
+Definition at line 366 of file utils\&.sh\&.
 .SS "create_options_array ()"
 
 .PP
 Read file \fBoptions\fP into a temporary array A which will contain command line specifications\&. Later on A initializes the read-only array \fBARR\fP 
 .PP
-Definition at line 37 of file utils\&.sh\&.
-.SS "get_device ()"
-
-.PP
-Give device from mount folder input\&. 
-.PP
-Definition at line 153 of file utils\&.sh\&.
-.SS "get_mountpoint ()"
-
-.PP
-Gives mount folder from device label input\&. 
-.PP
-Definition at line 137 of file utils\&.sh\&.
+Definition at line 71 of file utils\&.sh\&.
 .SS "if_fails ()"
 
 .PP
@@ -286,31 +260,7 @@ Command success is presumed to be identified by $? == 0\&.
 .PP
 
 .PP
-Definition at line 378 of file utils\&.sh\&.
-.SS "is_block_device (label)"
-
-.PP
-Test if argument is non-loop block device\&. 
-.PP
-\fBParameters\fP
-.RS 4
-\fIlabel\fP Label of potential block device (e\&.g\&. \fBsdc\fP) to be tested\&. 
-.RE
-.PP
-\fBReturn values\fP
-.RS 4
-\fIReturn\fP 0 (true) if input is a block device otherwise 1\&. 
-.RE
-.PP
-
-.PP
-Definition at line 127 of file utils\&.sh\&.
-.SS "list_block_devices ()"
-
-.PP
-List all non-loop block devices\&. 
-.PP
-Definition at line 116 of file utils\&.sh\&.
+Definition at line 476 of file utils\&.sh\&.
 .SS "recreate_liveCD_ISO (dir)"
 
 .PP
@@ -333,7 +283,7 @@ An alternative xorriso solution could be considered
 .PP
 
 .PP
-Definition at line 196 of file utils\&.sh\&.
+Definition at line 276 of file utils\&.sh\&.
 .SS "send_mail ()"
 
 .PP
@@ -341,7 +291,7 @@ Send an email to $EMAIL at $SMTP_URL to warn about end of processing\&.
 .PP
 \fBWarning\fP
 .RS 4
-Email password is entered in clear under $EMAIL_PASSWD which is not safe if mkgentoo is run on any other platform than the user's own\&. Use with care in a private context\&. 
+Email password is entered in clear using $EMAIL_PASSWD which is not safe if mkg is run on any other platform than the user's own\&. Use with care in a private context\&. 
 .RE
 .PP
 \fBReturns\fP
@@ -351,34 +301,7 @@ Return value of `curl' command\&.
 .PP
 
 .PP
-Definition at line 101 of file utils\&.sh\&.
-.SS "test_cdrecord ()"
-
-.PP
-Test whether \fBcdrecord\fP is functional\&. Try to scan the SCSI bus and exit on error 
-.PP
-\fBWarning\fP
-.RS 4
-There may be a rights issue with versions of \fBcdrecord\fP built from original source as they sometimes request elevated rights to perform burning with some hardware configurations\&. 
-.br
-In such an event, either run script with elevated rights or modify \fBcdrecord\fP rights using:
-.PP
-.nf
-chown root cdrecord && chgrp bin cdrecord && chmod 04755 cdrecord
-
-.fi
-.PP
- 
-.RE
-.PP
-\fBReturn values\fP
-.RS 4
-\fI0\fP on success otherwise -1 on failure\&. 
-.RE
-.PP
-
-.PP
-Definition at line 178 of file utils\&.sh\&.
+Definition at line 143 of file utils\&.sh\&.
 .SS "test_email (Email)"
 
 .PP
@@ -396,7 +319,7 @@ grep value against input string
 .PP
 
 .PP
-Definition at line 89 of file utils\&.sh\&.
+Definition at line 131 of file utils\&.sh\&.
 .SS "test_numeric (number)"
 
 .PP
@@ -414,7 +337,7 @@ grep value against input string
 .PP
 
 .PP
-Definition at line 67 of file utils\&.sh\&.
+Definition at line 109 of file utils\&.sh\&.
 .SS "test_URL (Internet)"
 
 .PP
@@ -432,25 +355,7 @@ grep value against input string
 .PP
 
 .PP
-Definition at line 77 of file utils\&.sh\&.
-.SS "validate_option (option)"
-
-.PP
-Check if argument is part of array \fBARR\fP as a legitimate commandline option\&. 
-.PP
-\fBParameters\fP
-.RS 4
-\fIoption\fP String of option\&. 
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-true if legitimate option otherwise false\&. 
-.RE
-.PP
-
-.PP
-Definition at line 181 of file mkgentoo\&.sh\&.
+Definition at line 119 of file utils\&.sh\&.
 .SH "Author"
 .PP 
-Generated automatically by Doxygen for gentoo-creator from the source code\&.
+Generated automatically by Doxygen for mkg from the source code\&.

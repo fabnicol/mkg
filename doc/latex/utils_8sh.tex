@@ -8,7 +8,7 @@ Auxiliary functions.
 \doxysubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}{create\+\_\+options\+\_\+array}} ()
+declare i \mbox{\hyperlink{utils_8sh_a1eff9a1c5942c362f2838b7d69848255}{A\+R\+R\+A\+Y\+\_\+\+L\+E\+N\+G\+TH}} \mbox{\hyperlink{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}{create\+\_\+options\+\_\+array}} ()
 \begin{DoxyCompactList}\small\item\em Read file {\bfseries{options}} into a temporary array A which will contain command line specifications. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}{check\+\_\+md5sum}} (filename)
 \begin{DoxyCompactList}\small\item\em Check md5sums in file M\+D5\+S\+U\+MS. \end{DoxyCompactList}\item 
@@ -20,16 +20,8 @@ Auxiliary functions.
 \begin{DoxyCompactList}\small\item\em Test whether the input value is a valid email address. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga132042cf80f0610ddde0fdb6fc234a45}{send\+\_\+mail}} ()
 \begin{DoxyCompactList}\small\item\em Send an email to \$\+E\+M\+A\+IL at \$\+S\+M\+T\+P\+\_\+\+U\+RL to warn about end of processing. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__auxiliary_functions_ga25a80837ae3373590d59e5d558c1ab83}{list\+\_\+block\+\_\+devices}} ()
-\begin{DoxyCompactList}\small\item\em List all non-\/loop block devices. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__auxiliary_functions_ga3684c6e188b7eb9eec7fbe851ab7e660}{is\+\_\+block\+\_\+device}} (label)
-\begin{DoxyCompactList}\small\item\em Test if argument is non-\/loop block device. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__auxiliary_functions_gaa35d741a19132f1ec7a0a699640e6b5a}{get\+\_\+mountpoint}} ()
-\begin{DoxyCompactList}\small\item\em Gives mount folder from device label input. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__auxiliary_functions_gab53bde930eb12adf7c84b549b7a4e241}{get\+\_\+device}} ()
-\begin{DoxyCompactList}\small\item\em Give device from mount folder input. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__auxiliary_functions_ga08542b578002f8342cd3e0a5252b5543}{test\+\_\+cdrecord}} ()
-\begin{DoxyCompactList}\small\item\em Test whether {\bfseries{cdrecord}} is functional. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{utils_8sh_a08542b578002f8342cd3e0a5252b5543}{test\+\_\+cdrecord}} ()
+\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga38ca6200b4d28d4ea8fcadb531533519}{recreate\+\_\+live\+C\+D\+\_\+\+I\+SO}} (dir)
 \begin{DoxyCompactList}\small\item\em Create I\+SO of live\+CD out of directory. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}{burn\+\_\+iso}} ()
@@ -45,11 +37,15 @@ Auxiliary functions.
 \mbox{\hyperlink{group__auxiliary_functions_ga00a42c03a3293fb36712737e7b558d11}{check\+\_\+tool}} ()
 \begin{DoxyCompactList}\small\item\em Checks existence of auxiliary tools. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga7b33b974eed52f5a62f278deebd358d3}{if\+\_\+fails}} ()
-\begin{DoxyCompactList}\small\item\em Echoes a message and exit in case of previous command failure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Echoes a message and exit in case of previous command failure. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_gaff07c1d29d6d6a540c726948254a1764}{cleanup}} ()
+\begin{DoxyCompactList}\small\item\em Clean up all temporary files and directpries (except for Virtual\+Box build) \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
-Exported String \mbox{\hyperlink{utils_8sh_a21c8dd72c8ea1465437bf09c6ae1413d}{A}}
+Exported String \mbox{\hyperlink{group__create_installer_ga2b36d9209dbee6df3e60d878f3e51005}{A\+RR}}
+\begin{DoxyCompactList}\small\item\em global string array of switches and default values \end{DoxyCompactList}\item 
+Exported String \mbox{\hyperlink{utils_8sh_a1eff9a1c5942c362f2838b7d69848255}{A\+R\+R\+A\+Y\+\_\+\+L\+E\+N\+G\+TH}}
 \end{DoxyCompactItemize}
 
 
@@ -67,14 +63,27 @@ This file is not included into the clonezilla I\+SO live\+CD.
 \end{DoxyNote}
 
 
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{utils_8sh_a08542b578002f8342cd3e0a5252b5543}\label{utils_8sh_a08542b578002f8342cd3e0a5252b5543}} 
+\index{utils.sh@{utils.sh}!test\_cdrecord@{test\_cdrecord}}
+\index{test\_cdrecord@{test\_cdrecord}!utils.sh@{utils.sh}}
+\doxysubsubsection{\texorpdfstring{test\_cdrecord()}{test\_cdrecord()}}
+{\footnotesize\ttfamily test\+\_\+cdrecord (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 258 of file utils.\+sh.
+
+
+
 \doxysubsection{Variable Documentation}
-\mbox{\Hypertarget{utils_8sh_a21c8dd72c8ea1465437bf09c6ae1413d}\label{utils_8sh_a21c8dd72c8ea1465437bf09c6ae1413d}} 
-\index{utils.sh@{utils.sh}!A@{A}}
-\index{A@{A}!utils.sh@{utils.sh}}
-\doxysubsubsection{\texorpdfstring{A}{A}}
-{\footnotesize\ttfamily Exported String A}
+\mbox{\Hypertarget{utils_8sh_a1eff9a1c5942c362f2838b7d69848255}\label{utils_8sh_a1eff9a1c5942c362f2838b7d69848255}} 
+\index{utils.sh@{utils.sh}!ARRAY\_LENGTH@{ARRAY\_LENGTH}}
+\index{ARRAY\_LENGTH@{ARRAY\_LENGTH}!utils.sh@{utils.sh}}
+\doxysubsubsection{\texorpdfstring{ARRAY\_LENGTH}{ARRAY\_LENGTH}}
+{\footnotesize\ttfamily Exported String A\+R\+R\+A\+Y\+\_\+\+L\+E\+N\+G\+TH}
 
 
 
-Definition at line 42 of file utils.\+sh.
+Definition at line 82 of file utils.\+sh.
 

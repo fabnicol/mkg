@@ -1,0 +1,131 @@
+.TH "fetch_functions.sh" 3 "Thu Feb 18 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+fetch_functions.sh
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBfetch_gentoo_install_iso\fP ()"
+.br
+.RI "Download minimal Gentoo install ISO file and caches\&.q\&. "
+.ti -1c
+.RI "\fBfetch_clonezilla_iso\fP ()"
+.br
+.RI "Download clonezilla ISO file and caches it\&. "
+.ti -1c
+.RI "\fBcache_uncache_clonezilla_iso\fP ()"
+.br
+.RI "Either download clonezilla ISO file and caches it OR uncaches it\&. "
+.ti -1c
+.RI "\fBfetch_process_clonezilla_iso\fP ()"
+.br
+.RI "Download clonezilla ISO file and process it\&. "
+.ti -1c
+.RI "\fBfetch_livecd\fP ()"
+.br
+.RI "Downloads Gentoo install CD\&. "
+.ti -1c
+.RI "\fBfetch_stage3\fP ()"
+.br
+.RI "Downloads a fresh stage3 Gentoo archive\&. "
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "Exported String \fBLIVECD\fP = ${\fBISO\fP}"
+.br
+.ti -1c
+.RI "Exported String \fBCLONEZILLACD\fP = '${clonezilla_iso}'"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "cache_uncache_clonezilla_iso ()"
+
+.PP
+Either download clonezilla ISO file and caches it OR uncaches it\&. 
+.PP
+Definition at line 107 of file fetch_functions\&.sh\&.
+.SS "fetch_clonezilla_iso ()"
+
+.PP
+Download clonezilla ISO file and caches it\&. 
+.PP
+Definition at line 80 of file fetch_functions\&.sh\&.
+.SS "fetch_gentoo_install_iso ()"
+
+.PP
+Download minimal Gentoo install ISO file and caches\&.q\&. Optionaly checks MD5SUMS\&. 
+.PP
+Definition at line 8 of file fetch_functions\&.sh\&.
+.SS "fetch_livecd ()"
+
+.PP
+Downloads Gentoo install CD\&. Caches it as ${ISO} 
+.PP
+\fBReturn values\fP
+.RS 4
+\fIReturns\fP 0 on success or -1 on exit 
+.RE
+.PP
+
+.PP
+Definition at line 199 of file fetch_functions\&.sh\&.
+.SS "fetch_process_clonezilla_iso ()"
+
+.PP
+Download clonezilla ISO file and process it\&. 
+.PD 0
+
+.IP "\(bu" 2
+Download iff #DOWNLOAD_CLONEZILLA has value 'true' 
+.IP "\(bu" 2
+Optionnally checks MD5 sum\&. 
+.IP "\(bu" 2
+Caches ISO download for later uses\&. 
+.IP "\(bu" 2
+Uncaches it if no fresh download\&. 
+.IP "\(bu" 2
+Mount ISO download\&. Copy ro mounted filesystem to rw directory\&. 
+.IP "\(bu" 2
+Unsquash ISO filesystem\&.squashfs\&. 
+.IP "\(bu" 2
+Copy clonezilla config file\&. 
+.IP "\(bu" 2
+Copy resolv\&.conf to unsquashed filesystem\&. 
+.PP
+\fBReturn values\fP
+.RS 4
+\fI0\fP on success or exits -1 on failure\&. 
+.RE
+.PP
+
+.PP
+
+.PP
+Definition at line 148 of file fetch_functions\&.sh\&.
+.SS "fetch_stage3 ()"
+
+.PP
+Downloads a fresh stage3 Gentoo archive\&. Caches it as ${STAGE3} 
+.PP
+Definition at line 244 of file fetch_functions\&.sh\&.
+.SH "Variable Documentation"
+.PP 
+.SS "Exported String CLONEZILLACD = '${clonezilla_iso}'"
+
+.PP
+Definition at line 94 of file fetch_functions\&.sh\&.
+.SS "Exported String LIVECD = ${\fBISO\fP}"
+
+.PP
+Definition at line 64 of file fetch_functions\&.sh\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for mkg from the source code\&.

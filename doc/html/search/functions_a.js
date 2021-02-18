@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['partition_135',['partition',['../group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5',1,'mkvm.sh']]],
-  ['process_5fclonezilla_5fiso_136',['process_clonezilla_iso',['../group__create_installer.html#gac1f727409fd593a27f5e4df3270aab31',1,'mkgentoo.sh']]]
+  ['recreate_5flivecd_5fiso_132',['recreate_liveCD_ISO',['../group__auxiliary_functions.html#ga38ca6200b4d28d4ea8fcadb531533519',1,'utils.sh']]]
 ];

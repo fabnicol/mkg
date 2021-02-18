@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.18"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>gentoo-creator: utils.sh File Reference</title>
+<title>mkg: utils.sh File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -20,9 +20,8 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="gentoo-small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">gentoo-creator
+   <div id="projectname">mkg
    &#160;<span id="projectnumber">1.0</span>
    </div>
    <div id="projectbrief">Gentoo distribution creator</div>
@@ -79,7 +78,7 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaca1ddf007bdcce3b29c42e0c5dc41717"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gaca1ddf007bdcce3b29c42e0c5dc41717">create_options_array</a> ()</td></tr>
+<tr class="memitem:gaca1ddf007bdcce3b29c42e0c5dc41717"><td class="memItemLeft" align="right" valign="top">declare i <a class="el" href="utils_8sh.html#a1eff9a1c5942c362f2838b7d69848255">ARRAY_LENGTH</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gaca1ddf007bdcce3b29c42e0c5dc41717">create_options_array</a> ()</td></tr>
 <tr class="memdesc:gaca1ddf007bdcce3b29c42e0c5dc41717"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read file <b>options</b> into a temporary array A which will contain command line specifications.  <a href="group__auxiliary_functions.html#gaca1ddf007bdcce3b29c42e0c5dc41717">More...</a><br /></td></tr>
 <tr class="separator:gaca1ddf007bdcce3b29c42e0c5dc41717"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga913689f9801eab383c4187327367e870"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga913689f9801eab383c4187327367e870">check_md5sum</a> (filename)</td></tr>
@@ -97,21 +96,8 @@ Functions</h2></td></tr>
 <tr class="memitem:ga132042cf80f0610ddde0fdb6fc234a45"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga132042cf80f0610ddde0fdb6fc234a45">send_mail</a> ()</td></tr>
 <tr class="memdesc:ga132042cf80f0610ddde0fdb6fc234a45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an email to $EMAIL at $SMTP_URL to warn about end of processing.  <a href="group__auxiliary_functions.html#ga132042cf80f0610ddde0fdb6fc234a45">More...</a><br /></td></tr>
 <tr class="separator:ga132042cf80f0610ddde0fdb6fc234a45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga25a80837ae3373590d59e5d558c1ab83"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga25a80837ae3373590d59e5d558c1ab83">list_block_devices</a> ()</td></tr>
-<tr class="memdesc:ga25a80837ae3373590d59e5d558c1ab83"><td class="mdescLeft">&#160;</td><td class="mdescRight">List all non-loop block devices.  <a href="group__auxiliary_functions.html#ga25a80837ae3373590d59e5d558c1ab83">More...</a><br /></td></tr>
-<tr class="separator:ga25a80837ae3373590d59e5d558c1ab83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3684c6e188b7eb9eec7fbe851ab7e660"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga3684c6e188b7eb9eec7fbe851ab7e660">is_block_device</a> (label)</td></tr>
-<tr class="memdesc:ga3684c6e188b7eb9eec7fbe851ab7e660"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test if argument is non-loop block device.  <a href="group__auxiliary_functions.html#ga3684c6e188b7eb9eec7fbe851ab7e660">More...</a><br /></td></tr>
-<tr class="separator:ga3684c6e188b7eb9eec7fbe851ab7e660"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa35d741a19132f1ec7a0a699640e6b5a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gaa35d741a19132f1ec7a0a699640e6b5a">get_mountpoint</a> ()</td></tr>
-<tr class="memdesc:gaa35d741a19132f1ec7a0a699640e6b5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gives mount folder from device label input.  <a href="group__auxiliary_functions.html#gaa35d741a19132f1ec7a0a699640e6b5a">More...</a><br /></td></tr>
-<tr class="separator:gaa35d741a19132f1ec7a0a699640e6b5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab53bde930eb12adf7c84b549b7a4e241"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gab53bde930eb12adf7c84b549b7a4e241">get_device</a> ()</td></tr>
-<tr class="memdesc:gab53bde930eb12adf7c84b549b7a4e241"><td class="mdescLeft">&#160;</td><td class="mdescRight">Give device from mount folder input.  <a href="group__auxiliary_functions.html#gab53bde930eb12adf7c84b549b7a4e241">More...</a><br /></td></tr>
-<tr class="separator:gab53bde930eb12adf7c84b549b7a4e241"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga08542b578002f8342cd3e0a5252b5543"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga08542b578002f8342cd3e0a5252b5543">test_cdrecord</a> ()</td></tr>
-<tr class="memdesc:ga08542b578002f8342cd3e0a5252b5543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test whether <b>cdrecord</b> is functional.  <a href="group__auxiliary_functions.html#ga08542b578002f8342cd3e0a5252b5543">More...</a><br /></td></tr>
-<tr class="separator:ga08542b578002f8342cd3e0a5252b5543"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08542b578002f8342cd3e0a5252b5543"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8sh.html#a08542b578002f8342cd3e0a5252b5543">test_cdrecord</a> ()</td></tr>
+<tr class="separator:a08542b578002f8342cd3e0a5252b5543"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga38ca6200b4d28d4ea8fcadb531533519"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga38ca6200b4d28d4ea8fcadb531533519">recreate_liveCD_ISO</a> (dir)</td></tr>
 <tr class="memdesc:ga38ca6200b4d28d4ea8fcadb531533519"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create ISO of liveCD out of directory.  <a href="group__auxiliary_functions.html#ga38ca6200b4d28d4ea8fcadb531533519">More...</a><br /></td></tr>
 <tr class="separator:ga38ca6200b4d28d4ea8fcadb531533519"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -136,11 +122,17 @@ Functions</h2></td></tr>
 <tr class="memitem:ga7b33b974eed52f5a62f278deebd358d3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a> ()</td></tr>
 <tr class="memdesc:ga7b33b974eed52f5a62f278deebd358d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Echoes a message and exit in case of previous command failure.  <a href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">More...</a><br /></td></tr>
 <tr class="separator:ga7b33b974eed52f5a62f278deebd358d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaff07c1d29d6d6a540c726948254a1764"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a> ()</td></tr>
+<tr class="memdesc:gaff07c1d29d6d6a540c726948254a1764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean up all temporary files and directpries (except for VirtualBox build)  <a href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">More...</a><br /></td></tr>
+<tr class="separator:gaff07c1d29d6d6a540c726948254a1764"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a21c8dd72c8ea1465437bf09c6ae1413d"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8sh.html#a21c8dd72c8ea1465437bf09c6ae1413d">A</a></td></tr>
-<tr class="separator:a21c8dd72c8ea1465437bf09c6ae1413d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2b36d9209dbee6df3e60d878f3e51005"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__create_installer.html#ga2b36d9209dbee6df3e60d878f3e51005">ARR</a></td></tr>
+<tr class="memdesc:ga2b36d9209dbee6df3e60d878f3e51005"><td class="mdescLeft">&#160;</td><td class="mdescRight">global string array of switches and default values  <a href="group__create_installer.html#ga2b36d9209dbee6df3e60d878f3e51005">More...</a><br /></td></tr>
+<tr class="separator:ga2b36d9209dbee6df3e60d878f3e51005"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eff9a1c5942c362f2838b7d69848255"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8sh.html#a1eff9a1c5942c362f2838b7d69848255">ARRAY_LENGTH</a></td></tr>
+<tr class="separator:a1eff9a1c5942c362f2838b7d69848255"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Auxiliary functions. </p>
@@ -149,20 +141,40 @@ Variables</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>This file is not included into the clonezilla ISO liveCD. </dd></dl>
 
 <p class="definition">Definition in file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
-</div><h2 class="groupheader">Variable Documentation</h2>
-<a id="a21c8dd72c8ea1465437bf09c6ae1413d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21c8dd72c8ea1465437bf09c6ae1413d">&#9670;&nbsp;</a></span>A</h2>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a08542b578002f8342cd3e0a5252b5543"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08542b578002f8342cd3e0a5252b5543">&#9670;&nbsp;</a></span>test_cdrecord()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Exported String A</td>
+          <td class="memname">test_cdrecord </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00042">42</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00258">258</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a1eff9a1c5942c362f2838b7d69848255"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1eff9a1c5942c362f2838b7d69848255">&#9670;&nbsp;</a></span>ARRAY_LENGTH</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Exported String ARRAY_LENGTH</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00082">82</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
