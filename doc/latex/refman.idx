@@ -97,12 +97,10 @@
 \indexentry{recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{33}
 \indexentry{Auxiliary functions to check@{Auxiliary functions to check}!send\_mail@{send\_mail}|hyperpage}{34}
 \indexentry{send\_mail@{send\_mail}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{34}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_email@{test\_email}|hyperpage}{34}
-\indexentry{test\_email@{test\_email}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{34}
 \indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_numeric@{test\_numeric}|hyperpage}{34}
 \indexentry{test\_numeric@{test\_numeric}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{34}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_URL@{test\_URL}|hyperpage}{35}
-\indexentry{test\_URL@{test\_URL}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{35}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_URL@{test\_URL}|hyperpage}{34}
+\indexentry{test\_URL@{test\_URL}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{34}
 \indexentry{build\_virtualbox.sh@{build\_virtualbox.sh}|hyperpage}{37}
 \indexentry{build\_virtualbox.sh@{build\_virtualbox.sh}!DEBIAN\_FRONTEND@{DEBIAN\_FRONTEND}|hyperpage}{37}
 \indexentry{DEBIAN\_FRONTEND@{DEBIAN\_FRONTEND}!build\_virtualbox.sh@{build\_virtualbox.sh}|hyperpage}{37}

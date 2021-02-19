@@ -66,9 +66,8 @@
 \contentsline {subsubsection}{\numberline {7.3.2.10}if\_fails()}{33}{subsubsection.7.3.2.10}%
 \contentsline {subsubsection}{\numberline {7.3.2.11}recreate\_liveCD\_ISO()}{33}{subsubsection.7.3.2.11}%
 \contentsline {subsubsection}{\numberline {7.3.2.12}send\_mail()}{34}{subsubsection.7.3.2.12}%
-\contentsline {subsubsection}{\numberline {7.3.2.13}test\_email()}{34}{subsubsection.7.3.2.13}%
-\contentsline {subsubsection}{\numberline {7.3.2.14}test\_numeric()}{35}{subsubsection.7.3.2.14}%
-\contentsline {subsubsection}{\numberline {7.3.2.15}test\_URL()}{35}{subsubsection.7.3.2.15}%
+\contentsline {subsubsection}{\numberline {7.3.2.13}test\_numeric()}{34}{subsubsection.7.3.2.13}%
+\contentsline {subsubsection}{\numberline {7.3.2.14}test\_URL()}{35}{subsubsection.7.3.2.14}%
 \contentsline {chapter}{\numberline {8}File Documentation}{37}{chapter.8}%
 \contentsline {section}{\numberline {8.1}build\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}virtualbox.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{37}{section.8.1}%
 \contentsline {subsection}{\numberline {8.1.1}Variable Documentation}{37}{subsection.8.1.1}%

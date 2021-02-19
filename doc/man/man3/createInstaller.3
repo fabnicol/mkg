@@ -1,4 +1,4 @@
-.TH "createInstaller" 3 "Thu Feb 18 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "createInstaller" 3 "Fri Feb 19 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -149,7 +149,7 @@ Installing the guest additions is a prerequisite to folder sharing between the I
 .PP
 
 .PP
-Definition at line 1545 of file mkgentoo\&.sh\&.
+Definition at line 1592 of file mkgentoo\&.sh\&.
 .SS "build_virtualbox ()"
 
 .PP
@@ -187,7 +187,7 @@ build vbox-img beforehand\&.
 .PP
 
 .PP
-Definition at line 1316 of file mkgentoo\&.sh\&.
+Definition at line 1362 of file mkgentoo\&.sh\&.
 .SS "clone_vm_to_raw ()"
 
 .PP
@@ -200,7 +200,7 @@ VBoxManage clonemedium
 .PP
  to clone VDI to RAW file before bare-metal copy to device\&. 
 .PP
-Definition at line 1363 of file mkgentoo\&.sh\&.
+Definition at line 1409 of file mkgentoo\&.sh\&.
 .SS "clonezilla_device_to_image ()"
 
 .PP
@@ -213,7 +213,7 @@ Create CloneZilla xz-compressed image out of an external block device (like a US
 .PP
 
 .PP
-Definition at line 1678 of file mkgentoo\&.sh\&.
+Definition at line 1725 of file mkgentoo\&.sh\&.
 .SS "clonezilla_to_iso (iso, dir)"
 
 .PP
@@ -233,7 +233,7 @@ ISO can be burned to DVD or used to create a bootable USB stick using dd on *nix
 .PP
 
 .PP
-Definition at line 1497 of file mkgentoo\&.sh\&.
+Definition at line 1543 of file mkgentoo\&.sh\&.
 .SS "create_device_system (Mode)"
 
 .PP
@@ -258,7 +258,7 @@ Requires \fBhot_install\fP on command line to be activated as a security confirm
 .PP
 
 .PP
-Definition at line 1432 of file mkgentoo\&.sh\&.
+Definition at line 1478 of file mkgentoo\&.sh\&.
 .SS "create_iso_vm ()"
 
 .PP
@@ -282,7 +282,7 @@ the \fBsharedfolder\fP command may fail vith older version of VirtualBox or not 
 .PP
 
 .PP
-Definition at line 1176 of file mkgentoo\&.sh\&.
+Definition at line 1222 of file mkgentoo\&.sh\&.
 .SS "create_vm ()"
 
 .PP
@@ -312,7 +312,7 @@ Find a way to only compact on success and never on failure of VM\&.
 .PP
 
 .PP
-Definition at line 1007 of file mkgentoo\&.sh\&.
+Definition at line 1053 of file mkgentoo\&.sh\&.
 .SS "dd_to_usb ()"
 
 .PP
@@ -325,13 +325,13 @@ Used only if vbox-img (patched version) has not been built\&.
 .PP
 
 .PP
-Definition at line 1373 of file mkgentoo\&.sh\&.
+Definition at line 1419 of file mkgentoo\&.sh\&.
 .SS "deep_clean ()"
 
 .PP
 Force-clean root VirtualBox registry\&. 
 .PP
-Definition at line 854 of file mkgentoo\&.sh\&.
+Definition at line 897 of file mkgentoo\&.sh\&.
 .SS "delete_vm (vm, ext)"
 
 .PP
@@ -359,25 +359,25 @@ Deletes its folder structure and hard drive (default is 'vdi' as a second argume
 .PP
 
 .PP
-Definition at line 907 of file mkgentoo\&.sh\&.
+Definition at line 953 of file mkgentoo\&.sh\&.
 .SS "generate_Gentoo ()"
 
 .PP
 Launch routines: fetch install IO, starge3 archive, create VM\&. 
 .PP
-Definition at line 1470 of file mkgentoo\&.sh\&.
+Definition at line 1516 of file mkgentoo\&.sh\&.
 .SS "get_options ()"
 
 .PP
 Parse command line\&. 
 .PP
-Definition at line 219 of file mkgentoo\&.sh\&.
+Definition at line 218 of file mkgentoo\&.sh\&.
 .SS "help_ ()"
 
 .PP
 Print usage to stdout\&. 
 .PP
-Definition at line 191 of file mkgentoo\&.sh\&.
+Definition at line 190 of file mkgentoo\&.sh\&.
 .SS "help_md ()"
 
 .PP
@@ -390,7 +390,7 @@ white space at end of echoes is there for markdown in post-processing
 .PP
 
 .PP
-Definition at line 125 of file mkgentoo\&.sh\&.
+Definition at line 124 of file mkgentoo\&.sh\&.
 .SS "main ()"
 
 .PP
@@ -403,7 +403,7 @@ Daemonize the part below generate_Gentoo when #VMTYPE is \fCheadless\fP so that 
 .PP
 
 .PP
-Definition at line 1798 of file mkgentoo\&.sh\&.
+Definition at line 1818 of file mkgentoo\&.sh\&.
 .SS "make_boot_from_livecd ()"
 
 .PP
@@ -428,7 +428,7 @@ Will be run in the ${VM} virtual machine
 .PP
 
 .PP
-Definition at line 716 of file mkgentoo\&.sh\&.
+Definition at line 759 of file mkgentoo\&.sh\&.
 .SS "mount_live_cd ()"
 
 .PP
@@ -441,7 +441,7 @@ live CD is mounted under $VMPATH/mnt and rsync'd to $VMPATH/mnt2
 .PP
 
 .PP
-Definition at line 634 of file mkgentoo\&.sh\&.
+Definition at line 677 of file mkgentoo\&.sh\&.
 .SS "test_cli (cli)"
 
 .PP
@@ -462,7 +462,7 @@ Also checks type of argument against types described for \fBARR\fP
 .PP
 
 .PP
-Definition at line 403 of file mkgentoo\&.sh\&.
+Definition at line 404 of file mkgentoo\&.sh\&.
 .SS "test_cli_post ()"
 
 .PP
@@ -475,7 +475,7 @@ Check commanline coherence and incompatibilities\&.
 .PP
 
 .PP
-Definition at line 540 of file mkgentoo\&.sh\&.
+Definition at line 543 of file mkgentoo\&.sh\&.
 .SS "test_cli_pre ()"
 
 .PP
@@ -488,7 +488,7 @@ Check VirtualBox version and prepare commandline analysis\&.
 .PP
 
 .PP
-Definition at line 291 of file mkgentoo\&.sh\&.
+Definition at line 290 of file mkgentoo\&.sh\&.
 .SS "test_vm_running (vm)"
 
 .PP
@@ -506,7 +506,7 @@ Check if VM as first named argument exists and is running\&.
 .PP
 
 .PP
-Definition at line 844 of file mkgentoo\&.sh\&.
+Definition at line 887 of file mkgentoo\&.sh\&.
 .SS "validate_option (option)"
 
 .PP
@@ -524,7 +524,7 @@ true if legitimate option otherwise false\&.
 .PP
 
 .PP
-Definition at line 206 of file mkgentoo\&.sh\&.
+Definition at line 205 of file mkgentoo\&.sh\&.
 .SS "vbox_img_works ()"
 
 .PP
@@ -544,7 +544,7 @@ Currently vbox-img is broken for --stdout\&. Using guestfish as an alternative\&
 .PP
 
 .PP
-Definition at line 1404 of file mkgentoo\&.sh\&.
+Definition at line 1450 of file mkgentoo\&.sh\&.
 .SH "Variable Documentation"
 .PP 
 .SS "ARR"
@@ -594,13 +594,13 @@ Definition at line 81 of file utils\&.sh\&.
 .PP
 Custom name of ISO output\&. Default value is false Can be reversed by a name of type filename\&.iso on command line, previously created and reused to burn or dd to device installer\&. 
 .PP
-Definition at line 114 of file mkgentoo\&.sh\&.
+Definition at line 113 of file mkgentoo\&.sh\&.
 .SS "ISO = 'downloaded\&.iso'"
 
 .PP
 Name of downloaded clonezilla ISO file\&. 
 .PP
-Definition at line 106 of file mkgentoo\&.sh\&.
+Definition at line 105 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for mkg from the source code\&.

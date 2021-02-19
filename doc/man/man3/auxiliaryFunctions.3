@@ -1,4 +1,4 @@
-.TH "auxiliaryFunctions" 3 "Thu Feb 18 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "auxiliaryFunctions" 3 "Fri Feb 19 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -26,10 +26,6 @@ auxiliaryFunctions \- lines, files, devices and burn disk\&.
 .RI "\fBtest_URL\fP (Internet)"
 .br
 .RI "Test whether the input value is a valid URL\&. "
-.ti -1c
-.RI "\fBtest_email\fP (Email)"
-.br
-.RI "Test whether the input value is a valid email address\&. "
 .ti -1c
 .RI "\fBsend_mail\fP ()"
 .br
@@ -95,7 +91,7 @@ Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&.
 .PP
 
 .PP
-Definition at line 316 of file utils\&.sh\&.
+Definition at line 308 of file utils\&.sh\&.
 .SS "check_dir ()"
 
 .PP
@@ -118,7 +114,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 394 of file utils\&.sh\&.
+Definition at line 386 of file utils\&.sh\&.
 .SS "check_file ()"
 
 .PP
@@ -143,7 +139,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 415 of file utils\&.sh\&.
+Definition at line 407 of file utils\&.sh\&.
 .SS "check_files ()"
 
 .PP
@@ -166,7 +162,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 435 of file utils\&.sh\&.
+Definition at line 427 of file utils\&.sh\&.
 .SS "check_md5sum (filename)"
 
 .PP
@@ -207,13 +203,13 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 455 of file utils\&.sh\&.
+Definition at line 447 of file utils\&.sh\&.
 .SS "cleanup ()"
 
 .PP
 Clean up all temporary files and directpries (except for VirtualBox build) 
 .PP
-Definition at line 489 of file utils\&.sh\&.
+Definition at line 481 of file utils\&.sh\&.
 .SS "create_install_ext_device ()"
 
 .PP
@@ -231,7 +227,7 @@ Use with care, check your EXT_DEVICE variable\&.
 .PP
 
 .PP
-Definition at line 366 of file utils\&.sh\&.
+Definition at line 358 of file utils\&.sh\&.
 .SS "create_options_array ()"
 
 .PP
@@ -260,7 +256,7 @@ Command success is presumed to be identified by $? == 0\&.
 .PP
 
 .PP
-Definition at line 476 of file utils\&.sh\&.
+Definition at line 468 of file utils\&.sh\&.
 .SS "recreate_liveCD_ISO (dir)"
 
 .PP
@@ -283,7 +279,7 @@ An alternative xorriso solution could be considered
 .PP
 
 .PP
-Definition at line 276 of file utils\&.sh\&.
+Definition at line 269 of file utils\&.sh\&.
 .SS "send_mail ()"
 
 .PP
@@ -301,25 +297,7 @@ Return value of `curl' command\&.
 .PP
 
 .PP
-Definition at line 143 of file utils\&.sh\&.
-.SS "test_email (Email)"
-
-.PP
-Test whether the input value is a valid email address\&. 
-.PP
-\fBParameters\fP
-.RS 4
-\fIEmail\fP address 
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-grep value against input string 
-.RE
-.PP
-
-.PP
-Definition at line 131 of file utils\&.sh\&.
+Definition at line 133 of file utils\&.sh\&.
 .SS "test_numeric (number)"
 
 .PP
