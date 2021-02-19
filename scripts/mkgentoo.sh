@@ -558,7 +558,12 @@ Resetting *interactive* to *true*."
     else
         # forcing INTERACTIVE as false only for background jobs.
 
-        [ -z "$PS1" ] && INTERACTIVE=false
+        case $(ps -o stat= -p $$) in
+            *+*) echo "[MSG] Running in foreground with interactive=${INTERACTIVE}." ;;
+            *) echo "[MSG] Running in background in non-interactive mode."
+               INTERACTIVE=false
+               ;;
+        esac
     fi
 
     "${DOWNLOAD}" && ! "${CREATE_SQUASHFS}" \
