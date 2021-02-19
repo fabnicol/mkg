@@ -1760,8 +1760,7 @@ $(get_mountpoint /dev/${EXT_DEVICE})"
         cd "${VMPATH}"
         mkdir -p  /home/partimag/image
         ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5p \
-               -i 40960000000 -fsck -senc \
-               -p echo "[MSG] End of CloneZilla process."  \
+               -i 40960000000 -fsck -senc  \
                savedisk image ${EXT_DEVICE}
     else
         # we have to boostrap clonzilla from the iso disk
@@ -1777,7 +1776,7 @@ $(get_mountpoint /dev/${EXT_DEVICE})"
 #!/bin/bash
 mkdir -p  /home/partimag/image
 ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5p \
--i 40960000000 -fsck -senc -p poweroff \
+-i 40960000000 -fsck -senc \
 savedisk image ${EXT_DEVICE}
 exit
 EOF
