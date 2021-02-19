@@ -556,7 +556,9 @@ Resetting *interactive* to *true*."
             INTERACTIVE=true
         fi
     else
-        INTERACTIVE=false
+        # forcing INTERACTIVE as false only for background jobs.
+
+        [ -z "$PS1" ] && INTERACTIVE=false
     fi
 
     "${DOWNLOAD}" && ! "${CREATE_SQUASHFS}" \
@@ -650,7 +652,7 @@ for a given ext_device"
         else
             echo "[WAR] CAUTION: non-interactive mode is on. Device ${EXT_DEVICE} \
 will be erased and written to upon completion. \
-You may want to abort this process just now (it should be time).\
+You may want to abort this process just now (it should be time). \
 Allowing a 10 second break for second thoughts."
             echo sleep 10
         fi
