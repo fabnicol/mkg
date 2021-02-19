@@ -607,6 +607,14 @@ third-party applications for this mail to be sent."
         CLEANUP=false
         ${LOG[*]} "[MSG] Deactivated cleanup"
     fi
+
+    if "${HOT_INSTALL}" && "${DEVICE_INSTALLER}"
+    then
+        ${LOG[*]} "[ERR] Either use hot_install or device_installer \
+for a given ext_device"
+        exit 1
+    fi
+
     if  "${HOT_INSTALL}" || ([ -n "${EXT_DEVICE}" ] \
                              && [ "${EXT_DEVICE}" != "dep" ])\
                          ||  "${DEVICE_INSTALLER}"
