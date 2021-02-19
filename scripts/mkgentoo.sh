@@ -508,7 +508,7 @@ values for ${y}=false and ${sw}=${!V} are incompatible."
         then
             ${LOG[*]} "[ERR] Execution cannot proceed without explicit value \
 for ${sw}"
-            if [ "${INTERACTIVE}" = "true" ]
+            if "${INTERACTIVE}"
             then
                 local reply=""
                 while [ -z ${reply} ]
@@ -541,6 +541,23 @@ for ${sw}"
 test_cli_post() {
 
     # ruling out incompatible options
+
+    # GUI and INTERACTIVE are linked options.
+    # You should always reply to security requests unless you want the process
+    # in the background
+
+    if "${GUI}"
+    then
+        if ! "${INTERACTIVE}"
+        then
+            ${LOG[*]} "[WAR] Unless you want the process to run \
+in the background, user interaction is allowed by default. \
+Resetting *interactive* to *true*."
+            INTERACTIVE=true
+        fi
+    else
+        INTERACTIVE=false
+    fi
 
     "${DOWNLOAD}" && ! "${CREATE_SQUASHFS}" \
         && { ${LOG[*]} "[ERR][CLI] You cannot set \
@@ -588,9 +605,9 @@ disk ${VMPATH}/${VM}.vdi was not found"
     echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}" \
          >> "${ELIST}.accept_keywords"
 
-    if [ -n "${EMAIL}" ]
+    if [ -n "${EMAIL}" ] && [ -z "${EMAIL_PASSWD}" ]
     then
-        "${GUI}" && read -p "[MSG] Enter email password: " EMAIL_PASSWD
+        "${INTERACTIVE}" && read -p "[MSG] Enter email password: " EMAIL_PASSWD
         [ -z "${EMAIL_PASSWD}" ] \
             && ${LOG[*]} "[WAR] No email password, aborting sendmail."
         ${LOG[*]} "[INF] Sending warning email to ${EMAIL}"
@@ -621,13 +638,22 @@ for a given ext_device"
                              && [ "${EXT_DEVICE}" != "dep" ])\
                          ||  "${DEVICE_INSTALLER}"
     then
-        read -p "[WAR] All data will be wiped out on device(s): ${EXT_DEVICE}. \
-Please confirm by entering uppercase Y: " reply
-        [ ${reply} != "Y" ] && exit 0
-        read -p "[WAR] Once again. \
-All data will be wiped out on device(s): ${EXT_DEVICE}. \
-Please confirm by entering uppercase Y: " reply
-        [ ${reply} != "Y" ] && exit 0
+        if "${INTERACTIVE}"
+        then
+            echo "[WAR] All data will be wiped out on device(s): ${EXT_DEVICE}."
+            read -p "Please confirm by entering uppercase Y: " rep
+            [ "${rep}" != "Y" ] && exit 0
+            echo "[WAR] Once again."
+            echo "      All data will be wiped out on device(s): ${EXT_DEVICE}."
+            read -p "      Please confirm by entering uppercase Y: " rep
+            [ "${rep}" != "Y" ] && exit 0
+        else
+            echo "[WAR] CAUTION: non-interactive mode is on. Device ${EXT_DEVICE} \
+will be erased and written to upon completion. \
+You may want to abort this process just now (it should be time).\
+Allowing a 10 second break for second thoughts."
+            echo sleep 10
+        fi
     fi
 }
 
@@ -880,10 +906,13 @@ your running VMs."
         ${LOG[*]} "[WAR] Enter Y when this is done or another key to exit."
         ${LOG[*]} "[WAR] In which case \"${VM}.vdi\" might not be properly \
 attached to virtual machine ${VM}"
-        [ "$1" != "ISO_STAGE" ] \
-            &&   read -p "Enter Y to continue or another key to skip deep \
+        if "${INTERACTIVE}"
+        then
+            [ "$1" != "ISO_STAGE" ] \
+                &&   read -p "Enter Y to continue or another key to skip deep \
 clean: " reply || reply="Y"
-        [ "${reply}" != "Y" ] && [ "${reply}" != "y" ] && return 0
+            [ "${reply}" != "Y" ] && [ "${reply}" != "y" ] && return 0
+        fi
     fi
     /etc/init.d/virtualbox stop
     sleep 5

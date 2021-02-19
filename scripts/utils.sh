@@ -214,14 +214,17 @@ get_device() {
             res=$(find_device_by_vendor "$1")
             if [ -n "${res}" ]
             then
-                read -p "[WAR] Please confirm there is no error and you wish \
+                if "${INTERACTIVE}"
+                then
+                    read -p "[WAR] Please confirm there is no error and you wish \
 to create an installer with device /dev/${res}, vendor name $1. Reply with \
 uppercase Y to continue: " reply
-                if [ "${reply}" = "Y" ]
-                then
-                    get_device "${res}"
-                else
-                    exit 0
+                    if [ "${reply}" = "Y" ]
+                    then
+                        get_device "${res}"
+                    else
+                        exit 0
+                    fi
                 fi
             else
             ${LOG[*]} "[ERR] $1 is neither a mountpoint nor a \
