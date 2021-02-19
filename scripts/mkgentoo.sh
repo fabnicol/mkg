@@ -93,7 +93,6 @@
 ## @endcode
 ## @defgroup createInstaller Create Gentoo linux image and installer.
 
-source scripts/utils.sh
 
 # ---------------------------------------------------------------------------- #
 # Global declarations
@@ -665,7 +664,7 @@ stage3 archive are cached in the directory after prior downloads"
     mkdir mnt2/
     check_dir mnt2
     "${VERBOSE}" && ${LOG[*]} "[INF] Syncing mnt2 with ISO mountpoint..."
-    rsync -a ${verb} mnt/ mnt2
+    rsync -a mnt/ mnt2
 
     # parameter adjustment to account for Gentoo/CloneZilla differences
 
@@ -825,7 +824,7 @@ make_boot_from_livecd() {
     umount -l mnt
     if "${CLEANUP}"
     then
-        ${LOG[*]} <<< $(rm -rf ${verb} mnt && rm -rf ${verb} mnt2 2>&1 \
+        ${LOG[*]} <<< $(rm -rf mnt && rm -rf mnt2 2>&1 \
                             | xargs echo "[INF] Removing mount directories")
     fi
     return 0
@@ -882,7 +881,7 @@ clean: " reply || reply="Y"
     sed -i -E  's/^(.*)<MediaRegistry>.*$/\1<MediaRegisty\/>/g' ${registry}
     sed -i '/^.*<\/MediaRegistry>.*$/d' ${registry}
     sed -i  '/^[[:space:]]*$/d' ${registry}
-    "${VERBOSE}" && cat  ${registry}
+    "${DEBUG_MODE}" && cat  ${registry}
 
     # it is necessary to sleep a bit otherwise doaemons will wake up
     # with inconstitencies
@@ -1216,7 +1215,7 @@ create_iso_vm() {
                                --vtxvpid ${VTXVPID} \
                                --paravirtprovider ${PARAVIRTPROVIDER} \
                                --rtcuseutc ${RTCUSEUTC} \
-                               --firmware ${FIRMWARE} 2>&1 \
+                               --firmware "bios" 2>&1 \
                         | xargs echo [MSG])
 
     if_fails $? "[ERR] Failed to set parameters of VM *${ISOVM}*"
@@ -1502,9 +1501,10 @@ clonezilla_to_iso() {
     cd "${VMPATH}"
 
     local verb=""
-    "${VERBOSE}" && verb="-v"
 
-    rm ${verb} -rf "$2/live/squashfs-root/"
+    "${VERBOSE}" && ${LOG[*]} "[INF] Removing $2/live/squashfs-root ..."
+
+    rm  -rf "$2/live/squashfs-root/"
 
     [ ! -f "$2/syslinux/isohdpfx.bin" ] \
         && cp ${verb} -f "clonezilla/syslinux/isohdpfx.bin" "$2/syslinux"
@@ -1627,14 +1627,14 @@ an ISO installer or to back up a device"
 
     # copy to ISOFILES as a skeletteon for ISO recovery image authoring
 
-    [ -d ISOFILES ] && rm ${verb} -rf ISOFILES
+    [ -d ISOFILES ] && rm -rf ISOFILES
     mkdir -p ISOFILES/home/partimag
     check_dir ISOFILES/home/partimag
     check_dir mnt2
     "${VERBOSE}" \
         && ${LOG[*]} "[INF] Now copying CloneZilla files to temporary \
 folder ISOFILES"
-    rsync ${verb} -a mnt2/ ISOFILES
+    rsync -a mnt2/ ISOFILES
     check_dir mnt2/syslinux
     if "${CREATE_ISO}"
     then
@@ -1797,6 +1797,8 @@ did not find grentoo.img"
 
 main() {
 
+    source scripts/utils.sh
+
     # Using a temporary writable array A so that
     # ARR will not be writable later on
     # Help cases: bail out
@@ -1829,6 +1831,7 @@ main() {
     for ((i=0; i<ARRAY_LENGTH; i++)); do test_cli $i; done
     test_cli_post
     cd ${VMPATH}
+
     source scripts/fetch_functions.sh
     source scripts/build_virtualbox.sh
 
@@ -1936,3 +1939,4 @@ clonezilla image..."
     ${LOG[*]} "[MSG] Gentoo building process ended."
     exit 0
 }
+
