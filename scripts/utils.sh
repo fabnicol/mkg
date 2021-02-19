@@ -269,7 +269,6 @@ recreate_liveCD_ISO() {
     check_files "${ISO}"\
                 "$1${ISOLINUX_DIR}/isolinux.bin" \
                 "$1${ISOLINUX_DIR}/boot.cat"
-    echo "\n[MSG] checking: $(ls  $1${ISOLINUX_DIR})"
     sleep 5
     check_dir "$1${ISOLINUX_DIR}"
 #    if  "${DEBUG_MODE}"
