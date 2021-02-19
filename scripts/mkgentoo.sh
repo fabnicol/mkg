@@ -438,10 +438,12 @@ either 'false' or 'true' on command line"
 directory."
                          exit 1; }
                 ;;
-            e)  [ test_email "${!V}" != 0 ] \
-                    && { ${LOG[*]} "[ERR] ${sw}=... must be a valid email \
+            e)  if ! grep -E "[a-z]+@[a-z]+\.[a-z]+" <<< "${!V}"
+                then
+                    ${LOG[*]} "[ERR] ${sw}=... must be a valid email \
 address"
-                         exit 1; }
+                    exit 1
+                fi
                 ;;
             f)  [ ! -f "${!V}" ] \
                     && { ${LOG[*]} "[ERR] ${sw}=... must be an existing file."

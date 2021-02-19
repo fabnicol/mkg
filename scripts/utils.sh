@@ -122,16 +122,6 @@ test_URL() {
          <<< "$1"
 }
 
-## @fn test_email()
-## @brief Test whether the input value is a valid email address
-## @param Email address
-## @return grep value against input string
-## @ingroup auxiliaryFunctions
-
-test_email() {
-    grep -E "[a-z]+@[a-z]+\.[a-z]+" <<< "$1"
-}
-
 ## @fn send_mail()
 ## @brief Send an email to $EMAIL at $SMTP_URL to warn about end of processing.
 ## @warning Email password is entered in clear using $EMAIL_PASSWD which is not
