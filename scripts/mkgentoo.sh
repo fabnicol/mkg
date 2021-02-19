@@ -299,7 +299,9 @@ the same time"
 
     [ "$(whoami)" != "root" ] && { ${LOG[*]} "[ERR] must be root to continue"
                                    exit 1; }
-    [ -d /home/partimage ] && rm -rf /home/partimag
+    [ -L /home/partimag ] && rm     /home/partimag
+    [ -d /home/partimag ] && rm -rf /home/partimag
+
     mkdir -p /home/partimag
     if_fails $? "[ERR] Could not create partimag directory under /home"
 
@@ -641,9 +643,8 @@ for a given ext_device"
         exit 1
     fi
 
-    if  "${HOT_INSTALL}" || ([ -n "${EXT_DEVICE}" ] \
-                             && [ "${EXT_DEVICE}" != "dep" ])\
-                         ||  "${DEVICE_INSTALLER}"
+    if  ("${HOT_INSTALL}" || "${DEVICE_INSTALLER}") \
+        &&  [ -n "${EXT_DEVICE}" ]  && [ "${EXT_DEVICE}" != "dep" ]
     then
         if "${INTERACTIVE}"
         then
@@ -1723,44 +1724,6 @@ unmount_clonezilla_iso() {
 
 clonezilla_device_to_image() {
 
-    find_ocs_sr=`which ocs-sr`
-
-    # if no platform-installed ocs-sr, try to bootstrap it from clonezill iso
-
-    if [ -z "$find_ocs_sr" ]
-    then
-        bind_mount_clonezilla_iso
-
-        # now under mnt2/live
-
-        if_fails $? "[ERR] Could not remount and bind CloneZilla ISO file"
-
-        local CLONEZILLA_MOUNTED=true
-        local PATH0="${PATH}"
-        local LD0="${LD_LIBRARY_PATH}"
-        PATH="${PATH}":squashfs-root/sbin:squashfs-root/bin:\
-squashfs-root/usr/bin:squashfs-root/usr/sbin
-        LD_LIBRARY_PATH="${LDO}":squashfs-root/lib:squashfs-root/lib64:\
-squashfs-root/lib32:squashfs-root/usr/lib:squashfs-root/usr/lib64:\
-squashfs-root/usr/lib32
-        find_ocs_sr=$(which ocs-sr)
-        if [ -z "$find_ocs_sr" ]
-        then
-            # local mount did not work
-
-            ${LOG[*]} "[ERR] Could not find ocs_sr !"
-            ${LOG[*]} "[MSG] Install Clonezilla in a standard path or rerun \
- after adding its path to the PATH environment variable"
-            ${LOG[*]} "[MSG] Note: Debian-based distributions provide a handy \
-CloneZilla package."
-            unmount_clonezilla_iso
-            PATH="${PATH0}"
-            LD_LIBRARY_PATH="${LD0}"
-            exit 1
-        fi
-    fi
-
-    # now ocs-sr is an available tool
     # At this stage EXT_DEVICE can no longer be a mountpoint as it has
     # been previously converted to device label
 
@@ -1787,46 +1750,58 @@ $(get_mountpoint /dev/${EXT_DEVICE})"
         ${LOG[*]} "[ERR] Impossible to unmount device ${EXT_DEVICE}"
         exit 1
     fi
-    if [ -d /home/partimag ]
+
+    # if no platform-installed ocs-sr, try to bootstrap it from clonezill iso
+
+    if $(which ocs-sr)
     then
-        ${LOG[*]} "[WAR] /home/partimag needs to be wiped out..."
-        ${LOG[*]} "[INF] Trying with user rights..."
-        if ! rm -rf /home/partimag
-        then
-            ${LOG[*]} "[WAR] Directory /home/partimag needs elevated rights..."
-            if ! rm -rf /home/partimag
-            then
-                ${LOG[*]} "[ERR] Could not fix /home/partimag issue."
-                exit 1
-            fi
-        fi
+        # clonezilla has been installed on platform
+
+        cd "${VMPATH}"
+        mkdir -p  /home/partimag/image
+        ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5p \
+               -i 40960000000 -fsck -senc \
+               -p echo "[MSG] End of CloneZilla process."  \
+               savedisk image ${EXT_DEVICE}
+    else
+        # we have to boostrap clonzilla from the iso disk
+
+        bind_mount_clonezilla_iso
+
+        # now under mnt2/live
+
+        if_fails $? "[ERR] Could not remount and bind CloneZilla ISO file"
+        local CLONEZILLA_MOUNTED=true
+
+        cat > squashfs-root/create_backup_iso.sh << EOF
+#!/bin/bash
+mkdir -p  /home/partimag/image
+ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5p \
+-i 40960000000 -fsck -senc -p poweroff \
+savedisk image ${EXT_DEVICE}
+exit
+EOF
+
+        chmod +x squashfs-root/create_backup_iso.sh
+
+        # now chroot and run update script
+
+        chroot squashfs-root /bin/bash create_backup_iso.sh
     fi
 
-    if "${CLEANUP}"
-    then
-        ${LOG[*]} "[INF] Erasing virtual disk and virtual machine to save \
-disk space..."
-        [ -f "${VMPATH}/${VM}.vdi" ] && rm -f "${VMPATH}/${VM}.vdi"
-        [ -d "${VMPATH}/${VM}" ] && rm -rf "${VMPATH}/${VM}"
-    fi
-    rm -rf ISOFILES/home/partimag/image/*
-    if_fails $? "[ERR] Could not remove old Clonezilla image"
-
-    ln -s  ${VMPATH}/ISOFILES/home/partimag/image  /home/partimag
-    /usr/sbin/ocs-sr -q2 -c -j2 -nogui -batch -gm -gmf -noabo -z5 \
-     -i 40960000000 -fsck -senc -p poweroff \
-     savedisk gentoo.img ${EXT_DEVICE}
+    # after exit of chroot
 
     if_fails $? "[ERR] Cloning failed!"
-    check_file /home/partimag/gentoo.img "[ERR] Cloning failed: \
-did not find grentoo.img"
     ${LOG[*]} "[MSG] Cloning succeeded!"
 
     if "${CLONEZILLA_MOUNTED}"
     then
-        unmount_clonezilla_iso
-        PATH="${PATH0}"
-        LD_LIBRARY_PATH="${LD0}"
+        for i in proc sys dev run; do umount squashfs-root/$i; done
+        mv squashfs-root/home/partimag/image "${VMPATH}"/ISOFILES/home/partimag
+        cd "${VMPATH}"
+        rm -rf mnt2/
+    else
+        cd "${VMPATH}"
     fi
     return 0
 }
