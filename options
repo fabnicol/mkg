@@ -15,7 +15,7 @@
 
 #    "Option name"        "Description"                                                                                  "Default value" "Type"
 
-     "debug_mode"         "Do not clean up gentoolize custom logs at root of gentoo system files before VM shutdown. Boolean."   "false" "b"
+     "debug_mode"         "Do not clean up mkg custom logs at root of gentoo system files before VM shutdown. Boolean."   "false" "b"
      "verbose"            "Increase verbosity"                                                                                   "false" "b"
      "bios"               "Type of bootloader: BIOS or EFI (default) "                                                           "false" "b"
      "blank"              "Blank rewritable optical disk before burning installation image."                                     "false" "b"
@@ -39,7 +39,7 @@
      "download_rstudio"   "Download and build RStudio. Boolean."                                                                  "true" "b"
      "download_arch"      "Download and install stage3 archive to virtual disk. Booelan."                                         "true" "b"
      "elist"              "File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the 'elist'.accept_keywords and 'elist'.use files" "ebuilds.list" "f"
-     "email"              "Email address to send warning to when Gentoo has been created."                                            "" "e"
+     "email"              "Email address to send a warning to upon build completion. Note: you will have to accept so-called *insecure software* with some providers. It is not insecure if you are using your private PC throughout."  "" "e"
      "email_passwd"       "Email password"                                                                                            "" "s:email"
      "emirrors"           "Mirror sites for downloading ebuilds"                                                                 "path2" "u"
      "ext_device"         "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb, hdb), or a mountpoint directory (if mounted), or a few consecutive letters of the vendor name (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such. Requires *hot_install* on commandline."    "" "s"

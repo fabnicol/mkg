@@ -65,7 +65,7 @@ adjust_environment() {
     emerge-webrsync
     ! emerge -1 sys-apps/portage \
         && { echo "[ERR] emerge-webrsync failed!" | tee emerge.build
-        return -1; }
+        return 1; }
 
     # select profile (most recent plasma desktop)
 
@@ -101,7 +101,7 @@ adjust_environment() {
     if [ $? != 0 ]
     then
         echo "emerge cmake failed!" | tee emerge.build
-        return -1
+        return 1
     fi
 
     # add logger. However it will not be usable for now,
@@ -129,7 +129,7 @@ adjust_environment() {
     emerge -uDN @world 2>&1 | tee emerge.build
     [ $? != 0 ] && {
         echo "[ERR] emerge @world failed!"  | tee emerge.build
-        return -1; }
+        return 1; }
 
     # Networking in the new environment
 
@@ -198,7 +198,7 @@ build_kernel() {
     if  [ $? != 0 ]
     then
         echo "[ERR] Kernel building failed!" | tee  kernel.log
-        return -1
+        return 1
     fi
 
     genkernel --install initramfs
@@ -210,7 +210,7 @@ build_kernel() {
         echo "[ERR] Kernel was built" | tee kernel.log
     else
         echo "[ERR] Kernel compilation failed!"  | tee  kernel.log
-        return -1
+        return 1
     fi
 
     if [ -f /boot/initr*.img ]
@@ -218,7 +218,7 @@ build_kernel() {
         echo "[ERR] initramfs was built" | tee  kernel.log
     else
         echo "[ERR] initramfs compilation failed!" | tee  kernel.log
-        return -1
+        return 1
     fi
 }
 
@@ -258,7 +258,7 @@ install_software() {
     then
         echo "[ERR] Main package build step failed" \
             | tee log_install_software.log
-        return -1
+        return 1
     fi
 
     # do not use \ to continue line below:
@@ -322,12 +322,25 @@ global_config() {
 
     useradd -m -G users,wheel,audio,video,plugdev \
             -s /bin/bash "${NONROOT_USER}"
+
+    if [ $? != 0 ]
+    then
+        echo "[ERR] Could not useradd root" | tee useradd.log
+    fi
+
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
+
     gpasswd -a sddm video
 
     # normally a non-op (useradd -m), just for paranoia
 
     chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}
+
+    if ! "$(which grub)"
+    then
+        echo "[ERR] Did not find grub!" | tee grub.log
+        return 3
+    fi
 
     #--- Creating the bootloader
 
@@ -338,7 +351,19 @@ global_config() {
         grub-install --target=x86_64-efi --efi-directory=/boot --removable
     fi
 
+    if [ $? != 0 ]
+    then
+        echo "[ERR] Could not install grub" | tee grub.log
+        exit 1
+    fi
+
     grub-mkconfig -o /boot/grub/grub.cfg
+
+    if [ $? != 0 ]
+    then
+        echo "[ERR] Could not configure grub" | tee grub.log
+        exit 1
+    fi
 
     #--- Passwords: take care to use long enough passwds
 
@@ -355,10 +380,6 @@ global_config() {
 finalize() {
 
     umount -l /boot
-
-    # Final steps: cleaning up
-
-    ! "${DEBUG_MODE}" &&  rm -f * && sed -i 's/^export .*$//g' .bashrc
 
     # freeing up some disk space
 
@@ -379,13 +400,17 @@ finalize() {
 
     # kernel sources will have to be reinstalled by user if necessary
 
-    emerge --depclean                2>&1 | tee log_uninstall.log
+    emerge --depclean 2>&1 | tee log_uninstall.log
     rm -rf /var/tmp/*
     rm -rf /var/log/*
     rm -rf ~/.cache/
     rm /tmp/*
 
-    eix-update
+    # Final steps: cleaning up
+
+    ! "${DEBUG_MODE}" &&  rm -f * && sed -i 's/^export .*$//g' .bashrc
+
+    "$(which eix)" && eix-update
 
     # prepare to compact with vbox-img comp act --filename
     # ${VMPATH}/${VM}.vdi

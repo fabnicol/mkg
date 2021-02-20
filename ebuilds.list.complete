@@ -12,7 +12,6 @@
  app-portage/eix
  dev-libs/re2
  dev-vcs/git
- gentoolkit
  sys-boot/grub:2
  dev-java/ant
  x11-apps/xdm
