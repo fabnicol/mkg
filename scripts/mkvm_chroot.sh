@@ -408,7 +408,11 @@ finalize() {
 
     # Final steps: cleaning up
 
-    ! "${DEBUG_MODE}" &&  rm -f * && sed -i 's/^export .*$//g' .bashrc
+    if ! "${DEBUG_MODE}"
+    then
+        find . -maxdepth 1 -type f -delete
+        sed -i 's/^export .*$//g' .bashrc
+    fi
 
     "$(which eix)" && eix-update
 
