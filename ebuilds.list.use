@@ -22,3 +22,5 @@ app-text/xmlto text
 >=kde-frameworks/kitemmodels-5.74.0 qml
 app-editors/emacs athena Xaw3d
 >=kde-frameworks/prison-5.77.0 qml
+>=virtual/mpi-2.0-r4 threads cxx
+>=sys-cluster/openmpi-2.0.4 threads cxx

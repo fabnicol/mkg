@@ -185,16 +185,16 @@ build_kernel() {
 
     if [ "$PWD" != "/usr/src/linux" ]
     then
-        echo "[ERR] Could not cd to /usr/src/linux" | tee kernel.log
+        echo "[ERR] Could not cd to /usr/src/linux" >> tee kernel.log
         exit 2
     fi
 
     # kernel config issue here
 
     make syncconfig  # replaces silentoldconfig as of 4.19
-    make -s -j${NCPUS}   2>&1 | tee kernel.log
-    make modules_install 2>&1 | tee kernel.log
-    make install         2>&1 | tee kernel.log
+    make -s -j${NCPUS}   2>&1 >>  kernel.log
+    make modules_install 2>&1 >>  kernel.log
+    make install         2>&1 >>  kernel.log
     if  [ $? != 0 ]
     then
         echo "[ERR] Kernel building failed!" | tee  kernel.log
@@ -205,19 +205,19 @@ build_kernel() {
     emerge sys-kernel/linux-firmware
     make clean
 
-    if [ -f /boot/vmlinu* ]
+    if [ -f /boot/vmlinuz* ]
     then
-        echo "[ERR] Kernel was built" | tee kernel.log
+        echo "[MSG] Kernel was built" >> kernel.log
     else
-        echo "[ERR] Kernel compilation failed!"  | tee  kernel.log
+        echo "[ERR] Kernel compilation failed!"  >>  kernel.log
         return 1
     fi
 
     if [ -f /boot/initr*.img ]
     then
-        echo "[ERR] initramfs was built" | tee  kernel.log
+        echo "[MSG] initramfs was built" >>  kernel.log
     else
-        echo "[ERR] initramfs compilation failed!" | tee  kernel.log
+        echo "[ERR] initramfs compilation failed!" >>  kernel.log
         return 1
     fi
 }
