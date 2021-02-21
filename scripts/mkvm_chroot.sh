@@ -336,7 +336,7 @@ global_config() {
 
     chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}
 
-    if ! "$(which grub)"
+    if ! "$(which grub-mkconfig)"
     then
         echo "[ERR] Did not find grub!" | tee grub.log
         return 3
