@@ -343,13 +343,13 @@ package."; do_exit=true; }
     # Check VirtualBox version
 
     declare -r vbox_version=$(VBoxManage -v)
-    declare -r version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< ${vbox_version})
+    declare -r version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< "${vbox_version}")
     declare -r version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
-                                   <<< ${vbox_version})
+                                   <<< "${vbox_version}")
     declare -r version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/' \
-                                   <<< ${vbox_version})
-    if [ ${version_major} -lt 6 ] || [ ${version_minor} -lt 1 ] \
-           || [ ${version_index} -lt 10 ]
+                                   <<< "${vbox_version}")
+    if [ "${version_major}" -lt 6 ] || [ "${version_minor}" -lt 1 ] \
+           || [ "${version_index}" -lt 10 ]
     then
         ${LOG[*]} "[ERR] VirtualBox must be at least version 6.1.10"
         ${LOG[*]} "[ERR] Please update and reinstall"
@@ -826,7 +826,15 @@ make_boot_from_livecd() {
     # this will be placed under /root in the VM
 
     rc=".bashrc"
-    ${LOG[*]} <<< $(cp ${verb} -f /etc/bash.bashrc ${rc})
+    local BASHRC=/etc/bash/bashrc
+    ! [ -f "${BASHRC}" ] && BASHRC=/etc/bash.bashrc # Ubuntu
+    if ! [ -f "${BASHRC}" ] 
+    then
+        ${LOG[*]} "[ERR] Could not locate a bashrc skeleton"
+        exit 1
+    fi
+
+    ${LOG[*]} <<< $(cp ${verb} -f ${BASHRC} ${rc})
     declare -i i
     for ((i=0; i<ARRAY_LENGTH; i++))
     do
