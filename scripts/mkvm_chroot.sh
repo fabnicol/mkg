@@ -254,12 +254,10 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN ${packages}  2>&1 | tee log_install_software.log
-    if [ $? != 0 ]
-    then
-        echo "[ERR] Main package build step failed" \
-            | tee log_install_software.log
-        return 1
-    fi
+    local res_install=$?
+
+    # note (v1.1.2): allow a certain tolerance for incopmplete builds caused
+    # by changes in portage tree package names and versions.
 
     # do not use \ to continue line below:
 
@@ -273,6 +271,13 @@ install_software() {
 
     env-update
     source /etc/profile
+
+    if [ ${res_install} != 0 ]
+    then
+        echo "[ERR] Main package build step failed" \
+            | tee log_install_software.log
+        return 1
+    fi
 }
 
 ## @fn global_config()
