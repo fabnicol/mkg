@@ -13,8 +13,7 @@
  dev-libs/re2
  dev-vcs/git
  sys-boot/grub:2
- dev-java/ant
- x11-apps/xdm
+  x11-apps/xdm
  x11-misc/sddm 
  kde-plasma/sddm-kcm
  
