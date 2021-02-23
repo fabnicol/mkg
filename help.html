@@ -34,13 +34,13 @@ u: URL</p>
 <th style="text-align: center;">Option</th>
 <th style="text-align: center;">Description</th>
 <th style="text-align: center;">Default value</th>
-<th style="text-align: center;"></th>
+<th style="text-align: center;">Type</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">debug_mode</td>
-<td style="text-align: center;">Do not clean up gentoolize custom logs at root of gentoo system files before VM shutdown. Boolean.</td>
+<td style="text-align: center;">Do not clean up mkg custom logs at root of gentoo system files before VM shutdown. Boolean.</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
@@ -184,7 +184,7 @@ u: URL</p>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">email</td>
-<td style="text-align: center;">Email address to send warning to when Gentoo has been created.</td>
+<td style="text-align: center;">Email address to send a warning to upon build completion. Note: you will have to accept so-called <em>insecure software</em> with some providers. It is not insecure if you are using your private PC throughout.</td>
 <td style="text-align: center;">[]</td>
 <td style="text-align: center;">e</td>
 </tr>
@@ -345,64 +345,76 @@ u: URL</p>
 <td style="text-align: center;">s:vm</td>
 </tr>
 <tr class="even">
+<td style="text-align: center;">plot</td>
+<td style="text-align: center;">Plot VDI disk size using GNUPlot</td>
+<td style="text-align: center;">[false]</td>
+<td style="text-align: center;">b</td>
+</tr>
+<tr class="odd">
 <td style="text-align: center;">processor</td>
 <td style="text-align: center;">Processor type</td>
 <td style="text-align: center;">[amd64]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">quiet_mode</td>
 <td style="text-align: center;">Silence output except for the most severe errors.</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">logging</td>
 <td style="text-align: center;">Activate logging</td>
 <td style="text-align: center;">[true]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">remove_vdi</td>
 <td style="text-align: center;">Remove virtual disk on clean-up</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">rootpasswd</td>
 <td style="text-align: center;">Root password</td>
 <td style="text-align: center;">[_dev2021_]</td>
 <td style="text-align: center;">s:vm</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">rtcuseutc</td>
 <td style="text-align: center;">Use UTC as time reference: on/off</td>
 <td style="text-align: center;">[on]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">r_version</td>
 <td style="text-align: center;">R version</td>
 <td style="text-align: center;">[4.0.2]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">scsi_address</td>
 <td style="text-align: center;">In case of several optical disc burners, specify the SCSI address as x,y,z</td>
 <td style="text-align: center;">[]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">size</td>
 <td style="text-align: center;">Dynamic disc size</td>
 <td style="text-align: center;">[55000]</td>
 <td style="text-align: center;">n</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">smtp_url</td>
 <td style="text-align: center;">SMTP URL of email provider for end-of-job warning. Default: gmail SMTP</td>
 <td style="text-align: center;">[smtps://smtp.gmail.com:465]</td>
 <td style="text-align: center;">u</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">span</td>
+<td style="text-align: center;">Number of minutes of virtual disk processing to be plotted, back in time</td>
+<td style="text-align: center;">[0]</td>
+<td style="text-align: center;">n</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">stage3</td>

@@ -162,7 +162,7 @@ help_md() {
     echo "the name of the dependency."
     echo "   "
     echo "   "
-    echo " | Option | Description | Default value |  "
+    echo " | Option | Description | Default value | Type |  "
     echo " |:-----:|:--------:|:-----:|:---------:|  "
     declare -i i
     for ((i=0; i<ARRAY_LENGTH; i++)); do
@@ -542,6 +542,29 @@ for ${sw}"
 
 test_cli_post() {
 
+    # Tests existence of GNUPlot on system
+
+    if "${PLOT}"
+    then
+	# clean up the environment, PLOT may pollute other builds.
+	unset PLOT
+        GNUPLOT_BINARY="$(which gnuplot)"
+        if [ -z "${GNUPLOT_BINARY}" ] || [ -z "`"${GNUPLOT_BINARY}" --version`" ]
+        then
+	    ${LOG[*]} "[ERR] Did not find gnuplot."
+	    ${LOG[*]} "[ERR] Install gnuplot and run again, or run without 'plot'."
+	    do_exit=true
+        else
+ 	    DO_GNU_PLOT=true
+            PLOT_DURATION=${SPAN}
+	fi
+    else
+        DO_GNU_PLOT=false
+	PLOT_DURATION=0
+    fi
+
+    unset SPAN
+
     # ruling out incompatible options
 
     # GUI and INTERACTIVE are linked options.
@@ -828,7 +851,7 @@ make_boot_from_livecd() {
     rc=".bashrc"
     local BASHRC=/etc/bash/bashrc
     ! [ -f "${BASHRC}" ] && BASHRC=/etc/bash.bashrc # Ubuntu
-    if ! [ -f "${BASHRC}" ] 
+    if ! [ -f "${BASHRC}" ]
     then
         ${LOG[*]} "[ERR] Could not locate a bashrc skeleton"
         exit 1
@@ -1194,8 +1217,24 @@ UUID: ${MEDIUM_UUID}"
     do
         ${LOG[*]} "[MSG] ${VM} running. Disk size: " \
                   $(du -hal "${VM}.vdi")
-        sleep 60
+
+        if "${DO_GNU_PLOT}"
+        then
+            gunzip -f /var/log/syslog*
+	    cat /var/log/syslog* | sort | awk '/\[[A-Z]{3}\]/ {print $11}' \
+            | grep -E '[,.]?[0-9]+G' | sed 's/G//g' | tail -n ${PLOT_DURATION} > datafile
+	    "${GNUPLOT_BINARY}" -p -e "set title 'Gentoo VDI disk size'; plot 'datafile'"
+
+	    # allow for 5 sec of lost job time (to be tested)
+
+            sleep 55
+            pkill "${GNUPLOT_BINARY}"
+	    rm -f datafile
+        else
+	    sleep 60
+	fi
     done
+
     ${LOG[*]} "[MSG] ${VM} has stopped"
     if "${COMPACT}"
     then
@@ -1854,7 +1893,9 @@ main() {
     get_options $@
 
     check_tool "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
-               "VBoxManage" "curl" "grep" "lsblk" "awk"
+               "VBoxManage" "curl" "grep" "lsblk" "awk" "uuid" \
+	       "mkisofs" "rsync" "xz" "VBoxManage"
+
     test_cli_pre
     for ((i=0; i<ARRAY_LENGTH; i++)); do test_cli $i; done
     test_cli_post
@@ -1967,4 +2008,3 @@ clonezilla image..."
     ${LOG[*]} "[MSG] Gentoo building process ended."
     exit 0
 }
-
