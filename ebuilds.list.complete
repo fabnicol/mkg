@@ -13,7 +13,7 @@
  dev-libs/re2
  dev-vcs/git
  sys-boot/grub:2
-  x11-apps/xdm
+ x11-apps/xdm
  x11-misc/sddm 
  kde-plasma/sddm-kcm
  
@@ -44,7 +44,7 @@
  
 # Other desktop
 
-app-office/libreoffice
+ app-office/libreoffice
  kate
  konsole
  kde-apps/dolphin
@@ -53,5 +53,5 @@ app-office/libreoffice
 ## PDF-related
  
  okular
- =dev-texlive/texlive-latex-2020
- texlive
+ dev-texlive/texlive-latex
+ app-text/texlive
