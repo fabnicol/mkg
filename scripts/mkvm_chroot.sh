@@ -258,7 +258,8 @@ install_software() {
 
     # do not quote `packages' variable!
 
-    emerge -uDN --keep-going ${packages}  2>&1 | tee log_install_software.log
+    emerge -uDN --keep-going ${packages}  2>&1 \
+    | tee log_install_software.log
     local res_install=$?
 
     if ! ${res_install}
@@ -270,11 +271,14 @@ install_software() {
 
     # do not use \ to continue line below:
 
-    echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
-'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" > libs.R
-
-    ! "${MINIMAL}" && { Rscript libs.R 2>&1 | tee Rlibs.log
-                        rm -f libs.R; }
+    if ! "${MINIMAL}" 
+    then
+       Rscript libs.R 2>&1 | tee Rlibs.log
+       rm -f libs.R 
+       echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
+'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" \
+> libs.R
+    fi
 
     # update environment
 
@@ -416,7 +420,6 @@ finalize() {
 
     emerge --depclean 2>&1 | tee log_uninstall.log
     rm -rf /var/tmp/*
-    rm -rf ~/.cache/
     rm /tmp/*
 
     # Final steps: cleaning up
