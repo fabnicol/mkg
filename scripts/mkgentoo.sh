@@ -1225,15 +1225,14 @@ UUID: ${MEDIUM_UUID}"
 
         if "${DO_GNU_PLOT}"
         then
-            gunzip -f /var/log/syslog*
-	    cat /var/log/syslog* | sort | awk '/\[[A-Z]{3}\]/ {print $11}' \
+            gunzip -f /var/log/syslog* 2>/dev/null
+	    cat /var/log/syslog* 2>/dev/null | sort | awk '/\[[A-Z]{3}\]/ {print $11}' \
             | grep -E '[,.]?[0-9]+G' | sed 's/G//g' | tail -n ${PLOT_DURATION} > datafile
-	    "${GNUPLOT_BINARY}" -p -e "set title 'Gentoo VDI disk size'; plot 'datafile'"
+	    "${GNUPLOT_BINARY}" -e "set title 'Gentoo VDI disk size';set style line 5 lt rgb 'cyan' lw 3 pt 3;plot 'datafile'  with linespoints ls 5;pause 5" 
 
 	    # allow for 5 sec of lost job time (to be tested)
 
             sleep 55
-            pkill "${GNUPLOT_BINARY}"
 	    rm -f datafile
         else
 	    sleep 60
