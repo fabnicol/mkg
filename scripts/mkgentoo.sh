@@ -550,8 +550,6 @@ test_cli_post() {
 
     if "${PLOT}"
     then
-	# clean up the environment, PLOT may pollute other builds.
-	unset PLOT
         GNUPLOT_BINARY="$(which gnuplot)"
         if [ -z "${GNUPLOT_BINARY}" ] || [ -z "`"${GNUPLOT_BINARY}" --version`" ]
         then
@@ -561,13 +559,10 @@ test_cli_post() {
         else
 	    check_tool "pkill"
  	    DO_GNU_PLOT=true
-            PLOT_DURATION=${SPAN}
 	    [ "${PLOT_PAUSE}" -gt 50 ] && PLOT_PAUSE=50
 	fi
     else
         DO_GNU_PLOT=false
-	PLOT_DURATION=0
-	PLOT_PAUSE=0
     fi
 
     unset SPAN
@@ -1216,30 +1211,7 @@ UUID: ${MEDIUM_UUID}"
                                    keyboardputscancode 1c 2>&1 \
                                    | xargs echo [MSG])
 
-    # VM is created in a separate process
-    # Wait for it to come to end
-    # Test if still running every minute
-
-    while test_vm_running ${VM}
-    do
-        ${LOG[*]} "[MSG] ${VM} running. Disk size: " \
-                  $(du -hal "${VM}.vdi")
-
-        if "${DO_GNU_PLOT}"
-        then
-            gunzip -f /var/log/syslog* 2>/dev/null
-	    cat /var/log/syslog* 2>/dev/null | sort | awk '/\[[A-Z]{3}\]/ {print $11}' \
-            | grep -E '[,.]?[0-9]+G' | sed 's/G//g' | tail -n "${PLOT_DURATION}" > datafile
-	    "${GNUPLOT_BINARY}" -e "set title 'Gentoo VDI disk size';set style line 5 lt rgb 'cyan' lw 3 pt 3;plot 'datafile'  with linespoints ls 5;pause ${PLOT_PAUSE}" 
-
-	    # allow for 8 (3 for gunzip + pipes and 5 for pause) sec of lost job time (to be tested)
-
-            sleep 52
-	    rm -f datafile
-        else
-	    sleep 60
-	fi
-    done
+    log_loop
 
     ${LOG[*]} "[MSG] ${VM} has stopped"
     if "${COMPACT}"
@@ -1249,6 +1221,63 @@ UUID: ${MEDIUM_UUID}"
                             | xargs echo [MSG])
     fi
 }
+
+## @fn log_loop()
+## @brief Loop log tags every minute and optionally plot
+##        virtual disk size
+## @details Customizable suing options:
+##          plot_color, plot_period, plot_position, plot_pause, plot_span
+## @ingroup createInstaller
+
+
+log_loop() {
+
+    # VM is created in a separate process
+    # Wait for it to come to end
+    # Test if still running every minute
+
+    declare -i loop_count=0
+
+    while test_vm_running ${VM}
+    do
+        ${LOG[*]} "[MSG] ${VM} running. Disk size: " \
+                  $(du -hal "${VM}.vdi")
+
+        if "${DO_GNU_PLOT}"
+        then
+	    if [ "${loop_count}" = "${PLOT_PERIOD}" ]
+	    then
+		if ls /var/log/syslog*gz
+		then
+		    gunzip -f /var/log/syslog*gz 2>/dev/null
+		fi
+		loop_count=0
+		cat /var/log/syslog* 2>/dev/null  \
+		    | awk '/\[[A-Z]{3}\]/ {print $11}' \
+		    | grep -E '[,.]?[0-9]+G' | sed 's/G//g' \
+		    | sort \
+		    | tail -n "${PLOT_SPAN}" > datafile
+
+		    "${GNUPLOT_BINARY}" \
+			-e "set terminal x11 position ${PLOT_POSITION};\
+set title 'Gentoo VDI disk size';\
+set style line 5 lt rgb ${PLOT_COLOR} lw 3 pt 3;\
+plot 'datafile'  with linespoints ls 5;pause ${PLOT_PAUSE}"
+
+		    # by default allow for 7 (2 for gunzip + pipes
+		    # and 5 for pause) sec of lost job time (to be tested)
+
+		    sleep $((60-${PLOT_PAUSE}-2))
+		    rm -f datafile
+	    else
+		loop_count=loop_count+1
+	    fi
+        else
+	    sleep 60
+	fi
+    done
+}
+
 
 ## @fn create_iso_vm()
 ## @brief Create the new VirtualBox machine aimed at converting the VDI
