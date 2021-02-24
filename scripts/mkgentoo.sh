@@ -1665,7 +1665,8 @@ clonezilla_to_iso() {
     [ ! -f "$2/syslinux/isohdpfx.bin" ] \
         && cp ${verb} -f "clonezilla/syslinux/isohdpfx.bin" "$2/syslinux"
 
-    xorriso -as mkisofs   -isohybrid-mbr "$2/syslinux/isohdpfx.bin"  \
+    xorriso -split_size 2047m -as mkisofs  \
+	    -isohybrid-mbr "$2/syslinux/isohdpfx.bin"  \
             -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
             -boot-load-size 4   -boot-info-table   -eltorito-alt-boot  \
             -e boot/grub/efi.img \
