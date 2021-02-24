@@ -1255,7 +1255,7 @@ log_loop() {
 		cat /var/log/syslog* 2>/dev/null  \
 		    | awk '/\[[A-Z]{3}\]/ {print $11}' \
 		    | grep -E '[,.]?[0-9]+G' | sed 's/G//g' \
-		    | sort \
+		    | sort -g \
 		    | tail -n "${PLOT_SPAN}" > datafile
 
 		    "${GNUPLOT_BINARY}" \

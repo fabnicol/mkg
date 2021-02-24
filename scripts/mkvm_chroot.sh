@@ -428,7 +428,7 @@ finalize() {
         sed -i 's/^export .*$//g' .bashrc
     fi
 
-    [ -n "$(which eix)" ] && eix-update
+    [ -n "$(which eix-update)" ] && eix-update
 
     # prepare to compact with vbox-img comp act --filename
     # ${VMPATH}/${VM}.vdi
