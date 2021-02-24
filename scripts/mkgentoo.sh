@@ -191,6 +191,33 @@ help_() {
     help_md | sed 's/[\*\|\>]//g' | grep -v -E "(Option *Desc.*|:--.*)"
 }
 
+## @fn manpage()
+## @brief Print help to man page
+## @ingroup createInstaller
+
+manpage() {
+    check_tool pandoc
+    help_md | pandoc -o mkg.1 && sed -i -E 's/(.PP|.PD$)/\1\n.br/' mkg.1
+}
+
+## @fn htmlpage()
+## @brief Print help to html page
+## @ingroup createInstaller
+
+htmlpage() {
+    check_tool pandoc
+    help_md | pandoc -o mkg.html
+}
+
+## @fn pdfpage()
+## @brief Print help to pdf page
+## @ingroup createInstaller
+
+pdfpage() {
+    check_tool pandoc
+    help_md | pandoc -V margin-right=1.5cm -V margin-left=1.5cm -o mkg.pdf
+}
+
 # ---------------------------------------------------------------------------- #
 # Option parsing
 #
@@ -1911,15 +1938,37 @@ main() {
         help_md
         exit 0
     else
-        if grep -q 'help'    <<< "$@"
-        then
-            create_options_array options
-            help_
-            exit 0
-        else
-            create_options_array options2
-        fi
+    if grep -q 'help'    <<< "$@"
+    then
+        create_options_array options
+        help_
+        exit 0
+    else
+    if grep -q 'manpage' <<< "$@"
+    then
+        create_options_array options 
+        manpage
+	exit 0
+    else
+    if grep -q 'htmlpage' <<< "$@"
+    then
+        create_options_array options
+	htmlpage
+	exit 0
+    else
+    if grep -q 'pdfpage' <<< "$@"
+    then
+        create_options_array options
+	pdfpage
+	exit 0
+    else 
+        create_options_array options2
     fi
+    fi
+    fi
+    fi
+    fi
+
     # parse command line. All arguments must be in the form a=true/false except
     # for help, file.iso. But 'a' can be used as shorthand for 'a=true'
 
