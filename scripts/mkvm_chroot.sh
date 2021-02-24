@@ -69,13 +69,12 @@ adjust_environment() {
 
     # select profile (most recent plasma desktop)
 
-    local profile=$(eselect profile list \
+    local profile=$(eselect --color=no --brief profile list \
                         | grep desktop \
-                        | grep plasma \
+                        | grep gnome \
                         | grep ${PROCESSOR} \
                         | grep -v systemd \
-                        | tail -1 \
-                        | cut -f1 -d'[' | cut -f1 -d']')
+                        | head -n 1)
 
     eselect profile set ${profile}
 
@@ -258,7 +257,8 @@ install_software() {
 
     # do not quote `packages' variable!
 
-    emerge -uDN --keep-going ${packages}  2>&1 | tee log_install_software.log
+    emerge -uDN --keep-going ${packages}  2>&1 \
+    | tee log_install_software.log
     local res_install=$?
 
     if ! ${res_install}
@@ -270,11 +270,14 @@ install_software() {
 
     # do not use \ to continue line below:
 
-    echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
-'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" > libs.R
-
-    ! "${MINIMAL}" && { Rscript libs.R 2>&1 | tee Rlibs.log
-                        rm -f libs.R; }
+    if ! "${MINIMAL}" 
+    then
+       Rscript libs.R 2>&1 | tee Rlibs.log
+       rm -f libs.R 
+       echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
+'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" \
+> libs.R
+    fi
 
     # update environment
 
@@ -416,7 +419,6 @@ finalize() {
 
     emerge --depclean 2>&1 | tee log_uninstall.log
     rm -rf /var/tmp/*
-    rm -rf ~/.cache/
     rm /tmp/*
 
     # Final steps: cleaning up

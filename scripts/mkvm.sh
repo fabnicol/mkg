@@ -228,7 +228,7 @@ install_stage3() {
     echo "L10N=\"${LANGUAGE} en\""    >> ${m_conf}
     echo "LINGUAS=\"${LANGUAGE} en\"" >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
-    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager \
+    echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist networkmanager \
 elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
