@@ -450,18 +450,22 @@ address"
             f)  [ ! -f "${!V}" ] \
                     && { ${LOG[*]} "[ERR] ${sw}=... must be an existing file."
                          exit 1;} ;;
-            n)  [ test_numeric "${!V}" != 0 ] \
-                    && { ${LOG[*]} "[ERR] ${sw}=... is not numeric."
-                         exit 1; }
+            n)  if ! test_numeric "${!V}"
+                then
+		    ${LOG[*]} "[ERR] ${sw}=... is not numeric."
+                    exit 1
+		fi
                 ;;
             o)  [ "${!V}" != "on" ] && [ "${!V}" != "off" ] \
                     && { ${LOG[*]} "[ERR] ${sw}=on or ${sw}=off are the only \
  two possible values."
                          exit 1; }
                 ;;
-            u)  [ test_URL "${!V}" != 0 ] \
-                    && { ${LOG[*]} "[ERR] ${sw}=... must be a valid URL"
-                         exit 1; }
+            u)  if ! test_URL "${!V}"
+		then
+                     ${LOG[*]} "[ERR] ${sw}=... must be a valid URL"
+                     exit 1
+		fi
                 ;;
             vm)  [ "${VM}" = "false" ] && VM=""
                  ;;
