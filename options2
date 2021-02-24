@@ -68,6 +68,7 @@
      "paravirtprovider"   "Virtualization interface: kvm for GNU/Linux, may be tweaked (see VirtualBox documentation)"             "kvm" "s"
      "passwd"             "User password"                                                                                     "_user2021_" "s:vm"
      "plot"               "Plot VDI disk size using GNUPlot"                                                                     "false" "b"
+     "plot_pause"         "Number of seconds of plot display per minute of processing. Maximum 50."                                  "5" "n"    
      "processor"          "Processor type"                                                                                       "amd64" "s"
      "quiet_mode"         "Silence output except for the most severe errors."                                                    "false" "b"
      "logging"            "Activate logging"                                                                                      "true" "b"

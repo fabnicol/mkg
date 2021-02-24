@@ -562,10 +562,12 @@ test_cli_post() {
 	    check_tool "pkill"
  	    DO_GNU_PLOT=true
             PLOT_DURATION=${SPAN}
+	    [ "${PLOT_PAUSE}" -gt 50 ] && PLOT_PAUSE=50
 	fi
     else
         DO_GNU_PLOT=false
 	PLOT_DURATION=0
+	PLOT_PAUSE=0
     fi
 
     unset SPAN
@@ -1227,12 +1229,12 @@ UUID: ${MEDIUM_UUID}"
         then
             gunzip -f /var/log/syslog* 2>/dev/null
 	    cat /var/log/syslog* 2>/dev/null | sort | awk '/\[[A-Z]{3}\]/ {print $11}' \
-            | grep -E '[,.]?[0-9]+G' | sed 's/G//g' | tail -n ${PLOT_DURATION} > datafile
-	    "${GNUPLOT_BINARY}" -e "set title 'Gentoo VDI disk size';set style line 5 lt rgb 'cyan' lw 3 pt 3;plot 'datafile'  with linespoints ls 5;pause 5" 
+            | grep -E '[,.]?[0-9]+G' | sed 's/G//g' | tail -n "${PLOT_DURATION}" > datafile
+	    "${GNUPLOT_BINARY}" -e "set title 'Gentoo VDI disk size';set style line 5 lt rgb 'cyan' lw 3 pt 3;plot 'datafile'  with linespoints ls 5;pause ${PLOT_PAUSE}" 
 
-	    # allow for 5 sec of lost job time (to be tested)
+	    # allow for 8 (3 for gunzip + pipes and 5 for pause) sec of lost job time (to be tested)
 
-            sleep 55
+            sleep 52
 	    rm -f datafile
         else
 	    sleep 60
