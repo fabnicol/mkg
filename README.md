@@ -21,11 +21,6 @@ Should you need to install it, please perform installation as follows:
 
 Finally check that `which uuid` has zero exit code.
 
-The ` logtool`  utility is not an MKG dependency but may be used for to [monitor builds](https://github.com/fabnicol/mkg/wiki/Frequently-Asked-Questions-(FAQ)#pending-completion-how-can-i-monitor-if-all-goes-well). Install the package as for libuuid:   
-
-+ unpack: `tar xzvf logtool_1.2.11.tar.gz`   
-+ cd logtool-1.2.11
-+ ./configure && make && sudo make install
 
 
 
