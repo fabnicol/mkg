@@ -1,4 +1,4 @@
-.TH "mkgentoo.sh" 3 "Fri Feb 19 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "mkgentoo.sh" 3 "Wed Feb 24 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -62,6 +62,10 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .RI "\fBcreate_vm\fP ()"
 .br
 .RI "Create main VirtualBox machine using VBoxManage commandline\&. "
+.ti -1c
+.RI "\fBlog_loop\fP ()"
+.br
+.RI "Loop log tags every minute and optionally plot virtual disk size\&. "
 .ti -1c
 .RI "\fBcreate_iso_vm\fP ()"
 .br
@@ -228,7 +232,7 @@ Definition in file \fBmkgentoo\&.sh\fP\&.
 .SS "Exported String ISOLINUX_DIR = isolinux"
 
 .PP
-Definition at line 717 of file mkgentoo\&.sh\&.
+Definition at line 742 of file mkgentoo\&.sh\&.
 .SS "Exported String LOG"
 
 .PP
@@ -236,7 +240,7 @@ Definition at line 225 of file mkgentoo\&.sh\&.
 .SS "Exported String PATH = '${PATH}':'${VBPATH}'"
 
 .PP
-Definition at line 1055 of file mkgentoo\&.sh\&.
+Definition at line 1088 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for mkg from the source code\&.

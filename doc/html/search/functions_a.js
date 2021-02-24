@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['recreate_5flivecd_5fiso_131',['recreate_liveCD_ISO',['../group__auxiliary_functions.html#ga38ca6200b4d28d4ea8fcadb531533519',1,'utils.sh']]]
+  ['partition_127',['partition',['../group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5',1,'mkvm.sh']]]
 ];
