@@ -555,6 +555,7 @@ test_cli_post() {
 	    ${LOG[*]} "[ERR] Install gnuplot and run again, or run without 'plot'."
 	    do_exit=true
         else
+	    check_tool "pkill"
  	    DO_GNU_PLOT=true
             PLOT_DURATION=${SPAN}
 	fi

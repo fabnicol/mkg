@@ -251,13 +251,22 @@ install_software() {
 
     echo ${packages} > package_list
 
+    # v1.3: adding --keep-going. Limited emerge failures may not render
+    # the build useless.
+    # allow some tolerance for incomplete builds caused
+    # by changes in portage tree package names and versions.
+
     # do not quote `packages' variable!
 
-    emerge -uDN ${packages}  2>&1 | tee log_install_software.log
+    emerge -uDN --keep-going ${packages}  2>&1 | tee log_install_software.log
     local res_install=$?
 
-    # note (v1.1.2): allow a certain tolerance for incopmplete builds caused
-    # by changes in portage tree package names and versions.
+    if ! ${res_install}
+    then
+	# one more chance, who knows
+	emerge --resume
+        res_install=$?
+    fi
 
     # do not use \ to continue line below:
 
@@ -407,7 +416,6 @@ finalize() {
 
     emerge --depclean 2>&1 | tee log_uninstall.log
     rm -rf /var/tmp/*
-    rm -rf /var/log/*
     rm -rf ~/.cache/
     rm /tmp/*
 
@@ -415,11 +423,12 @@ finalize() {
 
     if ! "${DEBUG_MODE}"
     then
+        rm -rf /var/log/*
         find . -maxdepth 1 -type f -delete
         sed -i 's/^export .*$//g' .bashrc
     fi
 
-    "$(which eix)" && eix-update
+    [ -n "$(which eix)" ] && eix-update
 
     # prepare to compact with vbox-img comp act --filename
     # ${VMPATH}/${VM}.vdi
