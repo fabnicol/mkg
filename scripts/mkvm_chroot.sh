@@ -69,13 +69,12 @@ adjust_environment() {
 
     # select profile (most recent plasma desktop)
 
-    local profile=$(eselect profile list \
+   local profile=$(eselect --color=no --brief profile list \
                         | grep desktop \
                         | grep plasma \
                         | grep ${PROCESSOR} \
                         | grep -v systemd \
-                        | tail -1 \
-                        | cut -f1 -d'[' | cut -f1 -d']')
+                        | head -n 1)
 
     eselect profile set ${profile}
 
