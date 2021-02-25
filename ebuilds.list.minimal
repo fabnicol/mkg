@@ -14,10 +14,10 @@
  sys-boot/grub:2
  dev-vcs/git
  x11-apps/xdm
- x11-misc/gdm 
  
 ## GNOME
- 
+
+ gnome-base/gdm 
  gnome-base/gnome
  gnome-core-apps
  gnome-desktop
@@ -26,8 +26,5 @@
 
  x11-base/xorg-x11
  x11-base/xorg-drivers
- 
-## PDF-related
- 
- okular
+
 

@@ -108,6 +108,7 @@ adjust_environment() {
 
     emerge -uD app-admin/sysklogd
     rc-update add sysklogd default
+    rc-service sysklogd start
 
     # other core sysapps to be merged first. LZ4 is a kernel
     # dependency for newer linux kernels.
@@ -240,9 +241,10 @@ install_software() {
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
-
-    # TODO: develop several options wrt to package set.
-
+    
+    # for gnome there is a circuylar dependency to break:
+    USE="-sqlite -bluetooth" emerge dev-lang/python
+    
     local packages=`grep -E -v '(^\s*$|^\s*#.*$)' ${ELIST} \
 | sed "s/dev-lang\/R-.*$/dev-lang\/R-${R_VERSION}/"`
 
