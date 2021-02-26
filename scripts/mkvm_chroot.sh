@@ -250,7 +250,7 @@ install_software() {
 
     # Trace for debugging
 
-    echo ${packages} > package_list
+    echo "${packages}" > package_list
 
     # v1.3: adding --keep-going. Limited emerge failures may not render
     # the build useless.
@@ -263,7 +263,7 @@ install_software() {
     | tee log_install_software.log
     local res_install=$?
 
-    if ! ${res_install}
+    if [ "${res_install}" != "0" ]
     then
 	# one more chance, who knows
 	emerge --resume
@@ -286,7 +286,7 @@ install_software() {
     env-update
     source /etc/profile
 
-    if [ ${res_install} != 0 ]
+    if [ "${res_install}" != "0" ]
     then
         echo "[ERR] Main package build step failed" \
             | tee log_install_software.log
