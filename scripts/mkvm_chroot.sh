@@ -261,7 +261,7 @@ install_software() {
     | tee log_install_software.log
     local res_install=$?
 
-    if ! ${res_install}
+    if [ ${res_install} != 0 ]
     then
 	# one more chance, who knows
 	emerge --resume
