@@ -584,7 +584,6 @@ test_cli_post() {
 	    ${LOG[*]} "[ERR] Install gnuplot and run again, or run without 'plot'."
 	    do_exit=true
         else
-	    check_tool "pkill"
  	    DO_GNU_PLOT=true
 	    [ "${PLOT_PAUSE}" -gt 50 ] && PLOT_PAUSE=50
 	fi
@@ -592,7 +591,7 @@ test_cli_post() {
         DO_GNU_PLOT=false
     fi
 
-    unset SPAN
+    unset PLOT
 
     # ruling out incompatible options
 
@@ -925,9 +924,21 @@ make_boot_from_livecd() {
 
     # cleanup by default
 
-    umount -l mnt
+    if mountpoint mnt
+    then
+	umount -l mnt
+    fi
+
     if "${CLEANUP}"
     then
+	if mountpoint mnt2/live/squashfs-root/dev;
+	then
+	    for i in proc sys dev dev/pts run
+	    do
+		umount mnt2/live/squashfs-root/$i
+	    done
+	fi
+
         ${LOG[*]} <<< $(rm -rf mnt && rm -rf mnt2 2>&1 \
                             | xargs echo "[INF] Removing mount directories")
     fi
@@ -1285,6 +1296,10 @@ log_loop() {
 		    | sort -g \
 		    | tail -n "${PLOT_SPAN}" > datafile
 
+		echo DONE_LOG
+		if [ -s datafile ]
+		then
+		    echo PLOTTING
 		    "${GNUPLOT_BINARY}" \
 			-e "set terminal x11 position ${PLOT_POSITION};\
 set title 'Gentoo VDI disk size';\
@@ -1296,8 +1311,13 @@ plot 'datafile'  with linespoints ls 5;pause ${PLOT_PAUSE}"
 
 		    sleep $((60-${PLOT_PAUSE}-2))
 		    rm -f datafile
+		else
+		    echo NOT_PLOTTING
+		    sleep 58
+		fi
 	    else
 		loop_count=loop_count+1
+		sleep 60
 	    fi
         else
 	    sleep 60
@@ -1947,7 +1967,7 @@ main() {
     else
     if grep -q 'manpage' <<< "$@"
     then
-        create_options_array options 
+        create_options_array options
         manpage
 	exit 0
     else
@@ -1962,7 +1982,7 @@ main() {
         create_options_array options
 	pdfpage
 	exit 0
-    else 
+    else
         create_options_array options2
     fi
     fi
