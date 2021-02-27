@@ -227,8 +227,8 @@ Run with download=true" ; exit 1; }
                 && { ${LOG[*]} "[INF] Uncaching ${ISO} from ${CACHED_ISO}"
                 cp -f ${CACHED_ISO} "${ISO}"; }
         else
-            ${LOG[*]} "[ERR] No ISO file was found, please rerun with \
-download=true"
+            ${LOG[*]} "[ERR] No minimal install Gentoo ISO  was found, \
+please rerun with download=true"
             exit 1
         fi
         LIVECD="${ISO}"
@@ -265,7 +265,7 @@ ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
     else
         check_file latest-stage3-${PROCESSOR}.txt \
             "[ERR] No stage 3 download information available!" \
-            "[ERR] Rerun with download_stage3=true"
+            "[ERR] Rerun with download_arch=true"
     fi
 
     local current=$(cat latest-stage3-${PROCESSOR}.txt | \

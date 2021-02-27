@@ -55,6 +55,7 @@ adjust_environment() {
          >> /etc/fstab
     echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"   \
          >> /etc/fstab
+    
     source /etc/profile
 
     # Refresh and rebuild @world frequently emerge complains about
