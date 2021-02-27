@@ -14,28 +14,13 @@
  dev-vcs/git
  sys-boot/grub:2
  x11-apps/xdm
- x11-misc/sddm 
- kde-plasma/sddm-kcm
+ x11-misc/lightdm
  
 # Data science
 
  =dev-lang/R-4.0.2
  app-editors/emacs
  app-editors/vim
-
-## KDE
-
- qtcore
- qtwidgets
- qtxml
- qtgui
- 
-## these 3 deps only for RStudio, you may withdraw otherwise
-
- qtwebengine
- qtpositioning
- qtopengl
- plasma-meta
 
 # X
 
@@ -45,13 +30,4 @@
 # Other desktop
 
  app-office/libreoffice
- kate
- konsole
- kde-apps/dolphin
- konqueror
-
-## PDF-related
- 
- okular
- dev-texlive/texlive-latex
- app-text/texlive
+ app-editors/gedit

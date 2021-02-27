@@ -267,7 +267,7 @@ install_software() {
     then
 	# one more chance, who knows
 	emerge --resume
-        res_install=$?
+    res_install=$?
     fi
 
     # do not use \ to continue line below:
@@ -310,14 +310,7 @@ install_software() {
 
 global_config() {
 
-    # Configuration --- sddm
-
-    echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
-        | tee log_uninstall_software.log
-    echo "setxkbmap ${LANGUAGE},us" > /usr/share/sddm/scripts/Xsetup \
-        | tee log_uninstall_software.log
-    chmod +x /usr/share/sddm/scripts/Xsetup
-    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
+      sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="lightdm"/' \
         /etc/conf.d/xdm
 
     #--- Services
@@ -349,13 +342,11 @@ global_config() {
 
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
-    gpasswd -a sddm video
-
     # normally a non-op (useradd -m), just for paranoia
 
     chown -R ${NONROOT_USER}:${NONROOT_USER} /home/${NONROOT_USER}
 
-    if ! "$(which grub-mkconfig)"
+    if ! which grub-mkconfig
     then
         echo "[ERR] Did not find grub!" | tee grub.log
         return 3

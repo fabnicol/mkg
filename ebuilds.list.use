@@ -1,26 +1,18 @@
 >=dev-libs/libpcre2-10.35 pcre16
->=dev-texlive/texlive-latex-2020 xetex
 sys-apps/util-linux caps
 app-arch/p7zip -kde -wxwidgets
 sys-auth/polkit  introspection nls pam
->=dev-qt/qtcore-5.14.2 icu
 >=dev-lang/python-2.7.18-r1:2.7 sqlite
 >=media-libs/harfbuzz-2.6.7 icu
 >=media-libs/gd-2.3.0 png
->=dev-qt/qtgui-5.14.2-r1 jpeg egl
 >=media-video/vlc-3.0.11.1 vorbis ogg
 >=sys-libs/zlib-1.2.11-r2 minizip
->=dev-qt/qtwebengine-5.14.2 widgets
 >=media-libs/mesa-20.0.8 wayland
->=dev-qt/qtwebchannel-5.14.2 qml
 >=dev-libs/libxml2-2.9.10-r1 icu
 >=media-libs/libvpx-1.7.0-r1 svc
 >=dev-libs/xmlsec-1.2.30 nss
 >=app-text/ghostscript-gpl-9.52-r1 cups
->=dev-qt/qtprintsupport-5.14.2 cups
 app-text/xmlto text
->=kde-frameworks/kitemmodels-5.74.0 qml
-app-editors/emacs athena Xaw3d
->=kde-frameworks/prison-5.77.0 qml
+app-editors/emacs gtk
 >=virtual/mpi-2.0-r4 threads cxx
 >=sys-cluster/openmpi-2.0.4 threads cxx
