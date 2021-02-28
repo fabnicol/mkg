@@ -2030,11 +2030,39 @@ main() {
         # Now create a new VM from clonezilla ISO to retrieve
         # Gentoo filesystem from the VDI virtual disk.
 
-        ${LOG[*]} "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM."
-        "${VERBOSE}" \
-            && ${LOG[*]} "[INF] These are necessary to activate folder sharing."
+	if [ -z "${CUSTOM_CLONEZILLA}" ]
+	then
+            ${LOG[*]} "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM."
+            "${VERBOSE}" \
+                && ${LOG[*]} "[INF] These are necessary to activate folder sharing."
 
-        add_guest_additions_to_clonezilla_iso
+            add_guest_additions_to_clonezilla_iso
+	else
+            CLONEZILLACD="${CUSTOM_CLONEZILLA}"
+	    check_file "${CLONEZILLACD}"
+	    ${LOG[*]} "[INF] Using ${CLONEZILLACD} as custom-made \
+CloneZilla CD with VirtualBox and guest additions."
+
+            # copy to ISOFILES as a skeletton for ISO recovery image authoring
+
+            [ -d ISOFILES ] && rm -rf ISOFILES
+            mkdir -p ISOFILES/home/partimag
+            check_dir ISOFILES/home/partimag
+	    if [ -d mnt2 ]
+	    then
+		rm -rf mnt2/
+	        if_fails $? "[ERR] Could not remove directory mnt2. \
+Unmount it and remove it manually then restart."
+	    fi
+	    mkdir mnt2
+            check_dir mnt2
+	    mount -oloop "${CLONEZILLACD}" mnt2/
+	    if_fails $? "[ERR] Could not mount ${CLONEZILLACD} to mnt2"
+            rsync -a mnt2/ ISOFILES
+	    if_fails $? "[ERR] Could not sync files between mnt2 and ISOFILES"
+	    umount mnt2
+	    if_fails $? "[ERR] Could not unmount mnt2"	    
+	fi    
 
         # And launch the corresponding VM
 

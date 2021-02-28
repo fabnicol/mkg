@@ -276,7 +276,7 @@ install_software() {
     if ! "${MINIMAL}" 
     then
        Rscript libs.R 2>&1 | tee Rlibs.log
-       rm -f libs.R 
+       rm -f libs.R
        echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
 'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" \
 > libs.R
