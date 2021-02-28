@@ -14,7 +14,6 @@
  dev-vcs/git
  sys-boot/grub:2
  x11-apps/xdm
- x11-misc/lightdm
  
 # Data science
 
@@ -22,10 +21,17 @@
  app-editors/emacs
  app-editors/vim
 
+## GNOME
+
+ gnome-base/gnome-desktop
+ gnome-base/gnome
+
 # X
 
  x11-base/xorg-x11
  x11-base/xorg-drivers
+ x11-terms/guake
+ x11-terms/xterm
  
 # Other desktop
 

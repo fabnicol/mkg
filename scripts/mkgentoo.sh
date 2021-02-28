@@ -130,21 +130,21 @@ help_md() {
     echo "**mkg**  [[switch=argument]...]                [3]  "
     echo "**mkg**  help[=md]                             [4]  "
     echo "  "
-    echo "Usage [1] and [2] create a bootable ISO output file with a current"
+    echo "Usage [1] and [2] create a bootable ISO output file with a current  "
     echo "Gentoo distribution.  "
     echo "For [1], implicit ISO output name is **gentoo.iso**  "
-    echo "Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine"
+    echo "Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine  "
     echo "with name Gentoo.  "
-    echo "Usage [4] prints this help, in markdown form if argument 'md' is"
+    echo "Usage [4] prints this help, in markdown form if argument 'md' is  "
     echo "specified.  "
-    echo "Warning: you should have at least 55 GB of free disk space in the"
+    echo "Warning: you should have at least 55 GB of free disk space in the  "
     echo "current directory or in vmpath if specified.  "
     echo "  "
     echo "**Switches:**  "
     echo "  "
-    echo "Boolean values are either 'true' or 'false'. For example, to build"
+    echo "Boolean values are either 'true' or 'false'. For example, to build  "
     echo "a minimal distribution, specify:  "
-    echo ">  minimal=true  "
+    echo "`minimal=true`  "
     echo "  "
     echo "on command line.  "
     echo "  "
@@ -158,8 +158,10 @@ help_md() {
     echo "s: String  "
     echo "u: URL  "
     echo
-    echo "When a field depends on another, a colon separates the type and"
+    echo "When a field depends on another, a colon separates the type and  "
     echo "the name of the dependency."
+    echo "dep is a reserved word for dummy defaults of dependencies i.e.  "
+    echo "optional strings that may remain unspecified.  "
     echo "   "
     echo "   "
     echo " | Option | Description | Default value | Type |  "
@@ -541,7 +543,7 @@ values for ${y}=false and ${sw}=${!V} are incompatible."
         then
             ${LOG[*]} "[ERR] Execution cannot proceed without explicit value \
 for ${sw}"
-            if "${INTERACTIVE}"
+            if [ "${INTERACTIVE}" = "true" ]
             then
                 local reply=""
                 while [ -z ${reply} ]
@@ -642,6 +644,12 @@ from_device or from_vm may be specified on commandline."
 
     "${CLONEZILLA_INSTALL}" && OSTYPE=Ubuntu_64 || OSTYPE=Gentoo_64
 
+    if [ -n "${CUSTOM_CLONEZILLA}" ] && [ "${CUSTOM_CLONEZILLA}" != "dep" ]
+    then
+	DOWNLOAD_CLONEZILLA=false
+	CLONEZILLACD="${CUSTOM_CLONEZILLA}"
+    fi
+
     # minimal CPU allocation
 
     [ "${NCPUS}" = "0" ] && NCPUS=1
@@ -651,7 +659,7 @@ from_device or from_vm may be specified on commandline."
 
     ! "${FORCE}" && ! "${FROM_VM}" && VM="${VM}".$(date +%F-%H-%M-%S)
 
-    "${CREATE_ISO}" && ISOVM="${VM}_ISO"
+    "${CREATE_ISO}" && ISOVM="${VM}".$(date +%F-%H-%M-%S)"_ISO"
 
     "${FROM_VM}" && [ ! -f "${VM}.vdi" ] \
         && { ${LOG[*]} "[ERR] Virtual machine \
@@ -921,8 +929,6 @@ make_boot_from_livecd() {
 
     ${LOG[*]} <<< $(recreate_liveCD_ISO "${VMPATH}/mnt2/" | \
                         xargs echo "[INF] Recreating ISO")
-
-    # cleanup by default
 
     if mountpoint mnt
     then
@@ -1685,7 +1691,7 @@ clonezilla_to_iso() {
     [ ! -f "$2/syslinux/isohdpfx.bin" ] \
         && cp ${verb} -f "clonezilla/syslinux/isohdpfx.bin" "$2/syslinux"
 
-    xorriso -split_size 2047m -as mkisofs  \
+    xorriso -split_size 4096m -as mkisofs  \
 	    -isohybrid-mbr "$2/syslinux/isohdpfx.bin"  \
             -c syslinux/boot.cat   -b syslinux/isolinux.bin   -no-emul-boot \
             -boot-load-size 4   -boot-info-table   -eltorito-alt-boot  \
@@ -2030,7 +2036,7 @@ main() {
         # Now create a new VM from clonezilla ISO to retrieve
         # Gentoo filesystem from the VDI virtual disk.
 
-	if [ -z "${CUSTOM_CLONEZILLA}" ]
+	if [ -z "${CUSTOM_CLONEZILLA}" ] || [ "${CUSTOM_CLONEZILLA}" = "dep" ]
 	then
             ${LOG[*]} "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM."
             "${VERBOSE}" \
@@ -2122,8 +2128,11 @@ clonezilla image..."
 
     # default cleanup
 
-    "${CLEANUP}" &&
-        ${LOG[*]} <<< $(cleanup 2>&1 | xargs echo '[INF] Cleaning up: ')
+    if "${CLEANUP}"
+    then
+        ${LOG[*]} <<< $(cleanup 2>&1 | xargs echo '[INF] Cleaning up.')
+	cleanup
+    fi
 
     # send wake-up call
 

@@ -263,12 +263,20 @@ install_software() {
     emerge -uDN --keep-going ${packages}  2>&1 \
     | tee log_install_software.log
     local res_install=$?
-
+    
     if [ "${res_install}" != "0" ]
     then
 	# one more chance, who knows
 	emerge --resume
     res_install=$?
+    fi
+
+    emerge gdm
+    
+    if [ $? != 0 ]
+    then
+	# one more chance, who knows
+	emerge --resume
     fi
 
     # do not use \ to continue line below:
@@ -311,7 +319,7 @@ install_software() {
 
 global_config() {
 
-      sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="lightdm"/' \
+      sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="gdm"/' \
         /etc/conf.d/xdm
 
     #--- Services
@@ -333,7 +341,7 @@ global_config() {
 
     #--- groups and sudo
 
-    useradd -m -G users,wheel,audio,video,plugdev \
+    useradd -m -G userswheel,audio,video,plugdev \
             -s /bin/bash "${NONROOT_USER}"
 
     if [ $? != 0 ]

@@ -14,16 +14,17 @@
  sys-boot/grub:2
  dev-vcs/git
  x11-apps/xdm
- x11-misc/lightdm
  
 ## GNOME
 
  gnome-desktop
- app-editors/gedit
+ gnome-base/gnome
 
 # X
 
  x11-base/xorg-x11
  x11-base/xorg-drivers
+ x11-terms/guake
+ x11-terms/xterm
 
 
