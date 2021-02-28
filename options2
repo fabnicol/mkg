@@ -25,7 +25,6 @@
      "cdrecord"           "cdrecord full path. Automatically determined if left unspecified."                    "`which cdrecord`" "f:burn"
      "cflags"             "GCC CFLAGS options for ebuilds"                                                           "-march=native -O2" ""     
      "cleanup"            "Clean up archives, temporary images and virtual machine after successful completion. Boolean."         "true" "b"
-     "custom_clonezilla"   "Use this previously created custom CloneZilla ISO with added VirtualBox and guest additions."         ""    "s"
      "clonezilla_install" "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false" "b"
      "cloning_method"     "Method used by hot_install ext_device=... to intall Gentoo to disk. One of: 'guestfish' (default), 'with-raw-buffer' (slower) or 'vbox-img' (currently unavailable)" "guestfish"  "s:ext_device"
      "compact"            "Compact virtual disk after VM building. Caution: this may impede hot_install and ext_device."         "false" "b"
