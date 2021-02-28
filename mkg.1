@@ -24,6 +24,10 @@
 .PP
 .br
 Usage [1] and [2] create a bootable ISO output file with a current
+.PD 0
+.P
+.PD
+.br
 Gentoo distribution.
 .PD 0
 .P
@@ -35,37 +39,87 @@ For [1], implicit ISO output name is \f[B]gentoo.iso\f[R]
 .PD
 .br
 Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine
+.PD 0
+.P
+.PD
+.br
 with name Gentoo.
 .PD 0
 .P
 .PD
 .br
 Usage [4] prints this help, in markdown form if argument `md' is
+.PD 0
+.P
+.PD
+.br
 specified.
 .PD 0
 .P
 .PD
 .br
 Warning: you should have at least 55 GB of free disk space in the
-current directory or in vmpath if specified.
-.PP
-.br
-\f[B]Switches:\f[R]
-.PP
-.br
-Boolean values are either `true' or `false'.
-For example, to build a minimal distribution, specify:
 .PD 0
 .P
 .PD
 .br
-> minimal=true
+current directory or in vmpath if specified.
 .PP
 .br
-on command line.
+\f[B]Options:\f[R]
 .PP
 .br
-Type Conventions:
+Boolean values are either \f[C]true\f[R] or \f[C]false\f[R].
+For example, to build
+.PD 0
+.P
+.PD
+.br
+a minimal distribution, add to command line:
+.PD 0
+.P
+.PD
+.br
+\f[C]minimal=true\f[R]
+.PD 0
+.P
+.PD
+.br
+or simply: \f[C]minimal\f[R] as \f[C]true\f[R] can be omitted (unlike
+\f[C]false\f[R]).
+.PP
+.br
+\f[B]Examples\f[R]
+.PP
+.br
+\f[C]# ./mkg pdfpage\f[R]
+.PD 0
+.P
+.PD
+.br
+\f[C]# ./mkg debug_mode verbose from_vm vm=Gentoo.iso gentoo_small.iso\f[R]
+\  \f[C]ext_device=sdc device_installer blank burn cleanup=false\f[R]
+.PD 0
+.P
+.PD
+.br
+\f[C]# ./mkg download_arch=false download=false download_clonezilla=false\f[R]
+\  \f[C]custom_clonezilla=clonezilla_cached.iso nonroot_user=phil\f[R]
+.PD 0
+.P
+.PD
+.br
+\f[C]# nohup ./mkg plot plot_color=red plot_period=10 plot_pause=7\f[R]
+\  \f[C]compact minimal minimal_size  gui=false elist=myebuilds\f[R] \ 
+\f[C]email=my.name\[at]gmail.com email_passwd=\[aq]mypasswd\[aq] &\f[R]
+.PD 0
+.P
+.PD
+.br
+\f[C]# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\f[R]
+.PP
+.br
+\f[B]Type Conventions:\f[R]
 .PD 0
 .P
 .PD
@@ -108,8 +162,18 @@ s: String
 u: URL
 .PP
 .br
-When a field depends on another, a colon separates the type and the name
-of the dependency.
+When a field depends on another, a colon separates the type and
+.PD 0
+.P
+.PD
+.br
+the name of the dependency.
+dep is a reserved word for dummy defaults of dependencies i.e.
+.PD 0
+.P
+.PD
+.br
+optional strings that may remain unspecified.
 .PP
 .br
 .TS
@@ -214,34 +278,6 @@ T}@T{
 b
 T}
 T{
-compact
-T}@T{
-Compact virtual disk after VM building.
-Caution: this may impede hot_install and ext_device.
-T}@T{
-[false]
-T}@T{
-b
-T}
-T{
-CRAN_REPOS
-T}@T{
-CRAN repository URL for downloading extra R packages
-T}@T{
-[https://cloud.r-project.org]
-T}@T{
-s
-T}
-T{
-remove_vdi
-T}@T{
-Full clean-up: also remove VDI disks
-T}@T{
-[false]
-T}@T{
-b
-T}
-T{
 clonezilla_install
 T}@T{
 Use the CloneZilla live CD instead of the official Gentoo minimal
@@ -265,6 +301,16 @@ T}@T{
 s:ext_device
 T}
 T{
+compact
+T}@T{
+Compact virtual disk after VM building.
+Caution: this may impede hot_install and ext_device.
+T}@T{
+[false]
+T}@T{
+b
+T}
+T{
 cpuexecutioncap
 T}@T{
 Maximum percentage of CPU per core (0 to 100)
@@ -272,6 +318,15 @@ T}@T{
 [100]
 T}@T{
 n
+T}
+T{
+CRAN_REPOS
+T}@T{
+CRAN repository URL for downloading extra R packages
+T}@T{
+[https://cloud.r-project.org]
+T}@T{
+s
 T}
 T{
 create_squashfs
@@ -282,6 +337,16 @@ T}@T{
 [true]
 T}@T{
 b
+T}
+T{
+custom_clonezilla
+T}@T{
+Use this previously created custom CloneZilla ISO with added VirtualBox
+and guest additions.
+T}@T{
+[dep]
+T}@T{
+s
 T}
 T{
 device_installer
@@ -313,6 +378,16 @@ T}@T{
 b
 T}
 T{
+download_arch
+T}@T{
+Download and install stage3 archive to virtual disk.
+Booelan.
+T}@T{
+[true]
+T}@T{
+b
+T}
+T{
 download_clonezilla
 T}@T{
 Refresh CloneZilla ISO download.
@@ -332,26 +407,6 @@ T}@T{
 [path1]
 T}@T{
 u
-T}
-T{
-download_rstudio
-T}@T{
-Download and build RStudio.
-Boolean.
-T}@T{
-[true]
-T}@T{
-b
-T}
-T{
-download_arch
-T}@T{
-Download and install stage3 archive to virtual disk.
-Booelan.
-T}@T{
-[true]
-T}@T{
-b
 T}
 T{
 elist
@@ -479,6 +534,15 @@ T}@T{
 b:ext_device
 T}
 T{
+htmlpage
+T}@T{
+Create HTML help page
+T}@T{
+[false]
+T}@T{
+b
+T}
+T{
 hwvirtex
 T}@T{
 Activate HWVIRTEX: on/off
@@ -543,6 +607,24 @@ T}@T{
 [gentoo.iso]
 T}@T{
 f
+T}
+T{
+logging
+T}@T{
+Activate logging
+T}@T{
+[true]
+T}@T{
+b
+T}
+T{
+manpage
+T}@T{
+Create manpage mkg.1
+T}@T{
+[false]
+T}@T{
+b
 T}
 T{
 mem
@@ -631,6 +713,15 @@ T}@T{
 s:vm
 T}
 T{
+pdfpage
+T}@T{
+Create PDF help page
+T}@T{
+[false]
+T}@T{
+b
+T}
+T{
 plot
 T}@T{
 Plot VDI disk size using GNUPlot
@@ -659,12 +750,21 @@ T}@T{
 n
 T}
 T{
+plot_period
+T}@T{
+Number of minutes elapsed between two successive plots
+T}@T{
+[10]
+T}@T{
+n
+T}
+T{
 plot_position
 T}@T{
-Plot position of on monitor screen (top-left angle) in pixels e.g 0,0 or
-500,500
+Plot position of on monitor screen (top-left angle) in pixels e.g `0,0'
+or `500,500'
 T}@T{
-[0,0]
+[`0,0']
 T}@T{
 s
 T}
@@ -673,16 +773,7 @@ plot_span
 T}@T{
 Number of minutes of virtual disk processing to be plotted, back in time
 T}@T{
-[0]
-T}@T{
-n
-T}
-T{
-plot_period
-T}@T{
-Number of minutes elapsed between two successive plots
-T}@T{
-[10]
+[1200]
 T}@T{
 n
 T}
@@ -705,13 +796,13 @@ T}@T{
 b
 T}
 T{
-logging
+r_version
 T}@T{
-Activate logging
+R version
 T}@T{
-[true]
+[4.0.2]
 T}@T{
-b
+s
 T}
 T{
 remove_vdi
@@ -739,15 +830,6 @@ T}@T{
 [on]
 T}@T{
 o
-T}
-T{
-r_version
-T}@T{
-R version
-T}@T{
-[4.0.2]
-T}@T{
-s
 T}
 T{
 scsi_address

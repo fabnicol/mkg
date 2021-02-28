@@ -3,16 +3,27 @@
 <strong>mkg</strong> [[switch=argument]…] filename.iso [2]<br />
 <strong>mkg</strong> [[switch=argument]…] [3]<br />
 <strong>mkg</strong> help[=md] [4]</p>
-<p>Usage [1] and [2] create a bootable ISO output file with a current Gentoo distribution.<br />
+<p>Usage [1] and [2] create a bootable ISO output file with a current<br />
+Gentoo distribution.<br />
 For [1], implicit ISO output name is <strong>gentoo.iso</strong><br />
-Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine with name Gentoo.<br />
-Usage [4] prints this help, in markdown form if argument ‘md’ is specified.<br />
-Warning: you should have at least 55 GB of free disk space in the current directory or in vmpath if specified.</p>
-<p><strong>Switches:</strong></p>
-<p>Boolean values are either ‘true’ or ‘false’. For example, to build a minimal distribution, specify:<br />
-&gt; minimal=true</p>
-<p>on command line.</p>
-<p>Type Conventions:<br />
+Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine<br />
+with name Gentoo.<br />
+Usage [4] prints this help, in markdown form if argument ‘md’ is<br />
+specified.<br />
+Warning: you should have at least 55 GB of free disk space in the<br />
+current directory or in vmpath if specified.</p>
+<p><strong>Options:</strong></p>
+<p>Boolean values are either <code>true</code> or <code>false</code>. For example, to build<br />
+a minimal distribution, add to command line:<br />
+<code>minimal=true</code><br />
+or simply: <code>minimal</code> as <code>true</code> can be omitted (unlike <code>false</code>).</p>
+<p><strong>Examples</strong></p>
+<p><code># ./mkg pdfpage</code><br />
+<code># ./mkg debug_mode verbose from_vm vm=Gentoo.iso gentoo_small.iso</code>   <code>ext_device=sdc device_installer blank burn cleanup=false</code><br />
+<code># ./mkg download_arch=false download=false download_clonezilla=false</code>   <code>custom_clonezilla=clonezilla_cached.iso nonroot_user=phil</code><br />
+<code># nohup ./mkg plot plot_color=red plot_period=10 plot_pause=7</code>   <code>compact minimal minimal_size  gui=false elist=myebuilds</code>   <code>email=my.name@gmail.com email_passwd='mypasswd' &amp;</code><br />
+<code># nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &amp;</code></p>
+<p><strong>Type Conventions:</strong><br />
 b: true/false Boolean<br />
 o: on/off Boolean<br />
 n: Integer<br />
@@ -21,7 +32,9 @@ d: Directory path<br />
 e: Email address<br />
 s: String<br />
 u: URL</p>
-<p>When a field depends on another, a colon separates the type and the name of the dependency.</p>
+<p>When a field depends on another, a colon separates the type and<br />
+the name of the dependency. dep is a reserved word for dummy defaults of dependencies i.e.<br />
+optional strings that may remain unspecified.</p>
 <table>
 <colgroup>
 <col style="width: 20%" />
@@ -93,34 +106,22 @@ u: URL</p>
 <td style="text-align: center;">b</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">compact</td>
-<td style="text-align: center;">Compact virtual disk after VM building. Caution: this may impede hot_install and ext_device.</td>
-<td style="text-align: center;">[false]</td>
-<td style="text-align: center;">b</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">CRAN_REPOS</td>
-<td style="text-align: center;">CRAN repository URL for downloading extra R packages</td>
-<td style="text-align: center;">[https://cloud.r-project.org]</td>
-<td style="text-align: center;">s</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">remove_vdi</td>
-<td style="text-align: center;">Full clean-up: also remove VDI disks</td>
-<td style="text-align: center;">[false]</td>
-<td style="text-align: center;">b</td>
-</tr>
-<tr class="odd">
 <td style="text-align: center;">clonezilla_install</td>
 <td style="text-align: center;">Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc).</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">cloning_method</td>
 <td style="text-align: center;">Method used by hot_install ext_device=… to intall Gentoo to disk. One of: ‘guestfish’ (default), ‘with-raw-buffer’ (slower) or ‘vbox-img’ (currently unavailable)</td>
 <td style="text-align: center;">[guestfish]</td>
 <td style="text-align: center;">s:ext_device</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">compact</td>
+<td style="text-align: center;">Compact virtual disk after VM building. Caution: this may impede hot_install and ext_device.</td>
+<td style="text-align: center;">[false]</td>
+<td style="text-align: center;">b</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">cpuexecutioncap</td>
@@ -129,10 +130,22 @@ u: URL</p>
 <td style="text-align: center;">n</td>
 </tr>
 <tr class="even">
+<td style="text-align: center;">CRAN_REPOS</td>
+<td style="text-align: center;">CRAN repository URL for downloading extra R packages</td>
+<td style="text-align: center;">[https://cloud.r-project.org]</td>
+<td style="text-align: center;">s</td>
+</tr>
+<tr class="odd">
 <td style="text-align: center;">create_squashfs</td>
 <td style="text-align: center;">(Re)create the squashfs filesystem. Boolean.</td>
 <td style="text-align: center;">[true]</td>
 <td style="text-align: center;">b</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">custom_clonezilla</td>
+<td style="text-align: center;">Use this previously created custom CloneZilla ISO with added VirtualBox and guest additions.</td>
+<td style="text-align: center;">[dep]</td>
+<td style="text-align: center;">s</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">device_installer</td>
@@ -153,100 +166,100 @@ u: URL</p>
 <td style="text-align: center;">b</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">download_clonezilla</td>
-<td style="text-align: center;">Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean</td>
-<td style="text-align: center;">[true]</td>
-<td style="text-align: center;">b</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">download_clonezilla_path</td>
-<td style="text-align: center;">Download the following CloneZilla ISO</td>
-<td style="text-align: center;">[path1]</td>
-<td style="text-align: center;">u</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">download_rstudio</td>
-<td style="text-align: center;">Download and build RStudio. Boolean.</td>
-<td style="text-align: center;">[true]</td>
-<td style="text-align: center;">b</td>
-</tr>
-<tr class="odd">
 <td style="text-align: center;">download_arch</td>
 <td style="text-align: center;">Download and install stage3 archive to virtual disk. Booelan.</td>
 <td style="text-align: center;">[true]</td>
 <td style="text-align: center;">b</td>
 </tr>
+<tr class="odd">
+<td style="text-align: center;">download_clonezilla</td>
+<td style="text-align: center;">Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean</td>
+<td style="text-align: center;">[true]</td>
+<td style="text-align: center;">b</td>
+</tr>
 <tr class="even">
+<td style="text-align: center;">download_clonezilla_path</td>
+<td style="text-align: center;">Download the following CloneZilla ISO</td>
+<td style="text-align: center;">[path1]</td>
+<td style="text-align: center;">u</td>
+</tr>
+<tr class="odd">
 <td style="text-align: center;">elist</td>
 <td style="text-align: center;">File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the ‘elist’.accept_keywords and ‘elist’.use files</td>
 <td style="text-align: center;">[ebuilds.list]</td>
 <td style="text-align: center;">f</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">email</td>
 <td style="text-align: center;">Email address to send a warning to upon build completion. Note: you will have to accept so-called <em>insecure software</em> with some providers. It is not insecure if you are using your private PC throughout.</td>
 <td style="text-align: center;">[]</td>
 <td style="text-align: center;">e</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">email_passwd</td>
 <td style="text-align: center;">Email password</td>
 <td style="text-align: center;">[]</td>
 <td style="text-align: center;">s:email</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">emirrors</td>
 <td style="text-align: center;">Mirror sites for downloading ebuilds</td>
 <td style="text-align: center;">[path2]</td>
 <td style="text-align: center;">u</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">ext_device</td>
 <td style="text-align: center;">Create Gentoo OS on external device. Argument is either a device label (e.g. sdb, hdb), or a mountpoint directory (if mounted), or a few consecutive letters of the vendor name (e.g. ‘Samsu’, ‘PNY’ or ‘Kingst’), if there is just one such. Requires <em>hot_install</em> on commandline.</td>
 <td style="text-align: center;">[]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">force</td>
 <td style="text-align: center;">Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running.</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">from_device</td>
 <td style="text-align: center;">Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean.</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b:ext_device</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">from_iso</td>
 <td style="text-align: center;">Do not generate Gentoo but use the bootable ISO given on commandline.</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">from_vm</td>
 <td style="text-align: center;">Do not generate Gentoo but use the VM. Boolean.</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">gui</td>
 <td style="text-align: center;">Binary: true corresponds to VBoxManage startvm … –type=gui, false to –type=headless</td>
 <td style="text-align: center;">[true]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">help</td>
 <td style="text-align: center;">This help</td>
 <td style="text-align: center;">[]</td>
 <td style="text-align: center;"></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">hot_install</td>
 <td style="text-align: center;">Intall to Gentoo attached device (like /dev/sdb) possibly mounted (like /media/USER/567EAF). To be used with <em>ext_device=…</em></td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b:ext_device</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">htmlpage</td>
+<td style="text-align: center;">Create HTML help page</td>
+<td style="text-align: center;">[false]</td>
+<td style="text-align: center;">b</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">hwvirtex</td>
@@ -289,6 +302,18 @@ u: URL</p>
 <td style="text-align: center;">Path to the live CD that will start the VM</td>
 <td style="text-align: center;">[gentoo.iso]</td>
 <td style="text-align: center;">f</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">logging</td>
+<td style="text-align: center;">Activate logging</td>
+<td style="text-align: center;">[true]</td>
+<td style="text-align: center;">b</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">manpage</td>
+<td style="text-align: center;">Create manpage mkg.1</td>
+<td style="text-align: center;">[false]</td>
+<td style="text-align: center;">b</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">mem</td>
@@ -345,82 +370,82 @@ u: URL</p>
 <td style="text-align: center;">s:vm</td>
 </tr>
 <tr class="even">
+<td style="text-align: center;">pdfpage</td>
+<td style="text-align: center;">Create PDF help page</td>
+<td style="text-align: center;">[false]</td>
+<td style="text-align: center;">b</td>
+</tr>
+<tr class="odd">
 <td style="text-align: center;">plot</td>
 <td style="text-align: center;">Plot VDI disk size using GNUPlot</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">plot_color</td>
 <td style="text-align: center;">Plot line color between simple quotes (e.g: ‘cyan’,‘red’ etc.)</td>
 <td style="text-align: center;">[‘cyan’]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">plot_pause</td>
 <td style="text-align: center;">Number of seconds of plot display per minute of processing. Maximum 50.</td>
 <td style="text-align: center;">[5]</td>
 <td style="text-align: center;">n</td>
 </tr>
-<tr class="odd">
-<td style="text-align: center;">plot_position</td>
-<td style="text-align: center;">Plot position of on monitor screen (top-left angle) in pixels e.g 0,0 or 500,500</td>
-<td style="text-align: center;">[0,0]</td>
-<td style="text-align: center;">s</td>
-</tr>
 <tr class="even">
-<td style="text-align: center;">plot_span</td>
-<td style="text-align: center;">Number of minutes of virtual disk processing to be plotted, back in time</td>
-<td style="text-align: center;">[0]</td>
-<td style="text-align: center;">n</td>
-</tr>
-<tr class="odd">
 <td style="text-align: center;">plot_period</td>
 <td style="text-align: center;">Number of minutes elapsed between two successive plots</td>
 <td style="text-align: center;">[10]</td>
 <td style="text-align: center;">n</td>
 </tr>
+<tr class="odd">
+<td style="text-align: center;">plot_position</td>
+<td style="text-align: center;">Plot position of on monitor screen (top-left angle) in pixels e.g ‘0,0’ or ‘500,500’</td>
+<td style="text-align: center;">[‘0,0’]</td>
+<td style="text-align: center;">s</td>
+</tr>
 <tr class="even">
+<td style="text-align: center;">plot_span</td>
+<td style="text-align: center;">Number of minutes of virtual disk processing to be plotted, back in time</td>
+<td style="text-align: center;">[1200]</td>
+<td style="text-align: center;">n</td>
+</tr>
+<tr class="odd">
 <td style="text-align: center;">processor</td>
 <td style="text-align: center;">Processor type</td>
 <td style="text-align: center;">[amd64]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">quiet_mode</td>
 <td style="text-align: center;">Silence output except for the most severe errors.</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
-<td style="text-align: center;">logging</td>
-<td style="text-align: center;">Activate logging</td>
-<td style="text-align: center;">[true]</td>
-<td style="text-align: center;">b</td>
-</tr>
 <tr class="odd">
+<td style="text-align: center;">r_version</td>
+<td style="text-align: center;">R version</td>
+<td style="text-align: center;">[4.0.2]</td>
+<td style="text-align: center;">s</td>
+</tr>
+<tr class="even">
 <td style="text-align: center;">remove_vdi</td>
 <td style="text-align: center;">Remove virtual disk on clean-up</td>
 <td style="text-align: center;">[false]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">rootpasswd</td>
 <td style="text-align: center;">Root password</td>
 <td style="text-align: center;">[_dev2021_]</td>
 <td style="text-align: center;">s:vm</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">rtcuseutc</td>
 <td style="text-align: center;">Use UTC as time reference: on/off</td>
 <td style="text-align: center;">[on]</td>
 <td style="text-align: center;">o</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">r_version</td>
-<td style="text-align: center;">R version</td>
-<td style="text-align: center;">[4.0.2]</td>
-<td style="text-align: center;">s</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">scsi_address</td>
