@@ -541,7 +541,6 @@ values for ${y}=false and ${sw}=${!V} are incompatible."
 
         if [ "${type}" = "s" ] && [ -z "${default}" ] && [ "${sw}" != "dep" ]
         then
-	    echo "$V   ${!V}  ${sw} default=$default"
             ${LOG[*]} "[ERR] Execution cannot proceed without explicit value \
 for ${sw}"
             if [ "${INTERACTIVE}" = "true" ]
@@ -938,7 +937,7 @@ make_boot_from_livecd() {
 
     if "${CLEANUP}"
     then
-	if mountpoint mnt2/live/squashfs-root/dev;
+	if mountpoint mnt2/live/squashfs-root/dev
 	then
 	    for i in proc sys dev dev/pts run
 	    do
