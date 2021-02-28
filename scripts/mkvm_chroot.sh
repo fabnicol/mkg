@@ -341,7 +341,7 @@ global_config() {
 
     #--- groups and sudo
 
-    useradd -m -G userswheel,audio,video,plugdev \
+    useradd -m -G users,wheel,audio,video,plugdev \
             -s /bin/bash "${NONROOT_USER}"
 
     if [ $? != 0 ]
