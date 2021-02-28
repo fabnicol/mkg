@@ -541,7 +541,6 @@ values for ${y}=false and ${sw}=${!V} are incompatible."
 
         if [ "${type}" = "s" ] && [ -z "${default}" ] && [ "${sw}" != "dep" ]
         then
-	    echo "$V   ${!V}  ${sw} default=$default"
             ${LOG[*]} "[ERR] Execution cannot proceed without explicit value \
 for ${sw}"
             if [ "${INTERACTIVE}" = "true" ]
