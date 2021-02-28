@@ -502,8 +502,8 @@ address"
             # conditional types of the form e/f/s:...
 
             *:*)
-                if [ "${cond}" != "true" ] && { [ "${cond}" = "false" ] \
-                                                    || [ -z "${cond}" ]; }
+                if [ "${cond}" != "true" ] \
+		&& { [ "${cond}" = "false" ] || [ -z "${cond}" ]; } 
                 then
                     if [ -z "${cond}" ]
                     then
@@ -932,21 +932,12 @@ make_boot_from_livecd() {
 
     if mountpoint mnt
     then
-    if mountpoint mnt
-    then
 	umount -l mnt
     fi
 
     if "${CLEANUP}"
     then
-	if mountpoint mnt2/live/squashfs-root/dev;
-	then
-	    for i in proc sys dev dev/pts run
-	    do
-		umount mnt2/live/squashfs-root/$i
-	    done
-	fi
-	if mountpoint mnt2/live/squashfs-root/dev;
+	if mountpoint mnt2/live/squashfs-root/dev
 	then
 	    for i in proc sys dev dev/pts run
 	    do
@@ -1311,8 +1302,6 @@ log_loop() {
 		    | sort -g \
 		    | tail -n "${PLOT_SPAN}" > datafile
 
-		if [ -s datafile ]
-		then
 		if [ -s datafile ]
 		then
 		    "${GNUPLOT_BINARY}" \
