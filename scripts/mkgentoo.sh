@@ -932,11 +932,20 @@ make_boot_from_livecd() {
 
     if mountpoint mnt
     then
+    if mountpoint mnt
+    then
 	umount -l mnt
     fi
 
     if "${CLEANUP}"
     then
+	if mountpoint mnt2/live/squashfs-root/dev;
+	then
+	    for i in proc sys dev dev/pts run
+	    do
+		umount mnt2/live/squashfs-root/$i
+	    done
+	fi
 	if mountpoint mnt2/live/squashfs-root/dev;
 	then
 	    for i in proc sys dev dev/pts run
@@ -1302,6 +1311,10 @@ log_loop() {
 		    | sort -g \
 		    | tail -n "${PLOT_SPAN}" > datafile
 
+		echo DONE_LOG
+		if [ -s datafile ]
+		then
+		    echo PLOTTING
 		echo DONE_LOG
 		if [ -s datafile ]
 		then
