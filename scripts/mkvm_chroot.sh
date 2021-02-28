@@ -269,6 +269,7 @@ install_software() {
 	# one more chance, who knows
 	emerge --resume
     res_install=$?
+        res_install=$?
     fi
 
     emerge gdm
@@ -319,7 +320,7 @@ install_software() {
 
 global_config() {
 
-      sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="gdm"/' \
+    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="gdm"/' \
         /etc/conf.d/xdm
 
     #--- Services
@@ -341,7 +342,7 @@ global_config() {
 
     #--- groups and sudo
 
-    useradd -m -G userswheel,audio,video,plugdev \
+    useradd -m -G users,wheel,audio,video,plugdev \
             -s /bin/bash "${NONROOT_USER}"
 
     if [ $? != 0 ]
