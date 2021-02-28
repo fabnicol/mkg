@@ -1311,14 +1311,10 @@ log_loop() {
 		    | sort -g \
 		    | tail -n "${PLOT_SPAN}" > datafile
 
-		echo DONE_LOG
 		if [ -s datafile ]
 		then
-		    echo PLOTTING
-		echo DONE_LOG
 		if [ -s datafile ]
 		then
-		    echo PLOTTING
 		    "${GNUPLOT_BINARY}" \
 			-e "set terminal x11 position ${PLOT_POSITION};\
 set title 'Gentoo VDI disk size';\
@@ -1331,7 +1327,6 @@ plot 'datafile'  with linespoints ls 5;pause ${PLOT_PAUSE}"
 		    sleep $((60-${PLOT_PAUSE}-2))
 		    rm -f datafile
 		else
-		    echo NOT_PLOTTING
 		    sleep 58
 		fi
 	    else
