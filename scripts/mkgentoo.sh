@@ -2032,9 +2032,12 @@ main() {
 
     # you can bypass generation by setting vm= on commandline
 
-    [ -n "${VM}" ] && ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}" \
-        && generate_Gentoo
-
+    if [ -n "${VM}" ] && ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}"
+    then
+        generate_Gentoo
+        if_fails $? "[ERR] Could not create the OS virtual disk."
+    fi
+        
     # process the virtual disk into a clonezilla image
 
     if [ -f "${VM}.vdi" ] \
@@ -2085,7 +2088,12 @@ clonezilla image..."
         create_iso_vm
     fi
 
-    "${FROM_DEVICE}" && clonezilla_device_to_image
+    if "${FROM_DEVICE}"
+    then
+	clonezilla_device_to_image
+    fi
+
+    if_fails $? "[ERR] Cannot proceed further on account of previous failures."
 
     # Now convert the clonezilla xz image image into a bootable ISO
 
