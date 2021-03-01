@@ -28,7 +28,7 @@ jobs:
              sudo apt update 
              sudo apt install uuid
              sudo apt install libguestfs-tools squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
-             sudo apt install virtualbox virtualbox-guest-additions-iso virtualbox-ext-pack  
+             sudo apt install virtualbox virtualbox-guest-additions-iso   
 
       # Runs a set of commands using the runners shell
       - name: run
