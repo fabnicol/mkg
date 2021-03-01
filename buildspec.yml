@@ -1,0 +1,21 @@
+version: 0.2
+
+env:
+  shell: bash
+  
+phases:
+  build:
+    # The type of runner that the job will run on
+
+  on-failure: ABORT
+  commands:
+             - sudo apt update 
+             - sudo apt install uuid
+             - sudo apt install libguestfs-tools squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
+             - sudo apt install virtualbox virtualbox-guest-additions-iso   
+             - sudo ./mkg compact minimal minimal_size gentoo-$(date +%F-%H-%M-%S).iso gui=false vtxvpid=off
+
+artifacts:
+  files: 
+  - gentoo.iso
+  name: gentoo_gnome_$(date +%Y-%m-%d)_x86_64.iso
