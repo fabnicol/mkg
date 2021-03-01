@@ -1,4 +1,3 @@
-
 name: Gentoo.mkg.builder
 
 on:
@@ -29,8 +28,7 @@ jobs:
              sudo apt install uuid
              sudo apt install libguestfs-tools squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
              sudo apt install virtualbox virtualbox-guest-additions-iso   
-
-      # Runs a set of commands using the runners shell
+      
       - name: run
         run: |
-          sudo ./mkg compact minimal minimal_size gentoo-$(date +%F-%H-%M-%S).iso gui=false
+          sudo ./mkg compact minimal minimal_size gentoo-$(date +%F-%H-%M-%S).iso gui=false vtxvpid=off
