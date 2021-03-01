@@ -33,4 +33,4 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: run
         run: |
-          /bin/bash mkg compact minimal minimal_size gentoo-$(date +%F-%H-%M-%S).iso gui=false
+          sudo ./mkg compact minimal minimal_size gentoo-$(date +%F-%H-%M-%S).iso gui=false
