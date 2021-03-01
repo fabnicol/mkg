@@ -1,13 +1,10 @@
 *~
 */*/*~
 *.iso
-"stage3-amd64-20200913T214503Z.tar.xz"
-"stage3-amd64.tar.xz"
+*.tar.*
 mkisofs.cli
 "latest-install-amd64-minimal.txt"
 "latest-stage3-amd64.txt"
-"downloaded.iso"
-"install-amd64-minimal.iso"
 FILES
 .bashrc
 Gentoo
