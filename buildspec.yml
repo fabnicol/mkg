@@ -5,15 +5,13 @@ env:
   
 phases:
   build:
-    # The type of runner that the job will run on
-
-  on-failure: ABORT
-  commands:
-             - sudo apt update 
-             - sudo apt install uuid
-             - sudo apt install libguestfs-tools squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
-             - sudo apt install virtualbox virtualbox-guest-additions-iso   
-             - sudo ./mkg compact minimal minimal_size gentoo-$(date +%F-%H-%M-%S).iso gui=false vtxvpid=off
+    on-failure: ABORT
+    commands:
+             - apt update -yq
+             - apt install -yq uuid
+             - apt install -yq libguestfs-tools squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
+             - apt install -yq virtualbox virtualbox-guest-additions-iso   
+             - ./mkg compact minimal minimal_size gentoo.iso gui=false cleanup remove_dvi
 
 artifacts:
   files: 
