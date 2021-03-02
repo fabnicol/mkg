@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['validate_5foption_138',['validate_option',['../group__create_installer.html#ga70ccc3a81e02612a86b3a3983bc1c586',1,'mkgentoo.sh']]],
-  ['vbox_5fimg_5fworks_139',['vbox_img_works',['../group__create_installer.html#ga1eee61abdc54f97375ce8ccb16e1e6aa',1,'mkgentoo.sh']]]
+  ['unmount_5fclonezilla_5fiso_151',['unmount_clonezilla_iso',['../group__create_installer.html#ga692cf2f94dddfbc83f4f0b0dd08526f3',1,'mkgentoo.sh']]]
 ];

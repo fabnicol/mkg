@@ -260,126 +260,170 @@ $(function() {
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordflow">return</span> 0</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;}</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="preprocessor">## @fn fetch_livecd()</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="preprocessor">## @brief Downloads Gentoo install CD</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="preprocessor">## @details Caches it as ${ISO}</span></div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="preprocessor">## @retval Returns 0 on success or -1 on exit</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="preprocessor">## @fn fetch_clonezilla_with_virtualbox()</span></div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="preprocessor">## @brief Download automatic output of</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="preprocessor">## Github Actions at fabnicol/clonezila_with_virtualbox.Github</span></div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="preprocessor">## @note URL is: GITHUB_RELEASE_PATH/WORKFLOW_TAG</span></div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="preprocessor">## @ingroup fetchFunctions</span></div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
-<div class="line"><a name="l00199"></a><span class="lineno"><a class="line" href="fetch__functions_8sh.html#a747eb6a6a3e3fce1becde116190e868f">  199</a></span>&#160;<a class="code" href="fetch__functions_8sh.html#a747eb6a6a3e3fce1becde116190e868f">fetch_livecd</a>() {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    cd <span class="stringliteral">&quot;${VMPATH}&quot;</span></div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    local CACHED_ISO=<span class="stringliteral">&quot;install-${PROCESSOR}-minimal.iso&quot;</span></div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="preprocessor">    # Use clonezilla ISO for headless VM and Gentoo minimal install ISO for gui</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="preprocessor">    # VM</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno"><a class="line" href="fetch__functions_8sh.html#ade8328225ffd2dd0c30aa6895637361e">  199</a></span>&#160;<a class="code" href="fetch__functions_8sh.html#ade8328225ffd2dd0c30aa6895637361e">fetch_clonezilla_with_virtualbox</a>() {</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;local verb=<span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;! <span class="stringliteral">&quot;${VERBOSE}&quot;</span> &amp;&amp; verb=<span class="stringliteral">&quot;-s&quot;</span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Downloading CloneZilla with virtualbox from Github Actions...&quot;</span></div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">if</span>  <span class="stringliteral">&quot;${CLONEZILLA_INSTALL}&quot;</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    then</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        DOWNLOAD_CLONEZILLA=<span class="stringliteral">&quot;${DOWNLOAD}&quot;</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        CACHED_ISO=clonezilla.iso</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="stringliteral">&quot;${DOWNLOAD}&quot;</span> &amp;&amp; <a class="code" href="fetch__functions_8sh.html#a30dd5a4bfe7845ae1717ec4b142c10e6">fetch_gentoo_install_iso</a></div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    fi</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keywordflow">if</span> <span class="stringliteral">&quot;${DOWNLOAD_CLONEZILLA}&quot;</span></div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    then</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        <a class="code" href="fetch__functions_8sh.html#ae1918429f97793a7d5ff449988d57ebd">fetch_clonezilla_iso</a></div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="stringliteral">&quot;${CLONEZILLA_INSTALL}&quot;</span> &amp;&amp; <a class="code" href="group__create_installer.html#ga86cf981e617fa62d9780236ea2756256">ISO</a>=<span class="stringliteral">&quot;${CLONEZILLACD}&quot;</span></div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        [ -f <span class="stringliteral">&quot;clonezilla.iso&quot;</span> ] &amp;&amp; <a class="code" href="fetch__functions_8sh.html#ae1600f518b0a3f0c05e2a46812c96939">CLONEZILLACD</a>=<span class="stringliteral">&quot;clonezilla.iso&quot;</span> \</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        || { ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[ERR] CloneZilla ISO has not been cached. \</span></div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;<span class="stringliteral">Run with download=true&quot;</span> ; exit 1; }</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    fi</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordflow">if</span> ! <span class="stringliteral">&quot;${DOWNLOAD}&quot;</span></div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    then</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        <span class="keywordflow">if</span>  <span class="stringliteral">&quot;${CREATE_SQUASHFS}&quot;</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        then</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;            [ -f ${CACHED_ISO} ] \</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;                &amp;&amp; { ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Uncaching ${ISO} from ${CACHED_ISO}&quot;</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;                cp -f ${CACHED_ISO} <span class="stringliteral">&quot;${ISO}&quot;</span>; }</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;            ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[ERR] No ISO file was found, please rerun with \</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="stringliteral">download=true&quot;</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;            exit 1</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        fi</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        <a class="code" href="fetch__functions_8sh.html#a060afc2d4febc5e904b82d131fbc8f3e">LIVECD</a>=<span class="stringliteral">&quot;${ISO}&quot;</span></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    fi</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="keywordflow">return</span> 0</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;}</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} &lt;&lt;&lt; <span class="stringliteral">&quot;$(curl -L -O ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}/\</span></div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="stringliteral">clonezilla_with_virtualbox.iso  ${verb} 2&gt;&amp;1 | xargs echo &#39;[INF]&#39;)&quot;</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<a class="code" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a> $? <span class="stringliteral">&quot;[ERR] Could not download stage3 from URL \</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="stringliteral">${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}&quot;</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} &lt;&lt;&lt; <span class="stringliteral">&quot;$(curl -L -O ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}/\</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="stringliteral">checksums.txt  ${verb} 2&gt;&amp;1 | xargs echo &#39;[INF]&#39;)&quot;</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;<a class="code" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a> $? <span class="stringliteral">&quot;[ERR] Could not download checksums.txt from URL \</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;<span class="stringliteral">${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}&quot;</span></div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="keywordflow">if</span> ! ${DISABLE_MD5_CHECK}</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;then</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  local md5=$(md5sum <span class="stringliteral">&quot;clonezilla_with_virtualbox.iso&quot;</span> | cut -f 1 -d<span class="charliteral">&#39; &#39;</span>)</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  [ -f checksums.txt ] &amp;&amp; rm -f checksums.txt</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  local md5_=cat <span class="stringliteral">&#39;checksums.txt&#39;</span> |  xargs | cut -f2 -d<span class="charliteral">&#39; &#39;</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="keywordflow">if</span> [ ${md5} != ${md5_} ]</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  then</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[ERR] MD5 sum of clonezila_with_virtualbox from Github Actions \</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="stringliteral">could not be checked against downloaded file.&quot;</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      exit 2</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  fi</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;fi</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;}</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="preprocessor">## @fn fetch_livecd()</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="preprocessor">## @brief Downloads Gentoo install CD</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="preprocessor">## @details Caches it as ${ISO}</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="preprocessor">## @retval Returns 0 on success or -1 on exit</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="preprocessor">## @ingroup fetchFunctions</span></div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="preprocessor">## @fn fetch_stage3()</span></div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="preprocessor">## @brief Downloads a fresh stage3 Gentoo archive</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="preprocessor">## @details Caches it as ${STAGE3}</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<span class="preprocessor">## @ingroup fetchFunctions</span></div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
-<div class="line"><a name="l00244"></a><span class="lineno"><a class="line" href="fetch__functions_8sh.html#aeea237ee4e4e714889c00f67211ddb2b">  244</a></span>&#160;<a class="code" href="fetch__functions_8sh.html#aeea237ee4e4e714889c00f67211ddb2b">fetch_stage3</a>() {</div>
+<div class="line"><a name="l00239"></a><span class="lineno"><a class="line" href="fetch__functions_8sh.html#a747eb6a6a3e3fce1becde116190e868f">  239</a></span>&#160;<a class="code" href="fetch__functions_8sh.html#a747eb6a6a3e3fce1becde116190e868f">fetch_livecd</a>() {</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    cd <span class="stringliteral">&quot;${VMPATH}&quot;</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    local CACHED_ISO=<span class="stringliteral">&quot;install-${PROCESSOR}-minimal.iso&quot;</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="preprocessor">    # Use clonezilla ISO for headless VM and Gentoo minimal install ISO for gui</span></div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="preprocessor">    # VM</span></div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="preprocessor">    # Fetching stage3 tarball</span></div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    local CACHED_STAGE3=<span class="stringliteral">&quot;stage3-${PROCESSOR}.tar.xz&quot;</span></div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    local verb1=<span class="stringliteral">&quot;&quot;</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    local verb2=<span class="stringliteral">&quot;&quot;</span></div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    ! <span class="stringliteral">&quot;${VERBOSE}&quot;</span> &amp;&amp; verb1=<span class="stringliteral">&quot;-s&quot;</span></div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="stringliteral">&quot;${VERBOSE}&quot;</span> &amp;&amp; verb2=<span class="stringliteral">&quot;-v&quot;</span></div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordflow">if</span> <span class="stringliteral">&quot;${DOWNLOAD_ARCH}&quot;</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="keywordflow">if</span>  <span class="stringliteral">&quot;${CLONEZILLA_INSTALL}&quot;</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    then</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        DOWNLOAD_CLONEZILLA=<span class="stringliteral">&quot;${DOWNLOAD}&quot;</span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        CACHED_ISO=clonezilla.iso</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="stringliteral">&quot;${DOWNLOAD}&quot;</span> &amp;&amp; <a class="code" href="fetch__functions_8sh.html#a30dd5a4bfe7845ae1717ec4b142c10e6">fetch_gentoo_install_iso</a></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    fi</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordflow">if</span> <span class="stringliteral">&quot;${DOWNLOAD_CLONEZILLA}&quot;</span></div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    then</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Cleaning up stage3 data...&quot;</span></div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <span class="keywordflow">for</span> file in latest-stage3*.txt*</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        <span class="keywordflow">do</span></div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;            [ -f <span class="stringliteral">&quot;${file}&quot;</span> ] &amp;&amp; rm ${verb2} -f <span class="stringliteral">&quot;${file}&quot;</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        done</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Downloading stage3 data...&quot;</span></div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} &lt;&lt;&lt; <span class="stringliteral">&quot;$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/\</span></div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="stringliteral">latest-stage3-${PROCESSOR}.txt ${verb1} 2&gt;&amp;1 | xargs echo &#39;[INF]&#39;)&quot;</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <a class="code" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a> $? <span class="stringliteral">&quot;[ERR] Could not download stage3 from mirrors: \</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;<span class="stringliteral">${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt&quot;</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        <a class="code" href="group__auxiliary_functions.html#gaf79cae8ae0bba296925e9cb0e14e466b">check_file</a> latest-stage3-${PROCESSOR}.txt \</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;            <span class="stringliteral">&quot;[ERR] No stage 3 download information available!&quot;</span> \</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;            <span class="stringliteral">&quot;[ERR] Rerun with download_stage3=true&quot;</span></div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    fi</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    local current=$(cat latest-stage3-${PROCESSOR}.txt | \</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                        grep <span class="stringliteral">&quot;stage3-${PROCESSOR}&quot;</span>.*.tar.xz | cut -f 1 -d<span class="charliteral">&#39; &#39;</span>)</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160; </div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keywordflow">if</span> <span class="stringliteral">&quot;${DOWNLOAD_ARCH}&quot;</span></div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    then</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Cleaning up stage3 archives(s)...&quot;</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="keywordflow">for</span> file in <span class="stringliteral">&quot;stage3-${PROCESSOR}&quot;</span>-*tar.xz*</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        <span class="keywordflow">do</span></div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            [ -f ${file} ] &amp;&amp; rm ${verb2} -f <span class="stringliteral">&quot;${file}&quot;</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        done</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <a class="code" href="fetch__functions_8sh.html#ae1918429f97793a7d5ff449988d57ebd">fetch_clonezilla_iso</a></div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <span class="stringliteral">&quot;${CLONEZILLA_INSTALL}&quot;</span> &amp;&amp; <a class="code" href="group__create_installer.html#ga86cf981e617fa62d9780236ea2756256">ISO</a>=<span class="stringliteral">&quot;${CLONEZILLACD}&quot;</span></div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        <span class="keywordflow">if</span> ! ${USE_WORKFLOW} </div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    then</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            [ -f <span class="stringliteral">&quot;clonezilla.iso&quot;</span> ] &amp;&amp; <a class="code" href="fetch__functions_8sh.html#ae1600f518b0a3f0c05e2a46812c96939">CLONEZILLACD</a>=<span class="stringliteral">&quot;clonezilla.iso&quot;</span> \</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;            || { ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[ERR] CloneZilla ISO has not been cached. \</span></div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="stringliteral">Run with download=true&quot;</span> ; exit 1; }</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        fi</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    fi</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keywordflow">if</span> ! <span class="stringliteral">&quot;${DOWNLOAD}&quot;</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    then</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <span class="keywordflow">if</span>  <span class="stringliteral">&quot;${CREATE_SQUASHFS}&quot;</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        then</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;            [ -f ${CACHED_ISO} ] \</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                &amp;&amp; { ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Uncaching ${ISO} from ${CACHED_ISO}&quot;</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                cp -f ${CACHED_ISO} <span class="stringliteral">&quot;${ISO}&quot;</span>; }</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;            ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[ERR] No minimal install Gentoo ISO  was found, \</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="stringliteral">please rerun with download=true&quot;</span></div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;            exit 1</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        fi</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <a class="code" href="fetch__functions_8sh.html#a060afc2d4febc5e904b82d131fbc8f3e">LIVECD</a>=<span class="stringliteral">&quot;${ISO}&quot;</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    fi</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keywordflow">return</span> 0</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;}</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        [ -f ${STAGE3} ] &amp;&amp; rm ${verb2} -f ${STAGE3}</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Downloading ${current}...&quot;</span></div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} &lt;&lt;&lt; <span class="stringliteral">&quot;$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/\</span></div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="stringliteral">autobuilds/${current} ${verb1} 2&gt;&amp;1 | xargs echo &#39;[INF]&#39;)&quot;</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        <a class="code" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a> $? <span class="stringliteral">&quot;[ERR] Could not download stage3 tarball from mirror:\</span></div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="stringliteral"> ${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}&quot;</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="preprocessor">## @fn fetch_stage3()</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;<span class="preprocessor">## @brief Downloads a fresh stage3 Gentoo archive</span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;<span class="preprocessor">## @details Caches it as ${STAGE3}</span></div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="preprocessor">## @ingroup fetchFunctions</span></div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
+<div class="line"><a name="l00287"></a><span class="lineno"><a class="line" href="fetch__functions_8sh.html#aeea237ee4e4e714889c00f67211ddb2b">  287</a></span>&#160;<a class="code" href="fetch__functions_8sh.html#aeea237ee4e4e714889c00f67211ddb2b">fetch_stage3</a>() {</div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160; </div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        ! ${DISABLE_MD5_CHECK} &amp;&amp; <a class="code" href="group__auxiliary_functions.html#ga913689f9801eab383c4187327367e870">check_md5sum</a> $(basename ${current})</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Caching ${current} to ${CACHED_STAGE3}&quot;</span></div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        cp ${verb2} -f <span class="stringliteral">&quot;$(echo -s ${current} \</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="stringliteral">                             | sed s/.*stage3/stage3/)&quot;</span>  <span class="stringliteral">&quot;${CACHED_STAGE3}&quot;</span></div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    fi</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160; </div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <a class="code" href="group__auxiliary_functions.html#gaf79cae8ae0bba296925e9cb0e14e466b">check_file</a> <span class="stringliteral">&quot;${CACHED_STAGE3}&quot;</span>  <span class="stringliteral">&quot;[ERR] No stage3 tarball!&quot;</span> \</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                                   <span class="stringliteral">&quot;[ERR] Rerun with download_stage3=true&quot;</span></div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}&quot;</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    cp ${verb2} -f ${CACHED_STAGE3} <span class="stringliteral">&quot;${STAGE3}&quot;</span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;}</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="preprocessor">    # Fetching stage3 tarball</span></div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160; </div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    local CACHED_STAGE3=<span class="stringliteral">&quot;stage3-${PROCESSOR}.tar.xz&quot;</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    local verb1=<span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    local verb2=<span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    ! <span class="stringliteral">&quot;${VERBOSE}&quot;</span> &amp;&amp; verb1=<span class="stringliteral">&quot;-s&quot;</span></div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="stringliteral">&quot;${VERBOSE}&quot;</span> &amp;&amp; verb2=<span class="stringliteral">&quot;-v&quot;</span></div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordflow">if</span> <span class="stringliteral">&quot;${DOWNLOAD_ARCH}&quot;</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    then</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Cleaning up stage3 data...&quot;</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        <span class="keywordflow">for</span> file in latest-stage3*.txt*</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        <span class="keywordflow">do</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            [ -f <span class="stringliteral">&quot;${file}&quot;</span> ] &amp;&amp; rm ${verb2} -f <span class="stringliteral">&quot;${file}&quot;</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        done</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Downloading stage3 data...&quot;</span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} &lt;&lt;&lt; <span class="stringliteral">&quot;$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/\</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="stringliteral">latest-stage3-${PROCESSOR}.txt ${verb1} 2&gt;&amp;1 | xargs echo &#39;[INF]&#39;)&quot;</span></div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <a class="code" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a> $? <span class="stringliteral">&quot;[ERR] Could not download stage3 from mirrors: \</span></div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="stringliteral">${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt&quot;</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        <a class="code" href="group__auxiliary_functions.html#gaf79cae8ae0bba296925e9cb0e14e466b">check_file</a> latest-stage3-${PROCESSOR}.txt \</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;            <span class="stringliteral">&quot;[ERR] No stage 3 download information available!&quot;</span> \</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;            <span class="stringliteral">&quot;[ERR] Rerun with download_arch=true&quot;</span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    fi</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    local current=$(cat latest-stage3-${PROCESSOR}.txt | \</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;                        grep <span class="stringliteral">&quot;stage3-${PROCESSOR}&quot;</span>.*.tar.xz | cut -f 1 -d<span class="charliteral">&#39; &#39;</span>)</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160; </div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <span class="keywordflow">if</span> <span class="stringliteral">&quot;${DOWNLOAD_ARCH}&quot;</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    then</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Cleaning up stage3 archives(s)...&quot;</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;        <span class="keywordflow">for</span> file in <span class="stringliteral">&quot;stage3-${PROCESSOR}&quot;</span>-*tar.xz*</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        <span class="keywordflow">do</span></div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;            [ -f ${file} ] &amp;&amp; rm ${verb2} -f <span class="stringliteral">&quot;${file}&quot;</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        done</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160; </div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;        [ -f ${STAGE3} ] &amp;&amp; rm ${verb2} -f ${STAGE3}</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Downloading ${current}...&quot;</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} &lt;&lt;&lt; <span class="stringliteral">&quot;$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/\</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="stringliteral">autobuilds/${current} ${verb1} 2&gt;&amp;1 | xargs echo &#39;[INF]&#39;)&quot;</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        <a class="code" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a> $? <span class="stringliteral">&quot;[ERR] Could not download stage3 tarball from mirror:\</span></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="stringliteral"> ${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}&quot;</span></div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160; </div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;        ! ${DISABLE_MD5_CHECK} &amp;&amp; <a class="code" href="group__auxiliary_functions.html#ga913689f9801eab383c4187327367e870">check_md5sum</a> $(basename ${current})</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Caching ${current} to ${CACHED_STAGE3}&quot;</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;        cp ${verb2} -f <span class="stringliteral">&quot;$(echo -s ${current} \</span></div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="stringliteral">                             | sed s/.*stage3/stage3/)&quot;</span>  <span class="stringliteral">&quot;${CACHED_STAGE3}&quot;</span></div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    fi</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160; </div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    <a class="code" href="group__auxiliary_functions.html#gaf79cae8ae0bba296925e9cb0e14e466b">check_file</a> <span class="stringliteral">&quot;${CACHED_STAGE3}&quot;</span>  <span class="stringliteral">&quot;[ERR] No stage3 tarball!&quot;</span> \</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;                                   <span class="stringliteral">&quot;[ERR] Rerun with download_stage3=true&quot;</span></div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}&quot;</span></div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    cp ${verb2} -f ${CACHED_STAGE3} <span class="stringliteral">&quot;${STAGE3}&quot;</span></div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="agroup__auxiliary_functions_html_ga913689f9801eab383c4187327367e870"><div class="ttname"><a href="group__auxiliary_functions.html#ga913689f9801eab383c4187327367e870">check_md5sum</a></div><div class="ttdeci">check_md5sum(filename)</div><div class="ttdoc">Check md5sums in file MD5SUMS.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00093">utils.sh:93</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_ga7b33b974eed52f5a62f278deebd358d3"><div class="ttname"><a href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a></div><div class="ttdeci">if_fails()</div><div class="ttdoc">Echoes a message and exit in case of previous command failure.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00468">utils.sh:468</a></div></div>
 <div class="ttc" id="afetch__functions_8sh_html_ae1600f518b0a3f0c05e2a46812c96939"><div class="ttname"><a href="fetch__functions_8sh.html#ae1600f518b0a3f0c05e2a46812c96939">CLONEZILLACD</a></div><div class="ttdeci">Exported String CLONEZILLACD</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00094">fetch_functions.sh:94</a></div></div>
 <div class="ttc" id="afetch__functions_8sh_html_a64a49a9791d7042bd4b413c904f65f59"><div class="ttname"><a href="fetch__functions_8sh.html#a64a49a9791d7042bd4b413c904f65f59">cache_uncache_clonezilla_iso</a></div><div class="ttdeci">cache_uncache_clonezilla_iso()</div><div class="ttdoc">Either download clonezilla ISO file and caches it OR uncaches it.</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00107">fetch_functions.sh:107</a></div></div>
-<div class="ttc" id="amkgentoo_8sh_html_a99fb68646489d046faa1a0478d7c8e76"><div class="ttname"><a href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a></div><div class="ttdeci">Exported String LOG</div><div class="ttdef"><b>Definition:</b> <a href="mkgentoo_8sh_source.html#l00225">mkgentoo.sh:225</a></div></div>
+<div class="ttc" id="amkgentoo_8sh_html_a99fb68646489d046faa1a0478d7c8e76"><div class="ttname"><a href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a></div><div class="ttdeci">Exported String LOG</div><div class="ttdef"><b>Definition:</b> <a href="mkgentoo_8sh_source.html#l00275">mkgentoo.sh:275</a></div></div>
 <div class="ttc" id="afetch__functions_8sh_html_a996431f89efbe6441611e593254e487f"><div class="ttname"><a href="fetch__functions_8sh.html#a996431f89efbe6441611e593254e487f">fetch_process_clonezilla_iso</a></div><div class="ttdeci">fetch_process_clonezilla_iso()</div><div class="ttdoc">Download clonezilla ISO file and process it.</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00148">fetch_functions.sh:148</a></div></div>
-<div class="ttc" id="afetch__functions_8sh_html_a747eb6a6a3e3fce1becde116190e868f"><div class="ttname"><a href="fetch__functions_8sh.html#a747eb6a6a3e3fce1becde116190e868f">fetch_livecd</a></div><div class="ttdeci">fetch_livecd()</div><div class="ttdoc">Downloads Gentoo install CD.</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00199">fetch_functions.sh:199</a></div></div>
+<div class="ttc" id="afetch__functions_8sh_html_a747eb6a6a3e3fce1becde116190e868f"><div class="ttname"><a href="fetch__functions_8sh.html#a747eb6a6a3e3fce1becde116190e868f">fetch_livecd</a></div><div class="ttdeci">fetch_livecd()</div><div class="ttdoc">Downloads Gentoo install CD.</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00239">fetch_functions.sh:239</a></div></div>
+<div class="ttc" id="afetch__functions_8sh_html_ade8328225ffd2dd0c30aa6895637361e"><div class="ttname"><a href="fetch__functions_8sh.html#ade8328225ffd2dd0c30aa6895637361e">fetch_clonezilla_with_virtualbox</a></div><div class="ttdeci">fetch_clonezilla_with_virtualbox()</div><div class="ttdoc">Download automatic output of Github Actions at fabnicol/clonezila_with_virtualbox....</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00199">fetch_functions.sh:199</a></div></div>
 <div class="ttc" id="afetch__functions_8sh_html_a30dd5a4bfe7845ae1717ec4b142c10e6"><div class="ttname"><a href="fetch__functions_8sh.html#a30dd5a4bfe7845ae1717ec4b142c10e6">fetch_gentoo_install_iso</a></div><div class="ttdeci">fetch_gentoo_install_iso()</div><div class="ttdoc">Download minimal Gentoo install ISO file and caches.q.</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00008">fetch_functions.sh:8</a></div></div>
 <div class="ttc" id="afetch__functions_8sh_html_ae1918429f97793a7d5ff449988d57ebd"><div class="ttname"><a href="fetch__functions_8sh.html#ae1918429f97793a7d5ff449988d57ebd">fetch_clonezilla_iso</a></div><div class="ttdeci">fetch_clonezilla_iso()</div><div class="ttdoc">Download clonezilla ISO file and caches it.</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00080">fetch_functions.sh:80</a></div></div>
 <div class="ttc" id="afetch__functions_8sh_html_a060afc2d4febc5e904b82d131fbc8f3e"><div class="ttname"><a href="fetch__functions_8sh.html#a060afc2d4febc5e904b82d131fbc8f3e">LIVECD</a></div><div class="ttdeci">Exported String LIVECD</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00064">fetch_functions.sh:64</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_gaf79cae8ae0bba296925e9cb0e14e466b"><div class="ttname"><a href="group__auxiliary_functions.html#gaf79cae8ae0bba296925e9cb0e14e466b">check_file</a></div><div class="ttdeci">check_file()</div><div class="ttdoc">Checks existence of file.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00407">utils.sh:407</a></div></div>
-<div class="ttc" id="afetch__functions_8sh_html_aeea237ee4e4e714889c00f67211ddb2b"><div class="ttname"><a href="fetch__functions_8sh.html#aeea237ee4e4e714889c00f67211ddb2b">fetch_stage3</a></div><div class="ttdeci">fetch_stage3()</div><div class="ttdoc">Downloads a fresh stage3 Gentoo archive.</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00244">fetch_functions.sh:244</a></div></div>
+<div class="ttc" id="afetch__functions_8sh_html_aeea237ee4e4e714889c00f67211ddb2b"><div class="ttname"><a href="fetch__functions_8sh.html#aeea237ee4e4e714889c00f67211ddb2b">fetch_stage3</a></div><div class="ttdeci">fetch_stage3()</div><div class="ttdoc">Downloads a fresh stage3 Gentoo archive.</div><div class="ttdef"><b>Definition:</b> <a href="fetch__functions_8sh_source.html#l00287">fetch_functions.sh:287</a></div></div>
 <div class="ttc" id="agroup__create_installer_html_ga86cf981e617fa62d9780236ea2756256"><div class="ttname"><a href="group__create_installer.html#ga86cf981e617fa62d9780236ea2756256">ISO</a></div><div class="ttdeci">Exported String ISO</div><div class="ttdoc">Name of downloaded clonezilla ISO file.</div><div class="ttdef"><b>Definition:</b> <a href="mkgentoo_8sh_source.html#l00105">mkgentoo.sh:105</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

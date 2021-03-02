@@ -1,4 +1,4 @@
-.TH "fetch_functions.sh" 3 "Wed Feb 24 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "fetch_functions.sh" 3 "Tue Mar 2 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -25,6 +25,10 @@ fetch_functions.sh
 .RI "\fBfetch_process_clonezilla_iso\fP ()"
 .br
 .RI "Download clonezilla ISO file and process it\&. "
+.ti -1c
+.RI "\fBfetch_clonezilla_with_virtualbox\fP ()"
+.br
+.RI "Download automatic output of Github Actions at fabnicol/clonezila_with_virtualbox\&.Github\&. "
 .ti -1c
 .RI "\fBfetch_livecd\fP ()"
 .br
@@ -58,6 +62,19 @@ Definition at line 107 of file fetch_functions\&.sh\&.
 Download clonezilla ISO file and caches it\&. 
 .PP
 Definition at line 80 of file fetch_functions\&.sh\&.
+.SS "fetch_clonezilla_with_virtualbox ()"
+
+.PP
+Download automatic output of Github Actions at fabnicol/clonezila_with_virtualbox\&.Github\&. 
+.PP
+\fBNote\fP
+.RS 4
+URL is: GITHUB_RELEASE_PATH/WORKFLOW_TAG 
+.RE
+.PP
+
+.PP
+Definition at line 199 of file fetch_functions\&.sh\&.
 .SS "fetch_gentoo_install_iso ()"
 
 .PP
@@ -76,7 +93,7 @@ Downloads Gentoo install CD\&. Caches it as ${ISO}
 .PP
 
 .PP
-Definition at line 199 of file fetch_functions\&.sh\&.
+Definition at line 239 of file fetch_functions\&.sh\&.
 .SS "fetch_process_clonezilla_iso ()"
 
 .PP
@@ -115,7 +132,7 @@ Definition at line 148 of file fetch_functions\&.sh\&.
 .PP
 Downloads a fresh stage3 Gentoo archive\&. Caches it as ${STAGE3} 
 .PP
-Definition at line 244 of file fetch_functions\&.sh\&.
+Definition at line 287 of file fetch_functions\&.sh\&.
 .SH "Variable Documentation"
 .PP 
 .SS "Exported String CLONEZILLACD = '${clonezilla_iso}'"
