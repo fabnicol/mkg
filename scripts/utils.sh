@@ -107,7 +107,7 @@ Please download manually..."
 ## @ingroup auxiliaryFunctions
 
 test_numeric() {
-  grep -E "^[+-]?[0-9]+([.][0-9]+)?$" <<< "$1"
+  grep -q -E "^[+-]?[0-9]+([.][0-9]+)?$" <<< "$1"
 }
 
 ## @fn test_URL()
