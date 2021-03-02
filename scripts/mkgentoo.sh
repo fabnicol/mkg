@@ -140,6 +140,16 @@ help_md() {
     echo "Warning: you should have at least 55 GB of free disk space in the  "
     echo "current directory or in vmpath if specified.  "
     echo "  "
+    echo "As of tag 1st March, 2021, part of the build is performed  "
+    echo "by *Github Actions* automatically. An ISO file of CloneZilla  "
+    echo "supplemented with VirtualBox guest additions will be downloaded  "
+    echo "from the resulting automated Github release. To disable this behavior  "
+    echo "you can add \'use_workflow=false\' to command line, or build the  "
+    echo "custom ISO file beforehand using the companion project  "
+    echo "**clonezilla_with_virtualbox**. In this case, add:  "
+    echo "\`custom_clonezilla=your_build.iso\`  "
+    echo "to command line.  "
+    echo "  "
     echo "**Options:**  "
     echo "  "
     echo "Boolean values are either \`true\` or \`false\`. For example, to build  "
@@ -1797,6 +1807,13 @@ EOF
     clonezilla_to_iso "${CLONEZILLACD}" "mnt2"
 }
 
+## @fn bind_mount_clonezilla_iso()
+## @brief Fetches the clonezilla ISO.
+##        mount it to mnt, rsync it to mnt2 and ISOFILES
+##        bind-mount mnt2 live filesystem after unsquashfs
+## @private
+## @ingroup createInstaller
+
 bind_mount_clonezilla_iso() {
 
     if ! "${CREATE_ISO}" && ! "${FROM_DEVICE}" && ! "${FROM_VM}"
@@ -1843,6 +1860,12 @@ folder ISOFILES"
     if_fails $? "[ERR] Could not bind-mount squashfs-root"
     # add update script to clonezilla filesystem. Do not indent!
 }
+
+## @fn unmount_clonezilla_iso()
+## @brief Unmount the clonezilla filesystem after exiting chroot.
+##        Restore the squashfs filesystem.
+## @private
+## @ingroup createInstaller
 
 unmount_clonezilla_iso() {
 
@@ -1949,6 +1972,48 @@ EOF
     return 0
 }
 
+
+## @fn prepare_for_iso_vm() 
+## @details Short version of #add_guest_additions_to_clonezilla_iso when
+## the ISO has already been pre-authored.
+## @note Installing the guest additions is a prerequisite to folder sharing
+## between the ISO VM
+## and the host.
+## Folder sharing is necessary to recover a compressed clonezilla image of
+## the VDI virtual disk
+## into the directory ISOFILES/home/partimag/image
+## @ingroup createInstaller
+
+prepare_for_iso_vm() {
+
+        CLONEZILLACD="${CUSTOM_CLONEZILLA}"
+	    check_file "${CLONEZILLACD}"
+	    ${LOG[*]} "[INF] Using ${CLONEZILLACD} as custom-made \
+CloneZilla CD with VirtualBox and guest additions."
+
+            # copy to ISOFILES as a skeletton for ISO recovery image authoring
+
+        [ -d ISOFILES ] && rm -rf ISOFILES
+        mkdir -p ISOFILES/home/partimag
+        check_dir ISOFILES/home/partimag
+	    if [ -d mnt2 ]
+	    then
+		rm -rf mnt2/
+	        if_fails $? "[ERR] Could not remove directory mnt2. \
+Unmount it and remove it manually then restart."
+	    fi
+	    mkdir mnt2
+        check_dir mnt2
+	    mount -oloop "${CLONEZILLACD}" mnt2/
+	    if_fails $? "[ERR] Could not mount ${CLONEZILLACD} to mnt2"
+        rsync -a mnt2/ ISOFILES
+	    if_fails $? "[ERR] Could not sync files between mnt2 and ISOFILES"
+	    umount mnt2
+	    if_fails $? "[ERR] Could not unmount mnt2"	    
+}
+
+
+
 # ---------------------------------------------------------------------------- #
 # Core program
 #
@@ -2053,37 +2118,21 @@ main() {
             "${VERBOSE}" \
                 && ${LOG[*]} "[INF] These are necessary to activate folder sharing."
 
-            add_guest_additions_to_clonezilla_iso
+            if "${USE_WORKFLOW}"
+            then
+                fetch_clonezilla_with_virtualbox
+                CUSTOM_CLONEZILLA=clonezilla_with_virtualbox.iso
+                prepare_for_iso_vm
+            else
+                add_guest_additions_to_clonezilla_iso
+            fi
 	else
-            CLONEZILLACD="${CUSTOM_CLONEZILLA}"
-	    check_file "${CLONEZILLACD}"
-	    ${LOG[*]} "[INF] Using ${CLONEZILLACD} as custom-made \
-CloneZilla CD with VirtualBox and guest additions."
-
-            # copy to ISOFILES as a skeletton for ISO recovery image authoring
-
-            [ -d ISOFILES ] && rm -rf ISOFILES
-            mkdir -p ISOFILES/home/partimag
-            check_dir ISOFILES/home/partimag
-	    if [ -d mnt2 ]
-	    then
-		rm -rf mnt2/
-	        if_fails $? "[ERR] Could not remove directory mnt2. \
-Unmount it and remove it manually then restart."
-	    fi
-	    mkdir mnt2
-            check_dir mnt2
-	    mount -oloop "${CLONEZILLACD}" mnt2/
-	    if_fails $? "[ERR] Could not mount ${CLONEZILLACD} to mnt2"
-            rsync -a mnt2/ ISOFILES
-	    if_fails $? "[ERR] Could not sync files between mnt2 and ISOFILES"
-	    umount mnt2
-	    if_fails $? "[ERR] Could not unmount mnt2"	    
-	fi    
+	    prepare_for_iso_vm
+ 	fi    
 
         # And launch the corresponding VM
 
-        ${LOG[*]} "[INF] Launching Clonezilla VM to convert virtual disk to \
+   ${LOG[*]} "[INF] Launching Clonezilla VM to convert virtual disk to \
 clonezilla image..."
         create_iso_vm
     fi

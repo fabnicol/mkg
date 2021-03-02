@@ -47,6 +47,7 @@
      "from_device"        "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean."  "false" "b:ext_device"
      "from_iso"           "Do not generate Gentoo but use the bootable ISO given on commandline."                                "false" "b"
      "from_vm"            "Do not generate Gentoo but use the VM. Boolean."                                                      "false" "b"
+     "github_release_path" "URL to Github Release of clonezilla_with_virtualbox.iso"                                             "https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download" "s"     
      "gui"                "Binary: true corresponds to VBoxManage startvm ... --type=gui, false to --type=headless"               "true" "b"
      "help"               "This help"                                                                                                ""  ""
      "hot_install"        "Intall to Gentoo attached device (like /dev/sdb) possibly mounted (like /media/USER/567EAF). To be used with *ext_device=...*"        "false"  "b:ext_device"
@@ -88,14 +89,17 @@
      "stage3"             "Path to stage3 archive"                                                                       "stage3.tar.xz" "f"
      "usbehci"            "Activate USB2 driver: on/off"                                                                           "off" "o"
      "usbxhci"            "Activate USB3 driver: on/off. Note: if on, needs extension pack."                                       "off" "o"
+     "use_workflow"       "Use Github Actions workflow to add virtualbox guest additions to CloneZilla ISO."                      "true" "b"
      "vm"                 "Virtual Machine name. Unless 'force=true' is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name."  "Gentoo" "vm"
      "vbox_version"       "Virtualbox version"                                                                                "6.1.14"   "s"
      "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.14a"  "s"
      "vbpath"             "Path to VirtualBox directory"                                                                      "/usr/bin" "d"
      "vmpath"             "Path to VM base directory"                                                                         "$PWD"     "d"
      "vtxvpid"            "Activate VTXVPID: on/off"                                                                          "on"       "o"
+     "workflow_tag"       "Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by Github Actions"            "v1.8"     "s"
     
     
 # **path1:**  https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download    
 # **path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           
+# **path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download
 # **count:**  $((`nproc --all`/3))  

@@ -37,7 +37,7 @@ setup_network() {
            echo "[INF] Running ocs-live-netcfg..." | tee setup_network.log
            ocs-live-netcfg
        else
-           echo "[INF] Running net-setup..." | tee setup_network.log
+           echo "[INF] Running net-setup..." | tee -a setup_network.log
            net-setup
        fi
     else
@@ -50,14 +50,14 @@ setup_network() {
             # some sort.  This is why we wait some time in mkgentoo.sh
 
             read -p "[MSG] Waiting for keyboard input..."  input_str
-            echo "[MSG] Got input string: $input_str" | tee setup_network.log
-            echo "[INF] Running dhcpcd..."            | tee setup_network.log
+            echo "[MSG] Got input string: $input_str" | tee -a setup_network.log
+            echo "[INF] Running dhcpcd..."            | tee -a setup_network.log
             dhcpcd -HD $(ifconfig | cut -d' ' -f1   | head -n 1 | cut -d':' -f1)
         fi
     fi
     res=$?
     [ ${res} = 0 ] && touch setup_network || {
-        echo  "[ERR] Could not fix internet access!" | tee setup_network.log
+        echo  "[ERR] Could not fix internet access!" | tee -a setup_network.log
         "${GUI}" && exit 1 || shutdown -h now
     }
 }
@@ -138,16 +138,16 @@ partition() {
         echo "[MSG] Partioned /dev/sda4 correctly."
     else
         echo "[ERR] parted exit code: ${res0}"    | tee partition.log
-        echo "[ERR] mkfs.fat exit code: ${res1}"  | tee partition.log
-        echo "[ERR] mkfs.ext4 exit code: ${res2}" | tee partition.log
-        echo "[ERR] mkswap exit code: ${res3}"    | tee partition.log
-        echo "[ERR] swapon exit code: ${res4}"    | tee partition.log
-        echo "[ERR] mount exit code:  ${res5}"    | tee partition.log
-        echo "[ERR] Failed to cleanly partition main disk" | tee partition.log
+        echo "[ERR] mkfs.fat exit code: ${res1}"  | tee -a partition.log
+        echo "[ERR] mkfs.ext4 exit code: ${res2}" | tee -a partition.log
+        echo "[ERR] mkswap exit code: ${res3}"    | tee -a partition.log
+        echo "[ERR] swapon exit code: ${res4}"    | tee -a partition.log
+        echo "[ERR] mount exit code:  ${res5}"    | tee -a partition.log
+        echo "[ERR] Failed to cleanly partition main disk" | tee -a partition.log
         sleep 10
         if [ $((${res1} | ${res2} | ${res3} | ${res5})) != 0 ]
         then
-            echo  "[ERR] Critical errors while partitioning" | tee partition.log
+            echo  "[ERR] Critical errors while partitioning" | tee -a partition.log
             swapoff -a
             findmnt /dev/sda4 && umount -l /dev/sda4
             if "${GUI}"
@@ -199,8 +199,8 @@ install_stage3() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not cd to /mnt/gentoo"   | tee stage3.log
-        echo "[ERR] Shutting down in 5 seconds..." | tee stage3.log
+        echo "[ERR] Could not cd to /mnt/gentoo"   | tee -a stage3.log
+        echo "[ERR] Shutting down in 5 seconds..." | tee -a stage3.log
         sleep 5
         shutdown -h now
     fi
@@ -210,7 +210,7 @@ install_stage3() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] stage3 tarball could not be extracted" | tee stage3.log
+        echo "[ERR] stage3 tarball could not be extracted" | tee -a stage3.log
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
@@ -260,14 +260,14 @@ bh-luxi"' >> ${m_conf}
     if [ ${res} = 0 ]
     then
         touch stage3
-        echo "[MSG] Installed stage3 correctly."    | tee stage3.log
+        echo "[MSG] Installed stage3 correctly."    | tee -a stage3.log
     else
-        echo "mounting proc exit code: ${res0}"     | tee stage3.log
-        echo "mounting sys exit code: ${res1}"      | tee stage3.log
-        echo "rslave sys exit code: ${res2}"        | tee stage3.log
-        echo "mounting dev dev exit code: ${res3}"     | tee stage3.log
-        echo "rslave dev exit code exit code: ${res4}" | tee stage3.log
-        echo "Failed to bind liveCD to main disk"  | tee stage3.log
+        echo "mounting proc exit code: ${res0}"     | tee -a stage3.log
+        echo "mounting sys exit code: ${res1}"      | tee -a stage3.log
+        echo "rslave sys exit code: ${res2}"        | tee -a stage3.log
+        echo "mounting dev dev exit code: ${res3}"     | tee -a stage3.log
+        echo "rslave dev exit code exit code: ${res4}" | tee -a stage3.log
+        echo "Failed to bind liveCD to main disk"  | tee -a stage3.log
         sleep 10
         swapoff /dev/sda3
         findmnt /dev/sda4 && umount -l /dev/sda4
@@ -284,7 +284,7 @@ bh-luxi"' >> ${m_conf}
     cd ~
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not cd to $HOME" | tee stage3.log
+        echo "[ERR] Could not cd to $HOME" | tee -a stage3.log
         exit 2
     fi
 
@@ -292,8 +292,8 @@ bh-luxi"' >> ${m_conf}
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not chroot to /mnt/gentoo" | tee stage3.log
-        echo "[INF] Shutting down in 5 seconds" | tee stage3.log
+        echo "[ERR] Could not chroot to /mnt/gentoo" | tee -a stage3.log
+        echo "[INF] Shutting down in 5 seconds" | tee -a stage3.log
         sleep 5
         exit 2
     fi
@@ -323,11 +323,11 @@ finalize() {
 setup_network  2>&1 | tee setup_network.log
 if ! partition
 then
-    echo "[WAR] Second try at partitioning..." | tee partion.log
+    echo "[WAR] Second try at partitioning..." | tee -a partion.log
     findmnt /dev/sda2 && umount -l /dev/sda2
     findmnt /dev/sda4 && umount -l /dev/sda4
     swapoff -a
     partition
 fi
-install_stage3 2>&1 | tee stage3.log
+install_stage3 2>&1 | tee -a stage3.log
 finalize       2>&1 | tee finalize.log
