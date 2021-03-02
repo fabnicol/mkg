@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash
 
 # * Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>.
 # * This file is part of mkg.
@@ -55,7 +55,7 @@ adjust_environment() {
          >> /etc/fstab
     echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"   \
          >> /etc/fstab
-    
+
     source /etc/profile
 
     # Refresh and rebuild @world frequently emerge complains about
@@ -242,10 +242,10 @@ install_software() {
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
-    
+
     # for gnome there is a circuylar dependency to break:
     USE="-sqlite -bluetooth" emerge dev-lang/python
-    
+
     local packages=`grep -E -v '(^\s*$|^\s*#.*$)' ${ELIST} \
 | sed "s/dev-lang\/R-.*$/dev-lang\/R-${R_VERSION}/"`
 
@@ -263,7 +263,7 @@ install_software() {
     emerge -uDN --keep-going ${packages}  2>&1 \
     | tee -a log_install_software.log
     local res_install=$?
-    
+
     if [ "${res_install}" != "0" ]
     then
 	# one more chance, who knows
@@ -272,8 +272,6 @@ install_software() {
         res_install=$?
     fi
 
-    emerge gdm
-    
     if [ $? != 0 ]
     then
 	# one more chance, who knows
@@ -282,7 +280,7 @@ install_software() {
 
     # do not use \ to continue line below:
 
-    if ! "${MINIMAL}" 
+    if ! "${MINIMAL}"
     then
        Rscript libs.R 2>&1 | tee Rlibs.log
        rm -f libs.R
@@ -320,8 +318,17 @@ install_software() {
 
 global_config() {
 
-    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="gdm"/' \
+    # Configuration --- sddm
+
+    echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
+        | tee -a sddm.log
+    echo "setxkbmap ${LANGUAGE},us" > /usr/share/sddm/scripts/Xsetup \
+        | tee -a sddm.log
+    chmod +x /usr/share/sddm/scripts/Xsetup
+    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
         /etc/conf.d/xdm
+
+    gpasswd -a sddm video
 
     #--- Services
 
