@@ -66,6 +66,52 @@ Warning: you should have at least 55 GB of free disk space in the
 current directory or in vmpath if specified.
 .PP
 .br
+As of tag 1st March, 2021, part of the build is performed
+.PD 0
+.P
+.PD
+.br
+by \f[I]Github Actions\f[R] automatically.
+An ISO file of CloneZilla
+.PD 0
+.P
+.PD
+.br
+supplemented with VirtualBox guest additions will be downloaded
+.PD 0
+.P
+.PD
+.br
+from the resulting automated Github release.
+To disable this behavior
+.PD 0
+.P
+.PD
+.br
+you can add \f[C]use_workflow=false\f[R] to command line, or build the
+.PD 0
+.P
+.PD
+.br
+custom ISO file beforehand using the companion project
+.PD 0
+.P
+.PD
+.br
+\f[B]clonezilla_with_virtualbox\f[R].
+In this case, add:
+.PD 0
+.P
+.PD
+.br
+\f[C]custom_clonezilla=your_build.iso\f[R]
+.PD 0
+.P
+.PD
+.br
+to command line.
+.PP
+.br
 \f[B]Options:\f[R]
 .PP
 .br
@@ -505,6 +551,15 @@ T}@T{
 b
 T}
 T{
+github_release_path
+T}@T{
+URL to Github Release of clonezilla_with_virtualbox.iso
+T}@T{
+[path3]
+T}@T{
+s
+T}
+T{
 gui
 T}@T{
 Binary: true corresponds to VBoxManage startvm \&... \[en]type=gui,
@@ -889,6 +944,16 @@ T}@T{
 o
 T}
 T{
+use_workflow
+T}@T{
+Use Github Actions workflow to add virtualbox guest additions to
+CloneZilla ISO.
+T}@T{
+[true]
+T}@T{
+b
+T}
+T{
 vm
 T}@T{
 Virtual Machine name.
@@ -944,6 +1009,16 @@ T}@T{
 T}@T{
 o
 T}
+T{
+workflow_tag
+T}@T{
+Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by
+Github Actions
+T}@T{
+[v1.8]
+T}@T{
+s
+T}
 .TE
 .PP
 .br
@@ -953,12 +1028,13 @@ https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20
 .P
 .PD
 .br
-\f[B]path2:\f[R] https://github.com/rstudio/rstudio/archive/v
+\f[B]path2:\f[R] http://gentoo.mirrors.ovh.net/gentoo-distfiles/
 .PD 0
 .P
 .PD
 .br
-\f[B]path3:\f[R] http://gentoo.mirrors.ovh.net/gentoo-distfiles/
+\f[B]path3:\f[R]
+https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/
 .PD 0
 .P
 .PD
