@@ -1,4 +1,4 @@
-.TH "mkgentoo.sh" 3 "Wed Feb 24 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "mkgentoo.sh" 3 "Tue Mar 2 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -18,6 +18,18 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .RI "\fBhelp_\fP ()"
 .br
 .RI "Print usage to stdout\&. "
+.ti -1c
+.RI "\fBmanpage\fP ()"
+.br
+.RI "Print help to man page\&. "
+.ti -1c
+.RI "\fBhtmlpage\fP ()"
+.br
+.RI "Print help to html page\&. "
+.ti -1c
+.RI "\fBpdfpage\fP ()"
+.br
+.RI "Print help to pdf page\&. "
 .ti -1c
 .RI "\fBvalidate_option\fP (option)"
 .br
@@ -105,9 +117,20 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .br
 Upgrade it with virtualbox guest additions\&. "
 .ti -1c
+.RI "\fBbind_mount_clonezilla_iso\fP ()"
+.br
+.RI "Fetches the clonezilla ISO\&. mount it to mnt, rsync it to mnt2 and ISOFILES bind-mount mnt2 live filesystem after unsquashfs\&. "
+.ti -1c
+.RI "\fBunmount_clonezilla_iso\fP ()"
+.br
+.RI "Unmount the clonezilla filesystem after exiting chroot\&. Restore the squashfs filesystem\&. "
+.ti -1c
 .RI "\fBclonezilla_device_to_image\fP ()"
 .br
 .RI "Create CloneZilla xz-compressed image out of an external block device (like a USB stick) "
+.ti -1c
+.RI "\fBprepare_for_iso_vm\fP ()"
+.br
 .ti -1c
 .RI "\fBmain\fP ()"
 .br
@@ -232,15 +255,15 @@ Definition in file \fBmkgentoo\&.sh\fP\&.
 .SS "Exported String ISOLINUX_DIR = isolinux"
 
 .PP
-Definition at line 742 of file mkgentoo\&.sh\&.
+Definition at line 802 of file mkgentoo\&.sh\&.
 .SS "Exported String LOG"
 
 .PP
-Definition at line 225 of file mkgentoo\&.sh\&.
+Definition at line 275 of file mkgentoo\&.sh\&.
 .SS "Exported String PATH = '${PATH}':'${VBPATH}'"
 
 .PP
-Definition at line 1088 of file mkgentoo\&.sh\&.
+Definition at line 1158 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for mkg from the source code\&.
