@@ -283,7 +283,7 @@ get_options() {
 
     while (( "$#" ))
     do
-        if grep '=' <<< "$1" 2>/dev/null 1>/dev/null
+        if grep -q '=' <<< "$1" 
         then
             left=$(sed -E 's/(.*)=(.*)/\1/'  <<< "$1")
             right=$(sed -E 's/(.*)=(.*)/\2/' <<< "$1")
@@ -297,7 +297,7 @@ get_options() {
                 fi
             fi
         else
-            if  grep "\.iso"  <<< "$1" 2>/dev/null 1>/dev/null
+            if  grep -q "\.iso"  <<< "$1" 
             then
                 ISO_OUTPUT="$1"
                 CREATE_ISO=true
@@ -490,7 +490,7 @@ either 'false' or 'true' on command line"
 directory."
                          exit 1; }
                 ;;
-            e)  if ! grep -E "[a-z]+@[a-z]+\.[a-z]+" <<< "${!V}"
+            e)  if ! grep -q -E "[a-z]+@[a-z]+\.[a-z]+" <<< "${!V}"
                 then
                     ${LOG[*]} "[ERR] ${sw}=... must be a valid email \
 address"
@@ -502,9 +502,9 @@ address"
                          exit 1;} ;;
             n)  if ! test_numeric "${!V}"
                 then
-		    ${LOG[*]} "[ERR] ${sw}=... is not numeric."
+                    ${LOG[*]} "[ERR] ${sw}=... is not numeric."
                     exit 1
-		fi
+                fi
                 ;;
             o)  [ "${!V}" != "on" ] && [ "${!V}" != "off" ] \
                     && { ${LOG[*]} "[ERR] ${sw}=on or ${sw}=off are the only \
@@ -667,8 +667,13 @@ from_device or from_vm may be specified on commandline."
 
     if [ -n "${CUSTOM_CLONEZILLA}" ] && [ "${CUSTOM_CLONEZILLA}" != "dep" ]
     then
-	DOWNLOAD_CLONEZILLA=false
-	CLONEZILLACD="${CUSTOM_CLONEZILLA}"
+	    DOWNLOAD_CLONEZILLA=false
+	    CLONEZILLACD="${CUSTOM_CLONEZILLA}"
+    fi
+    
+    if "${USE_WORKFLOW}"
+    then
+        DOWNLOAD_CLONEZILLA=false
     fi
 
     # minimal CPU allocation
@@ -956,7 +961,7 @@ make_boot_from_livecd() {
 	umount -l mnt
     fi
 
-    if "${CLEANUP}"
+    if "${CLEANUP}" && [ -d mnt2/live/squashfs-root ]
     then
 	if mountpoint mnt2/live/squashfs-root/dev
 	then
