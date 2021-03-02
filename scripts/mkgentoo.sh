@@ -502,9 +502,9 @@ address"
                          exit 1;} ;;
             n)  if ! test_numeric "${!V}"
                 then
-		    ${LOG[*]} "[ERR] ${sw}=... is not numeric."
+                    ${LOG[*]} "[ERR] ${sw}=... is not numeric."
                     exit 1
-		fi
+                fi
                 ;;
             o)  [ "${!V}" != "on" ] && [ "${!V}" != "off" ] \
                     && { ${LOG[*]} "[ERR] ${sw}=on or ${sw}=off are the only \
@@ -667,8 +667,13 @@ from_device or from_vm may be specified on commandline."
 
     if [ -n "${CUSTOM_CLONEZILLA}" ] && [ "${CUSTOM_CLONEZILLA}" != "dep" ]
     then
-	DOWNLOAD_CLONEZILLA=false
-	CLONEZILLACD="${CUSTOM_CLONEZILLA}"
+	    DOWNLOAD_CLONEZILLA=false
+	    CLONEZILLACD="${CUSTOM_CLONEZILLA}"
+    fi
+    
+    if "${USE_WORKFLOW}"
+    then
+        DOWNLOAD_CLONEZILLA=false
     fi
 
     # minimal CPU allocation
