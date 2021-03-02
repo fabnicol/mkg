@@ -14,17 +14,26 @@
  sys-boot/grub:2
  dev-vcs/git
  x11-apps/xdm
+ x11-misc/sddm 
+ kde-plasma/sddm-kcm
  
-## GNOME
-
- gnome-desktop
- gnome-base/gnome
+## KDE
+ 
+ plasma-meta
 
 # X
 
  x11-base/xorg-x11
  x11-base/xorg-drivers
- x11-terms/guake
- x11-terms/xterm
+ 
+# Other desktop
 
+ kate
+ konsole
+ kde-apps/dolphin
+ konqueror
+
+## PDF-related
+ 
+ okular
 
