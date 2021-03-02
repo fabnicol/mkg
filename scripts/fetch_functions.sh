@@ -190,6 +190,46 @@ fetch_process_clonezilla_iso() {
     return 0
 }
 
+## @fn fetch_clonezilla_with_virtualbox()
+## @brief Download automatic output of 
+## Github Actions at fabnicol/clonezila_with_virtualbox.Github
+## @note URL is: GITHUB_RELEASE_PATH/WORKFLOW_TAG
+## @ingroup fetchFunctions
+
+fetch_clonezilla_with_virtualbox() {
+
+local verb=""
+! "${VERBOSE}" && verb="-s"
+
+${LOG[*]} "[INF] Downloading CloneZilla with virtualbox fro Github Actions..."
+
+${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}/\
+  ${verb} 2>&1 | xargs echo '[INF]')"
+
+if_fails $? "[ERR] Could not download stage3 from URL \
+${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}"
+
+${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}/\
+checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
+
+if_fails $? "[ERR] Could not download checksums.txt from URL \
+${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}"
+
+if ! ${DISABLE_MD5_CHECK} 
+then 
+  local md5=$(md5sum "clonezilla_with_virtualbox.iso" | cut -f 1 -d' ')
+  [ -f checksums.txt ] && rm -f checksums.txt
+  local md5_=cat 'checksums.txt' |  xargs | cut -f2 -d' '
+  if [ ${md5} != ${md5_} ]
+  then
+      ${LOG[*]} "[ERR] MD5 sum of clonezila_with_virtualbox from Github Actions \
+could not be checked against downloaded file."
+      exit 2
+  fi
+fi
+ 
+}
+    
 ## @fn fetch_livecd()
 ## @brief Downloads Gentoo install CD
 ## @details Caches it as ${ISO}

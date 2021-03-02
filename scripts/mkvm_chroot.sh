@@ -45,8 +45,8 @@ adjust_environment() {
     local uuid3=$(blkid | grep sda3 | cut -f2 -d' ')
     local uuid4=$(blkid | grep sda4 | cut -f2 -d' ')
     echo "Partition /dev/sda2 with ${uuid2}" | tee partition_log
-    echo "Partition /dev/sda3 with ${uuid3}" | tee partition_log
-    echo "Partition /dev/sda4 with ${uuid4}" | tee partition_log
+    echo "Partition /dev/sda3 with ${uuid3}" | tee -a partition_log
+    echo "Partition /dev/sda4 with ${uuid4}" | tee -a partition_log
     echo "${uuid2} /boot           vfat defaults            0 2" \
          >  /etc/fstab
     echo "${uuid3} none            swap sw                  0 0" \
@@ -100,7 +100,7 @@ adjust_environment() {
     USE='-qt5' emerge -1 cmake
     if [ $? != 0 ]
     then
-        echo "emerge cmake failed!" | tee emerge.build
+        echo "emerge cmake failed!" | tee -a emerge.build
         return 1
     fi
 
@@ -119,7 +119,7 @@ adjust_environment() {
 
     if [ $? != 0 ]
     then
-       echo "[ERR] emerge netifrs/pcmiautils failed!" | tee emerge.build
+       echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
        return 1
     fi
 
@@ -127,9 +127,9 @@ adjust_environment() {
     # 15-24 hours
     # as syslogd is not yet there we tee a custom build log
 
-    emerge -uDN @world 2>&1 | tee emerge.build
+    emerge -uDN @world 2>&1 | tee -a emerge.build
     [ $? != 0 ] && {
-        echo "[ERR] emerge @world failed!"  | tee emerge.build
+        echo "[ERR] emerge @world failed!"  | tee -a emerge.build
         return 1; }
 
     # Networking in the new environment
@@ -186,19 +186,19 @@ build_kernel() {
 
     if [ "$PWD" != "/usr/src/linux" ]
     then
-        echo "[ERR] Could not cd to /usr/src/linux" >> tee kernel.log
+        echo "[ERR] Could not cd to /usr/src/linux" | tee -a kernel.log
         exit 2
     fi
 
     # kernel config issue here
 
     make syncconfig  # replaces silentoldconfig as of 4.19
-    make -s -j${NCPUS}   2>&1 >>  kernel.log
-    make modules_install 2>&1 >>  kernel.log
-    make install         2>&1 >>  kernel.log
+    make -s -j${NCPUS}   2>&1 | tee -a  kernel.log
+    make modules_install 2>&1 | tee -a  kernel.log
+    make install         2>&1 | tee -a  kernel.log
     if  [ $? != 0 ]
     then
-        echo "[ERR] Kernel building failed!" | tee  kernel.log
+        echo "[ERR] Kernel building failed!" | tee -a kernel.log
         return 1
     fi
 
@@ -208,17 +208,17 @@ build_kernel() {
 
     if [ -f /boot/vmlinuz* ]
     then
-        echo "[MSG] Kernel was built" >> kernel.log
+        echo "[MSG] Kernel was built" | tee -a kernel.log
     else
-        echo "[ERR] Kernel compilation failed!"  >>  kernel.log
+        echo "[ERR] Kernel compilation failed!"  | tee -a  kernel.log
         return 1
     fi
 
     if [ -f /boot/initr*.img ]
     then
-        echo "[MSG] initramfs was built" >>  kernel.log
+        echo "[MSG] initramfs was built" | tee -a  kernel.log
     else
-        echo "[ERR] initramfs compilation failed!" >>  kernel.log
+        echo "[ERR] initramfs compilation failed!" | tee -a  kernel.log
         return 1
     fi
 }
@@ -261,7 +261,7 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN --keep-going ${packages}  2>&1 \
-    | tee log_install_software.log
+    | tee -a log_install_software.log
     local res_install=$?
     
     if [ "${res_install}" != "0" ]
@@ -299,7 +299,7 @@ install_software() {
     if [ "${res_install}" != "0" ]
     then
         echo "[ERR] Main package build step failed" \
-            | tee log_install_software.log
+            | tee -a log_install_software.log
         return 1
     fi
 }
@@ -373,7 +373,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not install grub" | tee grub.log
+        echo "[ERR] Could not install grub" | tee -a grub.log
         exit 1
     fi
 
@@ -381,7 +381,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not configure grub" | tee grub.log
+        echo "[ERR] Could not configure grub" | tee -a grub.log
         exit 1
     fi
 
@@ -404,23 +404,23 @@ finalize() {
     # freeing up some disk space
 
     echo "Cleaning up a bit aggressively before cloning..." \
-        | tee log_uninstall_software.log
+        | tee log_uninstall.log
 
     # MINIMAL_SIZE should only be set for packaging purposes.
     # and avoided for personal use
 
     if "${MINIMAL_SIZE}"
     then
-        emerge --unmerge gentoo-sources  2>&1 | tee log_uninstall.log
-        rm -rf /usr/src/linux/*               | tee log_uninstall.log
+        emerge --unmerge gentoo-sources  2>&1 | tee -a log_uninstall.log
+        rm -rf /usr/src/linux/*               | tee -a log_uninstall.log
         rm -rf /var/cache/distfiles/*
     else
-        eclean -d packages 2>&1 | tee log_uninstall_software.log
+        eclean -d packages 2>&1 | tee -a log_uninstall.log
     fi
 
     # kernel sources will have to be reinstalled by user if necessary
 
-    emerge --depclean 2>&1 | tee log_uninstall.log
+    emerge --depclean 2>&1 | tee -a log_uninstall.log
     rm -rf /var/tmp/*
     rm /tmp/*
 
