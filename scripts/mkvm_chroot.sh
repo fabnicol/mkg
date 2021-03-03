@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash
 
 # * Copyright (c) 2020 Fabrice Nicol <fabrnicol@gmail.com>.
 # * This file is part of mkg.
@@ -243,9 +243,6 @@ install_software() {
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
 
-    # for gnome there is a circuylar dependency to break:
-    USE="-sqlite -bluetooth" emerge dev-lang/python
-
     local packages=`grep -E -v '(^\s*$|^\s*#.*$)' ${ELIST} \
 | sed "s/dev-lang\/R-.*$/dev-lang\/R-${R_VERSION}/"`
 
@@ -275,7 +272,7 @@ install_software() {
     if [ $? != 0 ]
     then
 	# one more chance, who knows
-	emerge --resume
+	emerge --resume | tee -a log_install_software.log
     fi
 
     # do not use \ to continue line below:
@@ -437,7 +434,6 @@ finalize() {
     then
         rm -rf /var/log/*
         find . -maxdepth 1 -type f -delete
-        sed -i 's/^export .*$//g' .bashrc
     fi
 
     [ -n "$(which eix-update)" ] && eix-update
