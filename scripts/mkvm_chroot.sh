@@ -444,6 +444,9 @@ finalize() {
     cat /dev/zero > zeros ; sync ; rm zeros
 }
 
+# Normally a non-op 
+source .bashrc
+
 declare -i res=0
 adjust_environment
 [ $? = 0 ] || res=1
