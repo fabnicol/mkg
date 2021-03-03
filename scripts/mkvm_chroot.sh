@@ -267,7 +267,7 @@ install_software() {
     if [ "${res_install}" != "0" ]
     then
 	# one more chance, who knows
-	emerge --resume
+	emerge --resume | tee -a log_install_software.log
     res_install=$?
         res_install=$?
     fi
@@ -430,7 +430,6 @@ finalize() {
     then
         rm -rf /var/log/*
         find . -maxdepth 1 -type f -delete
-        sed -i 's/^export .*$//g' .bashrc
     fi
 
     [ -n "$(which eix-update)" ] && eix-update
@@ -440,6 +439,9 @@ finalize() {
 
     cat /dev/zero > zeros ; sync ; rm zeros
 }
+
+# Normally a non-op 
+source .bashrc
 
 declare -i res=0
 adjust_environment
