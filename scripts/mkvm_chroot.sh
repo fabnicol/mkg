@@ -250,6 +250,11 @@ install_software() {
 
     echo "${packages}" > package_list
 
+    # There is an intractable circular dependency that
+    # can be broken by pre-emerging python
+
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python
+
     # v1.3: adding --keep-going. Limited emerge failures may not render
     # the build useless.
     # allow some tolerance for incomplete builds caused
@@ -444,7 +449,7 @@ finalize() {
     cat /dev/zero > zeros ; sync ; rm zeros
 }
 
-# Normally a non-op 
+# Normally a non-op
 source .bashrc
 
 declare -i res=0
