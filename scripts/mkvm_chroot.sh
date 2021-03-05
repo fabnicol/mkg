@@ -269,7 +269,7 @@ install_software() {
     if [ "${res_install}" != "0" ]
     then
 	# one more chance, who knows
-	emerge --resume
+	emerge --resume | tee -a log_install_software.log
     res_install=$?
         res_install=$?
     fi

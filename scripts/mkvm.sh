@@ -237,7 +237,12 @@ elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
 
     echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code \
 bh-luxi"' >> ${m_conf}
-    echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
+    if [ "${BIOS}" = "true" ]
+    then
+        echo 'GRUB_PLATFORMS="i386-pc"' >> ${m_conf}
+    else
+        echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
+    fi
     echo 'VIDEO_CARDS="nouveau intel"'   >> ${m_conf}
     echo 'INPUT_DEVICES="evdev synaptics"' >> ${m_conf}
     mkdir --parents etc/portage/repos.conf
