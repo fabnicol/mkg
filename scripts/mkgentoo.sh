@@ -2166,10 +2166,12 @@ clonezilla image..."
         if clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
         then
             ${LOG[*]} "[MSG] Done."
-            [ -f "${ISO_OUTPUT}" ] \
-                && ${LOG[*]} "[MSG] ISO install medium was created here:\
-                       ${ISO_OUTPUT}"  \
-                    || ${LOG[*]} "[ERR] ISO install medium failed to be created."
+           if [ -f "${ISO_OUTPUT}" ] 
+	   then
+            ${LOG[*]} "[MSG] ISO install medium was created here: ${ISO_OUTPUT}"  
+	   else
+            ${LOG[*]} "[ERR] ISO install medium failed to be created."
+	   fi   
         else
             ${LOG[*]} "[ERR] ISO install medium failed to be created!"
             exit 1
