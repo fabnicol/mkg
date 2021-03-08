@@ -140,6 +140,10 @@ help_md() {
     echo "Warning: you should have at least 55 GB of free disk space in the  "
     echo "current directory or in vmpath if specified.  "
     echo "  "
+    echo "Arguments with white space (like \`cflags=\"-O2 -march=...\"\`) should be  "
+    echo "written in list form with commas and no spaces: \`cflags=[-O2,-march=...]\`  "
+    echo "The same holds for paths with white space.  "
+    echo "  "
     echo "As of tag 1st March, 2021, part of the build is performed  "
     echo "by *Github Actions* automatically. An ISO file of CloneZilla  "
     echo "supplemented with VirtualBox guest additions will be downloaded  "
@@ -164,7 +168,7 @@ help_md() {
     echo "    \`ext_device=sdc device_installer blank burn cleanup=false\`   "
     echo "\`# ./mkg download_arch=false download=false download_clonezilla=false\` \  "
     echo "    \`custom_clonezilla=clonezilla_cached.iso nonroot_user=phil\`  "
-    echo "\`# nohup ./mkg plot plot_color="'red'" plot_period=10 plot_pause=7\` \  "  
+    echo "\`# nohup ./mkg plot plot_color="'red'" plot_period=10 plot_pause=7\` \  "
     echo "        \`compact minimal minimal_size  gui=false elist=myebuilds\` \  "
     echo "        \`email=my.name@gmail.com email_passwd='mypasswd' &\`  "
     echo "\`# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\`  "
@@ -193,7 +197,7 @@ help_md() {
         declare -i desc=i*4+1
         declare -i def=i*4+2
         declare -i type=i*4+3
-        echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [${ARR[def]}] | ${ARR[type]}|"
+        echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [ ${ARR[def]} ] | ${ARR[type]}|"
     done
     echo "  "
     echo "  "
@@ -283,10 +287,10 @@ get_options() {
 
     while (( "$#" ))
     do
-        if grep -q '=' <<< "$1" 
+        if grep -q '=' <<< "$1"
         then
-            left=$(sed -E 's/(.*)=(.*)/\1/'  <<< "$1")
-            right=$(sed -E 's/(.*)=(.*)/\2/' <<< "$1")
+            left=$(sed -E 's/([^=]*)=(.*)/\1/'  <<< "$1")
+            right=$(sed -E 's/([^=]*)=(.*)$/\2/' <<< "$1")
             if validate_option "${left}"
             then
                 declare -u VAR=${left}
@@ -297,7 +301,7 @@ get_options() {
                 fi
             fi
         else
-            if  grep -q "\.iso"  <<< "$1" 
+            if  grep -q "\.iso"  <<< "$1"
             then
                 ISO_OUTPUT="$1"
                 CREATE_ISO=true
@@ -524,7 +528,7 @@ address"
 
             *:*)
                 if [ "${cond}" != "true" ] \
-		&& { [ "${cond}" = "false" ] || [ -z "${cond}" ]; } 
+		&& { [ "${cond}" = "false" ] || [ -z "${cond}" ]; }
                 then
                     if [ -z "${cond}" ]
                     then
@@ -583,9 +587,20 @@ for ${sw}"
         eval "${V}"=\""${default}"\"
     fi
 
-    # exporting is made necessary by usage in companion scripts.
+    # Post processing of arguments in list form [a,b...]
 
-    [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} "[MSG] Export: ${V}=${!V}"
+   if [ "${!V::1}" = "[" ]
+   then
+       local w="${!V}"
+       local V1="${w:1:(${#w}-2)}"
+       V1=$(sed 's/,/ /g' <<< ${V1})
+       eval "${V}"=\"${V1}\"
+   fi
+
+   [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} "[MSG] Export: ${V}=\"${!V}\""
+
+   # exporting is made necessary by usage in companion scripts.
+
     export "${V}"
 }
 
@@ -670,7 +685,7 @@ from_device or from_vm may be specified on commandline."
 	    DOWNLOAD_CLONEZILLA=false
 	    CLONEZILLACD="${CUSTOM_CLONEZILLA}"
     fi
-    
+
     if "${USE_WORKFLOW}"
     then
         DOWNLOAD_CLONEZILLA=false
@@ -748,6 +763,7 @@ Allowing a 10 second break for second thoughts."
             echo sleep 10
         fi
     fi
+
 }
 
 # ---------------------------------------------------------------------------- #
@@ -1150,6 +1166,17 @@ delete_vm() {
 ## @li Finally compact it.
 ## @note VM may be visible (vm type=gui) or without GUI (vm type=headless,
 ## currently to be fixed)
+## @bug     VB bug note
+## Unfortunately @code VBoxManage modifyvm --cpu-profile host @encode
+## is not fail-safe.
+## For example, this option detects my CPU (Intel core-i7 5820K) vendor,
+## model name, number of cpus etc. yet the list of flags is erroneous
+## and does not contain flags **fma, bmi, bmi2** necessary to compile with
+## @code -march=haswell @endcode.
+## The guest **/proc/cpuinfo** lacks these flags, which are listed in the host
+## /proc/cpuinfo, so the VB flag import capability is buggy or incomplete.
+## Borrowing solution from: https://superuser.com/questions/625648/
+## virtualbox-how-to-force-a-specific-cpu-to-the-guest
 ## @todo Find a way to only compact on success and never on failure of VM.
 ## @ingroup createInstaller
 
@@ -1176,7 +1203,6 @@ create_vm() {
 
     ${LOG[*]} <<< $(VBoxManage modifyvm "${VM}" \
                                --cpus ${NCPUS} \
-                               --cpu-profile host \
                                --memory ${MEM} \
                                --vram 128 \
                                --ioapic ${IOAPIC} \
@@ -1191,6 +1217,18 @@ create_vm() {
                                --rtcuseutc ${RTCUSEUTC} \
                                --firmware ${FIRMWARE} 2>&1 \
                         | xargs echo "[MSG]")
+
+
+    grep -E '^[[:digit:]abcdef]{8} ' <<< $(VBoxManage list hostcpuids) |\
+	while read -r line
+	do
+	    leaf="0x$(echo ${line} | cut -f1 -d' ')"
+	    if [[ ${leaf} -lt 0x0b || ${leaf} -gt 0x17 ]]
+	    then
+		${LOG[*]} <<< $(VBoxManage modifyvm "${VM}" --cpuidset ${line} \
+				    | xargs echo "[MSG]")
+	    fi
+	done
 
     # create virtual VDI disk, if it does not exist
 
@@ -1978,7 +2016,7 @@ EOF
 }
 
 
-## @fn prepare_for_iso_vm() 
+## @fn prepare_for_iso_vm()
 ## @details Short version of #add_guest_additions_to_clonezilla_iso when
 ## the ISO has already been pre-authored.
 ## @note Installing the guest additions is a prerequisite to folder sharing
@@ -2014,7 +2052,7 @@ Unmount it and remove it manually then restart."
         rsync -a mnt2/ ISOFILES
 	    if_fails $? "[ERR] Could not sync files between mnt2 and ISOFILES"
 	    umount mnt2
-	    if_fails $? "[ERR] Could not unmount mnt2"	    
+	    if_fails $? "[ERR] Could not unmount mnt2"
 }
 
 
@@ -2107,7 +2145,7 @@ main() {
         generate_Gentoo
         if_fails $? "[ERR] Could not create the OS virtual disk."
     fi
-        
+
     # process the virtual disk into a clonezilla image
 
     if [ -f "${VM}.vdi" ] \
@@ -2133,7 +2171,7 @@ main() {
             fi
 	else
 	    prepare_for_iso_vm
- 	fi    
+ 	fi
 
         # And launch the corresponding VM
 
@@ -2166,12 +2204,12 @@ clonezilla image..."
         if clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
         then
             ${LOG[*]} "[MSG] Done."
-           if [ -f "${ISO_OUTPUT}" ] 
+           if [ -f "${ISO_OUTPUT}" ]
 	   then
-            ${LOG[*]} "[MSG] ISO install medium was created here: ${ISO_OUTPUT}"  
+            ${LOG[*]} "[MSG] ISO install medium was created here: ${ISO_OUTPUT}"
 	   else
             ${LOG[*]} "[ERR] ISO install medium failed to be created."
-	   fi   
+	   fi
         else
             ${LOG[*]} "[ERR] ISO install medium failed to be created!"
             exit 1
