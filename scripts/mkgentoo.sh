@@ -1166,6 +1166,17 @@ delete_vm() {
 ## @li Finally compact it.
 ## @note VM may be visible (vm type=gui) or without GUI (vm type=headless,
 ## currently to be fixed)
+## @bug     VB bug note
+## Unfortunately @code VBoxManage modifyvm --cpu-profile host @encode
+## is not fail-safe.
+## For example, this option detects my CPU (Intel core-i7 5820K) vendor,
+## model name, number of cpus etc. yet the list of flags is erroneous
+## and does not contain flags **fma, bmi, bmi2** necessary to compile with
+## @code -march=haswell @endcode.
+## The guest **/proc/cpuinfo** lacks these flags, which are listed in the host
+## /proc/cpuinfo, so the VB flag import capability is buggy or incomplete.
+## Borrowing solution from: https://superuser.com/questions/625648/
+## virtualbox-how-to-force-a-specific-cpu-to-the-guest
 ## @todo Find a way to only compact on success and never on failure of VM.
 ## @ingroup createInstaller
 
@@ -1192,7 +1203,6 @@ create_vm() {
 
     ${LOG[*]} <<< $(VBoxManage modifyvm "${VM}" \
                                --cpus ${NCPUS} \
-                               --cpu-profile host \
                                --memory ${MEM} \
                                --vram 128 \
                                --ioapic ${IOAPIC} \
@@ -1208,6 +1218,18 @@ create_vm() {
                                --firmware ${FIRMWARE} 2>&1 \
                         | xargs echo "[MSG]")
 
+    
+    grep -E '^[[:digit:]abcdef]{8} ' <<< $(VBoxManage list hostcpuids) |\
+	while read -r line
+	do
+	    leaf="0x$(echo ${line} | cut -f1 -d' ')"
+	    if [[ ${leaf} -lt 0x0b || ${leaf} -gt 0x17 ]]
+	    then
+		${LOG[*]} <<< $(VBoxManage modifyvm "${VM}" --cpuidset ${line} \
+				    | xargs echo "[MSG]")
+	    fi
+	done
+    
     # create virtual VDI disk, if it does not exist
 
     if [ ! -f  "${VM}.vdi" ] || "${FORCE}"
