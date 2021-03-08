@@ -140,6 +140,10 @@ help_md() {
     echo "Warning: you should have at least 55 GB of free disk space in the  "
     echo "current directory or in vmpath if specified.  "
     echo "  "
+    echo "Arguments with white space (like \`cflags=\"-O2 -march=...\"\`) should be  "
+    echo "written in list form with commas and no spaces: \`cflags=[-O2,-march=...]\`  "
+    echo "The same holds for paths with white space.  "
+    echo "  "
     echo "As of tag 1st March, 2021, part of the build is performed  "
     echo "by *Github Actions* automatically. An ISO file of CloneZilla  "
     echo "supplemented with VirtualBox guest additions will be downloaded  "
@@ -193,7 +197,7 @@ help_md() {
         declare -i desc=i*4+1
         declare -i def=i*4+2
         declare -i type=i*4+3
-        echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [${ARR[def]}] | ${ARR[type]}|"
+        echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [ ${ARR[def]} ] | ${ARR[type]}|"
     done
     echo "  "
     echo "  "
@@ -285,8 +289,8 @@ get_options() {
     do
         if grep -q '=' <<< "$1" 
         then
-            left=$(sed -E 's/(.*)=(.*)/\1/'  <<< "$1")
-            right=$(sed -E 's/(.*)=(.*)/\2/' <<< "$1")
+            left=$(sed -E 's/([^=]*)=(.*)/\1/'  <<< "$1")
+            right=$(sed -E 's/([^=]*)=(.*)$/\2/' <<< "$1")
             if validate_option "${left}"
             then
                 declare -u VAR=${left}
@@ -583,9 +587,20 @@ for ${sw}"
         eval "${V}"=\""${default}"\"
     fi
 
-    # exporting is made necessary by usage in companion scripts.
+    # Post processing of arguments in list form [a,b...]
+    
+   if [ "${!V::1}" = "[" ]
+   then
+       local w="${!V}"
+       local V1="${w:1:(${#w}-2)}"
+       V1=$(sed 's/,/ /g' <<< ${V1})
+       eval "${V}"=\"${V1}\"
+   fi
 
-    [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} "[MSG] Export: ${V}=${!V}"
+   [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} "[MSG] Export: ${V}=\"${!V}\""
+    
+   # exporting is made necessary by usage in companion scripts.
+   
     export "${V}"
 }
 
@@ -748,6 +763,7 @@ Allowing a 10 second break for second thoughts."
             echo sleep 10
         fi
     fi
+    
 }
 
 # ---------------------------------------------------------------------------- #
