@@ -80,7 +80,7 @@
 ## @li Only create the VM and virtual disk, in debug mode,
 ## without R and set new passwords, for a French-language platform.
 ## Use 8 cores.
-## @code mkg language=fr minimal debug_mode ncpus=8
+## @code mkg vm_language=fr minimal debug_mode ncpus=8
 ## nonroot_user=ken passwd='util!Hx&32F' rootpasswd='Hk_32!_CD' cleanup=false
 ## @endcode
 ## @li Create ISO clonezilla image of Gentoo linux, burn it to DVD, create an

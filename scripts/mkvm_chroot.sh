@@ -142,9 +142,9 @@ adjust_environment() {
 
     # Set keymaps and time
 
-    if [ "${LANGUAGE}" = "fr" ]
+    if [ -n "${VM_LANGUAGE}" ]
     then
-        echo 'keymap="fr"' >  /etc/conf.d/keymaps
+        echo "keymap=${VM_LANGUAGE}" >  /etc/conf.d/keymaps
         echo 'keymap="us"' >> /etc/conf.d/keymaps
     else
         echo 'keymap="us"' >  /etc/conf.d/keymaps
@@ -324,7 +324,7 @@ global_config() {
 
     echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
         | tee -a sddm.log
-    echo "setxkbmap ${LANGUAGE},us" > /usr/share/sddm/scripts/Xsetup \
+    echo "setxkbmap ${VM_LANGUAGE},us" > /usr/share/sddm/scripts/Xsetup \
         | tee -a sddm.log
     chmod +x /usr/share/sddm/scripts/Xsetup
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
