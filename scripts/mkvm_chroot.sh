@@ -364,7 +364,7 @@ global_config() {
 
     #--- Creating the bootloader
 
-    if "${BIOS}"
+    if [ "${BIOS}" = "true" ]
     then
         grub-install /dev/sda
     else

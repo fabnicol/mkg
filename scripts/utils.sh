@@ -484,14 +484,18 @@ cleanup() {
     local verb=""
     ${VERBOSE} && verb="-v"
     cd "${VMPATH}" || exit 2
-    rm ${verb} -f *.xz
-    rm ${verb} -f *.txt
     rm ${verb} -rf ISOFILES/ mnt2/
     [ -d mnt ]  && mountpoint mnt && umount -l mnt/
     [ -d mnt ]  && rm ${verb} -rf mnt
     [ -d mnt2 ] && rm ${verb} -rf mnt2
     [ -d "${VM}" ] && rm ${verb} -rf "${VM}"
     [ -d "${VM}_ISO" ] && rm ${verb} -rf "${VM}_ISO"
-    "${REMOVE_VDI}" && [ -f "${VM}.vdi" ] && rm ${verb} -f "${VM}.vdi"
+    if "${FULL_CLEANUP}"
+    then
+	[ -f "${VM}.vdi" ] && rm ${verb} -f "${VM}.vdi"
+        rm ${verb} -f *.xz
+        rm ${verb} -f *.txt
+        rm ${verb} -f *.iso
+    fi
     return 0
 }

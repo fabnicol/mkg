@@ -23,7 +23,7 @@
      "build_virtualbox"   "Download code source and automatically build virtualbox and tools. Yields VirtualBox and vbox-img executables under main directory and subdirectory virtualbox with the build, including documentation." "false" "b"
      "burn"               "Burn to optical disc. Boolean."                                                                       "false" "b"
      "cdrecord"           "cdrecord full path. Automatically determined if left unspecified."                   "`which cdrecord`"  "f:burn"
-     "cflags"             "GCC CFLAGS options for ebuilds"                                                           "-march=native -O2" ""     
+     "cflags"             "GCC CFLAGS options for ebuilds"                                                         "[-march=native,-O2]" "s"     
      "cleanup"            "Clean up archives, temporary images and virtual machine after successful completion. Boolean."         "true" "b"
      "clonezilla_install" "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false" "b"
      "cloning_method"     "Method used by hot_install ext_device=... to intall Gentoo to disk. One of: 'guestfish' (default), 'with-raw-buffer' (slower) or 'vbox-img' (currently unavailable)" "guestfish"  "s:ext_device"
@@ -47,6 +47,7 @@
      "from_device"        "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean."  "false" "b:ext_device"
      "from_iso"           "Do not generate Gentoo but use the bootable ISO given on commandline."                                "false" "b"
      "from_vm"            "Do not generate Gentoo but use the VM. Boolean."                                                      "false" "b"
+     "full_cleanup"       "Remove virtual disk, archives and ISO files on clean-up"                                              "false" "b"
      "github_release_path" "URL to Github Release of clonezilla_with_virtualbox.iso"                                             "path3" "s"
      "gui"                "Binary: true corresponds to VBoxManage startvm ... --type=gui, false to --type=headless"               "true" "b"
      "help"               "This help"                                                                                                ""  ""
@@ -79,7 +80,6 @@
      "processor"          "Processor type"                                                                                       "amd64" "s"
      "quiet_mode"         "Silence output except for the most severe errors."                                                    "false" "b"
      "r_version"          "R version"                                                                                            "4.0.2" "s"
-     "remove_vdi"         "Remove virtual disk on clean-up"                                                                      "false" "b"
      "rootpasswd"         "Root password"                                                                               "\_dev2021\_" "s:vm"
      "rtcuseutc"          "Use UTC as time reference: on/off"                                                                    "on"    "o"
      "scsi_address"       "In case of several optical disc burners, specify the SCSI address as x,y,z"                                "" "s"
@@ -97,6 +97,7 @@
      "vmpath"             "Path to VM base directory"                                                                         "$PWD"     "d"
      "vtxvpid"            "Activate VTXVPID: on/off"                                                                          "on"       "o"
      "workflow_tag"       "Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by Github Actions"            "v1.8"     "s"
+
 # **path1:**  https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download    
 # **path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           
 # **path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/

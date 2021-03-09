@@ -334,7 +334,7 @@ autobuilds/${current} ${verb1} 2>&1 | xargs echo '[INF]')"
         cp ${verb2} -f "$(echo -s ${current} \
                              | sed s/.*stage3/stage3/)"  "${CACHED_STAGE3}"
     fi
-
+    ${LOG[*]} "[INF] Looking for: ${CACHED_STAGE3}"
     check_file "${CACHED_STAGE3}"  "[ERR] No stage3 tarball!" \
                                    "[ERR] Rerun with download_stage3=true"
     ${LOG[*]} "[INF] Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}"
