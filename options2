@@ -56,10 +56,9 @@
      "interactive"        "Allow interaction with user. This may cause deadlock if process is detached from the console (*nohup* or other methods)" "true" "b"
      "ioapic"             "IOAPIC parameter: on or off"                                                                             "on" "o"
      "kernel_config"      "Use a custom kernel config file"                                                                 ".config"    "f"
-     "language"           "Add support for non-US English language as a default. Use standard abbreviations (fr for french, es for spanish) etc."  "us"         "s"
      "lineno_patch"       "Line patched against vbox-img.cpp in virtualbox source code"                                     "797"        "n"
      "livecd"             "Path to the live CD that will start the VM"                                                      "gentoo.iso" "f"
-     "manpage"            "Create manpage mkg.1"                                                                                 "false" "b"       
+     "manpage"            "Create manpage mkg.1"                                                                                 "false" "b"
      "mem"                "VM RAM memory in MiB"                                                                            "8000"       "n"
      "minimal"            "Remove *libreoffice* and *data science tools* from default list of installed software. Boolean."      "false" "b"
      "minimal_size"       "Remove kernel sources to minimize packaging. Not advised for personal use but OK for deployment and distribution." "false" "b"
@@ -94,10 +93,10 @@
      "vbox_version"       "Virtualbox version"                                                                                "6.1.14"   "s"
      "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.14a"  "s"
      "vbpath"             "Path to VirtualBox directory"                                                                      "/usr/bin" "d"
+     "vm_language"        "Add support for non-US English language as a default. Use standard abbreviations (fr for french, es for spanish) etc."  "us"         "s"
      "vmpath"             "Path to VM base directory"                                                                         "$PWD"     "d"
      "vtxvpid"            "Activate VTXVPID: on/off"                                                                          "on"       "o"
-     "workflow_tag"       "Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by Github Actions"            "v1.8"     "s"
-    
+     "workflow_tag"       "Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by Github Actions"            "v1.8"     "s"    
     
 # **path1:**  https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download    
 # **path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           

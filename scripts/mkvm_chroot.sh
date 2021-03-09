@@ -142,12 +142,12 @@ adjust_environment() {
 
     # Set keymaps and time
 
-    if [ "${LANGUAGE}" = "fr" ]
+    if [ -n "${VM_LANGUAGE}" ]
     then
-        echo 'keymap="fr"' >  /etc/conf.d/keymaps
+        echo "keymap=${VM_LANGUAGE}" >  /etc/conf.d/keymaps
         echo 'keymap="us"' >> /etc/conf.d/keymaps
     else
-        echo 'keymap="us"' >  /etc/conf.d/keymaps
+        echo 'keymap="us"' >  /etc/conf.d/keymaps  
     fi
     sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
 

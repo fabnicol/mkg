@@ -225,8 +225,8 @@ install_stage3() {
     local m_conf="etc/portage/make.conf"
     sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS=\"${CFLAGS} -pipe\"/g"  ${m_conf}
     echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
-    echo "L10N=\"${LANGUAGE} en\""    >> ${m_conf}
-    echo "LINGUAS=\"${LANGUAGE} en\"" >> ${m_conf}
+    echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
+    echo "LINGUAS=\"${VM_LANGUAGE} en\"" >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
     echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist networkmanager \
 elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
