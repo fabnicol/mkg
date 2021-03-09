@@ -47,6 +47,7 @@
      "from_device"        "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean."  "false" "b:ext_device"
      "from_iso"           "Do not generate Gentoo but use the bootable ISO given on commandline."                                "false" "b"
      "from_vm"            "Do not generate Gentoo but use the VM. Boolean."                                                      "false" "b"
+     "full_cleanup"       "Remove virtual disk, archives and ISO files on clean-up"                                              "false" "b"
      "github_release_path" "URL to Github Release of clonezilla_with_virtualbox.iso"                                             "https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download" "s"     
      "gui"                "Binary: true corresponds to VBoxManage startvm ... --type=gui, false to --type=headless"               "true" "b"
      "help"               "This help"                                                                                                ""  ""
