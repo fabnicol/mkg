@@ -63,9 +63,13 @@ adjust_environment() {
     # emerge-webrsync as emerge --sync is a bit less robust (rsync
     # rotation bans...)
 
-    emerge-webrsync
-        && { echo "[ERR] emerge-webrsync failed!" | tee emerge.build
-        return 1; }
+    if ! emerge-webrsync
+    then
+        echo "[ERR] emerge-webrsync failed!" | tee emerge.build
+        return 1
+    fi
+
+    emerge -1 -u sys-app/portage
 
     # select profile (most recent plasma desktop)
 
@@ -122,9 +126,15 @@ adjust_environment() {
        return 1
     fi
 
+    # There is an intractable circular dependency that
+    # can be broken by pre-emerging python
+
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python
+
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours
     # as syslogd is not yet there we tee a custom build log
+    # emerging gcc and glibc is mainly for CFLAGS changes.
 
     emerge sys-devel/gcc
     emerge sys-libs/glibc
@@ -249,11 +259,6 @@ install_software() {
     # Trace for debugging
 
     echo "${packages}" > package_list
-
-    # There is an intractable circular dependency that
-    # can be broken by pre-emerging python
-
-    USE="-sqlite -bluetooth" emerge -1 dev-lang/python
 
     # v1.3: adding --keep-going. Limited emerge failures may not render
     # the build useless.

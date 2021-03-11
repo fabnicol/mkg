@@ -881,16 +881,16 @@ then
     echo "emerge cmake failed!"
     exit 8
 fi
+# There is an intractable circular dependency that
+# can be broken by pre-emerging python
+echo "[INF] Updating python. Please wait..."
+USE="-sqlite -bluetooth" emerge -1 -q dev-lang/python
 echo "[INF] Testing update of world set..."
 if ! emerge --pretend -uDN @world
 then
     echo "[ERR] Could not pass test of @world update"
     exit 2
 fi
-# There is an intractable circular dependency that
-# can be broken by pre-emerging python
-echo "[INF] Updating python. Please wait..."
-USE="-sqlite -bluetooth" emerge -1 -q dev-lang/python
 echo "[INF] Testing whether packages may be merged..."
 if ! emerge --pretend -uDN $(grep -v '#' "${ELIST}" | xargs)
 then
