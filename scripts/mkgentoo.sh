@@ -802,51 +802,108 @@ pre-test of package merging"
         return 0
     fi
 
-    local verb
-    "${VERBOSE}" && verb="-v"
-
     prepare_chroot
 
     cd "${VMPATH}"
     if_fails $? "[ERR] Could not cd to root directory."
     chown root ${ELIST}
     chmod +rw ${ELIST}
-    dos2unix ${ELIST}
-    move_auxiliary_files "${verb}" "mnt2/squashfs-root"
+    dos2unix -q ${ELIST}
+
+    move_auxiliary_files "mnt2/squashfs-root"
 
     cd mnt2/squashfs-root
     if_fails $? "[ERR] Could not cd to squashfs-root"
 
-    prepare_bash_rc "${verb}"
-    bind_filesystem "."
-    cp ${verb} --dereference /etc/resolv.conf etc/
-
     tar xpJf "${STAGE3}" --xattrs-include='*.*' --numeric-owner
-    mv ebuilds.list.accept_keywords /etc
+
+    prepare_bash_rc
+
+    mkdir --parents etc/portage/repos.conf
+    cp usr/share/portage/config/repos.conf etc/portage/repos.conf/gentoo.conf
+    cp ${verb} --dereference /etc/resolv.conf etc/
+    m_conf="etc/portage/make.conf"
+    ${LOG[*]} "[MSG] Using CFLAGS=${CFLAGS}"
+    sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS=\"${CFLAGS} -pipe\"/g"  ${m_conf}
+    echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
+    echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
+    echo "LINGUAS=\"${VM_LANGUAGE} en\"" >> ${m_conf}
+    sed  -i 's/USE=".*"//g'    ${m_conf}
+    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
+elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
+    echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
+    echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code \
+bh-luxi"' >> ${m_conf}
+    if [ "${BIOS}" = "true" ]
+    then
+        echo 'GRUB_PLATFORMS="i386-pc"' >> ${m_conf}
+    else
+        echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
+    fi
+    echo 'VIDEO_CARDS="nouveau intel"'   >> ${m_conf}
+    echo 'INPUT_DEVICES="evdev synaptics"' >> ${m_conf}
+    mkdir -p etc/portage/package.accept_keywords
+    mkdir -p etc/portage/package.use
+    cp -f "${ELIST}.accept_keywords" \
+       etc/portage/package.accept_keywords/
+    cp -f "${ELIST}.use"  etc/portage/package.use/
+    cp -f "${ELIST}.accept_keywords" \
+       etc/portage/package.accept_keywords/
+
+    bind_filesystem "."
 
     cat > portage_test.sh << EOF
 #!/bin/bash
-cat ebuilds.list
-grep --version
-xargs --version
-
-if ! emerge --sync >/dev/null 2>&1
+echo "[INF] Merging portage tree..."
+if ! emerge-webrsync >/dev/null 2>&1
 then
     echo "[ERR] Could not sync portage tree."
-    exit 1
+    exit 6
 fi
-
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+locale-gen
+eselect locale set 1
+env-update
+source /etc/profile
+if ! emerge -1 -q -u sys-apps/portage
+then
+    echo "[ERR] Could not merge portage"
+    exit 7
+fi
+# select profile (most recent plasma desktop)
+profile=$(eselect --color=no --brief profile list \
+                   | grep desktop \
+                   | grep plasma \
+                   | grep ${PROCESSOR} \
+                   | grep -v systemd \
+                   | head -n 1)
+echo "[MSG] Using profile=${profile}"
+eselect profile set ${profile}
+echo "[INF] Updating cmake..."
+USE='-qt5' emerge -1 -q cmake
+if [ $? != 0 ]
+then
+    echo "emerge cmake failed!"
+    exit 8
+fi
+echo "[INF] Testing update of world set..."
 if ! emerge --pretend -uDN @world
 then
     echo "[ERR] Could not pass test of @world update"
     exit 2
 fi
-
-if ! emerge --pretend -uDN $(grep -v '#' ebuilds.list | xargs)
+# There is an intractable circular dependency that
+# can be broken by pre-emerging python
+echo "[INF] Updating python. Please wait..."
+USE="-sqlite -bluetooth" emerge -1 -q dev-lang/python
+echo "[INF] Testing whether packages may be merged..."
+if ! emerge --pretend -uDN $(grep -v '#' "${ELIST}" | xargs)
 then
    echo "[ERR] Could not emerge packages"
    exit 3
 fi
+echo "[MSG] Portage tests: OK"
+exit 0
 EOF
 
     chmod +x portage_test.sh
@@ -933,12 +990,16 @@ remove_chroot() {
     ! [ -d mnt2 ] && return 0
     if [ -d "${ROOT_LIVE}/squashfs-root" ]
     then
-	    if mountpoint "${ROOT_LIVE}/squashfs-root/dev" \
-                || mountpoint "${ROOT_LIVE}/squashfs-root/sys"
+	    if mountpoint -q "${ROOT_LIVE}/squashfs-root/dev" \
+                || mountpoint -q "${ROOT_LIVE}/squashfs-root/sys"
 	    then
             unbind_filesystem "${ROOT_LIVE}/squashfs-root"
 	    fi
+    else
+        "${VERBOSE}" && echo "No directory: ${ROOT_LIVE}/squashfs-root"
     fi
+    if_fails $? "[ERR] Failed to unmount and wipe out ${ROOT_LIVE}/squashfs-root" \
+             "      Please see to this manually. You may have to reboot."
 
     ${LOG[*]} <<< $(rm -rf mnt2 2>&1 \
                         | xargs echo "[INF] Removing mount directory")
@@ -953,8 +1014,12 @@ move_auxiliary_files() {
     cd "${VMPATH}"
     if_fails $? "[ERR] Could not cd to root directory."
 
-    "${MINIMAL}" && cp "$1" -f "${ELIST}.minimal" "${ELIST}"  \
-            || cp "$1" -f "${ELIST}.complete" "${ELIST}"
+    if "${MINIMAL}"
+    then
+        cp  "${ELIST}.minimal"  "${ELIST}"
+    else
+        cp  "${ELIST}.complete" "${ELIST}"
+    fi
 
     check_file scripts/mkvm.sh  "[ERR] No mkvm.sh script!"
     check_file scripts/mkvm_chroot.sh "[ERR] No mkvm_chroot.sh script!"
@@ -964,25 +1029,25 @@ move_auxiliary_files() {
     check_file "${STAGE3}"  "[ERR] No stage3 archive!"
     check_file "${KERNEL_CONFIG}" "[ERR] No kernel configuration file!"
 
-    ${LOG[*]} <<< $(cp "$1" -f "${STAGE3}" "$2" 2>&1 \
-                        | xargs echo "[INF] Moving stage3")
+    ${LOG[*]} <<< $(cp -f "${STAGE3}" "$1" 2>&1 \
+                        | xargs echo "[INF] Moving ${STAGE3} to $1")
 
-    ${LOG[*]} <<< $(cp "$1" -f scripts/mkvm.sh "$2"  2>&1 \
+    ${LOG[*]} <<< $(cp -f scripts/mkvm.sh "$1"  2>&1 \
                         | xargs echo "[INF] Moving mkvm.sh")
-    ${LOG[*]} <<< $(chmod +x "$2"/mkvm.sh 2>&1 \
+    ${LOG[*]} <<< $(chmod +x "$1"/mkvm.sh 2>&1 \
                         | xargs echo "[INF] Changing permissions")
 
-    ${LOG[*]} <<< $(cp "$1" -f scripts/mkvm_chroot.sh "$2" 2>&1 \
+    ${LOG[*]} <<< $(cp -f scripts/mkvm_chroot.sh "$1" 2>&1 \
                         | xargs echo "[INF] Moving mkvm_chroot.sh")
 
-    ${LOG[*]} <<< $(chmod +x "$2"/mkvm_chroot.sh \
+    ${LOG[*]} <<< $(chmod +x "$1"/mkvm_chroot.sh \
                         | xargs echo "[INF] changing permissions")
 
-    ${LOG[*]} <<< $(cp "$1" -f "${ELIST}" "${ELIST}.use" \
-                       "${ELIST}.accept_keywords" "$2" 2>&1 \
+    ${LOG[*]} <<< $(cp -f "${ELIST}" "${ELIST}.use" \
+                       "${ELIST}.accept_keywords" "$1" 2>&1 \
                         | xargs echo "[INF] Moving ebuild lists")
 
-    ${LOG[*]} <<< $(cp "$1" -f "${KERNEL_CONFIG}" "$2" 2>&1 \
+    ${LOG[*]} <<< $(cp -f "${KERNEL_CONFIG}" "$1" 2>&1 \
                         | xargs echo "[INF] Moving kernel config")
 }
 
@@ -1087,7 +1152,7 @@ prepare_bash_rc() {
         exit 1
     fi
 
-    ${LOG[*]} <<< $(cp "$1" -f ${BASHRC} ${rc})
+    ${LOG[*]} <<< $(cp -f ${BASHRC} ${rc})
     declare -i i
     for ((i=0; i<ARRAY_LENGTH; i++))
     do

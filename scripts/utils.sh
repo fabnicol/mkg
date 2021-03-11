@@ -538,15 +538,26 @@ unbind_filesystem() {
     # undo bind_filesystem
 
     ${LOG[*]} "[INF] Unmounting host filesystem"
-    umount -l "$1"/dev{/shm,/pts,}
-    umount "$1"/run
-    umount "$1"/proc
-    umount "$1"/sys
-    if [ $? != 0 ]
+    if mountpoint -q "$1"/dev > /dev/null 2>&1
+    then
+        umount -l "$1"/dev{/shm,/pts,}
+    fi
+    if mountpoint -q "$1"/run > /dev/null 2>&1
+    then
+        umount "$1"/run
+    fi
+    if mountpoint -q "$1"/proc
+    then
+        mount --make-rslave "$1"/proc
+        umount -l "$1"/proc
+    fi
+    if mountpoint -q "$1"/sys
     then
         mount --make-rslave "$1"/sys
-        umount -R "$1"/sys
+        umount -l "$1"/sys
     fi
-
-    umount -R -l  "$1"
+    if mountpoint -q "$1"
+    then
+        umount -R -l  "$1"
+    fi
 }

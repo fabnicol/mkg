@@ -64,7 +64,6 @@ adjust_environment() {
     # rotation bans...)
 
     emerge-webrsync
-    ! emerge -1 sys-apps/portage \
         && { echo "[ERR] emerge-webrsync failed!" | tee emerge.build
         return 1; }
 
@@ -72,7 +71,7 @@ adjust_environment() {
 
     local profile=$(eselect --color=no --brief profile list \
                         | grep desktop \
-                        | grep gnome \
+                        | grep plasma \
                         | grep ${PROCESSOR} \
                         | grep -v systemd \
                         | head -n 1)
@@ -87,7 +86,7 @@ adjust_environment() {
        /etc/portage/package.accept_keywords/ \
         | tee emerge.build
 
-    cp -vf "${ELIST}.use"             /etc/portage/package.use/ \
+    cp -vf "${ELIST}.use" /etc/portage/package.use/ \
         |  tee emerge.build
 
     cp -vf "${ELIST}.accept_keywords" \

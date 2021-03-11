@@ -29,12 +29,6 @@
  qtwidgets
  qtxml
  qtgui
- 
-## these 3 deps only for RStudio, you may withdraw otherwise
-
- qtwebengine
- qtpositioning
- qtopengl
  plasma-meta
 
 # X
