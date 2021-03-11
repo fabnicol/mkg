@@ -185,7 +185,7 @@ fetch_process_clonezilla_iso() {
     unsquashfs filesystem.squashfs \
       || { ${LOG[*]} "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"
              exit 1; }
-    cp ${verb} -f /etc/resolv.conf squashfs-root/etc
+    cp ${verb} --dereference /etc/resolv.conf squashfs-root/etc
     cd "${VMPATH}"
     return 0
 }

@@ -127,7 +127,9 @@ adjust_environment() {
     # 15-24 hours
     # as syslogd is not yet there we tee a custom build log
 
-    emerge -uDN @world 2>&1 | tee -a emerge.build
+    emerge sys-devel/gcc
+    emerge sys-libs/glibc
+    emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
     [ $? != 0 ] && {
         echo "[ERR] emerge @world failed!"  | tee -a emerge.build
         return 1; }
@@ -243,8 +245,7 @@ install_software() {
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
 
-    local packages=`grep -E -v '(^\s*$|^\s*#.*$)' ${ELIST} \
-| sed "s/dev-lang\/R-.*$/dev-lang\/R-${R_VERSION}/"`
+    local packages=`grep -E -v '(^\s*$|^\s*#.*$)' "${ELIST}"`
 
     # Trace for debugging
 
@@ -262,7 +263,7 @@ install_software() {
 
     # do not quote `packages' variable!
 
-    emerge -uDN --keep-going ${packages}  2>&1 \
+    emerge -uDN --with-bdeps=y --keep-going ${packages}  2>&1 \
     | tee -a log_install_software.log
     local res_install=$?
 

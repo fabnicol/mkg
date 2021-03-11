@@ -19,7 +19,7 @@
  
 # Data science
 
- =dev-lang/R-4.0.2
+ dev-lang/R
  app-editors/emacs
  app-editors/vim
 
