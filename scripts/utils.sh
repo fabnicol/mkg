@@ -536,6 +536,10 @@ bind_filesystem() {
 unbind_filesystem() {
 
     # undo bind_filesystem
+    if ! [ -d "$1" ]
+    then
+        return 0
+    fi
 
     ${LOG[*]} "[INF] Unmounting host filesystem"
     if mountpoint -q "$1"/dev > /dev/null 2>&1

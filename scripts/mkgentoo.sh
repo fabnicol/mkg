@@ -707,13 +707,6 @@ from_device or from_vm may be specified on commandline."
 disk ${VMPATH}/${VM}.vdi was not found"
              exit 1; }
 
-    # other accept_keywords can be manually added to file
-    # ${ELIST}.accept_keywords defaulting to ebuilds.list.accept_keywords
-
-    sed -i '/dev-lang\/R.*$/d'  "${ELIST}.accept_keywords"
-    echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}" \
-         >> "${ELIST}.accept_keywords"
-
     if [ -n "${EMAIL}" ] && [ -z "${EMAIL_PASSWD}" ]
     then
         "${INTERACTIVE}" && read -p "[MSG] Enter email password: " EMAIL_PASSWD
@@ -854,15 +847,18 @@ bh-luxi"' >> ${m_conf}
 
     cat > portage_test.sh << EOF
 #!/bin/bash
+# Note: excaped \${...} are variables
+# in the subordinate environment. Non-escaped dollar
+# variables are host variables.
 echo "[INF] Merging portage tree..."
 if ! emerge-webrsync >/dev/null 2>&1
 then
     echo "[ERR] Could not sync portage tree."
     exit 6
 fi
-echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 locale-gen
-eselect locale set 1
+eselect locale set 1 > /dev/null 2>&1
 env-update
 source /etc/profile
 if ! emerge -1 -q -u sys-apps/portage
@@ -870,18 +866,17 @@ then
     echo "[ERR] Could not merge portage"
     exit 7
 fi
-# select profile (most recent plasma desktop)
-profile=$(eselect --color=no --brief profile list \
+prof=\$(eselect --color=no --brief profile list \
                    | grep desktop \
                    | grep plasma \
-                   | grep ${PROCESSOR} \
+                   | grep \${PROCESSOR} \
                    | grep -v systemd \
-                   | head -n 1)
-echo "[MSG] Using profile=${profile}"
-eselect profile set ${profile}
+                   | head -n 1 | xargs)
+echo "[MSG] Using profile=\${prof}"
+eselect profile set \${prof}
 echo "[INF] Updating cmake..."
 USE='-qt5' emerge -1 -q cmake
-if [ $? != 0 ]
+if [ \$? != 0 ]
 then
     echo "emerge cmake failed!"
     exit 8
@@ -902,7 +897,6 @@ then
    echo "[ERR] Could not emerge packages"
    exit 3
 fi
-echo "[MSG] Portage tests: OK"
 exit 0
 EOF
 
@@ -913,7 +907,10 @@ EOF
              "      and ebuilds.list.complete or minimal using messages from" \
              "      calls to emerge."
 
+    ${LOG[*]} "[MSG] Portage tests were passed."
+
     remove_chroot
+
 }
 
 prepare_chroot() {
@@ -994,12 +991,12 @@ remove_chroot() {
                 || mountpoint -q "${ROOT_LIVE}/squashfs-root/sys"
 	    then
             unbind_filesystem "${ROOT_LIVE}/squashfs-root"
+            if_fails $? "[ERR] Failed to unmount and wipe out ${ROOT_LIVE}/squashfs-root" \
+                     "      Please see to this manually. You may have to reboot."
 	    fi
     else
         "${VERBOSE}" && echo "No directory: ${ROOT_LIVE}/squashfs-root"
     fi
-    if_fails $? "[ERR] Failed to unmount and wipe out ${ROOT_LIVE}/squashfs-root" \
-             "      Please see to this manually. You may have to reboot."
 
     ${LOG[*]} <<< $(rm -rf mnt2 2>&1 \
                         | xargs echo "[INF] Removing mount directory")
@@ -1031,24 +1028,33 @@ move_auxiliary_files() {
 
     ${LOG[*]} <<< $(cp -f "${STAGE3}" "$1" 2>&1 \
                         | xargs echo "[INF] Moving ${STAGE3} to $1")
+    if_fails $? "[ERR] Could not move ${STAGE3}"
 
     ${LOG[*]} <<< $(cp -f scripts/mkvm.sh "$1"  2>&1 \
                         | xargs echo "[INF] Moving mkvm.sh")
+    if_fails $? "[ERR] Could not move ${STAGE3}"
+
     ${LOG[*]} <<< $(chmod +x "$1"/mkvm.sh 2>&1 \
                         | xargs echo "[INF] Changing permissions")
+    if_fails $? "[ERR] Could not move mkvm.sh"
 
     ${LOG[*]} <<< $(cp -f scripts/mkvm_chroot.sh "$1" 2>&1 \
                         | xargs echo "[INF] Moving mkvm_chroot.sh")
+    if_fails $? "[ERR] Could not move mkvm_chroot.sh"
 
     ${LOG[*]} <<< $(chmod +x "$1"/mkvm_chroot.sh \
                         | xargs echo "[INF] changing permissions")
+    if_fails $? "[ERR] Could not change permissions"
 
     ${LOG[*]} <<< $(cp -f "${ELIST}" "${ELIST}.use" \
                        "${ELIST}.accept_keywords" "$1" 2>&1 \
                         | xargs echo "[INF] Moving ebuild lists")
+    if_fails $? "[ERR] Could not move ebuild lists"
 
     ${LOG[*]} <<< $(cp -f "${KERNEL_CONFIG}" "$1" 2>&1 \
                         | xargs echo "[INF] Moving kernel config")
+    if_fails $? "[ERR] Could not move kernel config file"
+
 }
 
 ## @fn make_boot_from_livecd()
@@ -1090,14 +1096,12 @@ make_boot_from_livecd() {
     #
 
     local sqrt="${ROOT_LIVE}/squashfs-root/root/"
-    local verb
-    "${VERBOSE}" && verb="-v"
     check_dir  "${sqrt}"
 
-    move_auxiliary_files "${verb}" "${sqrt}"
-    cd ${sqrt} || exit 2
+    move_auxiliary_files "${sqrt}"
+    cd "${sqrt}" || exit 2
 
-    prepare_bash_rc "${verb}"
+    prepare_bash_rc
 
     # the whole platform-making process will be launched by mkvm.sh under /root/
     # and fired on by .bashrc sourcing once the liveCD exits the boot process
@@ -1110,12 +1114,11 @@ make_boot_from_livecd() {
     #
 
     cd ../.. || exit 2
-    ${LOG[*]} <<< $(rm ${verb} -f "${SQUASHFS_FILESYSTEM}" 2>&1 \
+    ${LOG[*]} <<< $(rm  -f "${SQUASHFS_FILESYSTEM}" 2>&1 \
                         | xargs echo "[INF] Removing ${SQUASHFS_FILESYSTEM}")
     local verb2="-quiet"
-    ${LOG[*]} <<< $(mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM} \
-                     ${verb2} 2>&1 | \
-                        xargs echo "[INF] Created ${SQUASHFS_FILESYSTEM}")
+    ${LOG[*]} <<< $(mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM}  2>&1 \
+                        | xargs echo "[INF] Created ${SQUASHFS_FILESYSTEM}")
     ${LOG[*]} <<< $(rm -rf squashfs-root/ 2>&1 \
                         | xargs echo "[INF] Removing squashfs-root")
 
@@ -1128,7 +1131,7 @@ make_boot_from_livecd() {
 
     if mountpoint mnt
     then
-	umount -l mnt
+        umount -l mnt
     fi
     ${LOG[*]} <<< $(rm -rf mnt | xargs echo "[INF] Removing mnt")
 
@@ -1909,6 +1912,7 @@ generate_Gentoo() {
     then
         ${LOG[*]} "[INF] Testing whether packages will be emerged..."
         test_emerge_step
+        "${TEST_ONLY}" && return 0
     fi
     ${LOG[*]} "[INF] Tweaking live CD..."
     make_boot_from_livecd
