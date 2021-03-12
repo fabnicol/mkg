@@ -567,6 +567,15 @@ T}@T{
 b
 T}
 T{
+full_cleanup
+T}@T{
+Remove virtual disk, archives and ISO files on clean-up
+T}@T{
+[ false ]
+T}@T{
+b
+T}
+T{
 github_release_path
 T}@T{
 URL to Github Release of clonezilla_with_virtualbox.iso
@@ -650,16 +659,6 @@ T}@T{
 [ .config ]
 T}@T{
 f
-T}
-T{
-language
-T}@T{
-Add support for non-US English language as a default.
-Use standard abbreviations (fr for french, es for spanish) etc.
-T}@T{
-[ us ]
-T}@T{
-s
 T}
 T{
 lineno_patch
@@ -867,24 +866,6 @@ T}@T{
 b
 T}
 T{
-r_version
-T}@T{
-R version
-T}@T{
-[ 4.0.2 ]
-T}@T{
-s
-T}
-T{
-remove_vdi
-T}@T{
-Remove virtual disk on clean-up
-T}@T{
-[ false ]
-T}@T{
-b
-T}
-T{
 rootpasswd
 T}@T{
 Root password
@@ -939,6 +920,26 @@ T}@T{
 [ stage3.tar.xz ]
 T}@T{
 f
+T}
+T{
+test_emerge
+T}@T{
+Test whether emerge will be able to install packages in the VM before
+starting it.
+T}@T{
+[ true ]
+T}@T{
+b
+T}
+T{
+test_only
+T}@T{
+Only test if portage will be able to install packages.
+Do not create a virtual machine.
+T}@T{
+[ false ]
+T}@T{
+b
 T}
 T{
 usbehci
@@ -1006,6 +1007,16 @@ T}@T{
 [ /usr/bin ]
 T}@T{
 d
+T}
+T{
+vm_language
+T}@T{
+Add support for non-US English language as a default.
+Use standard abbreviations (fr for french, es for spanish) etc.
+T}@T{
+[ us ]
+T}@T{
+s
 T}
 T{
 vmpath

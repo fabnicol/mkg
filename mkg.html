@@ -250,64 +250,64 @@ optional strings that may remain unspecified.</p>
 <td style="text-align: center;">b</td>
 </tr>
 <tr class="even">
+<td style="text-align: center;">full_cleanup</td>
+<td style="text-align: center;">Remove virtual disk, archives and ISO files on clean-up</td>
+<td style="text-align: center;">[ false ]</td>
+<td style="text-align: center;">b</td>
+</tr>
+<tr class="odd">
 <td style="text-align: center;">github_release_path</td>
 <td style="text-align: center;">URL to Github Release of clonezilla_with_virtualbox.iso</td>
 <td style="text-align: center;">[ path3 ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">gui</td>
 <td style="text-align: center;">Binary: true corresponds to VBoxManage startvm … –type=gui, false to –type=headless</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">help</td>
 <td style="text-align: center;">This help</td>
 <td style="text-align: center;">[ ]</td>
 <td style="text-align: center;"></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">hot_install</td>
 <td style="text-align: center;">Intall to Gentoo attached device (like /dev/sdb) possibly mounted (like /media/USER/567EAF). To be used with <em>ext_device=…</em></td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b:ext_device</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">htmlpage</td>
 <td style="text-align: center;">Create HTML help page</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">hwvirtex</td>
 <td style="text-align: center;">Activate HWVIRTEX: on/off</td>
 <td style="text-align: center;">[ on ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">interactive</td>
 <td style="text-align: center;">Allow interaction with user. This may cause deadlock if process is detached from the console (<em>nohup</em> or other methods)</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">ioapic</td>
 <td style="text-align: center;">IOAPIC parameter: on or off</td>
 <td style="text-align: center;">[ on ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">kernel_config</td>
 <td style="text-align: center;">Use a custom kernel config file</td>
 <td style="text-align: center;">[ .config ]</td>
 <td style="text-align: center;">f</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">language</td>
-<td style="text-align: center;">Add support for non-US English language as a default. Use standard abbreviations (fr for french, es for spanish) etc.</td>
-<td style="text-align: center;">[ us ]</td>
-<td style="text-align: center;">s</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">lineno_patch</td>
@@ -442,18 +442,6 @@ optional strings that may remain unspecified.</p>
 <td style="text-align: center;">b</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">r_version</td>
-<td style="text-align: center;">R version</td>
-<td style="text-align: center;">[ 4.0.2 ]</td>
-<td style="text-align: center;">s</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">remove_vdi</td>
-<td style="text-align: center;">Remove virtual disk on clean-up</td>
-<td style="text-align: center;">[ false ]</td>
-<td style="text-align: center;">b</td>
-</tr>
-<tr class="even">
 <td style="text-align: center;">rootpasswd</td>
 <td style="text-align: center;">Root password</td>
 <td style="text-align: center;">[ _dev2021_ ]</td>
@@ -488,6 +476,18 @@ optional strings that may remain unspecified.</p>
 <td style="text-align: center;">Path to stage3 archive</td>
 <td style="text-align: center;">[ stage3.tar.xz ]</td>
 <td style="text-align: center;">f</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">test_emerge</td>
+<td style="text-align: center;">Test whether emerge will be able to install packages in the VM before starting it.</td>
+<td style="text-align: center;">[ true ]</td>
+<td style="text-align: center;">b</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">test_only</td>
+<td style="text-align: center;">Only test if portage will be able to install packages. Do not create a virtual machine.</td>
+<td style="text-align: center;">[ false ]</td>
+<td style="text-align: center;">b</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">usbehci</td>
@@ -532,18 +532,24 @@ optional strings that may remain unspecified.</p>
 <td style="text-align: center;">d</td>
 </tr>
 <tr class="odd">
+<td style="text-align: center;">vm_language</td>
+<td style="text-align: center;">Add support for non-US English language as a default. Use standard abbreviations (fr for french, es for spanish) etc.</td>
+<td style="text-align: center;">[ us ]</td>
+<td style="text-align: center;">s</td>
+</tr>
+<tr class="even">
 <td style="text-align: center;">vmpath</td>
 <td style="text-align: center;">Path to VM base directory</td>
 <td style="text-align: center;">[ $PWD ]</td>
 <td style="text-align: center;">d</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">vtxvpid</td>
 <td style="text-align: center;">Activate VTXVPID: on/off</td>
 <td style="text-align: center;">[ on ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">workflow_tag</td>
 <td style="text-align: center;">Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by Github Actions</td>
 <td style="text-align: center;">[ v1.8 ]</td>
