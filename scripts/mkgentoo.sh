@@ -800,11 +800,11 @@ pre-test of package merging"
 
     cd "${VMPATH}"
     if_fails $? "[ERR] Could not cd to root directory."
+    move_auxiliary_files "mnt2/squashfs-root"
+
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix -q ${ELIST}
-
-    move_auxiliary_files "mnt2/squashfs-root"
 
     cd mnt2/squashfs-root
     if_fails $? "[ERR] Could not cd to squashfs-root"
