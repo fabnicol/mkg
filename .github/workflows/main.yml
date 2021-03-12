@@ -26,8 +26,8 @@ jobs:
         run: |
              sudo apt update 
              sudo apt install uuid dos2unix
-             sudo apt install libguestfs-tools squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
-             sudo apt install virtualbox virtualbox-guest-additions-iso   
+             sudo apt install squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
+             sudo apt install virtualbox    
       
       - name: run
         run: |

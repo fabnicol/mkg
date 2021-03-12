@@ -2310,7 +2310,7 @@ main() {
 
     check_tool "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
                "VBoxManage" "curl" "grep" "lsblk" "awk" "uuid" \
-	       "mkisofs" "rsync" "xz" "VBoxManage"
+	       "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
 
     test_cli_pre
     for ((i=0; i<ARRAY_LENGTH; i++)); do test_cli $i; done
