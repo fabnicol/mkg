@@ -25,10 +25,10 @@ jobs:
       - name: update 
         run: |
              sudo apt update 
-             sudo apt install uuid
+             sudo apt install uuid dos2unix
              sudo apt install libguestfs-tools squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
              sudo apt install virtualbox virtualbox-guest-additions-iso   
       
       - name: run
         run: |
-          sudo ./mkg hwvirtex=off compact minimal minimal_size gentoo-$(date +%F-%H-%M-%S).iso gui=false vtxvpid=off
+          sudo ./mkg test_only
