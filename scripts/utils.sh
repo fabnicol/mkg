@@ -460,7 +460,7 @@ which is used by this program."
 ## @fn if_fails()
 ## @brief   Echoes a message and exit in case of previous command failure.
 ## @param   ret Return value of command to be tested.
-## @parama  msg Message to be echoed inc case of a failure.
+## @param   msg ... Message(s) to be echoed inc case of a failure.
 ## @note    Command success is presumed to be identified by $? == 0.
 ## @retval  Undefined or exit 1 if $? != 0.
 ## @ingroup auxiliaryFunctions
@@ -468,7 +468,11 @@ which is used by this program."
 if_fails() {
     if [ $1 != 0 ]
     then
-        ${LOG[*]} "$2"
+        while [ -n "$2" ]
+        do
+            ${LOG[*]} "$2"
+            shift
+        done
         exit 1
     fi
 }
@@ -476,6 +480,10 @@ if_fails() {
 ## @fn cleanup()
 ## @brief Clean up all temporary files and directpries (except for VirtualBox
 ##        build)
+## @details Needs @code CLEANUP=true @endcode.
+##          If @code FULL_CLEANUP=true@endcode
+##          then erase ISO files with names containing @b clonezilla, @b install
+##          or @b downloaded names.
 ## @ingroup auxiliaryFunctions
 
 cleanup() {
@@ -495,7 +503,64 @@ cleanup() {
 	[ -f "${VM}.vdi" ] && rm ${verb} -f "${VM}.vdi"
         rm ${verb} -f *.xz
         rm ${verb} -f *.txt
-        rm ${verb} -f *.iso
+        rm ${verb} -f *clonezilla*.iso downloaded.iso install*.iso
     fi
     return 0
+}
+
+## @fn bind_filesystem()
+## @brief Bind-mounts the host live filesystem (proc/sys/dev/run) to a
+##        future chrooted OS-like tree of similar nature.
+## @param root Root directory of the subordinate filesystem.
+## @ingroup auxiliaryFunctions
+
+bind_filesystem() {
+
+    # prepare chroot in clonezilla filesystem
+
+    mount --types proc /proc "$1"/proc
+    res0=$?
+    mount --rbind /sys  "$1"/sys
+    res1=$?
+    mount --make-rslave "$1"/sys
+    res2=$?
+    mount --rbind /dev  "$1"/dev
+    res3=$?
+    mount --make-rslave "$1"/dev
+    res4=$?
+    local res=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4}))
+    if_fails ${res} "[ERR] Could not bind-mount $1"
+}
+
+unbind_filesystem() {
+
+    # undo bind_filesystem
+    if ! [ -d "$1" ]
+    then
+        return 0
+    fi
+
+    ${LOG[*]} "[INF] Unmounting host filesystem"
+    if mountpoint -q "$1"/dev > /dev/null 2>&1
+    then
+        umount -l "$1"/dev{/shm,/pts,}
+    fi
+    if mountpoint -q "$1"/run > /dev/null 2>&1
+    then
+        umount "$1"/run
+    fi
+    if mountpoint -q "$1"/proc
+    then
+        mount --make-rslave "$1"/proc
+        umount -l "$1"/proc
+    fi
+    if mountpoint -q "$1"/sys
+    then
+        mount --make-rslave "$1"/sys
+        umount -l "$1"/sys
+    fi
+    if mountpoint -q "$1"
+    then
+        umount -R -l  "$1"
+    fi
 }

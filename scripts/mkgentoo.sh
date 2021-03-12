@@ -707,13 +707,6 @@ from_device or from_vm may be specified on commandline."
 disk ${VMPATH}/${VM}.vdi was not found"
              exit 1; }
 
-    # other accept_keywords can be manually added to file
-    # ${ELIST}.accept_keywords defaulting to ebuilds.list.accept_keywords
-
-    sed -i '/dev-lang\/R.*$/d'  "${ELIST}.accept_keywords"
-    echo ">=dev-lang/R-${R_VERSION}  ~${PROCESSOR}" \
-         >> "${ELIST}.accept_keywords"
-
     if [ -n "${EMAIL}" ] && [ -z "${EMAIL_PASSWD}" ]
     then
         "${INTERACTIVE}" && read -p "[MSG] Enter email password: " EMAIL_PASSWD
@@ -777,6 +770,152 @@ Allowing a 10 second break for second thoughts."
 
 mount_live_cd() {
 
+      prepare_chroot
+
+      # ISOLINUX config adjustments to automate the boot and reduce user input
+      echo $PWD
+      check_dir "mnt2/${ISOLINUX_DIR}"
+      cd "mnt2/${ISOLINUX_DIR}"
+      if "${CLONEZILLA_INSTALL}"
+      then
+          cp ${verb} -f "${VMPATH}/clonezilla/syslinux/isolinux.cfg" .
+      else
+          check_files isolinux.cfg
+          sed -i 's/timeout.*/timeout 1/' isolinux.cfg
+          sed -i 's/ontimeout.*/ontimeout gentoo/' isolinux.cfg
+      fi
+      cd "${ROOT_LIVE}"
+}
+
+test_emerge_step() {
+
+    if "${CLONEZILLA_INSTALL}"
+    then
+        echo "[ERR] Clonezilla install does not support \
+pre-test of package merging"
+        return 0
+    fi
+
+    prepare_chroot
+
+    cd "${VMPATH}"
+    if_fails $? "[ERR] Could not cd to root directory."
+    chown root ${ELIST}
+    chmod +rw ${ELIST}
+    dos2unix -q ${ELIST}
+
+    move_auxiliary_files "mnt2/squashfs-root"
+
+    cd mnt2/squashfs-root
+    if_fails $? "[ERR] Could not cd to squashfs-root"
+
+    tar xpJf "${STAGE3}" --xattrs-include='*.*' --numeric-owner
+
+    prepare_bash_rc
+
+    mkdir --parents etc/portage/repos.conf
+    cp usr/share/portage/config/repos.conf etc/portage/repos.conf/gentoo.conf
+    cp ${verb} --dereference /etc/resolv.conf etc/
+    m_conf="etc/portage/make.conf"
+    ${LOG[*]} "[MSG] Using CFLAGS=${CFLAGS}"
+    sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS=\"${CFLAGS} -pipe\"/g"  ${m_conf}
+    echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
+    echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
+    echo "LINGUAS=\"${VM_LANGUAGE} en\"" >> ${m_conf}
+    sed  -i 's/USE=".*"//g'    ${m_conf}
+    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
+elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
+    echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
+    echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code \
+bh-luxi"' >> ${m_conf}
+    if [ "${BIOS}" = "true" ]
+    then
+        echo 'GRUB_PLATFORMS="i386-pc"' >> ${m_conf}
+    else
+        echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
+    fi
+    echo 'VIDEO_CARDS="nouveau intel"'   >> ${m_conf}
+    echo 'INPUT_DEVICES="evdev synaptics"' >> ${m_conf}
+    mkdir -p etc/portage/package.accept_keywords
+    mkdir -p etc/portage/package.use
+    cp -f "${ELIST}.accept_keywords" \
+       etc/portage/package.accept_keywords/
+    cp -f "${ELIST}.use"  etc/portage/package.use/
+    cp -f "${ELIST}.accept_keywords" \
+       etc/portage/package.accept_keywords/
+
+    bind_filesystem "."
+
+    cat > portage_test.sh << EOF
+#!/bin/bash
+# Note: excaped \${...} are variables
+# in the subordinate environment. Non-escaped dollar
+# variables are host variables.
+echo "[INF] Merging portage tree..."
+if ! emerge-webrsync >/dev/null 2>&1
+then
+    echo "[ERR] Could not sync portage tree."
+    exit 6
+fi
+echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+locale-gen
+eselect locale set 1 > /dev/null 2>&1
+env-update
+source /etc/profile
+if ! emerge -1 -q -u sys-apps/portage
+then
+    echo "[ERR] Could not merge portage"
+    exit 7
+fi
+prof=\$(eselect --color=no --brief profile list \
+                   | grep desktop \
+                   | grep plasma \
+                   | grep \${PROCESSOR} \
+                   | grep -v systemd \
+                   | head -n 1 | xargs)
+echo "[MSG] Using profile=\${prof}"
+eselect profile set \${prof}
+echo "[INF] Updating cmake..."
+USE='-qt5' emerge -1 -q cmake
+if [ \$? != 0 ]
+then
+    echo "emerge cmake failed!"
+    exit 8
+fi
+# There is an intractable circular dependency that
+# can be broken by pre-emerging python
+echo "[INF] Updating python. Please wait..."
+USE="-sqlite -bluetooth" emerge -1 -q dev-lang/python
+echo "[INF] Testing update of world set..."
+if ! emerge --pretend -uDN @world
+then
+    echo "[ERR] Could not pass test of @world update"
+    exit 2
+fi
+echo "[INF] Testing whether packages may be merged..."
+if ! emerge --pretend -uDN $(grep -v '#' "${ELIST}" | xargs)
+then
+   echo "[ERR] Could not emerge packages"
+   exit 3
+fi
+exit 0
+EOF
+
+    chmod +x portage_test.sh
+    chroot . /bin/bash portage_test.sh
+    if_fails $? "[ERR] Virtual machine should not be able to merge packages." \
+             "[ERR] Check files ebuilds.list.accept_keywords, ebuilds.list.use" \
+             "      and ebuilds.list.complete or minimal using messages from" \
+             "      calls to emerge."
+
+    ${LOG[*]} "[MSG] Portage tests were passed."
+
+    remove_chroot
+
+}
+
+prepare_chroot() {
+
     check_file "${ISO}" "[ERR] No active ISO file in current directory!"
     if ! "${CREATE_SQUASHFS}"
     then
@@ -803,15 +942,7 @@ stage3 archive are cached in the directory after prior downloads"
     mount -oloop "${ISO}" mnt/  2>/dev/null
     ! mountpoint -q mnt && ${LOG[*]} "[ERR] ISO not mounted!" && exit 1
 
-    # get a copy with write access
-
-    [ -d mnt2 ] && rm -rf mnt2/
-    mkdir mnt2/
-    check_dir mnt2
-    "${VERBOSE}" && ${LOG[*]} "[INF] Syncing mnt2 with ISO mountpoint..."
-    rsync -a mnt/ mnt2
-
-    # parameter adjustment to account for Gentoo/CloneZilla differences
+    #parameter adjustment to account for Gentoo/CloneZilla differences
 
     ROOT_LIVE="${VMPATH}/mnt2"
     SQUASHFS_FILESYSTEM=image.squashfs
@@ -823,18 +954,17 @@ stage3 archive are cached in the directory after prior downloads"
         SQUASHFS_FILESYSTEM=filesystem.squashfs
     fi
 
-    # ISOLINUX config adjustments to automate the boot and reduce user input
+    remove_chroot
 
-    check_dir "mnt2/${ISOLINUX_DIR}"
-    cd "mnt2/${ISOLINUX_DIR}"
-    if "${CLONEZILLA_INSTALL}"
-    then
-        cp ${verb} -f "${VMPATH}/clonezilla/syslinux/isolinux.cfg" .
-    else
-        check_files isolinux.cfg
-        sed -i 's/timeout.*/timeout 1/' isolinux.cfg
-        sed -i 's/ontimeout.*/ontimeout gentoo/' isolinux.cfg
-    fi
+    mkdir mnt2/
+    check_dir mnt2
+    ! [ -d mnt ] && mkdir mnt
+    check_dir mnt
+
+    # get a copy with write access
+
+    "${VERBOSE}" && ${LOG[*]} "[INF] Syncing mnt2 with ISO mountpoint..."
+    rsync -a mnt/ mnt2
 
     # now unsquashfs the liveCD filesystem
 
@@ -844,8 +974,86 @@ stage3 archive are cached in the directory after prior downloads"
         && unsquashfs "${SQUASHFS_FILESYSTEM}"  \
             ||  unsquashfs -q  "${SQUASHFS_FILESYSTEM}" 2>&1 >/dev/null
 
-    if_fails $? "[ERR] unsquashfs failed !"
+    if_fails $? "[ERR] unsquashfs failed!"
+    cd "${VMPATH}"
+    if_fails $? "[ERR] Could not cd to root directory"
 }
+
+remove_chroot() {
+
+    cd "${VMPATH}"
+    if_fails $? "[ERR] Could not cd to root directory."
+
+    ! [ -d mnt2 ] && return 0
+    if [ -d "${ROOT_LIVE}/squashfs-root" ]
+    then
+           if mountpoint -q "${ROOT_LIVE}/squashfs-root/dev" \
+                || mountpoint -q "${ROOT_LIVE}/squashfs-root/sys"
+           then
+            unbind_filesystem "${ROOT_LIVE}/squashfs-root"
+            if_fails $? "[ERR] Failed to unmount and wipe out ${ROOT_LIVE}/squashfs-root" \
+                     "      Please see to this manually. You may have to reboot."
+           fi
+    else
+        "${VERBOSE}" && echo "No directory: ${ROOT_LIVE}/squashfs-root"
+    fi
+
+    ${LOG[*]} <<< $(rm -rf mnt2 2>&1 \
+                        | xargs echo "[INF] Removing mount directory")
+}
+
+
+## @fn move_auxiliary_files()
+## @private
+
+move_auxiliary_files() {
+
+    cd "${VMPATH}"
+    if_fails $? "[ERR] Could not cd to root directory."
+
+    if "${MINIMAL}"
+    then
+        cp  "${ELIST}.minimal"  "${ELIST}"
+    else
+       cp  "${ELIST}.complete" "${ELIST}"
+    fi
+
+    check_file scripts/mkvm.sh  "[ERR] No mkvm.sh script!"
+    check_file scripts/mkvm_chroot.sh "[ERR] No mkvm_chroot.sh script!"
+    check_file "${ELIST}"     "[ERR] No ebuild list!"
+    check_file "${ELIST}.use" "[ERR] No ebuild list!"
+    check_file "${ELIST}.accept_keywords" "[ERR] No ebuild list!"
+    check_file "${STAGE3}"  "[ERR] No stage3 archive!"
+    check_file "${KERNEL_CONFIG}" "[ERR] No kernel configuration file!"
+
+    ${LOG[*]} <<< $(cp -f "${STAGE3}" "$1" 2>&1 \
+                        | xargs echo "[INF] Moving ${STAGE3} to $1")
+    if_fails $? "[ERR] Could not move ${STAGE3}"
+    ${LOG[*]} <<< $(cp -f scripts/mkvm.sh "$1"  2>&1 \
+                        | xargs echo "[INF] Moving mkvm.sh")
+    if_fails $? "[ERR] Could not move ${STAGE3}"
+
+    ${LOG[*]} <<< $(chmod +x "$1"/mkvm.sh 2>&1 \
+                        | xargs echo "[INF] Changing permissions")
+    if_fails $? "[ERR] Could not move mkvm.sh"
+
+    ${LOG[*]} <<< $(cp -f scripts/mkvm_chroot.sh "$1" 2>&1 \
+                        | xargs echo "[INF] Moving mkvm_chroot.sh")
+    if_fails $? "[ERR] Could not move mkvm_chroot.sh"
+    ${LOG[*]} <<< $(chmod +x "$1"/mkvm_chroot.sh \
+                        | xargs echo "[INF] changing permissions")
+    if_fails $? "[ERR] Could not change permissions"
+
+    ${LOG[*]} <<< $(cp -f "${ELIST}" "${ELIST}.use" \
+                      "${ELIST}.accept_keywords" "$1" 2>&1 \
+                        | xargs echo "[INF] Moving ebuild lists")
+    if_fails $? "[ERR] Could not move ebuild lists"
+
+    ${LOG[*]} <<< $(cp -f "${KERNEL_CONFIG}" "$1" 2>&1 \
+                        | xargs echo "[INF] Moving kernel config")
+    if_fails $? "[ERR] Could not move kernel config file"
+}
+
 
 ## @fn make_boot_from_livecd()
 ## @brief Tweak the Gentoo minimal install CD so that the custom-
@@ -881,69 +1089,17 @@ make_boot_from_livecd() {
     check_dir "${VMPATH}"
     cd "${VMPATH}"
 
-    "${MINIMAL}" && cp ${verb} -f "${ELIST}.minimal" "${ELIST}"  \
-            || cp ${verb} -f "${ELIST}.complete" "${ELIST}"
-
-    check_file scripts/mkvm.sh  "[ERR] No mkvm.sh script!"
-    check_file scripts/mkvm_chroot.sh "[ERR] No mkvm_chroot.sh script!"
-    check_file "${ELIST}"     "[ERR] No ebuild list!"
-    check_file "${ELIST}.use" "[ERR] No ebuild list!"
-    check_file "${ELIST}.accept_keywords" "[ERR] No ebuild list!"
-    check_file "${STAGE3}"  "[ERR] No stage3 archive!"
-    check_file "${KERNEL_CONFIG}" "[ERR] No kernel configuration file!"
 
     # ------------------------------------------------------ #
     # Moving platform building scripts to unsquashed live CD
     #
 
     local sqrt="${ROOT_LIVE}/squashfs-root/root/"
-    local verb
-    "${VERBOSE}" && verb="-v"
     check_dir  "${sqrt}"
 
-    ${LOG[*]} <<< $(mv ${verb} -f "${STAGE3}" ${sqrt} 2>&1 \
-                        | xargs echo "[INF] Moving stage3")
-
-    ${LOG[*]} <<< $(cp ${verb} -f scripts/mkvm.sh ${sqrt}  2>&1 \
-                        | xargs echo "[INF] Moving mkvm.sh")
-    ${LOG[*]} <<< $(chmod +x ${sqrt}mkvm.sh 2>&1 \
-                        | xargs echo "[INF] Changing permissions")
-
-    ${LOG[*]} <<< $(cp ${verb} -f scripts/mkvm_chroot.sh ${sqrt} 2>&1 \
-                        | xargs echo "[INF] Moving mkvm_chroot.sh")
-
-    ${LOG[*]} <<< $(chmod +x ${sqrt}mkvm_chroot.sh \
-                        | xargs echo "[INF] changing permissions")
-
-    ${LOG[*]} <<< $(cp ${verb} -f "${ELIST}" "${ELIST}.use" \
-                       "${ELIST}.accept_keywords" ${sqrt} 2>&1 \
-                        | xargs echo "[INF] Moving ebuild lists")
-
-    ${LOG[*]} <<< $(cp ${verb} -f "${KERNEL_CONFIG}" ${sqrt} 2>&1 \
-                        | xargs echo "[INF] Moving kernel config")
-    cd ${sqrt} || exit 2
-
-    # now prepare the .bashrc file by exporting the environment
-    # this will be placed under /root in the VM
-
-    rc=".bashrc"
-    local BASHRC=/etc/bash/bashrc
-    ! [ -f "${BASHRC}" ] && BASHRC=/etc/bash.bashrc # Ubuntu
-    if ! [ -f "${BASHRC}" ]
-    then
-        ${LOG[*]} "[ERR] Could not locate a bashrc skeleton"
-        exit 1
-    fi
-
-    ${LOG[*]} <<< $(cp ${verb} -f ${BASHRC} ${rc})
-    declare -i i
-    for ((i=0; i<ARRAY_LENGTH; i++))
-    do
-        local  capname=${ARR[i*4]^^}
-        local  expstring="export ${capname}=\"${!capname}\""
-        "${VERBOSE}" && ${LOG[*]} "${expstring}"
-        echo "${expstring}" >> ${rc}
-    done
+    move_auxiliary_files "${sqrt}"
+    cd "${sqrt}" || exit 2
+    prepare_bash_rc
 
     # the whole platform-making process will be launched by mkvm.sh under /root/
     # and fired on by .bashrc sourcing once the liveCD exits the boot process
@@ -956,12 +1112,12 @@ make_boot_from_livecd() {
     #
 
     cd ../.. || exit 2
-    ${LOG[*]} <<< $(rm ${verb} -f "${SQUASHFS_FILESYSTEM}" 2>&1 \
+    ${LOG[*]} <<< $(rm  -f "${SQUASHFS_FILESYSTEM}" 2>&1 \
                         | xargs echo "[INF] Removing ${SQUASHFS_FILESYSTEM}")
     local verb2="-quiet"
-    ${LOG[*]} <<< $(mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM} \
-                     ${verb2} 2>&1 | \
-                        xargs echo "[INF] Created ${SQUASHFS_FILESYSTEM}")
+    ${LOG[*]} <<< $(mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM}  2>&1 \
+                        | xargs echo "[INF] Created ${SQUASHFS_FILESYSTEM}")
+
     ${LOG[*]} <<< $(rm -rf squashfs-root/ 2>&1 \
                         | xargs echo "[INF] Removing squashfs-root")
 
@@ -974,23 +1130,37 @@ make_boot_from_livecd() {
 
     if mountpoint mnt
     then
-	umount -l mnt
+    	umount -l mnt
     fi
-
-    if "${CLEANUP}" && [ -d mnt2/live/squashfs-root ]
-    then
-	if mountpoint mnt2/live/squashfs-root/dev
-	then
-	    for i in proc sys dev dev/pts run
-	    do
-		umount mnt2/live/squashfs-root/$i
-	    done
-	fi
-
-        ${LOG[*]} <<< $(rm -rf mnt && rm -rf mnt2 2>&1 \
-                            | xargs echo "[INF] Removing mount directories")
-    fi
+    ${LOG[*]} <<< $(rm -rf mnt | xargs echo "[INF] Removing mnt")
+    "${CLEANUP}" && remove_chroot
     return 0
+}
+
+
+## @fn prepare_bash_rc()
+## Prepare the .bashrc file by exporting the environment
+## this will be placed under /root in the VM
+
+prepare_bash_rc() {
+
+    rc=".bashrc"
+    local BASHRC=/etc/bash/bashrc
+    ! [ -f "${BASHRC}" ] && BASHRC=/etc/bash.bashrc # Ubuntu
+    if ! [ -f "${BASHRC}" ]
+    then
+        ${LOG[*]} "[ERR] Could not locate a bashrc skeleton"
+        exit 1
+    fi
+    ${LOG[*]} <<< $(cp -f ${BASHRC} ${rc})
+    declare -i i
+    for ((i=0; i<ARRAY_LENGTH; i++))
+    do
+        local  capname=${ARR[i*4]^^}
+        local  expstring="export ${capname}=\"${!capname}\""
+        "${VERBOSE}" && ${LOG[*]} "${expstring}"
+        echo "${expstring}" >> ${rc}
+    done
 }
 
 # ---------------------------------------------------------------------------- #
@@ -1175,8 +1345,9 @@ delete_vm() {
 ## @code -march=haswell @endcode.
 ## The guest **/proc/cpuinfo** lacks these flags, which are listed in the host
 ## /proc/cpuinfo, so the VB flag import capability is buggy or incomplete.
-## Borrowing solution from: https://superuser.com/questions/625648/
+## Borrowing partial solution from: https://superuser.com/questions/625648/
 ## virtualbox-how-to-force-a-specific-cpu-to-the-guest
+## This added code does not unfortunately enables -march=haswell (+)
 ## @todo Find a way to only compact on success and never on failure of VM.
 ## @ingroup createInstaller
 
@@ -1193,7 +1364,7 @@ create_vm() {
                                --ostype ${OSTYPE}  \
                                --register \
                                --basefolder "${VMPATH}"  2>&1 \
-                        | xargs echo "[INF]")
+                        | xargs echo "[INF] Creating VM.")
 
     # add reasonably optimal options. Note: without --cpu-profile host,
     # building issues have arisen for qtsensors
@@ -1216,17 +1387,16 @@ create_vm() {
                                --paravirtprovider ${PARAVIRTPROVIDER} \
                                --rtcuseutc ${RTCUSEUTC} \
                                --firmware ${FIRMWARE} 2>&1 \
-                        | xargs echo "[MSG]")
-
+                        | xargs echo "[INF] Adding VM parameters.")
 
     grep -E '^[[:digit:]abcdef]{8} ' <<< $(VBoxManage list hostcpuids) |\
 	while read -r line
 	do
 	    leaf="0x$(echo ${line} | cut -f1 -d' ')"
-            if [[ $leaf -lt 0x0b || $leaf -gt 0x17 ]]
-            then
-                ${LOG[*]} <<< $(VBoxManage modifyvm "${VM}" --cpuidset ${line} \
-				| xargs echo "[MSG]")
+        if [[ $leaf -lt 0x0b || $leaf -gt 0x17 ]]
+        then
+            ${LOG[*]} <<< $(VBoxManage modifyvm "${VM}" --cpuidset ${line} \
+                   | xargs echo "[INF] Exporting host CPUID values")
 	    fi
 	done
 
@@ -1234,7 +1404,8 @@ create_vm() {
     ascii2hex() { echo -n 0x; od -A n --endian little -t x4 | sed 's/ //g'; }
 
     registers=(ebx edx ecx)
-    for (( i=0; i<${#vendor}; i+=4 )); do
+    for (( i=0; i<${#vendor}; i+=4 ))
+    do
     register=${registers[$(($i/4))]}
     value=`echo -n "${vendor:$i:4}" | ascii2hex`
     # set value to an empty string to reset the CPUID, i.e.
@@ -1254,7 +1425,9 @@ create_vm() {
         [ -f "${VM}.vdi" ] && rm -f "${VM}.vdi"
         ${LOG[*]} <<< $(VBoxManage createmedium --filename "${VM}.vdi" \
                                    --size ${SIZE} \
-                                   --variant Standard 2>&1 | xargs echo '[MSG]')
+                                   --variant Standard 2>&1 \
+                            | xargs echo "[INF] Adding virtual disk.")
+
     else
         ${LOG[*]} "[MSG] Using again old VDI disk: ${VM}.vdi, \
 UUID: ${MEDIUM_UUID}"
@@ -1272,19 +1445,22 @@ UUID: ${MEDIUM_UUID}"
     # registration issues
 
     ${LOG[*]} <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" \
-                               ${MEDIUM_UUID} 2>&1 | xargs echo '[MSG]')
+                               ${MEDIUM_UUID} 2>&1 \
+                        | xargs echo "[INF] Setting UUID to ${MEDIUM_UUID}" )
+
 
     # add storage controllers
 
     ${LOG[*]} <<< $(VBoxManage storagectl "${VM}" \
                                --name 'IDE Controller'  \
                                --add ide 2>&1 \
-                        | xargs echo [MSG])
+                       | xargs echo "[INF] Enabling live CD IDE controller.")
+
     ${LOG[*]} <<< $(VBoxManage storagectl "${VM}" \
                                --name 'SATA Controller' \
                                --add sata \
                                --bootable on 2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[INF] Enabling storage controller.")
 
     # attach media to controllers and double check that the attached
     # UUID is the right one as there have been occasional issues of
@@ -1298,7 +1474,8 @@ UUID: ${MEDIUM_UUID}"
                                --device 0  \
                                --type dvddrive \
                                --medium ${LIVECD} \
-                               --tempeject on  2>&1 | xargs echo [MSG])
+                               --tempeject on  2>&1 \
+                        | xargs echo "[INF] Attaching IDE controller.")
 
     ${LOG[*]} <<< $(VBoxManage storageattach "${VM}" \
                                --storagectl 'SATA Controller' \
@@ -1321,20 +1498,22 @@ UUID: ${MEDIUM_UUID}"
                                --device 1 \
                                --type dvddrive \
                                --medium emptydrive  2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[INF] Attaching empty drive.")
+
 
     # Starting VM
 
     ${LOG[*]} <<< $(VBoxManage startvm "${VM}" \
                                --type ${VMTYPE} 2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[INF] Starting VM ${VM}")
 
     # Sync with VM: this is a VBox bug workaround
 
     "${CLONEZILLA_INSTALL}" || ! "${GUI}" && sleep 90 \
             && ${LOG[*]} <<< $(VBoxManage controlvm "${VM}" \
                                    keyboardputscancode 1c 2>&1 \
-                                   | xargs echo [MSG])
+     | xargs echo "[INF] Working around VB bug sending keyboard scancode")
+
 
     log_loop
 
@@ -1343,7 +1522,7 @@ UUID: ${MEDIUM_UUID}"
     then
         ${LOG[*]} "[INF] Compacting VM..."
         ${LOG[*]} <<< $(VBoxManage modifymedium "${VM}.vdi" --compact 2>&1 \
-                            | xargs echo '[MSG]')
+                            | xargs echo "[MSG] Compacting disk ${VM}.vdi ...")
     fi
 }
 
@@ -1731,10 +1910,18 @@ generate_Gentoo() {
     fetch_livecd
     ${LOG[*]} "[INF] Fetching stage3 tarball..."
     fetch_stage3
+    if "${TEST_EMERGE}"
+    then
+        ${LOG[*]} "[INF] Testing whether packages will be emerged..."
+        test_emerge_step
+        "${TEST_ONLY}" && return 0
+    fi
+
     ${LOG[*]} "[INF] Tweaking live CD..."
     make_boot_from_livecd
     ${LOG[*]} "[INF] Creating VM"
-    if ! create_vm; then
+    if ! create_vm
+    then
         ${LOG[*]} "[ERR] VM failed to be created!"
         exit 1
     fi
@@ -1913,12 +2100,7 @@ folder ISOFILES"
 
     cd mnt2/live
 
-    # prepare chroot in clonezilla filesystem
-
-    for i in proc sys dev run; do mount -B /$i squashfs-root/$i; done
-
-    if_fails $? "[ERR] Could not bind-mount squashfs-root"
-    # add update script to clonezilla filesystem. Do not indent!
+    bind_filesystem squashfs-root
 }
 
 ## @fn unmount_clonezilla_iso()
@@ -1932,7 +2114,7 @@ unmount_clonezilla_iso() {
     # clean up and restore squashfs back
 
     rm -vf filesystem.squashfs
-    for i in proc sys dev run; do umount squashfs-root/$i; done
+    unbind_filesystem squashfs-root
     if_fails $? "[ERR] Could not unmount squashfs-root"
 
     mksquashfs squashfs-root filesystem.squashfs
@@ -1978,7 +2160,7 @@ $(get_mountpoint /dev/${EXT_DEVICE})"
         exit 1
     fi
 
-    # if no platform-installed ocs-sr, try to bootstrap it from clonezill iso
+    # if no platform-installed ocs-sr, try to bootstrap it from clonezilla iso
 
     if $(which ocs-sr)
     then
@@ -2022,7 +2204,7 @@ EOF
 
     if "${CLONEZILLA_MOUNTED}"
     then
-        for i in proc sys dev run; do umount squashfs-root/$i; done
+        unbind_filesystem squashfs-root
         mv squashfs-root/home/partimag/image "${VMPATH}"/ISOFILES/home/partimag
         cd "${VMPATH}"
         rm -rf mnt2/
@@ -2097,36 +2279,28 @@ main() {
         create_options_array options
         help_md
         exit 0
-    else
-    if grep -q 'help'    <<< "$@"
+    elif grep -q 'help'    <<< "$@"
     then
         create_options_array options
         help_
         exit 0
-    else
-    if grep -q 'manpage' <<< "$@"
+    elif grep -q 'manpage' <<< "$@"
     then
         create_options_array options
         manpage
-	exit 0
-    else
-    if grep -q 'htmlpage' <<< "$@"
+        exit 0
+    elif grep -q 'htmlpage' <<< "$@"
     then
         create_options_array options
-	htmlpage
-	exit 0
-    else
-    if grep -q 'pdfpage' <<< "$@"
+        htmlpage
+	    exit 0
+    elif grep -q 'pdfpage' <<< "$@"
     then
         create_options_array options
-	pdfpage
-	exit 0
+        pdfpage
+        exit 0
     else
         create_options_array options2
-    fi
-    fi
-    fi
-    fi
     fi
 
     # parse command line. All arguments must be in the form a=true/false except
@@ -2152,10 +2326,9 @@ main() {
 
     "${BUILD_VIRTUALBOX}" && { build_virtualbox; exit 0; }
 
-    # if Gentoo has already been built into an ISO image or on an external device
-    # skip generating it; otherwise go and build the Gentoo virtual machine
-
-    # you can bypass generation by setting vm= on commandline
+    # if Gentoo has already been built into an ISO image or on an external
+    # device skip generating it; otherwise go and build the Gentoo virtual
+    # machine
 
     if [ -n "${VM}" ] && ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}"
     then
@@ -2174,9 +2347,11 @@ main() {
 
 	if [ -z "${CUSTOM_CLONEZILLA}" ] || [ "${CUSTOM_CLONEZILLA}" = "dep" ]
 	then
-            ${LOG[*]} "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM."
+        ${LOG[*]}\
+            "[INF] Adding VirtualBox Guest Additions to CloneZilla ISO VM."
             "${VERBOSE}" \
-                && ${LOG[*]} "[INF] These are necessary to activate folder sharing."
+                && ${LOG[*]} \
+                       "[INF] These are necessary to activate folder sharing."
 
             if "${USE_WORKFLOW}"
             then
@@ -2221,15 +2396,17 @@ clonezilla image..."
         if clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
         then
             ${LOG[*]} "[MSG] Done."
-           if [ -f "${ISO_OUTPUT}" ]
-	   then
-            ${LOG[*]} "[MSG] ISO install medium was created here: ${ISO_OUTPUT}"
-	   else
-            ${LOG[*]} "[ERR] ISO install medium failed to be created."
-	   fi
+            if [ -f "${ISO_OUTPUT}" ]
+            then
+                ${LOG[*]}\
+                    "[MSG] ISO install medium was created here: ${ISO_OUTPUT}"
+            else
+                ${LOG[*]} \
+                    "[ERR] ISO install medium failed to be created."
+            fi
         else
-            ${LOG[*]} "[ERR] ISO install medium failed to be created!"
-            exit 1
+           ${LOG[*]} "[ERR] ISO install medium failed to be created!"
+           exit 1
         fi
     fi
 
@@ -2258,7 +2435,7 @@ clonezilla image..."
     if "${CLEANUP}"
     then
         ${LOG[*]} <<< $(cleanup 2>&1 | xargs echo '[INF] Cleaning up.')
-	cleanup
+    	cleanup
     fi
 
     # send wake-up call

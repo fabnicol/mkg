@@ -55,7 +55,7 @@ adjust_environment() {
          >> /etc/fstab
     echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"   \
          >> /etc/fstab
-    
+
     source /etc/profile
 
     # Refresh and rebuild @world frequently emerge complains about
@@ -63,10 +63,13 @@ adjust_environment() {
     # emerge-webrsync as emerge --sync is a bit less robust (rsync
     # rotation bans...)
 
-    emerge-webrsync
-    ! emerge -1 sys-apps/portage \
-        && { echo "[ERR] emerge-webrsync failed!" | tee emerge.build
-        return 1; }
+    if ! emerge-webrsync
+    then
+        echo "[ERR] emerge-webrsync failed!" | tee emerge.build
+        return 1
+    fi
+
+    emerge -1 -u sys-app/portage
 
     # select profile (most recent plasma desktop)
 
@@ -123,11 +126,20 @@ adjust_environment() {
        return 1
     fi
 
+    # There is an intractable circular dependency that
+    # can be broken by pre-emerging python
+
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python
+
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours
     # as syslogd is not yet there we tee a custom build log
+    # emerging gcc and glibc is mainly for CFLAGS changes.
 
-    emerge -uDN @world 2>&1 | tee -a emerge.build
+    emerge sys-devel/gcc
+    emerge sys-libs/glibc
+    emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
+
     [ $? != 0 ] && {
         echo "[ERR] emerge @world failed!"  | tee -a emerge.build
         return 1; }
@@ -242,12 +254,8 @@ install_software() {
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
-    
-    # for gnome there is a circuylar dependency to break:
-    USE="-sqlite -bluetooth" emerge dev-lang/python
-    
-    local packages=`grep -E -v '(^\s*$|^\s*#.*$)' ${ELIST} \
-| sed "s/dev-lang\/R-.*$/dev-lang\/R-${R_VERSION}/"`
+
+    local packages=`grep -E -v '(^\s*$|^\s*#.*$)' "${ELIST}"`
 
     # Trace for debugging
 
@@ -260,10 +268,10 @@ install_software() {
 
     # do not quote `packages' variable!
 
-    emerge -uDN --keep-going ${packages}  2>&1 \
+    emerge -uDN --with-bdeps=y --keep-going ${packages}  2>&1 \
     | tee -a log_install_software.log
     local res_install=$?
-    
+
     if [ "${res_install}" != "0" ]
     then
 	# one more chance, who knows
@@ -273,11 +281,11 @@ install_software() {
     fi
 
     emerge gdm
-    
+
     if [ $? != 0 ]
     then
 	# one more chance, who knows
-	emerge --resume
+	    emerge --resume | tee -a log_install_software.log
     fi
 
     # do not use \ to continue line below:
