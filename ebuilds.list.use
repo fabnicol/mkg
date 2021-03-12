@@ -1,19 +1,31 @@
->=dev-libs/libpcre2-10.35 pcre16
-dev-libs/gjs -sysprof
-sys-apps/util-linux caps
 app-arch/p7zip -kde -wxwidgets
-sys-auth/polkit  introspection nls pam
->=dev-lang/python-2.7.18-r1:2.7 sqlite
->=media-libs/harfbuzz-2.6.7 icu
->=media-libs/gd-2.3.0 png
->=media-video/vlc-3.0.11.1 vorbis ogg
->=sys-libs/zlib-1.2.11-r2 minizip
->=media-libs/mesa-20.0.8 wayland
->=dev-libs/libxml2-2.9.10-r1 icu
->=media-libs/libvpx-1.7.0-r1 svc
->=dev-libs/xmlsec-1.2.30 nss
+>=app-crypt/gcr-3.36.0 gtk
+>=app-crypt/pinentry-1.1.0-r4 gnome-keyring
+app-editors/emacs gtk
+>=app-i18n/ibus-1.5.22 gtk
 >=app-text/ghostscript-gpl-9.52-r1 cups
 app-text/xmlto text
-app-editors/emacs gtk
->=virtual/mpi-2.0-r4 threads cxx
+dev-libs/gjs -sysprof
+>=dev-libs/folks-0.14.0 eds
+>=dev-libs/libgdata-0.17.12 gnome-online-accounts
+>=dev-libs/libpcre2-10.35 pcre16
+>=dev-libs/libpeas-1.26.0-r100 gtk
+>=dev-libs/libxml2-2.9.10-r1 icu
+>=dev-libs/xmlsec-1.2.30 nss
+>=dev-lang/python-2.7.18-r1:2.7 sqlite
+>=gnome-extra/evolution-data-server-3.36.5 gtk vala
+>=media-libs/clutter-1.26.4 gtk
+>=media-libs/gegl-0.4.26-r1 raw
+>=media-libs/gd-2.3.0 png
+>=media-libs/gst-plugins-base-1.16.3 theora
+>=media-libs/harfbuzz-2.6.7 icu
+>=media-libs/libvpx-1.7.0-r1 svc
+>=media-libs/mesa-20.0.8 wayland
+>=media-plugins/alsa-plugins-1.2.2 pulseaudio
+>=media-plugins/grilo-plugins-0.3.11 tracker
+>=media-video/vlc-3.0.11.1 vorbis ogg
+sys-apps/util-linux caps
+sys-auth/polkit  introspection nls pam
 >=sys-cluster/openmpi-2.0.4 threads cxx
+>=sys-libs/zlib-1.2.11-r2 minizip
+>=virtual/mpi-2.0-r4 threads cxx
