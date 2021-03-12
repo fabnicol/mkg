@@ -66,6 +66,67 @@ Warning: you should have at least 55 GB of free disk space in the
 current directory or in vmpath if specified.
 .PP
 .br
+Arguments with white space (like
+\f[C]cflags=\[dq]-O2 -march=...\[dq]\f[R]) should be
+.PD 0
+.P
+.PD
+.br
+written in list form with commas and no spaces:
+\f[C]cflags=[-O2,-march=...]\f[R]
+.PD 0
+.P
+.PD
+.br
+The same holds for paths with white space.
+.PP
+.br
+As of tag 1st March, 2021, part of the build is performed
+.PD 0
+.P
+.PD
+.br
+by \f[I]Github Actions\f[R] automatically.
+An ISO file of CloneZilla
+.PD 0
+.P
+.PD
+.br
+supplemented with VirtualBox guest additions will be downloaded
+.PD 0
+.P
+.PD
+.br
+from the resulting automated Github release.
+To disable this behavior
+.PD 0
+.P
+.PD
+.br
+you can add \f[C]use_workflow=false\f[R] to command line, or build the
+.PD 0
+.P
+.PD
+.br
+custom ISO file beforehand using the companion project
+.PD 0
+.P
+.PD
+.br
+\f[B]clonezilla_with_virtualbox\f[R].
+In this case, add:
+.PD 0
+.P
+.PD
+.br
+\f[C]custom_clonezilla=your_build.iso\f[R]
+.PD 0
+.P
+.PD
+.br
+to command line.
+.PP
+.br
 \f[B]Options:\f[R]
 .PP
 .br
@@ -196,7 +257,7 @@ Do not clean up mkg custom logs at root of gentoo system files before VM
 shutdown.
 Boolean.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -205,7 +266,7 @@ verbose
 T}@T{
 Increase verbosity
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -214,7 +275,7 @@ bios
 T}@T{
 Type of bootloader: BIOS or EFI (default)
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -223,7 +284,7 @@ blank
 T}@T{
 Blank rewritable optical disk before burning installation image.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -234,7 +295,7 @@ Download code source and automatically build virtualbox and tools.
 Yields VirtualBox and vbox-img executables under main directory and
 subdirectory virtualbox with the build, including documentation.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -244,7 +305,7 @@ T}@T{
 Burn to optical disc.
 Boolean.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -254,7 +315,7 @@ T}@T{
 cdrecord full path.
 Automatically determined if left unspecified.
 T}@T{
-[\f[C]which cdrecord\f[R]]
+[ \f[C]which cdrecord\f[R] ]
 T}@T{
 f:burn
 T}
@@ -263,8 +324,9 @@ cflags
 T}@T{
 GCC CFLAGS options for ebuilds
 T}@T{
-[-march=native -O2]
+[ [-march=native,-O2] ]
 T}@T{
+s
 T}
 T{
 cleanup
@@ -273,7 +335,7 @@ Clean up archives, temporary images and virtual machine after successful
 completion.
 Boolean.
 T}@T{
-[true]
+[ true ]
 T}@T{
 b
 T}
@@ -285,7 +347,7 @@ install CD.
 May be more robust for headless install, owing to a VB bug requiring
 artificial keyboard input (see doc).
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -296,7 +358,7 @@ Method used by hot_install ext_device=\&... to intall Gentoo to disk.
 One of: `guestfish' (default), `with-raw-buffer' (slower) or `vbox-img'
 (currently unavailable)
 T}@T{
-[guestfish]
+[ guestfish ]
 T}@T{
 s:ext_device
 T}
@@ -306,7 +368,7 @@ T}@T{
 Compact virtual disk after VM building.
 Caution: this may impede hot_install and ext_device.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -315,7 +377,7 @@ cpuexecutioncap
 T}@T{
 Maximum percentage of CPU per core (0 to 100)
 T}@T{
-[100]
+[ 100 ]
 T}@T{
 n
 T}
@@ -324,7 +386,7 @@ CRAN_REPOS
 T}@T{
 CRAN repository URL for downloading extra R packages
 T}@T{
-[https://cloud.r-project.org]
+[ https://cloud.r-project.org ]
 T}@T{
 s
 T}
@@ -334,7 +396,7 @@ T}@T{
 (Re)create the squashfs filesystem.
 Boolean.
 T}@T{
-[true]
+[ true ]
 T}@T{
 b
 T}
@@ -344,7 +406,7 @@ T}@T{
 Use this previously created custom CloneZilla ISO with added VirtualBox
 and guest additions.
 T}@T{
-[dep]
+[ dep ]
 T}@T{
 s
 T}
@@ -354,7 +416,7 @@ T}@T{
 Create Gentoo clone installer on external device.
 \f[B]ext_device\f[R] value must be specified.
 T}@T{
-[]
+[ ]
 T}@T{
 T}
 T{
@@ -363,7 +425,7 @@ T}@T{
 Disable MD5 checkums verification after downloads.
 Boolean.
 T}@T{
-[true]
+[ true ]
 T}@T{
 b
 T}
@@ -373,7 +435,7 @@ T}@T{
 Download install ISO image from Gentoo mirror.
 Boolean.
 T}@T{
-[true]
+[ true ]
 T}@T{
 b
 T}
@@ -383,7 +445,7 @@ T}@T{
 Download and install stage3 archive to virtual disk.
 Booelan.
 T}@T{
-[true]
+[ true ]
 T}@T{
 b
 T}
@@ -395,7 +457,7 @@ An ISO file must have been downloaded to create the recovery image of
 the Gentoo platform once the virtual machine has ended its job.
 Boolean
 T}@T{
-[true]
+[ true ]
 T}@T{
 b
 T}
@@ -404,7 +466,7 @@ download_clonezilla_path
 T}@T{
 Download the following CloneZilla ISO
 T}@T{
-[path1]
+[ path1 ]
 T}@T{
 u
 T}
@@ -416,7 +478,7 @@ stage3.
 Note: if the default value is not used, adjust the names of the
 `elist'.accept_keywords and `elist'.use files
 T}@T{
-[ebuilds.list]
+[ ebuilds.list ]
 T}@T{
 f
 T}
@@ -428,7 +490,7 @@ Note: you will have to accept so-called \f[I]insecure software\f[R] with
 some providers.
 It is not insecure if you are using your private PC throughout.
 T}@T{
-[]
+[ ]
 T}@T{
 e
 T}
@@ -437,7 +499,7 @@ email_passwd
 T}@T{
 Email password
 T}@T{
-[]
+[ ]
 T}@T{
 s:email
 T}
@@ -446,7 +508,7 @@ emirrors
 T}@T{
 Mirror sites for downloading ebuilds
 T}@T{
-[path2]
+[ path2 ]
 T}@T{
 u
 T}
@@ -459,7 +521,7 @@ directory (if mounted), or a few consecutive letters of the vendor name
 (e.g.\ `Samsu', `PNY' or `Kingst'), if there is just one such.
 Requires \f[I]hot_install\f[R] on commandline.
 T}@T{
-[]
+[ ]
 T}@T{
 s
 T}
@@ -470,7 +532,7 @@ Forcefully creates machine even if others with same same exist.
 Stops and restarts VBox daemons.
 Not advised if other VMs are running.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -481,7 +543,7 @@ Do not Generate Gentoo but use the external device on which Gentoo was
 previously installed.
 Boolean.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b:ext_device
 T}
@@ -490,7 +552,7 @@ from_iso
 T}@T{
 Do not generate Gentoo but use the bootable ISO given on commandline.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -500,9 +562,27 @@ T}@T{
 Do not generate Gentoo but use the VM.
 Boolean.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
+T}
+T{
+full_cleanup
+T}@T{
+Remove virtual disk, archives and ISO files on clean-up
+T}@T{
+[ false ]
+T}@T{
+b
+T}
+T{
+github_release_path
+T}@T{
+URL to Github Release of clonezilla_with_virtualbox.iso
+T}@T{
+[ path3 ]
+T}@T{
+s
 T}
 T{
 gui
@@ -510,7 +590,7 @@ T}@T{
 Binary: true corresponds to VBoxManage startvm \&... \[en]type=gui,
 false to \[en]type=headless
 T}@T{
-[true]
+[ true ]
 T}@T{
 b
 T}
@@ -519,7 +599,7 @@ help
 T}@T{
 This help
 T}@T{
-[]
+[ ]
 T}@T{
 T}
 T{
@@ -529,7 +609,7 @@ Intall to Gentoo attached device (like /dev/sdb) possibly mounted (like
 /media/USER/567EAF).
 To be used with \f[I]ext_device=\&...\f[R]
 T}@T{
-[false]
+[ false ]
 T}@T{
 b:ext_device
 T}
@@ -538,7 +618,7 @@ htmlpage
 T}@T{
 Create HTML help page
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -547,7 +627,7 @@ hwvirtex
 T}@T{
 Activate HWVIRTEX: on/off
 T}@T{
-[on]
+[ on ]
 T}@T{
 o
 T}
@@ -558,7 +638,7 @@ Allow interaction with user.
 This may cause deadlock if process is detached from the console
 (\f[I]nohup\f[R] or other methods)
 T}@T{
-[true]
+[ true ]
 T}@T{
 b
 T}
@@ -567,7 +647,7 @@ ioapic
 T}@T{
 IOAPIC parameter: on or off
 T}@T{
-[on]
+[ on ]
 T}@T{
 o
 T}
@@ -576,26 +656,16 @@ kernel_config
 T}@T{
 Use a custom kernel config file
 T}@T{
-[.config]
+[ .config ]
 T}@T{
 f
-T}
-T{
-language
-T}@T{
-Add support for non-US English language as a default.
-Use standard abbreviations (fr for french, es for spanish) etc.
-T}@T{
-[us]
-T}@T{
-s
 T}
 T{
 lineno_patch
 T}@T{
 Line patched against vbox-img.cpp in virtualbox source code
 T}@T{
-[797]
+[ 797 ]
 T}@T{
 n
 T}
@@ -604,7 +674,7 @@ livecd
 T}@T{
 Path to the live CD that will start the VM
 T}@T{
-[gentoo.iso]
+[ gentoo.iso ]
 T}@T{
 f
 T}
@@ -613,7 +683,7 @@ logging
 T}@T{
 Activate logging
 T}@T{
-[true]
+[ true ]
 T}@T{
 b
 T}
@@ -622,7 +692,7 @@ manpage
 T}@T{
 Create manpage mkg.1
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -631,7 +701,7 @@ mem
 T}@T{
 VM RAM memory in MiB
 T}@T{
-[8000]
+[ 8000 ]
 T}@T{
 n
 T}
@@ -642,7 +712,7 @@ Remove \f[I]libreoffice\f[R] and \f[I]data science tools\f[R] from
 default list of installed software.
 Boolean.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -652,7 +722,7 @@ T}@T{
 Remove kernel sources to minimize packaging.
 Not advised for personal use but OK for deployment and distribution.
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -661,7 +731,7 @@ mirror
 T}@T{
 Mirror site for downloading of stage3 tarball
 T}@T{
-[path2]
+[ path2 ]
 T}@T{
 u
 T}
@@ -671,7 +741,7 @@ T}@T{
 Number of VM CPUs.
 By default the third of available threads.
 T}@T{
-[count]
+[ count ]
 T}@T{
 n
 T}
@@ -680,7 +750,7 @@ nonroot_user
 T}@T{
 Non-root user
 T}@T{
-[fab]
+[ fab ]
 T}@T{
 s
 T}
@@ -689,7 +759,7 @@ pae
 T}@T{
 Activate PAE: on/off
 T}@T{
-[on]
+[ on ]
 T}@T{
 o
 T}
@@ -699,7 +769,7 @@ T}@T{
 Virtualization interface: kvm for GNU/Linux, may be tweaked (see
 VirtualBox documentation)
 T}@T{
-[kvm]
+[ kvm ]
 T}@T{
 s
 T}
@@ -708,7 +778,7 @@ passwd
 T}@T{
 User password
 T}@T{
-[_user2021_]
+[ _user2021_ ]
 T}@T{
 s:vm
 T}
@@ -717,7 +787,7 @@ pdfpage
 T}@T{
 Create PDF help page
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -726,7 +796,7 @@ plot
 T}@T{
 Plot VDI disk size using GNUPlot
 T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -735,7 +805,7 @@ plot_color
 T}@T{
 Plot line color between simple quotes (e.g: `cyan',`red' etc.)
 T}@T{
-[`cyan']
+[ `cyan' ]
 T}@T{
 s
 T}
@@ -745,7 +815,7 @@ T}@T{
 Number of seconds of plot display per minute of processing.
 Maximum 50.
 T}@T{
-[5]
+[ 5 ]
 T}@T{
 n
 T}
@@ -754,7 +824,7 @@ plot_period
 T}@T{
 Number of minutes elapsed between two successive plots
 T}@T{
-[10]
+[ 10 ]
 T}@T{
 n
 T}
@@ -764,7 +834,7 @@ T}@T{
 Plot position of on monitor screen (top-left angle) in pixels e.g `0,0'
 or `500,500'
 T}@T{
-[`0,0']
+[ `0,0' ]
 T}@T{
 s
 T}
@@ -773,7 +843,7 @@ plot_span
 T}@T{
 Number of minutes of virtual disk processing to be plotted, back in time
 T}@T{
-[1200]
+[ 1200 ]
 T}@T{
 n
 T}
@@ -782,7 +852,7 @@ processor
 T}@T{
 Processor type
 T}@T{
-[amd64]
+[ amd64 ]
 T}@T{
 s
 T}
@@ -791,25 +861,7 @@ quiet_mode
 T}@T{
 Silence output except for the most severe errors.
 T}@T{
-[false]
-T}@T{
-b
-T}
-T{
-r_version
-T}@T{
-R version
-T}@T{
-[4.0.2]
-T}@T{
-s
-T}
-T{
-remove_vdi
-T}@T{
-Remove virtual disk on clean-up
-T}@T{
-[false]
+[ false ]
 T}@T{
 b
 T}
@@ -818,7 +870,7 @@ rootpasswd
 T}@T{
 Root password
 T}@T{
-[_dev2021_]
+[ _dev2021_ ]
 T}@T{
 s:vm
 T}
@@ -827,7 +879,7 @@ rtcuseutc
 T}@T{
 Use UTC as time reference: on/off
 T}@T{
-[on]
+[ on ]
 T}@T{
 o
 T}
@@ -837,7 +889,7 @@ T}@T{
 In case of several optical disc burners, specify the SCSI address as
 x,y,z
 T}@T{
-[]
+[ ]
 T}@T{
 s
 T}
@@ -846,7 +898,7 @@ size
 T}@T{
 Dynamic disc size
 T}@T{
-[55000]
+[ 55000 ]
 T}@T{
 n
 T}
@@ -856,7 +908,7 @@ T}@T{
 SMTP URL of email provider for end-of-job warning.
 Default: gmail SMTP
 T}@T{
-[smtps://smtp.gmail.com:465]
+[ smtps://smtp.gmail.com:465 ]
 T}@T{
 u
 T}
@@ -865,16 +917,36 @@ stage3
 T}@T{
 Path to stage3 archive
 T}@T{
-[stage3.tar.xz]
+[ stage3.tar.xz ]
 T}@T{
 f
+T}
+T{
+test_emerge
+T}@T{
+Test whether emerge will be able to install packages in the VM before
+starting it.
+T}@T{
+[ true ]
+T}@T{
+b
+T}
+T{
+test_only
+T}@T{
+Only test if portage will be able to install packages.
+Do not create a virtual machine.
+T}@T{
+[ false ]
+T}@T{
+b
 T}
 T{
 usbehci
 T}@T{
 Activate USB2 driver: on/off
 T}@T{
-[off]
+[ off ]
 T}@T{
 o
 T}
@@ -884,9 +956,19 @@ T}@T{
 Activate USB3 driver: on/off.
 Note: if on, needs extension pack.
 T}@T{
-[off]
+[ off ]
 T}@T{
 o
+T}
+T{
+use_workflow
+T}@T{
+Use Github Actions workflow to add virtualbox guest additions to
+CloneZilla ISO.
+T}@T{
+[ true ]
+T}@T{
+b
 T}
 T{
 vm
@@ -895,7 +977,7 @@ Virtual Machine name.
 Unless `force=true' is used, a time stamp will be appended to avoid
 registry issues with prior VMs of the same name.
 T}@T{
-[Gentoo]
+[ Gentoo ]
 T}@T{
 vm
 T}
@@ -904,7 +986,7 @@ vbox_version
 T}@T{
 Virtualbox version
 T}@T{
-[6.1.14]
+[ 6.1.14 ]
 T}@T{
 s
 T}
@@ -913,7 +995,7 @@ vbox_version_full
 T}@T{
 Virtualbox full version
 T}@T{
-[6.1.14a]
+[ 6.1.14a ]
 T}@T{
 s
 T}
@@ -922,16 +1004,26 @@ vbpath
 T}@T{
 Path to VirtualBox directory
 T}@T{
-[/usr/bin]
+[ /usr/bin ]
 T}@T{
 d
+T}
+T{
+vm_language
+T}@T{
+Add support for non-US English language as a default.
+Use standard abbreviations (fr for french, es for spanish) etc.
+T}@T{
+[ us ]
+T}@T{
+s
 T}
 T{
 vmpath
 T}@T{
 Path to VM base directory
 T}@T{
-[$PWD]
+[ $PWD ]
 T}@T{
 d
 T}
@@ -940,9 +1032,19 @@ vtxvpid
 T}@T{
 Activate VTXVPID: on/off
 T}@T{
-[on]
+[ on ]
 T}@T{
 o
+T}
+T{
+workflow_tag
+T}@T{
+Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by
+Github Actions
+T}@T{
+[ v1.8 ]
+T}@T{
+s
 T}
 .TE
 .PP
@@ -953,12 +1055,13 @@ https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20
 .P
 .PD
 .br
-\f[B]path2:\f[R] https://github.com/rstudio/rstudio/archive/v
+\f[B]path2:\f[R] http://gentoo.mirrors.ovh.net/gentoo-distfiles/
 .PD 0
 .P
 .PD
 .br
-\f[B]path3:\f[R] http://gentoo.mirrors.ovh.net/gentoo-distfiles/
+\f[B]path3:\f[R]
+https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/
 .PD 0
 .P
 .PD
