@@ -14,7 +14,7 @@ dev-libs/gjs -sysprof
 >=dev-libs/xmlsec-1.2.30 nss
 >=dev-lang/python-2.7.18-r1:2.7 sqlite
 >=gnome-extra/evolution-data-server-3.36.5 gtk vala
->=media-libs/clutter-1.26.4 gtk
+media-libs/clutter-gtk gtk
 >=media-libs/gegl-0.4.26-r1 raw
 >=media-libs/gd-2.3.0 png
 >=media-libs/gst-plugins-base-1.16.3 theora
