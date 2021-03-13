@@ -881,6 +881,16 @@ then
     echo "emerge cmake failed!"
     exit 8
 fi
+## ---- PATCH ----
+#
+# This is temporarily necessary while display-manager is not
+# stabilized in the portage tree (March 2021)
+# NOTE: should be retrieved later on
+
+emerge -q --unmerge sys-apps/sysvinit
+emerge -q sys-apps/sysvinit
+
+## ---- End of patch ----
 # There is an intractable circular dependency that
 # can be broken by pre-emerging python
 echo "[INF] Updating python. Please wait..."

@@ -126,6 +126,17 @@ adjust_environment() {
        return 1
     fi
 
+    ## ---- PATCH ----
+    #
+    # This is temporarily necessary while display-manager is not
+    # stabilized in the portage tree (March 2021)
+    # NOTE: should be retrieved later on
+
+    emerge -q --unmerge sys-apps/sysvinit
+    emerge -q sys-apps/sysvinit
+
+    ## ---- End of patch ----
+
     # There is an intractable circular dependency that
     # can be broken by pre-emerging python
 
@@ -313,8 +324,8 @@ install_software() {
 ## @details @li Cleanup log, distfiles (for deployment),
 ##          kernel build sources and objects
 ## @li Log this into \b log_uninstall_software
-## @li Update \b eix cache. Sets displaymanager for \b xdm.
-## @li Add services: <b>sysklog, cronie, xdm, dbus, elogind</b>
+## @li Update \b eix cache. Sets display for \b display-manager.
+## @li Add services: <b>sysklog, cronie, display-manager, dbus, elogind</b>
 ## @li Substitute \b NetworkManager to temporary networking setup.
 ## @li Adjust group and \b sudo settings for non-root user and \b sddm
 ## @li Install \b grub in EFI mode.
@@ -333,14 +344,14 @@ global_config() {
         | tee -a sddm.log
     chmod +x /usr/share/sddm/scripts/Xsetup
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
-        /etc/conf.d/xdm
+        /etc/conf.d/display-manager
 
     gpasswd -a sddm video
 
     #--- Services
 
     rc-update add cronie default
-    rc-update add xdm default
+    rc-update add display-manager default
     rc-update add dbus default
     rc-update add elogind boot
 
