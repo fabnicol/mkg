@@ -1551,7 +1551,7 @@ log_loop() {
         then
 	    if [ "${loop_count}" = "${PLOT_PERIOD}" ]
 	    then
-		if ls /var/log/syslog*gz
+		if ls /var/log/syslog*gz > /dev/null 2>&1
 		then
 		    gunzip -f /var/log/syslog*gz 2>/dev/null
 		fi
