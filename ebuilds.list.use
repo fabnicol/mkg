@@ -5,9 +5,10 @@ app-editors/emacs gtk
 >=app-i18n/ibus-1.5.22 gtk
 >=app-text/ghostscript-gpl-9.52-r1 cups
 app-text/xmlto text
-dev-libs/gjs -sysprof
 >=dev-libs/folks-0.14.0 eds
+dev-libs/gjs -sysprof
 >=dev-libs/libgdata-0.17.12 gnome-online-accounts
+>=dev-libs/libical-3.0.9 vala
 >=dev-libs/libpcre2-10.35 pcre16
 >=dev-libs/libpeas-1.26.0-r100 gtk
 >=dev-libs/libxml2-2.9.10-r1 icu
@@ -15,6 +16,7 @@ dev-libs/gjs -sysprof
 >=dev-lang/python-2.7.18-r1:2.7 sqlite
 >=gnome-extra/evolution-data-server-3.36.5 gtk vala
 media-libs/clutter-gtk gtk
+media-libs/clutter gtk
 >=media-libs/gegl-0.4.26-r1 raw
 >=media-libs/gd-2.3.0 png
 >=media-libs/gst-plugins-base-1.16.3 theora
