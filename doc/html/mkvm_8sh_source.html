@@ -293,10 +293,10 @@ $(function() {
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="preprocessor">    # Ajusting portage</span></div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160; </div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    local m_conf=<span class="stringliteral">&quot;etc/portage/make.conf&quot;</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    sed  -i <span class="stringliteral">&quot;s/COMMON_FLAGS=.*/COMMON_FLAGS=&#39;${CFLAGS} -pipe&#39;/g&quot;</span>  ${m_conf}</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    sed  -i <span class="stringliteral">&quot;s/COMMON_FLAGS=.*/COMMON_FLAGS=\&quot;${CFLAGS} -pipe\&quot;/g&quot;</span>  ${m_conf}</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    echo MAKEOPTS=-j${NCPUS}  &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    echo <span class="stringliteral">&quot;L10N=\&quot;${LANGUAGE} en\&quot;&quot;</span>    &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    echo <span class="stringliteral">&quot;LINGUAS=\&quot;${LANGUAGE} en\&quot;&quot;</span> &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    echo <span class="stringliteral">&quot;L10N=\&quot;${VM_LANGUAGE} en\&quot;&quot;</span>    &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    echo <span class="stringliteral">&quot;LINGUAS=\&quot;${VM_LANGUAGE} en\&quot;&quot;</span> &gt;&gt; ${m_conf}</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    sed  -i <span class="stringliteral">&#39;s/USE=&quot;.*&quot;//g&#39;</span>    ${m_conf}</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    echo <span class="stringliteral">&#39;USE=&quot;gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist networkmanager \</span></div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="stringliteral">elogind -consolekit -systemd mpi dbus X&quot;&#39;</span> &gt;&gt;  ${m_conf}</div>
@@ -307,105 +307,110 @@ $(function() {
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    echo <span class="stringliteral">&#39;ACCEPT_LICENSE=&quot;-* @FREE linux-fw-redistributable no-source-code \</span></div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="stringliteral">bh-luxi&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    echo <span class="stringliteral">&#39;GRUB_PLATFORMS=&quot;efi-64&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    echo <span class="stringliteral">&#39;VIDEO_CARDS=&quot;nouveau intel&quot;&#39;</span>   &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    echo <span class="stringliteral">&#39;INPUT_DEVICES=&quot;evdev synaptics&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    mkdir --parents etc/portage/repos.conf</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    cp usr/share/portage/config/repos.conf etc/portage/repos.conf/gentoo.conf</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    cp --dereference /etc/resolv.conf etc/</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="preprocessor">    # Chrooting the new environment</span></div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    mount --types proc /proc proc</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    res0=$?</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    mount --rbind /sys  sys</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    res1=$?</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    mount --make-rslave sys</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    res2=$?</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    mount --rbind /dev  dev</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    res3=$?</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    mount --make-rslave dev</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    res4=$?</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <a class="code" href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a>=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4}))</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordflow">if</span> [ ${<a class="code" href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a>} = 0 ]</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    then</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        touch stage3</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        echo <span class="stringliteral">&quot;[MSG] Installed stage3 correctly.&quot;</span>    | tee -a stage3.log</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        echo <span class="stringliteral">&quot;mounting proc exit code: ${res0}&quot;</span>     | tee -a stage3.log</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        echo <span class="stringliteral">&quot;mounting sys exit code: ${res1}&quot;</span>      | tee -a stage3.log</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        echo <span class="stringliteral">&quot;rslave sys exit code: ${res2}&quot;</span>        | tee -a stage3.log</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        echo <span class="stringliteral">&quot;mounting dev dev exit code: ${res3}&quot;</span>     | tee -a stage3.log</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        echo <span class="stringliteral">&quot;rslave dev exit code exit code: ${res4}&quot;</span> | tee -a stage3.log</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        echo <span class="stringliteral">&quot;Failed to bind liveCD to main disk&quot;</span>  | tee -a stage3.log</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        sleep 10</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        swapoff /dev/sda3</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        findmnt /dev/sda4 &amp;&amp; umount -l /dev/sda4</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        <span class="keywordflow">if</span> <span class="stringliteral">&quot;${GUI}&quot;</span></div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        then</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            exit 1</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;            echo <span class="stringliteral">&quot;[INF] Shutting down in 5 seconds...&quot;</span></div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            sleep 5</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;            shutdown -h now</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        fi</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    fi</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160; </div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    cd ~</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    if [ $? != 0 ]</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    then</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        echo <span class="stringliteral">&quot;[ERR] Could not cd to $HOME&quot;</span> | tee -a stage3.log</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        exit 2</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    fi</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160; </div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    chroot /mnt/gentoo /bin/bash mkvm_chroot.sh</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160; </div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">if</span> [ $? != 0 ]</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    then</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        echo <span class="stringliteral">&quot;[ERR] Could not chroot to /mnt/gentoo&quot;</span> | tee -a stage3.log</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        echo <span class="stringliteral">&quot;[INF] Shutting down in 5 seconds&quot;</span> | tee -a stage3.log</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        sleep 5</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        exit 2</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    fi</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;}</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160; </div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="preprocessor">## @fn finalize()</span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="preprocessor">## @brief Unmount chrooted system, restore user rights and shutdown VM</span></div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="preprocessor">## @ingroup mkFileSystem</span></div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160; </div>
-<div class="line"><a name="l00306"></a><span class="lineno"><a class="line" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">  306</a></span>&#160;<a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>() {</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160; </div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    umount -l /mnt/gentoo/dev{/shm,/pts,}</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    umount /mnt/gentoo/run</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    umount /mnt/gentoo/proc</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    umount /mnt/gentoo/sys</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    umount -R -l  /mnt/gentoo</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    umount -l /dev/sda4</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    fsck -AR -y</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    echo <span class="stringliteral">&quot;[INF] Shutting down in 5 seconds...&quot;</span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    sleep 5</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    shutdown -h now</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;}</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160; </div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;<span class="preprocessor"># Logging will only subsist as long as the liveCD is not shut down</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="preprocessor"># Logs are provided for debugging purposes</span></div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>  2&gt;&amp;1 | tee <a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>.log</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="keywordflow">if</span> ! <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;then</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    echo <span class="stringliteral">&quot;[WAR] Second try at partitioning...&quot;</span> | tee -a partion.log</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    findmnt /dev/sda2 &amp;&amp; umount -l /dev/sda2</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    findmnt /dev/sda4 &amp;&amp; umount -l /dev/sda4</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    swapoff -a</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;fi</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<a class="code" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a> 2&gt;&amp;1 | tee -a stage3.log</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>       2&gt;&amp;1 | tee <a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>.log</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;${BIOS}&quot;</span> = <span class="stringliteral">&quot;true&quot;</span> ]</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    then</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        echo <span class="stringliteral">&#39;GRUB_PLATFORMS=&quot;i386-pc&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        echo <span class="stringliteral">&#39;GRUB_PLATFORMS=&quot;efi-64&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    fi</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    echo <span class="stringliteral">&#39;VIDEO_CARDS=&quot;nouveau intel&quot;&#39;</span>   &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    echo <span class="stringliteral">&#39;INPUT_DEVICES=&quot;evdev synaptics&quot;&#39;</span> &gt;&gt; ${m_conf}</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    mkdir --parents etc/portage/repos.conf</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    cp usr/share/portage/config/repos.conf etc/portage/repos.conf/gentoo.conf</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    cp --dereference /etc/resolv.conf etc/</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="preprocessor">    # Chrooting the new environment</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    mount --types proc /proc proc</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    res0=$?</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    mount --rbind /sys  sys</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    res1=$?</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    mount --make-rslave sys</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    res2=$?</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    mount --rbind /dev  dev</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    res3=$?</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    mount --make-rslave dev</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    res4=$?</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <a class="code" href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a>=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4}))</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keywordflow">if</span> [ ${<a class="code" href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a>} = 0 ]</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    then</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        touch stage3</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        echo <span class="stringliteral">&quot;[MSG] Installed stage3 correctly.&quot;</span>    | tee -a stage3.log</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        echo <span class="stringliteral">&quot;mounting proc exit code: ${res0}&quot;</span>     | tee -a stage3.log</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        echo <span class="stringliteral">&quot;mounting sys exit code: ${res1}&quot;</span>      | tee -a stage3.log</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        echo <span class="stringliteral">&quot;rslave sys exit code: ${res2}&quot;</span>        | tee -a stage3.log</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        echo <span class="stringliteral">&quot;mounting dev dev exit code: ${res3}&quot;</span>     | tee -a stage3.log</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        echo <span class="stringliteral">&quot;rslave dev exit code exit code: ${res4}&quot;</span> | tee -a stage3.log</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        echo <span class="stringliteral">&quot;Failed to bind liveCD to main disk&quot;</span>  | tee -a stage3.log</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        sleep 10</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        swapoff /dev/sda3</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        findmnt /dev/sda4 &amp;&amp; umount -l /dev/sda4</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;        <span class="keywordflow">if</span> <span class="stringliteral">&quot;${GUI}&quot;</span></div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        then</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;            exit 1</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;            echo <span class="stringliteral">&quot;[INF] Shutting down in 5 seconds...&quot;</span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;            sleep 5</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            shutdown -h now</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        fi</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    fi</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160; </div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    cd ~</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    if [ $? != 0 ]</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    then</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        echo <span class="stringliteral">&quot;[ERR] Could not cd to $HOME&quot;</span> | tee -a stage3.log</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        exit 2</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    fi</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160; </div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    chroot /mnt/gentoo /bin/bash mkvm_chroot.sh</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160; </div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <span class="keywordflow">if</span> [ $? != 0 ]</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    then</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        echo <span class="stringliteral">&quot;[ERR] Could not chroot to /mnt/gentoo&quot;</span> | tee -a stage3.log</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;        echo <span class="stringliteral">&quot;[INF] Shutting down in 5 seconds&quot;</span> | tee -a stage3.log</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        sleep 5</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;        exit 2</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    fi</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;}</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160; </div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="preprocessor">## @fn finalize()</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;<span class="preprocessor">## @brief Unmount chrooted system, restore user rights and shutdown VM</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="preprocessor">## @ingroup mkFileSystem</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
+<div class="line"><a name="l00311"></a><span class="lineno"><a class="line" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">  311</a></span>&#160;<a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>() {</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160; </div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    umount -l /mnt/gentoo/dev{/shm,/pts,}</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    umount /mnt/gentoo/run</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    umount /mnt/gentoo/proc</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    umount /mnt/gentoo/sys</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    umount -R -l  /mnt/gentoo</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    umount -l /dev/sda4</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    fsck -AR -y</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    echo <span class="stringliteral">&quot;[INF] Shutting down in 5 seconds...&quot;</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    sleep 5</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    shutdown -h now</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;}</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160; </div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="preprocessor"># Logging will only subsist as long as the liveCD is not shut down</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="preprocessor"># Logs are provided for debugging purposes</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160; </div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>  2&gt;&amp;1 | tee <a class="code" href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a>.log</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="keywordflow">if</span> ! <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;then</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    echo <span class="stringliteral">&quot;[WAR] Second try at partitioning...&quot;</span> | tee -a partion.log</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    findmnt /dev/sda2 &amp;&amp; umount -l /dev/sda2</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    findmnt /dev/sda4 &amp;&amp; umount -l /dev/sda4</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    swapoff -a</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    <a class="code" href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;fi</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<a class="code" href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a> 2&gt;&amp;1 | tee -a stage3.log</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>       2&gt;&amp;1 | tee <a class="code" href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a>.log</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="agroup__mk_file_system_html_ga9caaa1f5ea6177e55f13ebe7dec2bd60"><div class="ttname"><a href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a></div><div class="ttdeci">finalize()</div><div class="ttdoc">Unmount chrooted system, restore user rights and shutdown VM.</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00306">mkvm.sh:306</a></div></div>
+<div class="ttc" id="agroup__mk_file_system_html_ga9caaa1f5ea6177e55f13ebe7dec2bd60"><div class="ttname"><a href="group__mk_file_system.html#ga9caaa1f5ea6177e55f13ebe7dec2bd60">finalize</a></div><div class="ttdeci">finalize()</div><div class="ttdoc">Unmount chrooted system, restore user rights and shutdown VM.</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00311">mkvm.sh:311</a></div></div>
 <div class="ttc" id="agroup__mk_file_system_html_ga4315b3877c965059c7db8593870066ba"><div class="ttname"><a href="group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba">setup_network</a></div><div class="ttdeci">setup_network()</div><div class="ttdoc">Call net-setup and dhcpcd to enable networking.</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00029">mkvm.sh:29</a></div></div>
 <div class="ttc" id="agroup__mk_file_system_html_ga57eb97a585b6daafed0d93e57b96cca3"><div class="ttname"><a href="group__mk_file_system.html#ga57eb97a585b6daafed0d93e57b96cca3">install_stage3</a></div><div class="ttdeci">install_stage3()</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00180">mkvm.sh:180</a></div></div>
-<div class="ttc" id="amkvm__chroot_8sh_html_a8847834db624db79ff5b3abf5222e106"><div class="ttname"><a href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a></div><div class="ttdeci">Integer res</div><div class="ttdef"><b>Definition:</b> <a href="mkvm__chroot_8sh_source.html#l00444">mkvm_chroot.sh:444</a></div></div>
+<div class="ttc" id="amkvm__chroot_8sh_html_a8847834db624db79ff5b3abf5222e106"><div class="ttname"><a href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a></div><div class="ttdeci">Integer res</div><div class="ttdef"><b>Definition:</b> <a href="mkvm__chroot_8sh_source.html#l00454">mkvm_chroot.sh:454</a></div></div>
 <div class="ttc" id="agroup__mk_file_system_html_gaa9952b2711fe0413d7a0bc6639c7f5a5"><div class="ttname"><a href="group__mk_file_system.html#gaa9952b2711fe0413d7a0bc6639c7f5a5">partition</a></div><div class="ttdeci">partition()</div><div class="ttdoc">Create partition table, /dev/sda1 (bios_grub), /dev/sda2 (boot), dev/sda3 (swap) and /dev/sda4 (syste...</div><div class="ttdef"><b>Definition:</b> <a href="mkvm_8sh_source.html#l00095">mkvm.sh:95</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

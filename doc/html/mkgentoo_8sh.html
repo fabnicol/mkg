@@ -112,9 +112,13 @@ Functions</h2></td></tr>
 <tr class="memitem:gad29a75dbf76ffa08bf28bf4254f234c7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__create_installer.html#gad29a75dbf76ffa08bf28bf4254f234c7">mount_live_cd</a> ()</td></tr>
 <tr class="memdesc:gad29a75dbf76ffa08bf28bf4254f234c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mount Gentoo/Clonezilla live CD and unsquashfs the GNU/linux system.  <a href="group__create_installer.html#gad29a75dbf76ffa08bf28bf4254f234c7">More...</a><br /></td></tr>
 <tr class="separator:gad29a75dbf76ffa08bf28bf4254f234c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9ed49342581d0210a4e9a75c1cbbbd8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mkgentoo_8sh.html#aa9ed49342581d0210a4e9a75c1cbbbd8">move_auxiliary_files</a> ()</td></tr>
+<tr class="separator:aa9ed49342581d0210a4e9a75c1cbbbd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac524b24b0add02df542887f9b251eb42"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__create_installer.html#gac524b24b0add02df542887f9b251eb42">make_boot_from_livecd</a> ()</td></tr>
 <tr class="memdesc:gac524b24b0add02df542887f9b251eb42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tweak the Gentoo minimal install CD so that the custom- made shell scripts and stage3 archive are included into the squashfs filesystem.  <a href="group__create_installer.html#gac524b24b0add02df542887f9b251eb42">More...</a><br /></td></tr>
 <tr class="separator:gac524b24b0add02df542887f9b251eb42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adaa4d5a23086fbb45c4ca4bf0f91424b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mkgentoo_8sh.html#adaa4d5a23086fbb45c4ca4bf0f91424b">prepare_bash_rc</a> ()</td></tr>
+<tr class="separator:adaa4d5a23086fbb45c4ca4bf0f91424b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga321673d67e2987c793505f7f323894a9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__create_installer.html#ga321673d67e2987c793505f7f323894a9">test_vm_running</a> (vm)</td></tr>
 <tr class="memdesc:ga321673d67e2987c793505f7f323894a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if VM as first named argument exists and is running.  <a href="group__create_installer.html#ga321673d67e2987c793505f7f323894a9">More...</a><br /></td></tr>
 <tr class="separator:ga321673d67e2987c793505f7f323894a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -205,7 +209,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
 </div><!-- fragment --> to print a list of possible switches and arguments. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>you should have at least 55 GB of free disk space in the current directory or in vmpath if specified. Boolean values are either 'true' or 'false'. An option no followed by '=' is equivalent to <b>option=true</b>, except for help and a possible ISO file. For example, to build a minimal: distribution,specify <code>minimal</code> or <code> minimal=true</code> on command line. </dd></dl>
 <dl class="section user"><dt><b>Examples</b>:</dt><dd><ul>
-<li>Only create the VM and virtual disk, in debug mode, without R and set new passwords, for a French-language platform. Use 8 cores. <div class="fragment"><div class="line"> mkg language=fr minimal debug_mode ncpus=8</div>
+<li>Only create the VM and virtual disk, in debug mode, without R and set new passwords, for a French-language platform. Use 8 cores. <div class="fragment"><div class="line"> mkg vm_language=fr minimal debug_mode ncpus=8</div>
 <div class="line">nonroot_user=ken passwd=<span class="stringliteral">&#39;util!Hx&amp;32F&#39;</span> rootpasswd=<span class="stringliteral">&#39;Hk_32!_CD&#39;</span> <a class="code" href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a>=<span class="keyword">false</span></div>
 </div><!-- fragment --> </li>
 <li>Create ISO clonezilla image of Gentoo linux, burn it to DVD, create an installed OS on a USB stick whose model label starts with <em>PNY</em> and finally create a clonezilla installer on another USB stick mounted under <code> /media/ken/AA45E </code> <div class="fragment"><div class="line"> mkgento burn hot_install ext_device=<span class="stringliteral">&quot;PNY&quot;</span> device_installer</div>
@@ -215,7 +219,47 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
 </dd></dl>
 
 <p class="definition">Definition in file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
-</div><h2 class="groupheader">Variable Documentation</h2>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="aa9ed49342581d0210a4e9a75c1cbbbd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9ed49342581d0210a4e9a75c1cbbbd8">&#9670;&nbsp;</a></span>move_auxiliary_files()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">move_auxiliary_files </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01010">1010</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+
+</div>
+</div>
+<a id="adaa4d5a23086fbb45c4ca4bf0f91424b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adaa4d5a23086fbb45c4ca4bf0f91424b">&#9670;&nbsp;</a></span>prepare_bash_rc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">prepare_bash_rc </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Prepare the .bashrc file by exporting the environment this will be placed under /root in the VM </p>
+
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01146">1146</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
 <a id="a93f04e4165d1e26b707af12275800ef3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a93f04e4165d1e26b707af12275800ef3">&#9670;&nbsp;</a></span>ISOLINUX_DIR</h2>
 
@@ -228,7 +272,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00802">802</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00950">950</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -244,7 +288,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00275">275</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00279">279</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -260,12 +304,12 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01158">1158</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01357">1357</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="agroup__auxiliary_functions_html_gaff07c1d29d6d6a540c726948254a1764"><div class="ttname"><a href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a></div><div class="ttdeci">cleanup()</div><div class="ttdoc">Clean up all temporary files and directpries (except for VirtualBox build)</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00481">utils.sh:481</a></div></div>
+<div class="ttc" id="agroup__auxiliary_functions_html_gaff07c1d29d6d6a540c726948254a1764"><div class="ttname"><a href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a></div><div class="ttdeci">cleanup()</div><div class="ttdoc">Clean up all temporary files and directpries (except for VirtualBox build)</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00489">utils.sh:489</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

@@ -60,20 +60,21 @@
 \contentsline {section}{\numberline {6.3}Auxiliary functions to check}{29}{section.6.3}%
 \contentsline {subsection}{\numberline {6.3.1}Detailed Description}{29}{subsection.6.3.1}%
 \contentsline {subsection}{\numberline {6.3.2}Function Documentation}{29}{subsection.6.3.2}%
-\contentsline {subsubsection}{\numberline {6.3.2.1}burn\_iso()}{29}{subsubsection.6.3.2.1}%
-\contentsline {subsubsection}{\numberline {6.3.2.2}check\_dir()}{30}{subsubsection.6.3.2.2}%
-\contentsline {subsubsection}{\numberline {6.3.2.3}check\_file()}{30}{subsubsection.6.3.2.3}%
-\contentsline {subsubsection}{\numberline {6.3.2.4}check\_files()}{31}{subsubsection.6.3.2.4}%
-\contentsline {subsubsection}{\numberline {6.3.2.5}check\_md5sum()}{31}{subsubsection.6.3.2.5}%
-\contentsline {subsubsection}{\numberline {6.3.2.6}check\_tool()}{32}{subsubsection.6.3.2.6}%
-\contentsline {subsubsection}{\numberline {6.3.2.7}cleanup()}{32}{subsubsection.6.3.2.7}%
-\contentsline {subsubsection}{\numberline {6.3.2.8}create\_install\_ext\_device()}{32}{subsubsection.6.3.2.8}%
-\contentsline {subsubsection}{\numberline {6.3.2.9}create\_options\_array()}{33}{subsubsection.6.3.2.9}%
-\contentsline {subsubsection}{\numberline {6.3.2.10}if\_fails()}{33}{subsubsection.6.3.2.10}%
-\contentsline {subsubsection}{\numberline {6.3.2.11}recreate\_liveCD\_ISO()}{33}{subsubsection.6.3.2.11}%
-\contentsline {subsubsection}{\numberline {6.3.2.12}send\_mail()}{34}{subsubsection.6.3.2.12}%
-\contentsline {subsubsection}{\numberline {6.3.2.13}test\_numeric()}{34}{subsubsection.6.3.2.13}%
-\contentsline {subsubsection}{\numberline {6.3.2.14}test\_URL()}{35}{subsubsection.6.3.2.14}%
+\contentsline {subsubsection}{\numberline {6.3.2.1}bind\_filesystem()}{29}{subsubsection.6.3.2.1}%
+\contentsline {subsubsection}{\numberline {6.3.2.2}burn\_iso()}{30}{subsubsection.6.3.2.2}%
+\contentsline {subsubsection}{\numberline {6.3.2.3}check\_dir()}{30}{subsubsection.6.3.2.3}%
+\contentsline {subsubsection}{\numberline {6.3.2.4}check\_file()}{31}{subsubsection.6.3.2.4}%
+\contentsline {subsubsection}{\numberline {6.3.2.5}check\_files()}{31}{subsubsection.6.3.2.5}%
+\contentsline {subsubsection}{\numberline {6.3.2.6}check\_md5sum()}{31}{subsubsection.6.3.2.6}%
+\contentsline {subsubsection}{\numberline {6.3.2.7}check\_tool()}{32}{subsubsection.6.3.2.7}%
+\contentsline {subsubsection}{\numberline {6.3.2.8}cleanup()}{32}{subsubsection.6.3.2.8}%
+\contentsline {subsubsection}{\numberline {6.3.2.9}create\_install\_ext\_device()}{33}{subsubsection.6.3.2.9}%
+\contentsline {subsubsection}{\numberline {6.3.2.10}create\_options\_array()}{33}{subsubsection.6.3.2.10}%
+\contentsline {subsubsection}{\numberline {6.3.2.11}if\_fails()}{33}{subsubsection.6.3.2.11}%
+\contentsline {subsubsection}{\numberline {6.3.2.12}recreate\_liveCD\_ISO()}{34}{subsubsection.6.3.2.12}%
+\contentsline {subsubsection}{\numberline {6.3.2.13}send\_mail()}{34}{subsubsection.6.3.2.13}%
+\contentsline {subsubsection}{\numberline {6.3.2.14}test\_numeric()}{34}{subsubsection.6.3.2.14}%
+\contentsline {subsubsection}{\numberline {6.3.2.15}test\_URL()}{35}{subsubsection.6.3.2.15}%
 \contentsline {chapter}{\numberline {7}File Documentation}{37}{chapter.7}%
 \contentsline {section}{\numberline {7.1}build\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}virtualbox.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{37}{section.7.1}%
 \contentsline {subsection}{\numberline {7.1.1}Variable Documentation}{37}{subsection.7.1.1}%
@@ -93,21 +94,24 @@
 \contentsline {subsubsection}{\numberline {7.2.2.2}LIVECD}{40}{subsubsection.7.2.2.2}%
 \contentsline {section}{\numberline {7.3}mkgentoo.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{41}{section.7.3}%
 \contentsline {subsection}{\numberline {7.3.1}Detailed Description}{42}{subsection.7.3.1}%
-\contentsline {subsection}{\numberline {7.3.2}Variable Documentation}{43}{subsection.7.3.2}%
-\contentsline {subsubsection}{\numberline {7.3.2.1}ISOLINUX\_DIR}{43}{subsubsection.7.3.2.1}%
-\contentsline {subsubsection}{\numberline {7.3.2.2}LOG}{43}{subsubsection.7.3.2.2}%
-\contentsline {subsubsection}{\numberline {7.3.2.3}PATH}{44}{subsubsection.7.3.2.3}%
+\contentsline {subsection}{\numberline {7.3.2}Function Documentation}{43}{subsection.7.3.2}%
+\contentsline {subsubsection}{\numberline {7.3.2.1}move\_auxiliary\_files()}{43}{subsubsection.7.3.2.1}%
+\contentsline {subsubsection}{\numberline {7.3.2.2}prepare\_bash\_rc()}{43}{subsubsection.7.3.2.2}%
+\contentsline {subsection}{\numberline {7.3.3}Variable Documentation}{44}{subsection.7.3.3}%
+\contentsline {subsubsection}{\numberline {7.3.3.1}ISOLINUX\_DIR}{44}{subsubsection.7.3.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.3.2}LOG}{44}{subsubsection.7.3.3.2}%
+\contentsline {subsubsection}{\numberline {7.3.3.3}PATH}{44}{subsubsection.7.3.3.3}%
 \contentsline {section}{\numberline {7.4}mkvm.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{44}{section.7.4}%
 \contentsline {section}{\numberline {7.5}mkvm\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}chroot.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{44}{section.7.5}%
-\contentsline {subsection}{\numberline {7.5.1}Detailed Description}{44}{subsection.7.5.1}%
+\contentsline {subsection}{\numberline {7.5.1}Detailed Description}{45}{subsection.7.5.1}%
 \contentsline {subsection}{\numberline {7.5.2}Function Documentation}{45}{subsection.7.5.2}%
 \contentsline {subsubsection}{\numberline {7.5.2.1}finalize()}{45}{subsubsection.7.5.2.1}%
 \contentsline {subsection}{\numberline {7.5.3}Variable Documentation}{45}{subsection.7.5.3}%
 \contentsline {subsubsection}{\numberline {7.5.3.1}res}{45}{subsubsection.7.5.3.1}%
-\contentsline {section}{\numberline {7.6}utils.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{45}{section.7.6}%
-\contentsline {subsection}{\numberline {7.6.1}Detailed Description}{46}{subsection.7.6.1}%
-\contentsline {subsection}{\numberline {7.6.2}Function Documentation}{46}{subsection.7.6.2}%
-\contentsline {subsubsection}{\numberline {7.6.2.1}test\_cdrecord()}{46}{subsubsection.7.6.2.1}%
-\contentsline {subsection}{\numberline {7.6.3}Variable Documentation}{46}{subsection.7.6.3}%
-\contentsline {subsubsection}{\numberline {7.6.3.1}ARRAY\_LENGTH}{46}{subsubsection.7.6.3.1}%
-\contentsline {chapter}{Index}{47}{section*.16}%
+\contentsline {section}{\numberline {7.6}utils.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}sh File Reference}{46}{section.7.6}%
+\contentsline {subsection}{\numberline {7.6.1}Detailed Description}{47}{subsection.7.6.1}%
+\contentsline {subsection}{\numberline {7.6.2}Function Documentation}{47}{subsection.7.6.2}%
+\contentsline {subsubsection}{\numberline {7.6.2.1}test\_cdrecord()}{47}{subsubsection.7.6.2.1}%
+\contentsline {subsection}{\numberline {7.6.3}Variable Documentation}{47}{subsection.7.6.3}%
+\contentsline {subsubsection}{\numberline {7.6.3.1}ARRAY\_LENGTH}{47}{subsubsection.7.6.3.1}%
+\contentsline {chapter}{Index}{49}{section*.16}%

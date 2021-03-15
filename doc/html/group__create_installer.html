@@ -205,7 +205,7 @@ Upgrade it with virtualbox guest additions. </p>
 <p>Chroot into the clonezilla Ubuntu GNU/Linux distribution and runs apt to build kernel modules and install the VirtualBox guest additions ISO image. <br  />
 Upgrade clonezilla kernel consequently Recreates the quashfs system after exiting chroot. Copy the new <b>isolinux.cfg</b> parameter file: automates and silences clonezilla behaviour on disk recovery. Calls <a class="el" href="group__create_installer.html#ga9cdb7f95380fd3520d58d31a1cd12f0d" title="Create Gentoo linux clonezilla ISO installer out of a clonezilla directory structure and an clonezill...">clonezilla_to_iso</a> </p><dl class="section note"><dt>Note</dt><dd>Installing the guest additions is a prerequisite to folder sharing between the ISO VM and the host. Folder sharing is necessary to recover a compressed clonezilla image of the VDI virtual disk into the directory ISOFILES/home/partimag/image </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01751">1751</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01994">1994</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -226,7 +226,7 @@ Upgrade clonezilla kernel consequently Recreates the quashfs system after exitin
 
 <p>Fetches the clonezilla ISO. mount it to mnt, rsync it to mnt2 and ISOFILES bind-mount mnt2 live filesystem after unsquashfs. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01822">1822</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02065">2065</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -279,7 +279,7 @@ This is only needed to reduce disk space requirements and avoid a temporary RAW 
 <dl class="section warning"><dt>Warning</dt><dd>Requests the <em>patched</em> version of <b>vbox-img</b> on account of Oracle source code bug (ticket #19901) or <b>guestfish</b> </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>build vbox-img beforehand. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01520">1520</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01755">1755</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -302,7 +302,7 @@ This is only needed to reduce disk space requirements and avoid a temporary RAW 
 <div class="fragment"><div class="line">VBoxManage clonemedium </div>
 </div><!-- fragment --><p> to clone VDI to RAW file before bare-metal copy to device. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01567">1567</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01802">1802</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -329,7 +329,7 @@ This is only needed to reduce disk space requirements and avoid a temporary RAW 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01897">1897</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02135">2135</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -369,7 +369,7 @@ This is only needed to reduce disk space requirements and avoid a temporary RAW 
 </dl>
 <dl class="section note"><dt>Note</dt><dd>ISO can be burned to DVD or used to create a bootable USB stick using dd on *nix platforms or Rufus (on Windows). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01701">1701</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01944">1944</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -405,7 +405,7 @@ This is only needed to reduce disk space requirements and avoid a temporary RAW 
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Requires <b>hot_install</b> on command line to be activated as a security confirmation. This function performs what a live CD does to a target disk, yet using the currently running operating system. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01636">1636</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01871">1871</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -432,7 +432,7 @@ Wait for the VM to complete its task. Check that it is still running every minut
 A new VM is necessary as the first VM used to build the Gentoo filesystem does not contain clonezilla or the VirtualBox guest additions (requested for sharing folders with host). Calls <a class="el" href="group__create_installer.html#gadc22bf7533f87e3218aba2acbf75e4c0" title="Download clonezilla ISO or recover it from cache calling fetch_process_clonezilla_iso....">add_guest_additions_to_clonezilla_iso</a> to satisfy these requirements. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>the <b>sharedfolder</b> command may fail vith older version of VirtualBox or not be implemented. It is transient, so it disappears on shutdown and requests prior startup of VM to be activated. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01380">1380</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01615">1615</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -457,11 +457,18 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 <li>Attach augmented clonezilla LiveCD to IDE controller. </li>
 <li>Wait for the VM to complete its task. Check that it is still running every minute. </li>
 <li>Finally compact it. <dl class="section note"><dt>Note</dt><dd>VM may be visible (vm type=gui) or without GUI (vm type=headless, currently to be fixed) </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Find a way to only compact on success and never on failure of VM. </dd></dl>
+<dl class="bug"><dt><b><a class="el" href="bug.html#_bug000001">Bug:</a></b></dt><dd>VB bug note Unfortunately</dd></dl>
+<div class="fragment"><div class="line"> VBoxManage modifyvm --cpu-profile host @encode</div>
+<div class="line">is not fail-safe.</div>
+<div class="line">For example, <span class="keyword">this</span> option detects my CPU (Intel core-i7 5820K) vendor,</div>
+<div class="line">model name, number of cpus etc. yet the list of flags is erroneous</div>
+<div class="line">and does not contain flags **fma, bmi, bmi2** necessary to compile with</div>
+<div class="line">@code -march=haswell </div>
+</div><!-- fragment -->. The guest <b>&zwj;/proc/cpuinfo</b> lacks these flags, which are listed in the host /proc/cpuinfo, so the VB flag import capability is buggy or incomplete. Borrowing partial solution from: <a href="https://superuser.com/questions/625648/">https://superuser.com/questions/625648/</a> virtualbox-how-to-force-a-specific-cpu-to-the-guest This added code does not unfortunately enables -march=haswell (+) <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Find a way to only compact on success and never on failure of VM. </dd></dl>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01156">1156</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01355">1355</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -483,7 +490,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 <p>Bare-metal copy of temporary RAW disk to external device. </p>
 <dl class="section note"><dt>Note</dt><dd>Used only if vbox-img (patched version) has not been built. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01577">1577</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01812">1812</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -504,7 +511,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 
 <p>Force-clean root VirtualBox registry. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01000">1000</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01187">1187</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -553,7 +560,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01056">1056</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01243">1243</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -574,7 +581,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 
 <p>Launch routines: fetch install IO, starge3 archive, create VM. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01674">1674</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01909">1909</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -595,7 +602,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 
 <p>Parse command line. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00268">268</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00272">272</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -616,7 +623,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 
 <p>Print usage to stdout. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00213">213</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00217">217</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -659,7 +666,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 
 <p>Print help to html page. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00230">230</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00234">234</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -681,7 +688,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 <p>Loop log tags every minute and optionally plot virtual disk size. </p>
 <p>Customizable suing options: plot_color, plot_period, plot_position, plot_pause, plot_span </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01303">1303</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01538">1538</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -703,7 +710,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 <p>Main function launching routines. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>Daemonize the part below generate_Gentoo when #VMTYPE is <code>headless</code> so that the script can be detached completely with <code>nohup mkgentoo.. &amp;</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02032">2032</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02270">2270</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -732,7 +739,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00844">844</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01069">1069</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -753,7 +760,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 
 <p>Print help to man page. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00221">221</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00225">225</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -775,7 +782,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 <p>Mount Gentoo/Clonezilla live CD and unsquashfs the GNU/linux system. </p>
 <dl class="section note"><dt>Note</dt><dd>live CD is mounted under $VMPATH/mnt and rsync'd to $VMPATH/mnt2 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00762">762</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00772">772</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -796,7 +803,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 
 <p>Print help to pdf page. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00239">239</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00243">243</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -816,7 +823,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 </div><div class="memdoc">
 <p>Short version of <a class="el" href="group__create_installer.html#gadc22bf7533f87e3218aba2acbf75e4c0" title="Download clonezilla ISO or recover it from cache calling fetch_process_clonezilla_iso....">add_guest_additions_to_clonezilla_iso</a> when the ISO has already been pre-authored. </p><dl class="section note"><dt>Note</dt><dd>Installing the guest additions is a prerequisite to folder sharing between the ISO VM and the host. Folder sharing is necessary to recover a compressed clonezilla image of the VDI virtual disk into the directory ISOFILES/home/partimag/image </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01992">1992</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02230">2230</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -849,7 +856,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 <li>Also checks type of argument against types described for <a class="el" href="group__create_installer.html#ga2b36d9209dbee6df3e60d878f3e51005" title="global string array of switches and default values">ARR</a> </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00454">454</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00458">458</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -876,7 +883,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00597">597</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00612">612</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -903,7 +910,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00340">340</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00344">344</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -937,7 +944,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00990">990</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01177">1177</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -958,7 +965,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 
 <p>Unmount the clonezilla filesystem after exiting chroot. Restore the squashfs filesystem. </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01875">1875</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02113">2113</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -987,7 +994,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if legitimate option otherwise false. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00255">255</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00259">259</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -1016,7 +1023,7 @@ A new VM is necessary as the first VM used to build the Gentoo filesystem does n
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Currently vbox-img is broken for &ndash;stdout. Using guestfish as an alternative. This test is there for when vbox-img is fixed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01608">1608</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01843">1843</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>

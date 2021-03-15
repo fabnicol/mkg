@@ -118,10 +118,41 @@ Functions</h2></td></tr>
 <tr class="memitem:gaff07c1d29d6d6a540c726948254a1764"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a> ()</td></tr>
 <tr class="memdesc:gaff07c1d29d6d6a540c726948254a1764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clean up all temporary files and directpries (except for VirtualBox build)  <a href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">More...</a><br /></td></tr>
 <tr class="separator:gaff07c1d29d6d6a540c726948254a1764"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab259926667a3920549a7bb236fbb7ad1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__auxiliary_functions.html#gab259926667a3920549a7bb236fbb7ad1">bind_filesystem</a> (root)</td></tr>
+<tr class="memdesc:gab259926667a3920549a7bb236fbb7ad1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind-mounts the host live filesystem (proc/sys/dev/run) to a future chrooted OS-like tree of similar nature.  <a href="group__auxiliary_functions.html#gab259926667a3920549a7bb236fbb7ad1">More...</a><br /></td></tr>
+<tr class="separator:gab259926667a3920549a7bb236fbb7ad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>lines, files, devices and burn disk. </p>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="gab259926667a3920549a7bb236fbb7ad1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab259926667a3920549a7bb236fbb7ad1">&#9670;&nbsp;</a></span>bind_filesystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bind_filesystem </td>
+          <td>(</td>
+          <td class="paramtype">root&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bind-mounts the host live filesystem (proc/sys/dev/run) to a future chrooted OS-like tree of similar nature. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">root</td><td>Root directory of the subordinate filesystem. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00517">517</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+
+</div>
+</div>
 <a id="ga37ccab4be14da0e5c11e2e176e48f36a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga37ccab4be14da0e5c11e2e176e48f36a">&#9670;&nbsp;</a></span>burn_iso()</h2>
 
@@ -337,8 +368,11 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Clean up all temporary files and directpries (except for VirtualBox build) </p>
+<p>Needs</p><div class="fragment"><div class="line">CLEANUP=<span class="keyword">true</span> </div>
+</div><!-- fragment --><p>. If</p><div class="fragment"><div class="line">FULL_CLEANUP=<span class="keyword">true</span></div>
+</div><!-- fragment --><p> then erase ISO files with names containing <b>clonezilla</b>, <b>install</b> or <b>downloaded</b> names. </p>
 
-<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00481">481</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8sh_source.html#l00489">489</a> of file <a class="el" href="utils_8sh_source.html">utils.sh</a>.</p>
 
 </div>
 </div>
@@ -410,7 +444,8 @@ Functions</h2></td></tr>
 <p>Echoes a message and exit in case of previous command failure. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">ret</td><td>Return value of command to be tested. @parama msg Message to be echoed inc case of a failure. </td></tr>
+    <tr><td class="paramname">ret</td><td>Return value of command to be tested. </td></tr>
+    <tr><td class="paramname">msg</td><td>... Message(s) to be echoed inc case of a failure. </td></tr>
   </table>
   </dd>
 </dl>

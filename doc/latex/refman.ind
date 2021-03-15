@@ -8,25 +8,28 @@
   \item {ARR}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{23}
   \item {ARRAY\_LENGTH}
-    \subitem {utils.sh}, \hyperpage{46}
+    \subitem {utils.sh}, \hyperpage{47}
   \item {Auxiliary functions to check}, \hyperpage{29}
-    \subitem {burn\_iso}, \hyperpage{29}
+    \subitem {bind\_filesystem}, \hyperpage{29}
+    \subitem {burn\_iso}, \hyperpage{30}
     \subitem {check\_dir}, \hyperpage{30}
     \subitem {check\_file}, \hyperpage{30}
     \subitem {check\_files}, \hyperpage{31}
     \subitem {check\_md5sum}, \hyperpage{31}
-    \subitem {check\_tool}, \hyperpage{31}
+    \subitem {check\_tool}, \hyperpage{32}
     \subitem {cleanup}, \hyperpage{32}
     \subitem {create\_install\_ext\_device}, \hyperpage{32}
     \subitem {create\_options\_array}, \hyperpage{33}
     \subitem {if\_fails}, \hyperpage{33}
-    \subitem {recreate\_liveCD\_ISO}, \hyperpage{33}
+    \subitem {recreate\_liveCD\_ISO}, \hyperpage{34}
     \subitem {send\_mail}, \hyperpage{34}
     \subitem {test\_numeric}, \hyperpage{34}
-    \subitem {test\_URL}, \hyperpage{34}
+    \subitem {test\_URL}, \hyperpage{35}
 
   \indexspace
 
+  \item {bind\_filesystem}
+    \subitem {Auxiliary functions to check}, \hyperpage{29}
   \item {bind\_mount\_clonezilla\_iso}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{13}
   \item {build\_kernel}
@@ -38,7 +41,7 @@
     \subitem {DEBIAN\_FRONTEND}, \hyperpage{37}
     \subitem {LD\_LIBRARY\_PATH}, \hyperpage{37}
   \item {burn\_iso}
-    \subitem {Auxiliary functions to check}, \hyperpage{29}
+    \subitem {Auxiliary functions to check}, \hyperpage{30}
 
   \indexspace
 
@@ -53,7 +56,7 @@
   \item {check\_md5sum}
     \subitem {Auxiliary functions to check}, \hyperpage{31}
   \item {check\_tool}
-    \subitem {Auxiliary functions to check}, \hyperpage{31}
+    \subitem {Auxiliary functions to check}, \hyperpage{32}
   \item {cleanup}
     \subitem {Auxiliary functions to check}, \hyperpage{32}
   \item {clone\_vm\_to\_device}
@@ -197,7 +200,7 @@
   \item {ISO}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{24}
   \item {ISOLINUX\_DIR}
-    \subitem {mkgentoo.sh}, \hyperpage{43}
+    \subitem {mkgentoo.sh}, \hyperpage{44}
 
   \indexspace
 
@@ -206,7 +209,7 @@
   \item {LIVECD}
     \subitem {fetch\_functions.sh}, \hyperpage{40}
   \item {LOG}
-    \subitem {mkgentoo.sh}, \hyperpage{43}
+    \subitem {mkgentoo.sh}, \hyperpage{44}
   \item {log\_loop}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{18}
 
@@ -219,15 +222,19 @@
   \item {manpage}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{19}
   \item {mkgentoo.sh}, \hyperpage{41}
-    \subitem {ISOLINUX\_DIR}, \hyperpage{43}
-    \subitem {LOG}, \hyperpage{43}
-    \subitem {PATH}, \hyperpage{43}
+    \subitem {ISOLINUX\_DIR}, \hyperpage{44}
+    \subitem {LOG}, \hyperpage{44}
+    \subitem {move\_auxiliary\_files}, \hyperpage{43}
+    \subitem {PATH}, \hyperpage{44}
+    \subitem {prepare\_bash\_rc}, \hyperpage{43}
   \item {mkvm.sh}, \hyperpage{44}
   \item {mkvm\_chroot.sh}, \hyperpage{44}
     \subitem {finalize}, \hyperpage{45}
     \subitem {res}, \hyperpage{45}
   \item {mount\_live\_cd}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{20}
+  \item {move\_auxiliary\_files}
+    \subitem {mkgentoo.sh}, \hyperpage{43}
 
   \indexspace
 
@@ -235,16 +242,18 @@
     \subitem {Create Gentoo linux filesystem on VM disk}, 
 		\hyperpage{27}
   \item {PATH}
-    \subitem {mkgentoo.sh}, \hyperpage{43}
+    \subitem {mkgentoo.sh}, \hyperpage{44}
   \item {pdfpage}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{20}
+  \item {prepare\_bash\_rc}
+    \subitem {mkgentoo.sh}, \hyperpage{43}
   \item {prepare\_for\_iso\_vm}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{20}
 
   \indexspace
 
   \item {recreate\_liveCD\_ISO}
-    \subitem {Auxiliary functions to check}, \hyperpage{33}
+    \subitem {Auxiliary functions to check}, \hyperpage{34}
   \item {res}
     \subitem {mkvm\_chroot.sh}, \hyperpage{45}
 
@@ -259,7 +268,7 @@
   \indexspace
 
   \item {test\_cdrecord}
-    \subitem {utils.sh}, \hyperpage{46}
+    \subitem {utils.sh}, \hyperpage{47}
   \item {test\_cli}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{20}
   \item {test\_cli\_post}
@@ -269,7 +278,7 @@
   \item {test\_numeric}
     \subitem {Auxiliary functions to check}, \hyperpage{34}
   \item {test\_URL}
-    \subitem {Auxiliary functions to check}, \hyperpage{34}
+    \subitem {Auxiliary functions to check}, \hyperpage{35}
   \item {test\_vm\_running}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{21}
 
@@ -277,9 +286,9 @@
 
   \item {unmount\_clonezilla\_iso}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{22}
-  \item {utils.sh}, \hyperpage{45}
-    \subitem {ARRAY\_LENGTH}, \hyperpage{46}
-    \subitem {test\_cdrecord}, \hyperpage{46}
+  \item {utils.sh}, \hyperpage{46}
+    \subitem {ARRAY\_LENGTH}, \hyperpage{47}
+    \subitem {test\_cdrecord}, \hyperpage{47}
 
   \indexspace
 

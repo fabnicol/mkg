@@ -1,4 +1,4 @@
-.TH "utils.sh" 3 "Tue Mar 2 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "utils.sh" 3 "Mon Mar 15 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -69,6 +69,10 @@ utils.sh \- Auxiliary functions\&.
 .RI "\fBcleanup\fP ()"
 .br
 .RI "Clean up all temporary files and directpries (except for VirtualBox build) "
+.ti -1c
+.RI "\fBbind_filesystem\fP (root)"
+.br
+.RI "Bind-mounts the host live filesystem (proc/sys/dev/run) to a future chrooted OS-like tree of similar nature\&. "
 .in -1c
 .SS "Variables"
 

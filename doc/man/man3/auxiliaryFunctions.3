@@ -1,4 +1,4 @@
-.TH "auxiliaryFunctions" 3 "Tue Mar 2 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "auxiliaryFunctions" 3 "Mon Mar 15 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -66,6 +66,10 @@ auxiliaryFunctions \- lines, files, devices and burn disk\&.
 .RI "\fBcleanup\fP ()"
 .br
 .RI "Clean up all temporary files and directpries (except for VirtualBox build) "
+.ti -1c
+.RI "\fBbind_filesystem\fP (root)"
+.br
+.RI "Bind-mounts the host live filesystem (proc/sys/dev/run) to a future chrooted OS-like tree of similar nature\&. "
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -74,6 +78,19 @@ lines, files, devices and burn disk\&.
 
 .SH "Function Documentation"
 .PP 
+.SS "bind_filesystem (root)"
+
+.PP
+Bind-mounts the host live filesystem (proc/sys/dev/run) to a future chrooted OS-like tree of similar nature\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIroot\fP Root directory of the subordinate filesystem\&. 
+.RE
+.PP
+
+.PP
+Definition at line 517 of file utils\&.sh\&.
 .SS "burn_iso ()"
 
 .PP
@@ -207,9 +224,23 @@ Definition at line 447 of file utils\&.sh\&.
 .SS "cleanup ()"
 
 .PP
-Clean up all temporary files and directpries (except for VirtualBox build) 
+Clean up all temporary files and directpries (except for VirtualBox build) Needs
 .PP
-Definition at line 481 of file utils\&.sh\&.
+.nf
+CLEANUP=true 
+
+.fi
+.PP
+\&. If
+.PP
+.nf
+FULL_CLEANUP=true
+
+.fi
+.PP
+ then erase ISO files with names containing \fBclonezilla\fP, \fBinstall\fP or \fBdownloaded\fP names\&. 
+.PP
+Definition at line 489 of file utils\&.sh\&.
 .SS "create_install_ext_device ()"
 
 .PP
@@ -241,7 +272,9 @@ Echoes a message and exit in case of previous command failure\&.
 .PP
 \fBParameters\fP
 .RS 4
-\fIret\fP Return value of command to be tested\&. @parama msg Message to be echoed inc case of a failure\&. 
+\fIret\fP Return value of command to be tested\&. 
+.br
+\fImsg\fP \&.\&.\&. Message(s) to be echoed inc case of a failure\&. 
 .RE
 .PP
 \fBNote\fP

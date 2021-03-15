@@ -1,4 +1,4 @@
-.TH "fetch_functions.sh" 3 "Tue Mar 2 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "fetch_functions.sh" 3 "Mon Mar 15 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -55,13 +55,13 @@ fetch_functions.sh
 .PP
 Either download clonezilla ISO file and caches it OR uncaches it\&. 
 .PP
-Definition at line 107 of file fetch_functions\&.sh\&.
+Definition at line 128 of file fetch_functions\&.sh\&.
 .SS "fetch_clonezilla_iso ()"
 
 .PP
 Download clonezilla ISO file and caches it\&. 
 .PP
-Definition at line 80 of file fetch_functions\&.sh\&.
+Definition at line 101 of file fetch_functions\&.sh\&.
 .SS "fetch_clonezilla_with_virtualbox ()"
 
 .PP
@@ -74,13 +74,13 @@ URL is: GITHUB_RELEASE_PATH/WORKFLOW_TAG
 .PP
 
 .PP
-Definition at line 199 of file fetch_functions\&.sh\&.
+Definition at line 220 of file fetch_functions\&.sh\&.
 .SS "fetch_gentoo_install_iso ()"
 
 .PP
 Download minimal Gentoo install ISO file and caches\&.q\&. Optionaly checks MD5SUMS\&. 
 .PP
-Definition at line 8 of file fetch_functions\&.sh\&.
+Definition at line 29 of file fetch_functions\&.sh\&.
 .SS "fetch_livecd ()"
 
 .PP
@@ -93,7 +93,7 @@ Downloads Gentoo install CD\&. Caches it as ${ISO}
 .PP
 
 .PP
-Definition at line 239 of file fetch_functions\&.sh\&.
+Definition at line 260 of file fetch_functions\&.sh\&.
 .SS "fetch_process_clonezilla_iso ()"
 
 .PP
@@ -126,23 +126,23 @@ Copy resolv\&.conf to unsquashed filesystem\&.
 .PP
 
 .PP
-Definition at line 148 of file fetch_functions\&.sh\&.
+Definition at line 169 of file fetch_functions\&.sh\&.
 .SS "fetch_stage3 ()"
 
 .PP
 Downloads a fresh stage3 Gentoo archive\&. Caches it as ${STAGE3} 
 .PP
-Definition at line 287 of file fetch_functions\&.sh\&.
+Definition at line 308 of file fetch_functions\&.sh\&.
 .SH "Variable Documentation"
 .PP 
 .SS "Exported String CLONEZILLACD = '${clonezilla_iso}'"
 
 .PP
-Definition at line 94 of file fetch_functions\&.sh\&.
+Definition at line 115 of file fetch_functions\&.sh\&.
 .SS "Exported String LIVECD = ${\fBISO\fP}"
 
 .PP
-Definition at line 64 of file fetch_functions\&.sh\&.
+Definition at line 85 of file fetch_functions\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for mkg from the source code\&.

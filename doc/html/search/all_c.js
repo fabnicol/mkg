@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['send_5fmail_71',['send_mail',['../group__auxiliary_functions.html#ga132042cf80f0610ddde0fdb6fc234a45',1,'utils.sh']]],
-  ['setup_5fnetwork_72',['setup_network',['../group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba',1,'mkvm.sh']]]
+  ['send_5fmail_74',['send_mail',['../group__auxiliary_functions.html#ga132042cf80f0610ddde0fdb6fc234a45',1,'utils.sh']]],
+  ['setup_5fnetwork_75',['setup_network',['../group__mk_file_system.html#ga4315b3877c965059c7db8593870066ba',1,'mkvm.sh']]]
 ];
