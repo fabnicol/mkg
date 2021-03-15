@@ -615,6 +615,7 @@ test_cli_post() {
 
     if "${PLOT}"
     then
+        check_tool "gnuplot"
         GNUPLOT_BINARY="$(which gnuplot)"
         if [ -z "${GNUPLOT_BINARY}" ] || [ -z "`"${GNUPLOT_BINARY}" --version`" ]
         then
