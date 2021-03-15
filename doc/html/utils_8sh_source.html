@@ -530,7 +530,7 @@ $(function() {
 <div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;<span class="preprocessor">## @fn if_fails()</span></div>
 <div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;<span class="preprocessor">## @brief   Echoes a message and exit in case of previous command failure.</span></div>
 <div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;<span class="preprocessor">## @param   ret Return value of command to be tested.</span></div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;<span class="preprocessor">## @parama  msg Message to be echoed inc case of a failure.</span></div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;<span class="preprocessor">## @param   msg ... Message(s) to be echoed inc case of a failure.</span></div>
 <div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;<span class="preprocessor">## @note    Command success is presumed to be identified by $? == 0.</span></div>
 <div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;<span class="preprocessor">## @retval  Undefined or exit 1 if $? != 0.</span></div>
 <div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;<span class="preprocessor">## @ingroup auxiliaryFunctions</span></div>
@@ -538,47 +538,117 @@ $(function() {
 <div class="line"><a name="l00468"></a><span class="lineno"><a class="line" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">  468</a></span>&#160;<a class="code" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a>() {</div>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    <span class="keywordflow">if</span> [ $1 != 0 ]</div>
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;    then</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;$2&quot;</span></div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        exit 1</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;    fi</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;}</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160; </div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;<span class="preprocessor">## @fn cleanup()</span></div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;<span class="preprocessor">## @brief Clean up all temporary files and directpries (except for VirtualBox</span></div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;<span class="preprocessor">##        build)</span></div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;<span class="preprocessor">## @ingroup auxiliaryFunctions</span></div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160; </div>
-<div class="line"><a name="l00481"></a><span class="lineno"><a class="line" href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">  481</a></span>&#160;<a class="code" href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a>() {</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160; </div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    ! <span class="stringliteral">&quot;${CLEANUP}&quot;</span> &amp;&amp; <span class="keywordflow">return</span> 0</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    local verb=<span class="stringliteral">&quot;&quot;</span></div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;    ${VERBOSE} &amp;&amp; verb=<span class="stringliteral">&quot;-v&quot;</span></div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    cd <span class="stringliteral">&quot;${VMPATH}&quot;</span> || exit 2</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    rm ${verb} -f *.xz</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    rm ${verb} -f *.txt</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    rm ${verb} -rf ISOFILES/ mnt2/</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    [ -d mnt ]  &amp;&amp; mountpoint mnt &amp;&amp; umount -l mnt/</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    [ -d mnt ]  &amp;&amp; rm ${verb} -rf mnt</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    [ -d mnt2 ] &amp;&amp; rm ${verb} -rf mnt2</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    [ -d <span class="stringliteral">&quot;${VM}&quot;</span> ] &amp;&amp; rm ${verb} -rf <span class="stringliteral">&quot;${VM}&quot;</span></div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    [ -d <span class="stringliteral">&quot;${VM}_ISO&quot;</span> ] &amp;&amp; rm ${verb} -rf <span class="stringliteral">&quot;${VM}_ISO&quot;</span></div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;    <span class="stringliteral">&quot;${REMOVE_VDI}&quot;</span> &amp;&amp; [ -f <span class="stringliteral">&quot;${VM}.vdi&quot;</span> ] &amp;&amp; rm ${verb} -f <span class="stringliteral">&quot;${VM}.vdi&quot;</span></div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;    <span class="keywordflow">return</span> 0</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;}</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        <span class="keywordflow">while</span> [ -n <span class="stringliteral">&quot;$2&quot;</span> ]</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        <span class="keywordflow">do</span></div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;            ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;$2&quot;</span></div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;            shift</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;        done</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        exit 1</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    fi</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;}</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160; </div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;<span class="preprocessor">## @fn cleanup()</span></div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;<span class="preprocessor">## @brief Clean up all temporary files and directpries (except for VirtualBox</span></div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;<span class="preprocessor">##        build)</span></div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;<span class="preprocessor">## @details Needs @code CLEANUP=true @endcode.</span></div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;<span class="preprocessor">##          If @code FULL_CLEANUP=true@endcode</span></div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;<span class="preprocessor">##          then erase ISO files with names containing @b clonezilla, @b install</span></div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;<span class="preprocessor">##          or @b downloaded names.</span></div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;<span class="preprocessor">## @ingroup auxiliaryFunctions</span></div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160; </div>
+<div class="line"><a name="l00489"></a><span class="lineno"><a class="line" href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">  489</a></span>&#160;<a class="code" href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a>() {</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160; </div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    ! <span class="stringliteral">&quot;${CLEANUP}&quot;</span> &amp;&amp; <span class="keywordflow">return</span> 0</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    local verb=<span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    ${VERBOSE} &amp;&amp; verb=<span class="stringliteral">&quot;-v&quot;</span></div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    cd <span class="stringliteral">&quot;${VMPATH}&quot;</span> || exit 2</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;    rm ${verb} -rf ISOFILES/ mnt2/</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;    [ -d mnt ]  &amp;&amp; mountpoint mnt &amp;&amp; umount -l mnt/</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;    [ -d mnt ]  &amp;&amp; rm ${verb} -rf mnt</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;    [ -d mnt2 ] &amp;&amp; rm ${verb} -rf mnt2</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;    [ -d <span class="stringliteral">&quot;${VM}&quot;</span> ] &amp;&amp; rm ${verb} -rf <span class="stringliteral">&quot;${VM}&quot;</span></div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;    [ -d <span class="stringliteral">&quot;${VM}_ISO&quot;</span> ] &amp;&amp; rm ${verb} -rf <span class="stringliteral">&quot;${VM}_ISO&quot;</span></div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;    <span class="keywordflow">if</span> <span class="stringliteral">&quot;${FULL_CLEANUP}&quot;</span></div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;    then</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;    [ -f <span class="stringliteral">&quot;${VM}.vdi&quot;</span> ] &amp;&amp; rm ${verb} -f <span class="stringliteral">&quot;${VM}.vdi&quot;</span></div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;        rm ${verb} -f *.xz</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;        rm ${verb} -f *.txt</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;        rm ${verb} -f *clonezilla*.iso downloaded.iso install*.iso</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;    fi</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;    <span class="keywordflow">return</span> 0</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;}</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160; </div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;<span class="preprocessor">## @fn bind_filesystem()</span></div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;<span class="preprocessor">## @brief Bind-mounts the host live filesystem (proc/sys/dev/run) to a</span></div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;<span class="preprocessor">##        future chrooted OS-like tree of similar nature.</span></div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;<span class="preprocessor">## @param root Root directory of the subordinate filesystem.</span></div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;<span class="preprocessor">## @ingroup auxiliaryFunctions</span></div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160; </div>
+<div class="line"><a name="l00517"></a><span class="lineno"><a class="line" href="group__auxiliary_functions.html#gab259926667a3920549a7bb236fbb7ad1">  517</a></span>&#160;<a class="code" href="group__auxiliary_functions.html#gab259926667a3920549a7bb236fbb7ad1">bind_filesystem</a>() {</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160; </div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;<span class="preprocessor">    # prepare chroot in clonezilla filesystem</span></div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160; </div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;    mount --types proc /proc <span class="stringliteral">&quot;$1&quot;</span>/proc</div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;    res0=$?</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    mount --rbind /sys  <span class="stringliteral">&quot;$1&quot;</span>/sys</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    res1=$?</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    mount --make-rslave <span class="stringliteral">&quot;$1&quot;</span>/sys</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;    res2=$?</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    mount --rbind /dev  <span class="stringliteral">&quot;$1&quot;</span>/dev</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;    res3=$?</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;    mount --make-rslave <span class="stringliteral">&quot;$1&quot;</span>/dev</div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    res4=$?</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;    local <a class="code" href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a>=$((${res0} | ${res1} | ${res2} | ${res3} | ${res4}))</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;    <a class="code" href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a> ${<a class="code" href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a>} <span class="stringliteral">&quot;[ERR] Could not bind-mount $1&quot;</span></div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;}</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160; </div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;unbind_filesystem() {</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160; </div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;<span class="preprocessor">    # undo bind_filesystem</span></div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;    <span class="keywordflow">if</span> ! [ -d <span class="stringliteral">&quot;$1&quot;</span> ]</div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;    then</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;        <span class="keywordflow">return</span> 0</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;    fi</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160; </div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    ${<a class="code" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a>[*]} <span class="stringliteral">&quot;[INF] Unmounting host filesystem&quot;</span></div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;    <span class="keywordflow">if</span> mountpoint -q <span class="stringliteral">&quot;$1&quot;</span>/dev &gt; /dev/<span class="keyword">null</span> 2&gt;&amp;1</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    then</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;        umount -l <span class="stringliteral">&quot;$1&quot;</span>/dev{/shm,/pts,}</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;    fi</div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;    <span class="keywordflow">if</span> mountpoint -q <span class="stringliteral">&quot;$1&quot;</span>/run &gt; /dev/<span class="keyword">null</span> 2&gt;&amp;1</div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;    then</div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;        umount <span class="stringliteral">&quot;$1&quot;</span>/run</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;    fi</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;    <span class="keywordflow">if</span> mountpoint -q <span class="stringliteral">&quot;$1&quot;</span>/proc</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;    then</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;        mount --make-rslave <span class="stringliteral">&quot;$1&quot;</span>/proc</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;        umount -l <span class="stringliteral">&quot;$1&quot;</span>/proc</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    fi</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;    <span class="keywordflow">if</span> mountpoint -q <span class="stringliteral">&quot;$1&quot;</span>/sys</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    then</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;        mount --make-rslave <span class="stringliteral">&quot;$1&quot;</span>/sys</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;        umount -l <span class="stringliteral">&quot;$1&quot;</span>/sys</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    fi</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;    <span class="keywordflow">if</span> mountpoint -q <span class="stringliteral">&quot;$1&quot;</span></div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;    then</div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;        umount -R -l  <span class="stringliteral">&quot;$1&quot;</span></div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    fi</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="agroup__auxiliary_functions_html_ga913689f9801eab383c4187327367e870"><div class="ttname"><a href="group__auxiliary_functions.html#ga913689f9801eab383c4187327367e870">check_md5sum</a></div><div class="ttdeci">check_md5sum(filename)</div><div class="ttdoc">Check md5sums in file MD5SUMS.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00093">utils.sh:93</a></div></div>
-<div class="ttc" id="agroup__auxiliary_functions_html_gaff07c1d29d6d6a540c726948254a1764"><div class="ttname"><a href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a></div><div class="ttdeci">cleanup()</div><div class="ttdoc">Clean up all temporary files and directpries (except for VirtualBox build)</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00481">utils.sh:481</a></div></div>
+<div class="ttc" id="agroup__auxiliary_functions_html_gaff07c1d29d6d6a540c726948254a1764"><div class="ttname"><a href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a></div><div class="ttdeci">cleanup()</div><div class="ttdoc">Clean up all temporary files and directpries (except for VirtualBox build)</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00489">utils.sh:489</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_ga7b33b974eed52f5a62f278deebd358d3"><div class="ttname"><a href="group__auxiliary_functions.html#ga7b33b974eed52f5a62f278deebd358d3">if_fails</a></div><div class="ttdeci">if_fails()</div><div class="ttdoc">Echoes a message and exit in case of previous command failure.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00468">utils.sh:468</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_ga37ccab4be14da0e5c11e2e176e48f36a"><div class="ttname"><a href="group__auxiliary_functions.html#ga37ccab4be14da0e5c11e2e176e48f36a">burn_iso</a></div><div class="ttdeci">burn_iso()</div><div class="ttdoc">Burn Gentoo clonezilla installer to DVD using cdrecord.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00308">utils.sh:308</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_gaac542e607b5e918f64c42081f88c228f"><div class="ttname"><a href="group__auxiliary_functions.html#gaac542e607b5e918f64c42081f88c228f">check_files</a></div><div class="ttdeci">check_files()</div><div class="ttdoc">Checks existence of files.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00427">utils.sh:427</a></div></div>
-<div class="ttc" id="amkgentoo_8sh_html_a99fb68646489d046faa1a0478d7c8e76"><div class="ttname"><a href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a></div><div class="ttdeci">Exported String LOG</div><div class="ttdef"><b>Definition:</b> <a href="mkgentoo_8sh_source.html#l00275">mkgentoo.sh:275</a></div></div>
+<div class="ttc" id="amkgentoo_8sh_html_a99fb68646489d046faa1a0478d7c8e76"><div class="ttname"><a href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a></div><div class="ttdeci">Exported String LOG</div><div class="ttdef"><b>Definition:</b> <a href="mkgentoo_8sh_source.html#l00279">mkgentoo.sh:279</a></div></div>
 <div class="ttc" id="autils_8sh_html_a1eff9a1c5942c362f2838b7d69848255"><div class="ttname"><a href="utils_8sh.html#a1eff9a1c5942c362f2838b7d69848255">ARRAY_LENGTH</a></div><div class="ttdeci">Exported String ARRAY_LENGTH</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00082">utils.sh:82</a></div></div>
-<div class="ttc" id="amkgentoo_8sh_html_a93f04e4165d1e26b707af12275800ef3"><div class="ttname"><a href="mkgentoo_8sh.html#a93f04e4165d1e26b707af12275800ef3">ISOLINUX_DIR</a></div><div class="ttdeci">Exported String ISOLINUX_DIR</div><div class="ttdef"><b>Definition:</b> <a href="mkgentoo_8sh_source.html#l00802">mkgentoo.sh:802</a></div></div>
+<div class="ttc" id="amkgentoo_8sh_html_a93f04e4165d1e26b707af12275800ef3"><div class="ttname"><a href="mkgentoo_8sh.html#a93f04e4165d1e26b707af12275800ef3">ISOLINUX_DIR</a></div><div class="ttdeci">Exported String ISOLINUX_DIR</div><div class="ttdef"><b>Definition:</b> <a href="mkgentoo_8sh_source.html#l00950">mkgentoo.sh:950</a></div></div>
 <div class="ttc" id="agroup__create_installer_html_ga2b36d9209dbee6df3e60d878f3e51005"><div class="ttname"><a href="group__create_installer.html#ga2b36d9209dbee6df3e60d878f3e51005">ARR</a></div><div class="ttdeci">Exported String ARR</div><div class="ttdoc">global string array of switches and default values</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00081">utils.sh:81</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_gaa521664c8068dda803d73ecb07b9d04e"><div class="ttname"><a href="group__auxiliary_functions.html#gaa521664c8068dda803d73ecb07b9d04e">create_install_ext_device</a></div><div class="ttdeci">create_install_ext_device()</div><div class="ttdoc">Create USB-stick (or any external device) Gentoo clonezilla installer.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00358">utils.sh:358</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_gaca1ddf007bdcce3b29c42e0c5dc41717"><div class="ttname"><a href="group__auxiliary_functions.html#gaca1ddf007bdcce3b29c42e0c5dc41717">create_options_array</a></div><div class="ttdeci">declare i ARRAY_LENGTH create_options_array()</div><div class="ttdoc">Read file options into a temporary array A which will contain command line specifications.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00071">utils.sh:71</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_ga00a42c03a3293fb36712737e7b558d11"><div class="ttname"><a href="group__auxiliary_functions.html#ga00a42c03a3293fb36712737e7b558d11">check_tool</a></div><div class="ttdeci">check_tool()</div><div class="ttdoc">Checks existence of auxiliary tools.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00447">utils.sh:447</a></div></div>
-<div class="ttc" id="amkvm__chroot_8sh_html_a8847834db624db79ff5b3abf5222e106"><div class="ttname"><a href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a></div><div class="ttdeci">Integer res</div><div class="ttdef"><b>Definition:</b> <a href="mkvm__chroot_8sh_source.html#l00451">mkvm_chroot.sh:451</a></div></div>
+<div class="ttc" id="agroup__auxiliary_functions_html_gab259926667a3920549a7bb236fbb7ad1"><div class="ttname"><a href="group__auxiliary_functions.html#gab259926667a3920549a7bb236fbb7ad1">bind_filesystem</a></div><div class="ttdeci">bind_filesystem(root)</div><div class="ttdoc">Bind-mounts the host live filesystem (proc/sys/dev/run) to a future chrooted OS-like tree of similar ...</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00517">utils.sh:517</a></div></div>
+<div class="ttc" id="amkvm__chroot_8sh_html_a8847834db624db79ff5b3abf5222e106"><div class="ttname"><a href="mkvm__chroot_8sh.html#a8847834db624db79ff5b3abf5222e106">res</a></div><div class="ttdeci">Integer res</div><div class="ttdef"><b>Definition:</b> <a href="mkvm__chroot_8sh_source.html#l00454">mkvm_chroot.sh:454</a></div></div>
 <div class="ttc" id="autils_8sh_html_a08542b578002f8342cd3e0a5252b5543"><div class="ttname"><a href="utils_8sh.html#a08542b578002f8342cd3e0a5252b5543">test_cdrecord</a></div><div class="ttdeci">test_cdrecord()</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00251">utils.sh:251</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_gaf79cae8ae0bba296925e9cb0e14e466b"><div class="ttname"><a href="group__auxiliary_functions.html#gaf79cae8ae0bba296925e9cb0e14e466b">check_file</a></div><div class="ttdeci">check_file()</div><div class="ttdoc">Checks existence of file.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00407">utils.sh:407</a></div></div>
 <div class="ttc" id="agroup__auxiliary_functions_html_ga38ca6200b4d28d4ea8fcadb531533519"><div class="ttname"><a href="group__auxiliary_functions.html#ga38ca6200b4d28d4ea8fcadb531533519">recreate_liveCD_ISO</a></div><div class="ttdeci">recreate_liveCD_ISO(dir)</div><div class="ttdoc">Create ISO of liveCD out of directory.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00269">utils.sh:269</a></div></div>

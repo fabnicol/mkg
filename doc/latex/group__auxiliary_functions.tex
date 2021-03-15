@@ -35,7 +35,9 @@ declare i \mbox{\hyperlink{utils_8sh_a1eff9a1c5942c362f2838b7d69848255}{A\+R\+R\
 \mbox{\hyperlink{group__auxiliary_functions_ga7b33b974eed52f5a62f278deebd358d3}{if\+\_\+fails}} ()
 \begin{DoxyCompactList}\small\item\em Echoes a message and exit in case of previous command failure. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_gaff07c1d29d6d6a540c726948254a1764}{cleanup}} ()
-\begin{DoxyCompactList}\small\item\em Clean up all temporary files and directpries (except for Virtual\+Box build) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Clean up all temporary files and directpries (except for Virtual\+Box build) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_gab259926667a3920549a7bb236fbb7ad1}{bind\+\_\+filesystem}} (root)
+\begin{DoxyCompactList}\small\item\em Bind-\/mounts the host live filesystem (proc/sys/dev/run) to a future chrooted O\+S-\/like tree of similar nature. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
@@ -44,6 +46,25 @@ lines, files, devices and burn disk.
 
 
 \doxysubsection{Function Documentation}
+\mbox{\Hypertarget{group__auxiliary_functions_gab259926667a3920549a7bb236fbb7ad1}\label{group__auxiliary_functions_gab259926667a3920549a7bb236fbb7ad1}} 
+\index{Auxiliary functions to check@{Auxiliary functions to check}!bind\_filesystem@{bind\_filesystem}}
+\index{bind\_filesystem@{bind\_filesystem}!Auxiliary functions to check@{Auxiliary functions to check}}
+\doxysubsubsection{\texorpdfstring{bind\_filesystem()}{bind\_filesystem()}}
+{\footnotesize\ttfamily bind\+\_\+filesystem (\begin{DoxyParamCaption}\item[{root}]{ }\end{DoxyParamCaption})}
+
+
+
+Bind-\/mounts the host live filesystem (proc/sys/dev/run) to a future chrooted O\+S-\/like tree of similar nature. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em root} & Root directory of the subordinate filesystem. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 517 of file utils.\+sh.
+
 \mbox{\Hypertarget{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}\label{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!burn\_iso@{burn\_iso}}
 \index{burn\_iso@{burn\_iso}!Auxiliary functions to check@{Auxiliary functions to check}}
@@ -210,9 +231,17 @@ Definition at line 447 of file utils.\+sh.
 
 Clean up all temporary files and directpries (except for Virtual\+Box build) 
 
+Needs
+\begin{DoxyCode}{0}
+\DoxyCodeLine{CLEANUP=\textcolor{keyword}{true} }
+\end{DoxyCode}
+. If
+\begin{DoxyCode}{0}
+\DoxyCodeLine{FULL\_CLEANUP=\textcolor{keyword}{true}}
+\end{DoxyCode}
+ then erase I\+SO files with names containing {\bfseries{clonezilla}}, {\bfseries{install}} or {\bfseries{downloaded}} names. 
 
-
-Definition at line 481 of file utils.\+sh.
+Definition at line 489 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_gaa521664c8068dda803d73ecb07b9d04e}\label{group__auxiliary_functions_gaa521664c8068dda803d73ecb07b9d04e}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!create\_install\_ext\_device@{create\_install\_ext\_device}}
@@ -262,7 +291,9 @@ Echoes a message and exit in case of previous command failure.
 
 
 \begin{DoxyParams}{Parameters}
-{\em ret} & Return value of command to be tested. @parama msg Message to be echoed inc case of a failure. \\
+{\em ret} & Return value of command to be tested. \\
+\hline
+{\em msg} & ... Message(s) to be echoed inc case of a failure. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyNote}{Note}
