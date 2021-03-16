@@ -169,7 +169,7 @@ help_md() {
     echo "\`# ./mkg download_arch=false download=false download_clonezilla=false\` \  "
     echo "    \`custom_clonezilla=clonezilla_cached.iso nonroot_user=phil\`  "
     echo "\`# nohup ./mkg plot plot_color="'red'" plot_period=10 plot_pause=7\` \  "
-    echo "        \`compact minimal minimal_size  gui=false elist=myebuilds\` \  "
+    echo "      \`compact minimal minimal_size=false  gui=false elist=myebuilds\` \  "
     echo "        \`email=my.name@gmail.com email_passwd='mypasswd' &\`  "
     echo "\`# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\`  "
     echo "  "
@@ -190,7 +190,7 @@ help_md() {
     echo "   "
     echo "   "
     echo " | Option | Description | Default value | Type |  "
-    echo " |:-----:|:--------:|:-----:|:---------:|  "
+    echo " |:------:|:------------|:-------------:|:----:|  "
     declare -i i
     for ((i=0; i<ARRAY_LENGTH; i++)); do
         declare -i sw=i*4       # no spaces!
@@ -242,7 +242,7 @@ htmlpage() {
 
 pdfpage() {
     check_tool pandoc
-    help_md | pandoc -V margin-right=1.5cm -V margin-left=1.5cm -o mkg.pdf
+    help_md | pandoc -V margin-right=0.75cm -V margin-left=0.75cm -o mkg.pdf
 }
 
 # ---------------------------------------------------------------------------- #
@@ -1560,7 +1560,7 @@ log_loop() {
         then
 	    if [ "${loop_count}" = "${PLOT_PERIOD}" ]
 	    then
-		if ls /var/log/syslog*gz
+		if ls /var/log/syslog*gz > /dev/null 2>&1
 		then
 		    gunzip -f /var/log/syslog*gz 2>/dev/null
 		fi
