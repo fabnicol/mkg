@@ -63,7 +63,7 @@
      "manpage"            "Create manpage mkg.1"                                                                                 "false" "b"  
      "mem"                "VM RAM memory in MiB"                                                                            "8000"       "n"
      "minimal"            "Remove *libreoffice* and *data science tools* from default list of installed software. Boolean."      "false" "b"
-     "minimal_size"       "Remove kernel sources to minimize packaging. Not advised for personal use but OK for deployment and distribution." "false" "b"
+     "minimal_size"       "Remove kernel sources to minimize packaging. Not advised for personal use but OK for deployment and distribution." "true" "b"
      "mirror"             "Mirror site for downloading of stage3 tarball"                                                        "path2" "u"
      "ncpus"              "Number of VM CPUs. By default the third of available threads."                                        "count" "n"
      "nonroot_user"       "Non-root user"                                                                                          "fab" "s"
