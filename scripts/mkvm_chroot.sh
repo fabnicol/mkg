@@ -126,17 +126,6 @@ adjust_environment() {
        return 1
     fi
 
-    ## ---- PATCH ----
-    #
-    # This is temporarily necessary while display-manager is not
-    # stabilized in the portage tree (March 2021)
-    # NOTE: should be retrieved later on
-
-    emerge -q --unmerge sys-apps/sysvinit
-    emerge -q sys-apps/sysvinit
-
-    ## ---- End of patch ----
-
     # There is an intractable circular dependency that
     # can be broken by pre-emerging python
 
@@ -149,10 +138,22 @@ adjust_environment() {
 
     emerge sys-devel/gcc
     emerge sys-libs/glibc
+    ## ---- PATCH ----
+    #
+    # This is temporarily necessary while display-manager is not
+    # stabilized in the portage tree (March 2021)
+    # NOTE: should be retrieved later on
+
+    emerge -q --unmerge sys-apps/sysvinit
+
+    ## ---- End of patch ----
+
     emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
     [ $? != 0 ] && {
         echo "[ERR] emerge @world failed!"  | tee -a emerge.build
         return 1; }
+
+    emerge -q -u sys-apps/sysvinit
 
     # Networking in the new environment
 
@@ -300,11 +301,16 @@ install_software() {
 
     if ! "${MINIMAL}"
     then
-       Rscript libs.R 2>&1 | tee Rlibs.log
-       rm -f libs.R
-       echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
+        # this test is for second-chance debugging runs
+
+        if ! Rscript -e "library(ggplot2)"
+        then
+            echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
 'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" \
-> libs.R
+             > libs.R
+            Rscript libs.R 2>&1 | tee Rlibs.log
+            rm -f libs.R
+        fi
     fi
 
     # update environment
@@ -315,7 +321,7 @@ install_software() {
     if [ "${res_install}" != "0" ]
     then
         echo "[ERR] Main package build step failed" \
-            | tee -a log_install_software.log
+             | tee -a log_install_software.log
         return 1
     fi
 }
