@@ -1029,40 +1029,40 @@ move_auxiliary_files() {
         cp  "${ELIST}.complete" "${ELIST}"
     fi
 
-    check_file scripts/mkvm.sh  "[ERR] No mkvm.sh script!"
-    check_file scripts/mkvm_chroot.sh "[ERR] No mkvm_chroot.sh script!"
+    check_file scripts/mkvm${1}.sh  "[ERR] No mkvm$1.sh script!"
+    check_file scripts/mkvm_chroot${1}.sh "[ERR] No mkvm_chroot$1.sh script!"
     check_file "${ELIST}"     "[ERR] No ebuild list!"
     check_file "${ELIST}.use" "[ERR] No ebuild list!"
     check_file "${ELIST}.accept_keywords" "[ERR] No ebuild list!"
     check_file "${STAGE3}"  "[ERR] No stage3 archive!"
     check_file "${KERNEL_CONFIG}" "[ERR] No kernel configuration file!"
 
-    ${LOG[*]} <<< $(cp -f "${STAGE3}" "$1" 2>&1 \
-                        | xargs echo "[INF] Moving ${STAGE3} to $1")
+    ${LOG[*]} <<< $(cp -f "${STAGE3}" "$2" 2>&1 \
+                        | xargs echo "[INF] Moving ${STAGE3} to $2")
     if_fails $? "[ERR] Could not move ${STAGE3}"
 
-    ${LOG[*]} <<< $(cp -f scripts/mkvm.sh "$1"  2>&1 \
-                        | xargs echo "[INF] Moving mkvm.sh")
+    ${LOG[*]} <<< $(cp -f scripts/mkvm${1}.sh "$2"  2>&1 \
+                        | xargs echo "[INF] Moving mkvm$1.sh")
     if_fails $? "[ERR] Could not move ${STAGE3}"
 
-    ${LOG[*]} <<< $(chmod +x "$1"/mkvm.sh 2>&1 \
+    ${LOG[*]} <<< $(chmod +x "$2"/mkvm${1}.sh 2>&1 \
                         | xargs echo "[INF] Changing permissions")
     if_fails $? "[ERR] Could not move mkvm.sh"
 
-    ${LOG[*]} <<< $(cp -f scripts/mkvm_chroot.sh "$1" 2>&1 \
-                        | xargs echo "[INF] Moving mkvm_chroot.sh")
+    ${LOG[*]} <<< $(cp -f scripts/mkvm_chroot${1}.sh "$2" 2>&1 \
+                        | xargs echo "[INF] Moving mkvm_chroot$1.sh")
     if_fails $? "[ERR] Could not move mkvm_chroot.sh"
 
-    ${LOG[*]} <<< $(chmod +x "$1"/mkvm_chroot.sh \
+    ${LOG[*]} <<< $(chmod +x "$2"/mkvm_chroot${1}.sh \
                         | xargs echo "[INF] changing permissions")
     if_fails $? "[ERR] Could not change permissions"
 
     ${LOG[*]} <<< $(cp -f "${ELIST}" "${ELIST}.use" \
-                       "${ELIST}.accept_keywords" "$1" 2>&1 \
+                       "${ELIST}.accept_keywords" "$2" 2>&1 \
                         | xargs echo "[INF] Moving ebuild lists")
     if_fails $? "[ERR] Could not move ebuild lists"
 
-    ${LOG[*]} <<< $(cp -f "${KERNEL_CONFIG}" "$1" 2>&1 \
+    ${LOG[*]} <<< $(cp -f "${KERNEL_CONFIG}" "$2" 2>&1 \
                         | xargs echo "[INF] Moving kernel config")
     if_fails $? "[ERR] Could not move kernel config file"
 
@@ -1081,7 +1081,7 @@ move_auxiliary_files() {
 make_boot_from_livecd() {
 
     # ------------------------------------- #
-    # Monting live CD and requirement checks
+    # Mounting live CD and requirement checks
     #
 
     mount_live_cd
@@ -1109,7 +1109,7 @@ make_boot_from_livecd() {
     local sqrt="${ROOT_LIVE}/squashfs-root/root/"
     check_dir  "${sqrt}"
 
-    move_auxiliary_files "${sqrt}"
+    move_auxiliary_files "$1" "${sqrt}"
     cd "${sqrt}" || exit 2
 
     prepare_bash_rc
@@ -1118,7 +1118,7 @@ make_boot_from_livecd() {
     # and fired on by .bashrc sourcing once the liveCD exits the boot process
     # into root shell
 
-    echo  "/bin/bash mkvm.sh"  >> ${rc}
+    echo  "/bin/bash $1"  >> ${rc}
 
     # -------------------------------------------------------------- #
     #  Now restore the squashfs filesystem to recreate a new live CD
@@ -1370,11 +1370,11 @@ create_vm() {
     export PATH="${PATH}":"${VBPATH}"
     check_dir "${VMPATH}"
     cd "${VMPATH}"
-    delete_vm "${VM}" "vdi"
+    delete_vm "${1}" "vdi"
 
     # create and register VM
 
-    ${LOG[*]} <<< $(VBoxManage createvm --name "${VM}" \
+    ${LOG[*]} <<< $(VBoxManage createvm --name "${1}" \
                                --ostype ${OSTYPE}  \
                                --register \
                                --basefolder "${VMPATH}"  2>&1 \
@@ -1386,7 +1386,7 @@ create_vm() {
     # By default the VB processor configuration is lower-grade
     # all other parameters are listed on commandline options with default values
 
-    ${LOG[*]} <<< $(VBoxManage modifyvm "${VM}" \
+    ${LOG[*]} <<< $(VBoxManage modifyvm "${1}" \
                                --cpus ${NCPUS} \
                                --memory ${MEM} \
                                --vram 128 \
@@ -1410,7 +1410,7 @@ create_vm() {
 	    leaf="0x$(echo ${line} | cut -f1 -d' ')"
             if [[ $leaf -lt 0x0b || $leaf -gt 0x17 ]]
             then
-                ${LOG[*]} <<< $(VBoxManage modifyvm "${VM}" --cpuidset ${line} \
+                ${LOG[*]} <<< $(VBoxManage modifyvm "${1}" --cpuidset ${line} \
 				| xargs echo "[INF] Exporting host CPUID values")
 	    fi
 	done
@@ -1427,27 +1427,26 @@ create_vm() {
         for eax in 00000000 80000000
         do
             key=VBoxInternal/CPUM/HostCPUID/${eax}/${register}
-            VBoxManage setextradata "${VM}" $key $value
-	    echo res=$?
+            VBoxManage setextradata "${1}" $key $value
         done
     done
 
     # create virtual VDI disk, if it does not exist
 
-    if [ ! -f  "${VM}.vdi" ] || "${FORCE}"
+    if [ ! -f  "${1}.vdi" ] || "${FORCE}"
     then
-        [ -f "${VM}.vdi" ] && rm -f "${VM}.vdi"
-        ${LOG[*]} <<< $(VBoxManage createmedium --filename "${VM}.vdi" \
+        [ -f "${1}.vdi" ] && rm -f "${1}.vdi"
+        ${LOG[*]} <<< $(VBoxManage createmedium --filename "${1}.vdi" \
                                    --size ${SIZE} \
                                    --variant Standard 2>&1 \
                              | xargs echo "[INF] Adding virtual disk.")
     else
-        ${LOG[*]} "[MSG] Using again old VDI disk: ${VM}.vdi, \
+        ${LOG[*]} "[MSG] Using again old VDI disk: ${1}.vdi, \
 UUID: ${MEDIUM_UUID}"
         ${LOG[*]} "[WAR] Hopefully size and caracteristics are correct."
     fi
 
-    MEDIUM_UUID=$(VBoxManage showmediuminfo "${VM}.vdi"  | head -n1 \
+    MEDIUM_UUID=$(VBoxManage showmediuminfo "${1}.vdi"  | head -n1 \
                       | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
 
     [ -z "${MEDIUM_UUID}" ] && MEDIUM_UUID=`uuid`
@@ -1457,17 +1456,17 @@ UUID: ${MEDIUM_UUID}"
     # same-name disks floating around with different UUIDs and
     # registration issues
 
-    ${LOG[*]} <<< $(VBoxManage internalcommands sethduuid "${VM}.vdi" \
+    ${LOG[*]} <<< $(VBoxManage internalcommands sethduuid "${1}.vdi" \
                                ${MEDIUM_UUID} 2>&1 \
                         | xargs echo "[INF] Setting UUID to ${MEDIUM_UUID}" )
 
     # add storage controllers
 
-    ${LOG[*]} <<< $(VBoxManage storagectl "${VM}" \
+    ${LOG[*]} <<< $(VBoxManage storagectl "${1}" \
                                --name 'IDE Controller'  \
                                --add ide 2>&1 \
                         | xargs echo "[INF] Enabling live CD IDE controller.")
-    ${LOG[*]} <<< $(VBoxManage storagectl "${VM}" \
+    ${LOG[*]} <<< $(VBoxManage storagectl "${1}" \
                                --name 'SATA Controller' \
                                --add sata \
                                --bootable on 2>&1 \
@@ -1479,7 +1478,7 @@ UUID: ${MEDIUM_UUID}"
     # Only one port/device is necessary
     # use --tempeject on for live CD
 
-    ${LOG[*]} <<< $(VBoxManage storageattach "${VM}" \
+    ${LOG[*]} <<< $(VBoxManage storageattach "${1}" \
                                --storagectl 'IDE Controller'  \
                                --port 0 \
                                --device 0  \
@@ -1488,13 +1487,14 @@ UUID: ${MEDIUM_UUID}"
                                --tempeject on  2>&1 \
                         | xargs echo "[INF] Attaching IDE controller.")
 
-    ${LOG[*]} <<< $(VBoxManage storageattach "${VM}" \
+    ${LOG[*]} <<< $(VBoxManage storageattach "${1}" \
                                --storagectl 'SATA Controller' \
-                               --medium "${VM}.vdi" \
+                               --medium "${1}.vdi" \
                                --port 0 \
                                --device 0 \
                                --type hdd \
-                               --setuuid ${MEDIUM_UUID} 2>&1| xargs echo [MSG])
+                               --setuuid ${MEDIUM_UUID} 2>&1 \
+                        | xargs echo "[MSG] Attaching SATA controller.")
 
     # note: forcing UUID will potentially cause issues with
     # registration if a prior run with the same disk has set a prior
@@ -1503,7 +1503,7 @@ UUID: ${MEDIUM_UUID}"
     # clean is in order (see below).  Attaching empty drives may
     # potentially be useful (e.g. when installing guest additions)
 
-    ${LOG[*]} <<< $(VBoxManage storageattach "${VM}" \
+    ${LOG[*]} <<< $(VBoxManage storageattach "${1}" \
                                --storagectl 'IDE Controller' \
                                --port 0 \
                                --device 1 \
@@ -1513,26 +1513,95 @@ UUID: ${MEDIUM_UUID}"
 
     # Starting VM
 
-    ${LOG[*]} <<< $(VBoxManage startvm "${VM}" \
+    ${LOG[*]} <<< $(VBoxManage startvm "${1}" \
                                --type ${VMTYPE} 2>&1 \
-                        | xargs echo "[INF] Starting VM ${VM}")
+                        | xargs echo "[INF] Starting VM ${1}")
 
     # Sync with VM: this is a VBox bug workaround
 
     "${CLONEZILLA_INSTALL}" || ! "${GUI}" && sleep 90 \
-            && ${LOG[*]} <<< $(VBoxManage controlvm "${VM}" \
+            && ${LOG[*]} <<< $(VBoxManage controlvm "${1}" \
                                    keyboardputscancode 1c 2>&1 \
        | xargs echo "[INF] Working around VB bug sending keyboard scancode")
 
-    log_loop
+    log_loop "$1"
 
-    ${LOG[*]} "[MSG] ${VM} has stopped"
+    ${LOG[*]} "[MSG] ${1} has stopped"
     if "${COMPACT}"
     then
         ${LOG[*]} "[INF] Compacting VM..."
-        ${LOG[*]} <<< $(VBoxManage modifymedium "${VM}.vdi" --compact 2>&1 \
-                            | xargs echo "[MSG] Compacting disk ${VM}.vdi ...")
+        ${LOG[*]} <<< $(VBoxManage modifymedium "${1}.vdi" --compact 2>&1 \
+                            | xargs echo "[MSG] Compacting disk ${1}.vdi ...")
     fi
+}
+
+## @fn add_guest_additions_to_gentoo_install_iso()
+## @brief Create new minimal gentoo install ISO
+##        or recover it from cache calling #fetch_process_gentoo_iso. @n
+##        This upgraded ISO
+##        enables real-time debugging as the build takes place in
+##        a host directory shared with the guest /dev/sda4 root.
+## Upgrade it with virtualbox guest additions.
+## @details Create a VM as in #create_vm yet with folder sharing
+## as in #create_iso_vm.@n
+## Install the VirtualBox guest additions ISO image. @n
+## @note Installing the guest additions is a prerequisite to folder sharing
+## between the ISO VM and the host.
+## Folder sharing is necessary to recover a build logs
+## the VDI virtual disk into the directory ISOFILES/home/partimag/image
+## @ingroup createInstaller
+
+add_guest_additions_to_gentoo_install_iso() {
+
+    if_fails [ "${CLONEZILLA_INSTALL}" = false ] \
+        "[ERR] Gentoo custom install ISO with guest additions requests\
+a standard minimal install download"
+
+    CLEANUP_SAVE="${CLEANUP}"
+    CLEANUP=false
+    COMPACT_SAVE=${COMPACT}
+    COMPACT=true
+
+    make_boot_from_livecd "${VM_GISO}"
+    create_vm "${VM_GISO}"
+
+    COMPACT=${COMPACT_SAVE}
+    CLEANUP=${CLEANUP_SAVE}
+
+    # copy system files out of VDI
+
+    local sqrt="mnt2/squashfs-root/"
+    check_dir  "${sqrt}"
+
+    move_system_files "${sqrt}"
+
+    # -------------------------------------------------------------- #
+    #  Now restore the squashfs filesystem to recreate a new live CD
+    #
+
+    cd ../.. || exit 2
+    ${LOG[*]} <<< $(rm  -f "${SQUASHFS_FILESYSTEM}" 2>&1 \
+                        | xargs echo "[INF] Removing ${SQUASHFS_FILESYSTEM}")
+    local verb2="-quiet"
+    ${LOG[*]} <<< $(mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM}  2>&1 \
+                        | xargs echo "[INF] Created ${SQUASHFS_FILESYSTEM}")
+    ${LOG[*]} <<< $(rm -rf squashfs-root/ 2>&1 \
+                        | xargs echo "[INF] Removing squashfs-root")
+
+    # restore the ISO in bootable format
+
+    cd "${VMPATH}" || exit 2
+
+    ${LOG[*]} <<< $(recreate_liveCD_ISO "${VMPATH}/mnt2/" | \
+                        xargs echo "[INF] Recreating ISO")
+
+    if mountpoint mnt
+    then
+        umount -l mnt
+    fi
+    ${LOG[*]} <<< $(rm -rf mnt | xargs echo "[INF] Removing mnt")
+
+    "${CLEANUP}" && remove_chroot
 }
 
 ## @fn log_loop()
@@ -1551,10 +1620,10 @@ log_loop() {
 
     declare -i loop_count=0
 
-    while test_vm_running ${VM}
+    while test_vm_running "$1"
     do
-        ${LOG[*]} "[MSG] ${VM} running. Disk size: " \
-                  $(du -hal "${VM}.vdi")
+        ${LOG[*]} "[MSG] $1 running. Disk size: " \
+                  $(du -hal "${1}.vdi")
 
         if "${DO_GNU_PLOT}"
         then
@@ -1645,7 +1714,7 @@ create_iso_vm() {
                                --ostype Ubuntu_64 \
                                --register \
                                --basefolder "${VMPATH}"  2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[MSG] Creating ISOVM.")
 
     if_fails $? "[ERR] Failed to create VM *${ISOVM}*"
 
@@ -1664,7 +1733,7 @@ create_iso_vm() {
                                --paravirtprovider ${PARAVIRTPROVIDER} \
                                --rtcuseutc ${RTCUSEUTC} \
                                --firmware "bios" 2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[MSG] Setting ISOVM parameters.")
 
     if_fails $? "[ERR] Failed to set parameters of VM *${ISOVM}*"
 
@@ -1672,7 +1741,7 @@ create_iso_vm() {
                                --name 'SATA Controller' \
                                --add sata \
                                --bootable on 2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[MSG] Creating ISOVM SATA controller.")
 
     if_fails $? \
              "[ERR] Failed to attach storage SATA controller to VM *${ISOVM}*"
@@ -1700,14 +1769,14 @@ create_iso_vm() {
                                --port 0 \
                                --device 0 \
                                --type hdd 2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[MSG] Attaching ISOVM")
 
     if_fails $? "[ERR] Failed to attach storage ${VM}.vdi to VM *${ISOVM}*"
 
     ${LOG[*]} <<< $(VBoxManage storagectl "${ISOVM}" \
                                --name "IDE Controller" \
                                --add ide 2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[MSG] Creating ISOVM IDE controller.")
 
     if_fails $? "[ERR] Failed to attach IDE storage controller to VM *${ISOVM}*"
 
@@ -1718,7 +1787,7 @@ create_iso_vm() {
                                --type dvddrive \
                                --medium "${CLONEZILLACD}" \
                                --tempeject on 2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[MSG] Attaching IDE controller.")
 
     if_fails $? "[ERR] Failed to attach clonezilla live CD to VM *${ISOVM}*"
 
@@ -1728,7 +1797,7 @@ create_iso_vm() {
                                --device 1 \
                                --type dvddrive \
                                --medium emptydrive 2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[MSG] Attaching empty drive.")
 
     if_fails $? "[ERR] Failed to attach IDE storage controller to VM *${ISOVM}*"
 
@@ -1737,7 +1806,7 @@ create_iso_vm() {
                                --hostpath "${VMPATH}/ISOFILES/home/partimag" \
                                --automount \
                                --auto-mount-point '/home/partimag'  2>&1 \
-                        | xargs echo [MSG])
+                        | xargs echo "[MSG] Adding shared folder to ISOVM.")
 
     if_fails $? "[ERR] Failed to attach shared folder \
 ${VMPATH}/ISOFILES/home/partimag"
@@ -1754,10 +1823,7 @@ ${VMPATH}/ISOFILES/home/partimag"
 
 ## @fn clone_vm_to_device()
 ## @brief Directly clone Gentoo VM to USB stick (or any using block device)
-## @param mode Either "vbox-img" or "guestfish"
-## @warning Requests the \e patched version of \b vbox-img on account of
-## Oracle source code bug (ticket #19901) or \b  guestfish
-## @note build vbox-img beforehand.
+## @param mode Either "qemu" or "guestfish"
 ## @ingroup createInstaller
 
 clone_vm_to_device() {
@@ -1774,25 +1840,24 @@ clone_vm_to_device() {
         && { ${LOG[*]} "[ERR] Could not find external device ${EXT_DEVICE}"
              exit 1; }
 
-    if [ "$1" = "vbox-img" ]
+    if [ "$1" = "qemu" ]
     then
-        VBOX_IMG_PREFIX="bin"
-        echo "Using ${VBOX_IMG_PREFIX}/vbox-img convert"
-        ${VBOX_IMG_PREFIX}/vbox-img convert --srcfilename "${VM}.vdi" \
-                          --stdout \
-                          --dstformat RAW | \
-            dd of=/dev/${EXT_DEVICE} bs=4M status=progress
+        echo "[MSG] Using ${QEMU_IMG_BINARY} convert"
+        check_tool qemu-img
+        QEMU_IMG_BINARY=$(which qemu-img)
+        ${QEMU_IMG_BINARY} convert -m $(($(nproc)/2+1)) -p -f vdi "${VM}.vdi" \
+                          /dev/${EXT_DEVICE}
     else
         if [ "$1" = "guestfish" ]
         then
-            echo "Using guestfish"
+            echo "[MSG] Using guestfish"
             check_tool guestfish
-
-            guestfish --progress-bars  --ro -a  "${VM}.vdi" run : \
+            GUESTFISH_BINARY=$(which guestfish)
+            ${GUESTFISH_BINARY} --progress-bars  --ro -a  "${VM}.vdi" run : \
                       download /dev/sda /dev/${EXT_DEVICE}
 	        sync
         else
-            echo "[ERR] Mode is either vbox-img or guestfish."
+            echo "[ERR] Mode is either qemu-img or guestfish."
             exit 1
         fi
     fi
@@ -1812,64 +1877,11 @@ clone_vm_to_raw() {
                --format RAW
 }
 
-## @fn dd_to_usb()
-## @brief Bare-metal copy of temporary RAW disk to external device
-## @note Used only if vbox-img (patched version) has not been built.
-## @ingroup createInstaller
-
-dd_to_usb() {
-    "[INF] Bare metal copy of RAW disk to USB device..."
-
-    # Test whether EXT_DEVICE is a mountpoint or a block device label
-
-    EXT_DEVICE=$(get_device ${EXT_DEVICE})
-
-    # Should not occur, only for paranoia
-
-    [ -z "${EXT_DEVICE}" ] \
-        && { ${LOG[*]} "[ERR] Could not set USB device ${EXT_DEVICE}"
-             exit 1; }
-    if dd if="${VMPATH}/tmpdisk.raw" \
-          of=/dev/${EXT_DEVICE} bs=4M status=progress
-    then
-        ${LOG[*]} "[INF] Removing temporary RAW disk..."
-        rm -f ${VMPATH}/tmpdisk.raw
-    fi
-}
-
-## @fn vbox_img_works()
-## @brief Test if \b vbox-img is functional
-## @details \b vbox-img is a script; it refers to \b vbox-img.bin,
-##           which is a soft link to the VirtuaBox patched build.
-## @retval 0 if vbox-img --version is non-empty
-## @retval 1 otherwise
-## @note Currently vbox-img is broken for --stdout.
-##       Using guestfish as an alternative.
-##       This test is there for when vbox-img is fixed.
-## @ingroup createInstaller
-
-vbox_img_works() {
-    cd "${VMPATH}" || exit 2
-
-    # Using the custom-patched version of the vbox-img utility:
-
-    if "${VBOX_IMG_PREFIX}/vbox-img" --version >/dev/null 2>&1
-    then
-        ${LOG[*]} "[MSG] bin/vbox-img works for this platform."
-        return 0
-    fi
-}
-
 ## @fn create_device_system()
 ## @brief Clone VDI virtual disk to external device (USB device or hard drive)
-## @details Two options are available. If vbox-img (patched) is functional
-## after building VirtualBox from source, then use it and clone VDI directly
-## to external device. Otherwise create a temporary RAW file and bare-metal copy
-## this file to external device.
-## @param Mode Mode must be vbox-img, guestfish or with-raw-buffer
-## @retval In the first two cases, the exit code of #clone_vm_to_device
-## @retval In the last case, the exit code of #dd_to_usb following
-##         #clone_vm_to_raw
+## @details Two options are available, qemu or guestfish.
+## @param Mode Mode must be qemu or guestfish.
+## @retval 0 on success, 1 on error.
 ## @note Requires @b hot_install on command line to be activated as a security
 ##       confirmation.
 ##       This function performs what a live CD does to a target disk, yet using
@@ -1878,7 +1890,7 @@ vbox_img_works() {
 
 create_device_system() {
 
-    if  [ "$1" = "guestfish" ] || [ "$1" = "vbox-img" ]
+    if  [ "$1" = "guestfish" ] || [ "$1" = "qemu" ]
     then
         ${LOG[*]} "[INF] Cloning virtual disk to ${EXT_DEVICE} ..."
         if ! clone_vm_to_device "$1"
@@ -1887,27 +1899,10 @@ create_device_system() {
             return 1
         fi
     else
-        if [ "$1" = "with-raw-buffer" ]
-        then
-            ${LOG[*]} "[INF] Cloning virtual disk to raw..."
-            if ! clone_vm_to_raw
-            then
-                ${LOG[*]} "[ERR] Cloning VDI disk to RAW failed !"
-                return 1
-            fi
-            ${LOG[*]} "[INF] Copying to external device..."
-            if ! dd_to_usb
-            then
-                ${LOG[*]} "[INF] Copying raw file to external device failed!"
-                ${LOG[*]} "[WAR] Check that your external device has \
-at least 50 GiB of reachable space"
-                exit 1
-            fi
-        else
-            echo "[ERR] Mode must be vbox-img, guestfish or with-raw-buffer"
+            echo "[ERR] Mode must be qemu or guestfish"
             exit 1
-        fi
     fi
+    return 0
 }
 
 ## @fn generate_Gentoo()
@@ -1924,6 +1919,12 @@ generate_Gentoo() {
         ${LOG[*]} "[INF] Testing whether packages will be emerged..."
         test_emerge_step
         "${TEST_ONLY}" && return 0
+    fi
+    if "${CUSTOM_GENTOO_INSTALL}"
+    then
+        ${LOG[*]} "[MSG] Creating custom Gentoo install ISO \
+with VirtualBox guest additions."
+        add_guest_additions_to_clonezilla_iso
     fi
     ${LOG[*]} "[INF] Tweaking live CD..."
     make_boot_from_livecd
@@ -2321,7 +2322,7 @@ main() {
 
     check_tool "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
                "VBoxManage" "curl" "grep" "lsblk" "awk" "uuid" \
-	       "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
+               "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
 
     test_cli_pre
     for ((i=0; i<ARRAY_LENGTH; i++)); do test_cli $i; done
@@ -2385,7 +2386,7 @@ clonezilla image..."
 
     if "${FROM_DEVICE}"
     then
-	clonezilla_device_to_image
+        clonezilla_device_to_image
     fi
 
     if_fails $? "[ERR] Cannot proceed further on account of previous failures."

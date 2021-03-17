@@ -90,6 +90,7 @@
      "test_only"          "Only test if portage will be able to install packages. Do not create a virtual machine."               "false" "b"
      "usbehci"            "Activate USB2 driver: on/off"                                                                          "off" "o"
      "usbxhci"            "Activate USB3 driver: on/off. Note: if on, needs extension pack."                                      "off" "o"
+     "use_qemu"           "Use qemu instead of guestfish for installing Gentoo to block device with **hot_install** or with **shareroot**" "false" "b" 
      "use_workflow"       "Use Github Actions workflow to add virtualbox guest additions to CloneZilla ISO."                      "true" "b"
      "vm"                 "Virtual Machine name. Unless 'force=true' is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name."  "Gentoo" "vm"
      "vbox_version"       "Virtualbox version"                                                                                "6.1.14"   "s"
