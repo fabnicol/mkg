@@ -69,6 +69,16 @@ adjust_environment() {
         return 1
     fi
 
+    # One needs to build cmake without the qt5 USE value first,
+    # otherwise dependencies cannot be resolved.
+
+    USE='-qt5' emerge -1 cmake
+    if [ $? != 0 ]
+    then
+        echo "emerge cmake failed!" | tee -a emerge.build
+        return 1
+    fi
+
     emerge -1 -u sys-app/portage
 
     # select profile (most recent plasma desktop)
@@ -96,16 +106,6 @@ adjust_environment() {
     cp -vf "${ELIST}.accept_keywords" \
        /etc/portage/package.accept_keywords/ \
         |  tee emerge.build
-
-    # One needs to build cmake without the qt5 USE value first,
-    # otherwise dependencies cannot be resolved.
-
-    USE='-qt5' emerge -1 cmake
-    if [ $? != 0 ]
-    then
-        echo "emerge cmake failed!" | tee -a emerge.build
-        return 1
-    fi
 
     # add logger. However it will not be usable for now,
     # this is why we are using custom logs and tee's.
