@@ -848,7 +848,7 @@ bh-luxi"' >> ${m_conf}
 
     cat > portage_test.sh << EOF
 #!/bin/bash
-# Note: excaped \${...} are variables
+# Note: escaped \${...} are variables
 # in the subordinate environment. Non-escaped dollar
 # variables are host variables.
 echo "[INF] Merging portage tree..."
@@ -862,11 +862,6 @@ locale-gen
 eselect locale set 1 > /dev/null 2>&1
 env-update
 source /etc/profile
-if ! emerge -1 -q -u sys-apps/portage
-then
-    echo "[ERR] Could not merge portage"
-    exit 7
-fi
 prof=\$(eselect --color=no --brief profile list \
                    | grep desktop \
                    | grep plasma \
@@ -881,6 +876,11 @@ if [ \$? != 0 ]
 then
     echo "emerge cmake failed!"
     exit 8
+fi
+if ! emerge -uDN --with-bdeps=y sys-apps/portage
+then
+    echo "[ERR] Could not merge portage"
+    exit 7
 fi
 ## ---- PATCH ----
 #
