@@ -129,7 +129,7 @@ adjust_environment() {
     # There is an intractable circular dependency that
     # can be broken by pre-emerging python
 
-    USE="-sqlite -bluetooth" emerge -1 dev-lang/python
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
 
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours
@@ -144,7 +144,7 @@ adjust_environment() {
     # stabilized in the portage tree (March 2021)
     # NOTE: should be retrieved later on
 
-    emerge -q --unmerge sys-apps/sysvinit
+    emerge -q --unmerge sys-apps/sysvinit | tee -a emerge.build
 
     ## ---- End of patch ----
 
@@ -173,6 +173,8 @@ adjust_environment() {
         echo 'keymap="us"' >  /etc/conf.d/keymaps
     fi
     sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
+    echo "${TIMEZONE}" > /etc/timezone
+    emerge -u --config sys-libs/timezone-data | tee -a emerge.build
 
     # Localization.
 
@@ -180,7 +182,7 @@ adjust_environment() {
     echo "fr_FR ISO-8859-15" >> /etc/locale.gen
     echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
     echo "en_US ISO-8859-1"  >> /etc/locale.gen
-    locale-gen
+    locale-gen | tee -a emerge.build
     eselect locale set 1
     env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 }
@@ -225,8 +227,8 @@ build_kernel() {
         return 1
     fi
 
-    genkernel --install initramfs
-    emerge sys-kernel/linux-firmware
+    genkernel --install initramfs     | tee -a kernel.log
+    emerge sys-kernel/linux-firmware  | tee -a kernel.log
     make clean
 
     if [ -f /boot/vmlinuz* ]
@@ -350,7 +352,7 @@ global_config() {
         | tee -a sddm.log
     chmod +x /usr/share/sddm/scripts/Xsetup
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
-        /etc/conf.d/display-manager
+        /etc/conf.d/display-manager | tee -a sddm.log
 
     gpasswd -a sddm video
 
@@ -378,7 +380,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not useradd root" | tee useradd.log
+        echo "[ERR] Could not useradd user ${NONROOT_USER}" | tee useradd.log
     fi
 
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
@@ -464,9 +466,6 @@ finalize() {
     fi
 
     [ -n "$(which eix-update)" ] && eix-update
-
-    # prepare to compact with vbox-img comp act --filename
-    # ${VMPATH}/${VM}.vdi
 
     cat /dev/zero > zeros ; sync ; rm zeros
 }

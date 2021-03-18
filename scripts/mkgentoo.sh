@@ -440,7 +440,7 @@ package."; do_exit=true; }
         fi
     fi
 
-    [ -n "${VM}" ] && [ "${VM}" != "false" ] && [ ${FROM_VM} != "true" ] \
+    [ -n "${VM}" ] && [ "${VM}" != "false" ] && [ "${FROM_VM}" != "true" ] \
         && ${LOG[*]} "[MSG] A Virtual machine will be created with name ${VM}"
 
     return 0
@@ -651,7 +651,7 @@ Resetting *interactive* to *true*."
         # forcing INTERACTIVE as false only for background jobs.
 
         case $(ps -o stat= -p $$) in
-            *+*) echo "[MSG] Running in foreground with interactive=${INTERACTIVE}." ;;
+            *+*) echo "[MSG] Running in foreground with interactive=${INTERACTIVE}."               ;;
             *) echo "[MSG] Running in background in non-interactive mode."
                INTERACTIVE=false
                ;;
@@ -1140,10 +1140,7 @@ make_boot_from_livecd() {
     ${LOG[*]} <<< $(recreate_liveCD_ISO "${VMPATH}/mnt2/" | \
                         xargs echo "[INF] Recreating ISO")
 
-    if mountpoint mnt
-    then
-        umount -l mnt
-    fi
+    mountpoint -q mnt && umount -l mnt
     ${LOG[*]} <<< $(rm -rf mnt | xargs echo "[INF] Removing mnt")
 
     "${CLEANUP}" && remove_chroot
@@ -1522,7 +1519,8 @@ UUID: ${MEDIUM_UUID}"
     "${CLONEZILLA_INSTALL}" || ! "${GUI}" && sleep 90 \
             && ${LOG[*]} <<< $(VBoxManage controlvm "${1}" \
                                    keyboardputscancode 1c 2>&1 \
-       | xargs echo "[INF] Working around VB bug sending keyboard scancode")
+                                   | xargs echo "[INF] Working around VB bug \
+sending keyboard scancode")
 
     log_loop "$1"
 
@@ -1592,13 +1590,10 @@ a standard minimal install download"
 
     cd "${VMPATH}" || exit 2
 
-    ${LOG[*]} <<< $(recreate_liveCD_ISO "${VMPATH}/mnt2/" | \
-                        xargs echo "[INF] Recreating ISO")
+    ${LOG[*]} <<< $(recreate_liveCD_ISO "${VMPATH}/mnt2/" \
+                        | xargs echo "[INF] Recreating ISO")
 
-    if mountpoint mnt
-    then
-        umount -l mnt
-    fi
+    mountpoint -q mnt && umount -l mnt
     ${LOG[*]} <<< $(rm -rf mnt | xargs echo "[INF] Removing mnt")
 
     "${CLEANUP}" && remove_chroot
@@ -1821,6 +1816,158 @@ ${VMPATH}/ISOFILES/home/partimag"
     done
 }
 
+# -----------------------------------------------------------------------------#
+# Accessing or cloning virrual machines using guestfish or qemu
+#
+
+## @fn mount_vdi()
+## @brief Use qemu to mount VDI file to host folder
+## @param "w" for enabling read-write mode, otherwise read-only.
+## @warning May involve security issues, especially if "w" is enabled.
+## @note Uses global variable ${SHARED_ROOT_DIR}
+## @see Guestfish and qemu websites for security issues.
+
+mount_vdi() {
+
+    cd "${VMPATH}" || exit 2
+    if ! [ -d "${SHARED_ROOT_DIR}" ]
+    then
+        logger -s "[ERR] \"${SHARED_ROOT_DIR}\" is not a directory."
+        exit 1
+    fi
+
+    if [ "$1" = "w" ]
+    then
+        logger -s "[WAR] Enabling write mode for VDI mount."
+        logger -s "[WAR] This may cause security issues: take care of I/O and"
+        logger -s "[WAR] networking security."
+    fi
+
+    check_tool qemu-nbd
+    QEMU_NBD_BINARY=$(which qemu-nbd)
+    modprobe nbd
+    if_fails $? \
+             "[ERR] Your linux kernel does not support the NBD protocol." \
+             "[ERR] Please revise and rebuild your kernel configuration \
+so that **modprobe nbd** succeeds."
+
+    declare -i j=1
+
+    while [ $j -le 10 ]
+    do
+        if [ "$1" = "w" ]
+        then
+            "${QEMU_NBD_BINARY}" -c /dev/nbd${j} -f vdi "${VM}.vdi"
+        else
+            echo "j=$j"
+            "${QEMU_NBD_BINARY}" --read-only -c /dev/nbd${j} -f vdi "${VM}.vdi"
+        fi
+        local res=$?
+        if [ $res = 0 ]
+        then
+            echo "[MSG] Connected /dev/nbd${j}"
+        else
+            echo "[WAR] Could not connect VDI disk, qemu exit code: $res"
+            echo "      looping nbd${j}..."
+            j=j+1
+            continue
+        fi
+
+        sync
+        sleep 2
+        mount /dev/nbd${j}p4 "${SHARED_ROOT_DIR}"
+
+        if [ $? != 0 ]
+        then
+            echo "[WAR] Failed to mount virtual disk ${VM}.vdi root \
+to ${SHARED_ROOT_DIR}."
+            echo "      Looping nbd${j}..."
+            j=j+1
+            "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
+            continue
+        fi
+
+        mount /dev/nbd${j}p2 "${SHARED_ROOT_DIR}/boot"
+
+        if [ $? != 0 ]
+        then
+            echo "[WAR] Failed to mount virtual disk ${VM}.vdi kernel \
+to ${SHARED_ROOT_DIR} boot directory."
+            echo "      Looping nbd${j}..."
+            j=j+1
+            "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
+            continue
+        fi
+
+        exit 0
+    done
+
+    "[ERR] Failed to connect virtual disk ${VM}.vdi to loop device \
+/dev/nbd${j}. Check that the VM is not running."
+    exit 1
+}
+
+## @fn unmount_vdi()
+## @brief Unmount connection to virtual disk (using qemu) to host folder.
+## @param mountpoint Optional mountpoint path parameter.
+## @note Uses global variable ${SHARED_ROOT_DIR}
+## @see Guestfish and qemu websites for security issues.
+
+unmount_vdi() {
+
+    local res=""
+    if [ -n "$1" ] && ! [ -d "$1" ]
+    then
+        read -p "[MSG] Which mountpoint \
+do you want to disconnect?" res || res="$1"
+        if ! [ -n "${res}" ]
+        then
+            logger -s "[ERR] Enter an explicit value for \
+mountpoint."
+            exit 1
+        fi
+    fi
+
+    if [ -d "${res}" ]
+    then
+        SHARED_ROOT_DIR="${res}"
+    else
+        declare -i j=1
+        while [ $j -le 10 ]
+        do
+            SHARED_ROOT_DIR="$(get_mountpoint nbd${j}p4)"
+            if [ -z "${SHARED_ROOT_DIR}" ] || ! [ -d "${SHARED_ROOT_DIR}" ]
+            then
+                logger -s "[WAR] Could not find mountpoint \
+directory for /dev/nbd${j}p4"
+            else
+                logger -s "[MSG] Found mountpoint \
+${SHARED_ROOT_DIR} for /dev/nbd${j}p4"
+                break
+            fi
+            j=j+1
+        done
+    fi
+
+    if [ -n "${SHARED_ROOT_DIR}" ] && [ -d "${SHARED_ROOT_DIR}" ]
+    then
+        umount  /dev/nbd${j}p2
+        umount  /dev/nbd${j}p4
+        sync
+        if_fails $? "[ERR] Failed to unmount ${res}. \
+Proceed manually."
+        [ -z "${QEMU_NBD_BINARY}" ] && QEMU_NBD_BINARY="$(which qemu-nbd)"
+        "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
+        if_fails $? "[ERR] Failed to disconnect loop device /dev/nbd${j}. \
+Proceed manually."
+        sync
+        sleep 2
+        exit 0
+    fi
+    sync
+    exit 1
+}
+
 ## @fn clone_vm_to_device()
 ## @brief Directly clone Gentoo VM to USB stick (or any using block device)
 ## @param mode Either "qemu" or "guestfish"
@@ -1863,18 +2010,8 @@ clone_vm_to_device() {
     fi
 
     sync
-    if_fails $? "[ERR] Could not convert dynamic virtual disk to raw USB device!"
+    if_fails $? "[ERR] Could not convert dynamic virtual disk to external block device!"
     return 0
-}
-
-## @fn clone_vm_to_raw()
-## @brief Use @code VBoxManage clonemedium @endcode
-## to clone VDI to RAW file before bare-metal copy to device.
-## @ingroup createInstaller
-
-clone_vm_to_raw() {
-    VBoxManage clonemedium "${VMPATH}/${VM}.vdi" "${VMPATH}/tmpdisk.raw" \
-               --format RAW
 }
 
 ## @fn create_device_system()
@@ -1903,37 +2040,6 @@ create_device_system() {
             exit 1
     fi
     return 0
-}
-
-## @fn generate_Gentoo()
-## @brief Launch routines: fetch install IO, starge3 archive, create VM
-## @ingroup createInstaller
-
-generate_Gentoo() {
-    ${LOG[*]} "[INF] Fetching live CD..."
-    fetch_livecd
-    ${LOG[*]} "[INF] Fetching stage3 tarball..."
-    fetch_stage3
-    if "${TEST_EMERGE}"
-    then
-        ${LOG[*]} "[INF] Testing whether packages will be emerged..."
-        test_emerge_step
-        "${TEST_ONLY}" && return 0
-    fi
-    if "${CUSTOM_GENTOO_INSTALL}"
-    then
-        ${LOG[*]} "[MSG] Creating custom Gentoo install ISO \
-with VirtualBox guest additions."
-        add_guest_additions_to_clonezilla_iso
-    fi
-    ${LOG[*]} "[INF] Tweaking live CD..."
-    make_boot_from_livecd
-    ${LOG[*]} "[INF] Creating VM"
-    if ! create_vm
-    then
-        ${LOG[*]} "[ERR] VM failed to be created!"
-        exit 1
-    fi
 }
 
 # ---------------------------------------------------------------------------- #
@@ -2148,8 +2254,8 @@ clonezilla_device_to_image() {
 
     if findmnt "/dev/${EXT_DEVICE}"
     then
-        ${LOG[*]} "[MSG] Device ${EXT_DEVICE} is mounted to: \
-$(get_mountpoint /dev/${EXT_DEVICE})"
+        ${LOG[*]} "[MSG] Device /dev/${EXT_DEVICE} is mounted to: \
+$(get_mountpoint ${EXT_DEVICE})"
         ${LOG[*]} "[WAR] The external USB device should not be mounted"
         ${LOG[*]} "[INF] Trying to unmount..."
         if umount -l "/dev/${EXT_DEVICE}"
@@ -2248,23 +2354,67 @@ CloneZilla CD with VirtualBox and guest additions."
         [ -d ISOFILES ] && rm -rf ISOFILES
         mkdir -p ISOFILES/home/partimag
         check_dir ISOFILES/home/partimag
+
 	    if [ -d mnt2 ]
 	    then
-		rm -rf mnt2/
+		    rm -rf mnt2/
 	        if_fails $? "[ERR] Could not remove directory mnt2. \
 Unmount it and remove it manually then restart."
 	    fi
+
 	    mkdir mnt2
         check_dir mnt2
+
 	    mount -oloop "${CLONEZILLACD}" mnt2/
 	    if_fails $? "[ERR] Could not mount ${CLONEZILLACD} to mnt2"
+
         rsync -a mnt2/ ISOFILES
 	    if_fails $? "[ERR] Could not sync files between mnt2 and ISOFILES"
+
 	    umount mnt2
 	    if_fails $? "[ERR] Could not unmount mnt2"
 }
 
+# -----------------------------------------------------------------------------#
+# Global build launcher
+#
 
+## @fn generate_Gentoo()
+## @brief Launch routines: fetch install IO, starge3 archive, create VM
+## @ingroup createInstaller
+
+generate_Gentoo() {
+
+    ${LOG[*]} "[INF] Fetching live CD..."
+    fetch_livecd
+
+    ${LOG[*]} "[INF] Fetching stage3 tarball..."
+    fetch_stage3
+
+    if "${TEST_EMERGE}"
+    then
+        ${LOG[*]} "[INF] Testing whether packages will be emerged..."
+        test_emerge_step
+        "${TEST_ONLY}" && return 0
+    fi
+    if "${CUSTOM_GENTOO_INSTALL}"
+    then
+        ${LOG[*]} "[MSG] Creating custom Gentoo install ISO \
+with VirtualBox guest additions."
+        add_guest_additions_to_clonezilla_iso
+    fi
+
+    ${LOG[*]} "[INF] Tweaking live CD..."
+
+    make_boot_from_livecd
+
+    ${LOG[*]} "[INF] Creating VM"
+    if ! create_vm
+    then
+        ${LOG[*]} "[ERR] VM failed to be created!"
+        exit 1
+    fi
+}
 
 # ---------------------------------------------------------------------------- #
 # Core program
@@ -2279,6 +2429,7 @@ Unmount it and remove it manually then restart."
 main() {
 
     source scripts/utils.sh
+    source scripts/run_mount_shared_dir.sh
 
     # Using a temporary writable array A so that
     # ARR will not be writable later on
@@ -2309,6 +2460,9 @@ main() {
         create_options_array options
 	    pdfpage
 	    exit 0
+    elif grep -q 'disconnect' <<< "$@"
+    then
+        unmount_vdi
     else
         create_options_array options2
     fi
@@ -2340,7 +2494,40 @@ main() {
     # device skip generating it; otherwise go and build the Gentoo virtual
     # machine
 
-    # you can bypass generation by setting vm= on commandline
+    # Delayed daemonized script for mounting VDI disk to ${SHARED_DIR}
+
+    if [ "${SHARE_ROOT}" != "dep" ]
+    then
+        export SHARE_ROOT
+        export SHARED_DIR
+        if "${NO_RUN}"
+        then
+            mount_shared_dir_daemon
+            if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
+            exit 0
+        else
+            check_tool at
+            ${LOG[*]} "[WAR] You should have a functional 'atd' service"
+            ${LOG[*]} "[WAR] Operation will not work otherwise/"
+            if $(which rc-service)
+            then
+                rc-service restart atd
+                if_fails $? "[ERR] Could not restart atd service (Openrc)"
+                ${LOG[*]} "[MSG] atd service was tested OK (Openrc)."
+            else
+                ${LOG[*]} "[WAR] It does not seem that you are running Openrc."
+                ${LOG[*]} "[WAR] You may have to check atd manually and restart later."
+            fi
+            ${LOG[*]} "[MSG] Virtual VDI disk will be mounted in 15 minutes from now"
+            ${LOG[*]} "[MSG] under directory ${SHARED_ROOT_DIR}"
+            ${LOG[*]} "[MSG] with permissions ${SHARE_ROOT}."
+
+            echo 'nohup /bin/bash -c "mount_shared_dir_daemon" &' | at now '+ 15 minutes'
+            if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
+        fi
+    fi
+
+    # You can bypass generation by setting vm= on commandline
 
     if [ -n "${VM}" ] && ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}"
     then
@@ -2348,7 +2535,7 @@ main() {
         if_fails $? "[ERR] Could not create the OS virtual disk."
     fi
 
-    # process the virtual disk into a clonezilla image
+    # Process the virtual disk into a clonezilla image
 
     if [ -f "${VM}.vdi" ] \
        && ("${CREATE_ISO}" || "${FROM_VM}") \
@@ -2379,7 +2566,7 @@ main() {
 
         # And launch the corresponding VM
 
-   ${LOG[*]} "[INF] Launching Clonezilla VM to convert virtual disk to \
+        ${LOG[*]} "[INF] Launching Clonezilla VM to convert virtual disk to \
 clonezilla image..."
         create_iso_vm
     fi

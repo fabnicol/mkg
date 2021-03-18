@@ -25,12 +25,6 @@
 ## @brief Build VirtualBox from source using an unsquashed clonezilla CD as a
 ##        chrooted environment.
 ## @details Build scripts are copied from \b clonezilla/build
-## @note This stage is only necessay if \b vbox-img is to be used to directly
-##       convert the VDI virtual disk into a block device, on account of a bug
-##       in Oracle source code (ticket #19901). @n
-## This is only needed to reduce disk space requirements and avoid a temporary
-## RAW file on disk of about 50 GB.
-## Otherwise it is simpler to use the distribution stock version.
 ## @ingroup createInstaller
 
 build_virtualbox() {
@@ -80,7 +74,6 @@ cd VirtualBox || exit 2
 ./configure --disable-hardening
 chmod +x ./env.sh
 source ./env.sh
-sed -i "${LINENO_PATCH}d" src/VBox/Storage/testcase/vbox-img.cpp
 echo Building...Please wait...
 kmk all >/dev/null 2>&1
 echo Packing...
@@ -114,12 +107,4 @@ modprobe vboxdrv
 EOF
     chmod +x VirtualBox
     chown $USER VirtualBox
-    cat > vbox-img << EOF
-#!/bin/bash
-export LD_LIBRARY_PATH="virtualbox/VirtualBox/out/linux.amd64/release/bin/\
-:virtualbox/lib:virtualbox/lib32:virtualbox/lib64"
-./virtualbox/VirtualBox/out/linux.amd64/release/bin/vbox-img \$*
-EOF
-    chmod +x vbox-img
-    chown $USER vbox-img
 }
