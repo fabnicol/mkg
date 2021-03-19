@@ -156,7 +156,7 @@ help_md() {
     echo "A similar procedure also applies to the minimal Gentoo install ISO.  "
     echo "MKG scripts and the stage3 archive are added within its squashfs filesystem  "
     echo "by the *Github Actions* workflow of the MKG Github site.  "
-    echo "An ISO file of labelled downloaded.iso is automatically released  "
+    echo "An ISO file labelled **downloaded.iso** is automatically released  "
     echo "by the workflow. It will be downloaded from the MKG Github release section.  "
     echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
     echo "to command line.   "
@@ -194,6 +194,7 @@ help_md() {
     echo "the name of the dependency."
     echo "dep is a reserved word for dummy defaults of dependencies i.e.  "
     echo "optional strings that may remain unspecified.  "
+    echo "Some options are incompatible, e.g. \`test_only\` and \`use_mkg_workflow\`  "
     echo "   "
     echo "   "
     echo " | Option | Description | Default value | Type |  "
@@ -213,6 +214,7 @@ clonezilla_live_alternative/20200703-focal/\
 clonezilla-live-20200703-focal-amd64.iso/download  "
     echo "**path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           "
     echo "**path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/  "
+    echo "**path4:**  https://github.com/fabnicol/mkg/releases/download  "
     echo "**count:** nproc --all / 3  "
 }
 
@@ -759,6 +761,8 @@ Allowing a 10 second break for second thoughts."
             echo sleep 10
         fi
     fi
+
+    "${TEST_ONLY}" && TEST_EMERGE=true && USE_MKG_WORKFLOW=false
 }
 
 # ---------------------------------------------------------------------------- #
@@ -853,7 +857,6 @@ bh-luxi"' >> ${m_conf}
 # Note: escaped \${...} are variables
 # in the subordinate environment. Non-escaped dollar
 # variables are host variables.
-# It may be occasionally necessay to block unstable updates.
 echo "[INF] Merging portage tree..."
 if ! emerge-webrsync >/dev/null 2>&1
 then
@@ -888,7 +891,7 @@ prof=\$(eselect --color=no --brief profile list \
                    | head -n 1 | xargs)
 echo "[MSG] Using profile=\${prof}"
 eselect profile set \${prof}
-if ! emerge -uDN --with-bdeps=y sys-apps/portage
+if ! emerge -1 -u sys-apps/portage
 then
     echo "[ERR] Could not merge portage."
     exit 7
@@ -2330,22 +2333,29 @@ generate_Gentoo() {
     then
         fetch_preprocessed_gentoo_install
         LIVECD=preprocessed_gentoo_install.iso
+        ISO=${LIVECD}
+        if "${TEST_EMERGE}"
+        then
+            ${LOG[*]} "[INF] Testing whether packages will be emerged..."
+            test_emerge_step
+        fi
     else
         ${LOG[*]} "[INF] Fetching live CD..."
         fetch_livecd
 
         ${LOG[*]} "[INF] Fetching stage3 tarball..."
         fetch_stage3
-
         if "${TEST_EMERGE}"
         then
             ${LOG[*]} "[INF] Testing whether packages will be emerged..."
             test_emerge_step
-            "${TEST_ONLY}" && return 0
         fi
         ${LOG[*]} "[INF] Tweaking live CD..."
         make_boot_from_livecd
     fi
+
+    checksums
+    "${TEST_ONLY}" && return 0
 
     if ! "${USE_CLONEZILLA_WORKFLOW}" && "${CREATE_ISO}"
     then
@@ -2359,17 +2369,6 @@ with VirtualBox guest additions."
     then
         ${LOG[*]} "[ERR] VM failed to be created!"
         exit 1
-    fi
-
-    if [ -f "${LIVECD}" ]
-    then
-        echo "[MSG] Workflow created file ${LIVECD}."
-        echo "      with following checksums:"
-        echo "      md5sum: $(md5sum ${LIVECD})"       | tee checksums.txt
-        echo "      sha1sum: $(sha1sum ${LIVECD})"     | tee -a checksums.txt
-        echo "      sha256sum: $(sha256sum ${LIVECD})" | tee -a checksums.txt
-    else
-        echo "[ERR] Workflow failed to create file ${LIVECD}."
     fi
 }
 
