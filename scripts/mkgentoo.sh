@@ -885,7 +885,7 @@ if [ $? != 0 ]
 then
     echo "[ERR] Could not update python."
 fi
-if ! emerge -uDN --with-bdeps=y sys-apps/portage
+if ! emerge -1 sys-apps/portage
 then
     echo "[ERR] Could not merge portage."
     exit 7
