@@ -877,9 +877,17 @@ then
     echo "emerge cmake failed!"
     exit 8
 fi
+# There is an intractable circular dependency that
+# can be broken by pre-emerging python
+echo "[INF] Updating python. Please wait..."
+USE="-sqlite -bluetooth" emerge -1 -q dev-lang/python
+if [ $? != 0 ]
+then
+    echo "[ERR] Could not update python."
+fi
 if ! emerge -uDN --with-bdeps=y sys-apps/portage
 then
-    echo "[ERR] Could not merge portage"
+    echo "[ERR] Could not merge portage."
     exit 7
 fi
 ## ---- PATCH ----
