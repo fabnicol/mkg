@@ -505,8 +505,19 @@ cleanup() {
 	[ -f "${VM}.vdi" ] && rm ${verb} -f "${VM}.vdi"
         rm ${verb} -f *.xz
         rm ${verb} -f *.txt
-        rm ${verb} -f *clonezilla*.iso downloaded.iso install*.iso
+        rm ${verb} -f "${CLONEZILLACD}" "${CACHED_ISO} *clonezilla*iso *install*iso" 
     fi
+    if [ -f "${LIVECD}" ]
+    then
+        echo "[MSG] Workflow created file ${LIVECD}."
+        echo "      with following checksums:"
+        echo "      md5sum: $(md5sum ${LIVECD})"       | tee checksums.txt
+        echo "      sha1sum: $(sha1sum ${LIVECD})"     | tee -a checksums.txt
+        echo "      sha256sum: $(sha256sum ${LIVECD})" | tee -a checksums.txt
+    else
+        echo "[ERR] Workflow failed to create file ${LIVECD}."
+    fi
+
     return 0
 }
 
