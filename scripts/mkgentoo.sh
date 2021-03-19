@@ -144,15 +144,22 @@ help_md() {
     echo "written in list form with commas and no spaces: \`cflags=[-O2,-march=...]\`  "
     echo "The same holds for paths with white space.  "
     echo "  "
-    echo "As of tag 1st March, 2021, part of the build is performed  "
+    echo "As of March, 2021, part of the build is performed  "
     echo "by *Github Actions* automatically. An ISO file of CloneZilla  "
     echo "supplemented with VirtualBox guest additions will be downloaded  "
     echo "from the resulting automated Github release. To disable this behavior  "
-    echo "you can add \`use_workflow=false\` to command line, or build the  "
+    echo "you can add \`use_clonezilla_workflow=false\` to command line, or build the  "
     echo "custom ISO file beforehand using the companion project  "
     echo "**clonezilla_with_virtualbox**. In this case, add:  "
     echo "\`custom_clonezilla=your_build.iso\`  "
     echo "to command line.  "
+    echo "A similar procedure also applies to the minimal Gentoo install ISO.  "
+    echo "MKG scripts and the stage3 archive are added within its squashfs filesystem  "
+    echo "by the *Github Actions* workflow of the MKG Github site.  "
+    echo "An ISO file of labelled downloaded.iso is automatically released  "
+    echo "by the workflow. It will be downloaded from the MKG Github release section.  "
+    echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
+    echo "to command line.   "
     echo "  "
     echo "**Options:**  "
     echo "  "
@@ -687,11 +694,6 @@ from_device or from_vm may be specified on commandline."
 	    CLONEZILLACD="${CUSTOM_CLONEZILLA}"
     fi
 
-    if "${USE_WORKFLOW}"
-    then
-        DOWNLOAD_CLONEZILLA=false
-    fi
-
     # minimal CPU allocation
 
     [ "${NCPUS}" = "0" ] && NCPUS=1
@@ -851,25 +853,13 @@ bh-luxi"' >> ${m_conf}
 # Note: escaped \${...} are variables
 # in the subordinate environment. Non-escaped dollar
 # variables are host variables.
+# It may be occasionally necessay to block unstable updates.
 echo "[INF] Merging portage tree..."
 if ! emerge-webrsync >/dev/null 2>&1
 then
     echo "[ERR] Could not sync portage tree."
     exit 6
 fi
-echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
-locale-gen
-eselect locale set 1 > /dev/null 2>&1
-env-update
-source /etc/profile
-prof=\$(eselect --color=no --brief profile list \
-                   | grep desktop \
-                   | grep plasma \
-                   | grep \${PROCESSOR} \
-                   | grep -v systemd \
-                   | head -n 1 | xargs)
-echo "[MSG] Using profile=\${prof}"
-eselect profile set \${prof}
 echo "[INF] Updating cmake..."
 USE='-qt5' emerge -1 -q cmake
 if [ \$? != 0 ]
@@ -885,6 +875,19 @@ if [ $? != 0 ]
 then
     echo "[ERR] Could not update python."
 fi
+echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+locale-gen
+eselect locale set 1 > /dev/null 2>&1
+env-update
+source /etc/profile
+prof=\$(eselect --color=no --brief profile list \
+                   | grep desktop \
+                   | grep plasma \
+                   | grep \${PROCESSOR} \
+                   | grep -v systemd \
+                   | head -n 1 | xargs)
+echo "[MSG] Using profile=\${prof}"
+eselect profile set \${prof}
 if ! emerge -uDN --with-bdeps=y sys-apps/portage
 then
     echo "[ERR] Could not merge portage."
@@ -895,15 +898,9 @@ fi
 # This is temporarily necessary while display-manager is not
 # stabilized in the portage tree (March 2021)
 # NOTE: should be retrieved later on
-
 emerge -q --unmerge sys-apps/sysvinit
 emerge -q sys-apps/sysvinit
-
 ## ---- End of patch ----
-# There is an intractable circular dependency that
-# can be broken by pre-emerging python
-echo "[INF] Updating python. Please wait..."
-USE="-sqlite -bluetooth" emerge -1 -q dev-lang/python
 echo "[INF] Testing update of world set..."
 if ! emerge --pretend -uDN @world
 then
@@ -921,15 +918,18 @@ EOF
 
     chmod +x portage_test.sh
     chroot . /bin/bash portage_test.sh
-    if_fails $? "[ERR] Virtual machine should not be able to merge packages." \
+    if [ $? != 0 ]
+    then
+        ${LOG[*]} "[ERR] Virtual machine should not be able to merge packages." \
              "[ERR] Check files ebuilds.list.accept_keywords, ebuilds.list.use" \
              "      and ebuilds.list.complete or minimal using messages from" \
              "      calls to emerge."
-
+        remove_chroot
+        exit 1
+    fi
     ${LOG[*]} "[MSG] Portage tests were passed."
-
     remove_chroot
-
+    return 0
 }
 
 prepare_chroot() {
@@ -1541,72 +1541,6 @@ sending keyboard scancode")
     fi
 }
 
-## @fn add_guest_additions_to_gentoo_install_iso()
-## @brief Create new minimal gentoo install ISO
-##        or recover it from cache calling #fetch_process_gentoo_iso. @n
-##        This upgraded ISO
-##        enables real-time debugging as the build takes place in
-##        a host directory shared with the guest /dev/sda4 root.
-## Upgrade it with virtualbox guest additions.
-## @details Create a VM as in #create_vm yet with folder sharing
-## as in #create_iso_vm.@n
-## Install the VirtualBox guest additions ISO image. @n
-## @note Installing the guest additions is a prerequisite to folder sharing
-## between the ISO VM and the host.
-## Folder sharing is necessary to recover a build logs
-## the VDI virtual disk into the directory ISOFILES/home/partimag/image
-## @ingroup createInstaller
-
-add_guest_additions_to_gentoo_install_iso() {
-
-    if_fails [ "${CLONEZILLA_INSTALL}" = false ] \
-        "[ERR] Gentoo custom install ISO with guest additions requests\
-a standard minimal install download"
-
-    CLEANUP_SAVE="${CLEANUP}"
-    CLEANUP=false
-    COMPACT_SAVE=${COMPACT}
-    COMPACT=true
-
-    make_boot_from_livecd "${VM_GISO}"
-    create_vm "${VM_GISO}"
-
-    COMPACT=${COMPACT_SAVE}
-    CLEANUP=${CLEANUP_SAVE}
-
-    # copy system files out of VDI
-
-    local sqrt="mnt2/squashfs-root/"
-    check_dir  "${sqrt}"
-
-    move_system_files "${sqrt}"
-
-    # -------------------------------------------------------------- #
-    #  Now restore the squashfs filesystem to recreate a new live CD
-    #
-
-    cd ../.. || exit 2
-    ${LOG[*]} <<< $(rm  -f "${SQUASHFS_FILESYSTEM}" 2>&1 \
-                        | xargs echo "[INF] Removing ${SQUASHFS_FILESYSTEM}")
-    local verb2="-quiet"
-    ${LOG[*]} <<< $(mksquashfs squashfs-root/ ${SQUASHFS_FILESYSTEM}  2>&1 \
-                        | xargs echo "[INF] Created ${SQUASHFS_FILESYSTEM}")
-    ${LOG[*]} <<< $(rm -rf squashfs-root/ 2>&1 \
-                        | xargs echo "[INF] Removing squashfs-root")
-
-    # restore the ISO in bootable format
-
-    cd "${VMPATH}" || exit 2
-
-    ${LOG[*]} <<< $(recreate_liveCD_ISO "${VMPATH}/mnt2/" \
-                        | xargs echo "[INF] Recreating ISO")
-
-    mountpoint -q mnt && umount -l mnt
-    ${LOG[*]} <<< $(rm -rf mnt | xargs echo "[INF] Removing mnt")
-
-    "${CLEANUP}" && remove_chroot
-}
-
 ## @fn log_loop()
 ## @brief Loop log tags every minute and optionally plot
 ##        virtual disk size
@@ -1668,7 +1602,6 @@ plot 'datafile'  with linespoints ls 5;pause ${PLOT_PAUSE}"
 	fi
     done
 }
-
 
 ## @fn create_iso_vm()
 ## @brief Create the new VirtualBox machine aimed at converting the VDI
@@ -2393,34 +2326,50 @@ Unmount it and remove it manually then restart."
 
 generate_Gentoo() {
 
-    ${LOG[*]} "[INF] Fetching live CD..."
-    fetch_livecd
-
-    ${LOG[*]} "[INF] Fetching stage3 tarball..."
-    fetch_stage3
-
-    if "${TEST_EMERGE}"
+    if "{USE_MKG_WORKFLOW}"
     then
-        ${LOG[*]} "[INF] Testing whether packages will be emerged..."
-        test_emerge_step
-        "${TEST_ONLY}" && return 0
+        fetch_preprocessed_gentoo_install
+        LIVECD=preprocessed_gentoo_install.iso
+    else
+        ${LOG[*]} "[INF] Fetching live CD..."
+        fetch_livecd
+
+        ${LOG[*]} "[INF] Fetching stage3 tarball..."
+        fetch_stage3
+
+        if "${TEST_EMERGE}"
+        then
+            ${LOG[*]} "[INF] Testing whether packages will be emerged..."
+            test_emerge_step
+            "${TEST_ONLY}" && return 0
+        fi
+        ${LOG[*]} "[INF] Tweaking live CD..."
+        make_boot_from_livecd
     fi
-    if "${CUSTOM_GENTOO_INSTALL}"
+
+    if ! "${USE_CLONEZILLA_WORKFLOW}" && "${CREATE_ISO}"
     then
         ${LOG[*]} "[MSG] Creating custom Gentoo install ISO \
 with VirtualBox guest additions."
         add_guest_additions_to_clonezilla_iso
     fi
 
-    ${LOG[*]} "[INF] Tweaking live CD..."
-
-    make_boot_from_livecd
-
     ${LOG[*]} "[INF] Creating VM"
     if ! create_vm
     then
         ${LOG[*]} "[ERR] VM failed to be created!"
         exit 1
+    fi
+
+    if [ -f "${LIVECD}" ]
+    then
+        echo "[MSG] Workflow created file ${LIVECD}."
+        echo "      with following checksums:"
+        echo "      md5sum: $(md5sum ${LIVECD})"       | tee checksums.txt
+        echo "      sha1sum: $(sha1sum ${LIVECD})"     | tee -a checksums.txt
+        echo "      sha256sum: $(sha256sum ${LIVECD})" | tee -a checksums.txt
+    else
+        echo "[ERR] Workflow failed to create file ${LIVECD}."
     fi
 }
 
@@ -2560,7 +2509,7 @@ main() {
                 && ${LOG[*]} \
                        "[INF] These are necessary to activate folder sharing."
 
-            if "${USE_WORKFLOW}"
+            if "${USE_CLONEZILLA_WORKFLOW}"
             then
                 fetch_clonezilla_with_virtualbox
                 CUSTOM_CLONEZILLA=clonezilla_with_virtualbox.iso

@@ -79,6 +79,16 @@ adjust_environment() {
         return 1
     fi
 
+    # There is an intractable circular dependency that
+    # can be broken by pre-emerging python
+
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
+    if [ $? != 0 ]
+    then
+        echo "emerge python failed!" | tee -a emerge.build
+        return 1
+    fi
+
     emerge -1 -u sys-app/portage
 
     # select profile (most recent plasma desktop)
@@ -125,11 +135,6 @@ adjust_environment() {
        echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
        return 1
     fi
-
-    # There is an intractable circular dependency that
-    # can be broken by pre-emerging python
-
-    USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
 
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours

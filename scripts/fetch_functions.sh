@@ -211,6 +211,47 @@ fetch_process_clonezilla_iso() {
     return 0
 }
 
+## @fn fetch_preprocessed_gentoo_install()
+## @brief Download automatic output of preprocessed_gentoo_install.iso from
+## Github Actions at fabnicol/mkg.git
+## @note URL is: GITHUB_RELEASE_PATH2/WORKFLOW_TAG2
+## @ingroup fetchFunctions
+
+fetch_preprocessed_gentoo_install() {
+
+local verb=""
+! "${VERBOSE}" && verb="-s"
+
+${LOG[*]} "[INF] Downloading Gentoo minimal install ISO updated with MKG scripts \
+from Github Actions..."
+
+${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}/\
+preprocessed_gentoo_install.iso  ${verb} 2>&1 | xargs echo '[INF]')"
+
+if_fails $? "[ERR] Could not download preprocessed Gentoo install ISO from URL \
+${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
+
+${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}/\
+checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
+
+if_fails $? "[ERR] Could not download checksums.txt from URL \
+${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
+
+if ! ${DISABLE_MD5_CHECK}
+then
+  local md5=$(md5sum "preprocessed_gentoo_install.iso" | cut -f 1 -d' ')
+  [ -f checksums.txt ] && rm -f checksums.txt
+  local md5_=cat 'checksums.txt' |  xargs | cut -f2 -d' '
+  if [ ${md5} != ${md5_} ]
+  then
+      ${LOG[*]} "[ERR] MD5 sum of preprocessed_gentoo_install.iso from Github Actions \
+could not be checked against downloaded file."
+      exit 2
+  fi
+fi
+
+}
+
 ## @fn fetch_clonezilla_with_virtualbox()
 ## @brief Download automatic output of
 ## Github Actions at fabnicol/clonezila_with_virtualbox.Github
@@ -276,7 +317,7 @@ fetch_livecd() {
         fetch_clonezilla_iso
         "${CLONEZILLA_INSTALL}" && ISO="${CLONEZILLACD}"
     else
-        if ! ${USE_WORKFLOW} 
+        if ! ${USE_CLONEZILLA_WORKFLOW}
 	then
             [ -f "clonezilla.iso" ] && CLONEZILLACD="clonezilla.iso" \
             || { ${LOG[*]} "[ERR] CloneZilla ISO has not been cached. \
