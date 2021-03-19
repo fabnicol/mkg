@@ -33,10 +33,12 @@ jobs:
         run: |
           sudo ./mkg test_only cleanup=false
 
-      - name: Delete Release
-        uses: larryjoelane/delete-release-action@v1.0.24
+      - uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
-          release-name: master
+          delete_release: true # default: false
+          tag_name: master # tag name to delete
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Release Assets
         run: |
