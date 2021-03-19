@@ -32,3 +32,21 @@ jobs:
       - name: run
         run: |
           sudo ./mkg test_only
+          
+      - name: Upload Release Assets
+        run: |
+            set -x
+            assets=()
+            for asset in "./checksums.txt latest-install-amd64-minimal.txt latest-stage3-amd64.txt downloaded.iso"; do
+            assets+=("-a" "$asset")
+            done
+            tag_name="${GITHUB_REF##*/}"
+            hub release create  "${assets[@]}" \
+            -m "Release $tag_name" \
+            -m "This release was automatically created by the Git Actions workflow corresponding to directory .github in the repository." \
+            -m "The output are the references of the latest stage3 archive and minimal Gentoo install ISO that were tested OK \
+            for portage dependencies." \
+            -m "File downloaded.iso is the custom MKG install ISO built from these references, to be used in a VirtualBox machine as an IDE optical device." \
+            "$tag_name"
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
