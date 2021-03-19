@@ -2329,7 +2329,7 @@ Unmount it and remove it manually then restart."
 
 generate_Gentoo() {
 
-    if "{USE_MKG_WORKFLOW}"
+    if "${USE_MKG_WORKFLOW}"
     then
         fetch_preprocessed_gentoo_install
         LIVECD=preprocessed_gentoo_install.iso

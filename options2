@@ -61,7 +61,6 @@
      "interactive"        "Allow interaction with user. This may cause deadlock if process is detached from the console (*nohup* or other methods)" "true" "b"
      "ioapic"             "IOAPIC parameter: on or off"                                                                             "on" "o"
      "kernel_config"      "Use a custom kernel config file"                                                                    ".config" "f"
-     "lineno_patch"       "Line patched against vbox-img.cpp in virtualbox source code"                                     "797"        "n"
      "livecd"             "Path to the live CD that will start the VM"                                                      "gentoo.iso" "f"
      "manpage"            "Create manpage mkg.1"                                                                                 "false" "b"       
      "mem"                "VM RAM memory in MiB"                                                                            "8000"       "n"

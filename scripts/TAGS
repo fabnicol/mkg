@@ -16,44 +16,44 @@ fetch_stage3() {fetch_stage3349,10550
 
 mkgentoo.sh,1843
 help_md() {help_md124,4310
-help_() {help_224,9097
-manpage() {manpage232,9261
-htmlpage() {htmlpage241,9452
-pdfpage() {pdfpage250,9602
-validate_option() {validate_option266,10057
-get_options() {get_options279,10271
-test_cli_pre() {test_cli_pre351,12166
-test_cli() {test_cli465,16316
-test_cli_post() {test_cli_post619,21287
-mount_live_cd() {mount_live_cd773,26219
-test_emerge_step() {test_emerge_step792,26714
-    cat > portage_test.sh << EOFEOF851,28685
-prepare_chroot() {prepare_chroot935,31076
-remove_chroot() {remove_chroot1001,33103
-move_auxiliary_files() {move_auxiliary_files1028,33900
-make_boot_from_livecd() {make_boot_from_livecd1089,36306
-prepare_bash_rc() {prepare_bash_rc1163,38490
-test_vm_running() {test_vm_running1195,39382
-deep_clean() {deep_clean1205,39629
-delete_vm() {delete_vm1261,41626
-create_vm() {create_vm1373,45727
-    ascii2hex() { echo -n 0x; od -A n --endian little -t x4 | sed 's/ //g'; }ascii2hex1424,47765
-log_loop() {log_loop1552,52937
-create_iso_vm() {create_iso_vm1628,55325
-mount_vdi() {mount_vdi1771,61139
-unmount_vdi() {unmount_vdi1857,63522
-clone_vm_to_device() {clone_vm_to_device1917,65091
-create_device_system() {create_device_system1969,66773
-clonezilla_to_iso() {clonezilla_to_iso1999,67688
-add_guest_additions_to_clonezilla_iso() {add_guest_additions_to_clonezilla_iso2049,69382
-    cat > squashfs-root/update_clonezilla.sh << EOFEOF2053,69456
-bind_mount_clonezilla_iso() {bind_mount_clonezilla_iso2120,71697
-unmount_clonezilla_iso() {unmount_clonezilla_iso2169,72949
-clonezilla_device_to_image() {clonezilla_device_to_image2191,73633
-        cat > squashfs-root/create_backup_iso.sh << EOFEOF2241,75146
-prepare_for_iso_vm() {prepare_for_iso_vm2286,76340
-generate_Gentoo() {generate_Gentoo2327,77486
-main() {main2373,78597
+help_() {help_226,9261
+manpage() {manpage234,9425
+htmlpage() {htmlpage243,9616
+pdfpage() {pdfpage252,9766
+validate_option() {validate_option268,10221
+get_options() {get_options281,10435
+test_cli_pre() {test_cli_pre353,12330
+test_cli() {test_cli467,16480
+test_cli_post() {test_cli_post621,21451
+mount_live_cd() {mount_live_cd777,26449
+test_emerge_step() {test_emerge_step796,26944
+    cat > portage_test.sh << EOFEOF855,28915
+prepare_chroot() {prepare_chroot938,31231
+remove_chroot() {remove_chroot1004,33258
+move_auxiliary_files() {move_auxiliary_files1031,34055
+make_boot_from_livecd() {make_boot_from_livecd1092,36461
+prepare_bash_rc() {prepare_bash_rc1166,38645
+test_vm_running() {test_vm_running1198,39537
+deep_clean() {deep_clean1208,39784
+delete_vm() {delete_vm1264,41781
+create_vm() {create_vm1376,45882
+    ascii2hex() { echo -n 0x; od -A n --endian little -t x4 | sed 's/ //g'; }ascii2hex1427,47920
+log_loop() {log_loop1555,53092
+create_iso_vm() {create_iso_vm1631,55480
+mount_vdi() {mount_vdi1774,61294
+unmount_vdi() {unmount_vdi1860,63677
+clone_vm_to_device() {clone_vm_to_device1920,65246
+create_device_system() {create_device_system1972,66928
+clonezilla_to_iso() {clonezilla_to_iso2002,67843
+add_guest_additions_to_clonezilla_iso() {add_guest_additions_to_clonezilla_iso2052,69537
+    cat > squashfs-root/update_clonezilla.sh << EOFEOF2056,69611
+bind_mount_clonezilla_iso() {bind_mount_clonezilla_iso2123,71852
+unmount_clonezilla_iso() {unmount_clonezilla_iso2172,73104
+clonezilla_device_to_image() {clonezilla_device_to_image2194,73788
+        cat > squashfs-root/create_backup_iso.sh << EOFEOF2244,75301
+prepare_for_iso_vm() {prepare_for_iso_vm2289,76495
+generate_Gentoo() {generate_Gentoo2330,77641
+main() {main2385,79093
 
 mkvm_chroot.sh,210
 adjust_environment() {adjust_environment40,1743
@@ -71,7 +71,7 @@ finalize() {finalize311,10531
 run_mount_shared_dir.sh,57
 mount_shared_dir_daemon() {mount_shared_dir_daemon3,13
 
-utils.sh,919
+utils.sh,953
 create_options_array() {create_options_array71,2700
 check_md5sum() {check_md5sum93,3266
 test_numeric() {test_numeric109,3733
@@ -92,5 +92,6 @@ check_files() {check_files429,13158
 check_tool() {check_tool449,13639
 if_fails() {if_fails470,14238
 cleanup() {cleanup491,14754
-bind_filesystem() {bind_filesystem531,16077
-unbind_filesystem() {unbind_filesystem549,16498
+bind_filesystem() {bind_filesystem520,15629
+unbind_filesystem() {unbind_filesystem538,16050
+checksums() {checksums571,16688
