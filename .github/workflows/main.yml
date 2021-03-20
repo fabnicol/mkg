@@ -57,7 +57,6 @@ jobs:
             -m "    - 8GB or virtual RAM" \
             -m "    - a new VDI SATA disk of at least 55 GB" \
             -m "    - downloaded.iso as an attached IDE optical disk \
-            -m "    - 4 virtual cores" \
             -m "    - non-EFI bootloader." \
             -m "Once the build is completed, the VM will shut down automatically." \
             -m "You can then clone the VDI disk into a functional Gentoo block device /dev/sdX using guestfish, qemu or **./mkg from_vm vm='name of your VB machine' hot_install ext_device=sdX**" \
@@ -68,7 +67,6 @@ jobs:
             -m "    - the VDI disk already used in the above procedure attached as a SATA device" \
             -m "    - clonezilla_with_virtualbox.iso downloaded from the companion Github project **clonezila_with_virtualbox** and attached as an IDE device" \
             -m "    - non-EFI bootloader" \
-            -m "This second VB machine will also shut down automatically. Now create an ISO installer using the command in **scripts/mkgentoo.sh:clonezilla_to_iso** with **gentoo.iso** as the first argument and **ISOFILES** as the second argument. You can now use **dd** to copy this ISO to a USB stick." \
             "$tag_name"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
