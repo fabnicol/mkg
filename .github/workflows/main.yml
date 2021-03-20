@@ -71,7 +71,7 @@ jobs:
             -m "  - **clonezilla_with_virtualbox.iso** downloaded from the companion Github project [clonezila_with_virtualbox](https://github.com/fabnicol/clonezilla_with_virtualbox/releases) and attached as an IDE device as live CD" \
             -m "  - non-EFI bootloader." \
             -m "This new machine will shut down automatically and the ISOFILES directory will contain the CloneZilla image (about 3GB)." \
-            -m "You can then use this image with a CloneZilla CD to install Gentoo onto any adequate device."
+            -m "You can then use this image with a CloneZilla CD to install Gentoo onto any adequate device." \
             "$tag_name"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
