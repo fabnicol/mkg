@@ -52,24 +52,23 @@ jobs:
             -m "Release $tag_name" \
             -m "This release was automatically created by the Git Actions workflow corresponding to directory .github in the repository." \
             -m "The output are the references of the latest stage3 archive and minimal Gentoo install ISO that were tested OK for portage dependencies." \
-            -m "File downloaded.iso is the custom MKG install ISO built from these references, to be used in a VirtualBox (VB) machine." \
-            -m "To create an updated Gentoo distribution, start a VB machine with the following specifications:" \
+            -m "File downloaded.iso is the custom MKG install ISO built from these references, to be used in a VirtualBox machine." \
+            -m "To create an updated Gentoo distribution, start a machine with the following specifications:" \
             -m "    - 8GB or virtual RAM" \
             -m "    - a new VDI SATA disk of at least 55 GB" \
             -m "    - downloaded.iso as an attached IDE optical disk \
             -m "    - 4 virtual cores" \
-            -m "    - a BIOS (non-EFI) bootloader." \
+            -m "    - non-EFI bootloader." \
             -m "Once the build is completed, the VM will shut down automatically." \
-            -m "You can then clone the VDI disk into a functional Gentoo block device /dev/sdX using guestfish, qemu or \`./mkg from_vm vm=(name of your VB machine) hot_install ext_device=sdX\`" \
+            -m "You can then clone the VDI disk into a functional Gentoo block device /dev/sdX using guestfish, qemu or **./mkg from_vm vm='name of your VB machine' hot_install ext_device=sdX**" \
             -m "Alternatively, you can create an install ISO and a CloneZilla installer medium /dev/sdX by running:" \
-            -m "    \`# ./mkg from_vm vm=(name of your VB machine) device_installer ext_device=sdX gentoo.iso"  \
+            -m "    **# ./mkg from_vm vm='name of your VB machine' device_installer ext_device=sdX gentoo.iso**"  \
             -m "You can also perform this step manually by starting another VB machine with the following specifications:" \
             -m "    - 4 GB of virtual RAM" \
             -m "    - the VDI disk already used in the above procedure attached as a SATA device" \
-            -m "    - clonezilla_with_virtualbox.iso downloaded from the companion Github project [clonezila_with_virtualbox]() and attached as an IDE device" \
-            -m "    - a BIOS (non-EFI) bootloader" \
-            -m "    - any number of cores between 1 and 4." \
-            -m "This second VB machine will also shut down automatically. Now create an ISO installer using the command in **scripts/mkgentoo.sh:clonezilla_to_iso()** with **gentoo.iso** as the first argument and **ISOFILES** as the second argument. You can now use \`dd\` to copy this ISO to a USB stick." \
+            -m "    - clonezilla_with_virtualbox.iso downloaded from the companion Github project **clonezila_with_virtualbox** and attached as an IDE device" \
+            -m "    - non-EFI bootloader" \
+            -m "This second VB machine will also shut down automatically. Now create an ISO installer using the command in **scripts/mkgentoo.sh:clonezilla_to_iso** with **gentoo.iso** as the first argument and **ISOFILES** as the second argument. You can now use **dd** to copy this ISO to a USB stick." \
             "$tag_name"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
