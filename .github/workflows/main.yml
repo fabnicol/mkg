@@ -56,7 +56,7 @@ jobs:
             -m "To create an updated Gentoo distribution, start a machine with the following specifications:" \
             -m "    - 8GB or virtual RAM" \
             -m "    - a new VDI SATA disk of at least 55 GB" \
-            -m "    - downloaded.iso as an attached IDE optical disk \
+            -m "    - downloaded.iso as an attached IDE optical disk" \
             -m "    - 4 virtual cores" \
             -m "    - non-EFI bootloader." \
             -m "Once the build is completed, the VM will shut down automatically." \
