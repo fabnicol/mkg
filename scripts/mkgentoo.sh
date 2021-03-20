@@ -762,7 +762,14 @@ Allowing a 10 second break for second thoughts."
         fi
     fi
 
+    if ("${TEST_ONLY}" || "${TEST_EMERGE}") && "${USE_MKG_WORKFLOW}"
+    then
+        ${LOG[*]} "Options use_mkg_workflow and test_... are incompatible."
+        exit 1
+    fi
+
     "${TEST_ONLY}" && TEST_EMERGE=true && USE_MKG_WORKFLOW=false
+
 }
 
 # ---------------------------------------------------------------------------- #
@@ -807,7 +814,7 @@ pre-test of package merging"
     cd "${VMPATH}"
     if_fails $? "[ERR] Could not cd to root directory."
 
-    move_auxiliary_files ''  "mnt2/squashfs-root"
+    move_auxiliary_files "mnt2/squashfs-root"
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix -q ${ELIST}
@@ -1040,40 +1047,40 @@ move_auxiliary_files() {
         cp  "${ELIST}.complete" "${ELIST}"
     fi
 
-    check_file scripts/mkvm${1}.sh  "[ERR] No mkvm$1.sh script!"
-    check_file scripts/mkvm_chroot${1}.sh "[ERR] No mkvm_chroot$1.sh script!"
+    check_file scripts/mkvm.sh  "[ERR] No mkvm.sh script!"
+    check_file scripts/mkvm_chroot.sh "[ERR] No mkvm_chroot.sh script!"
     check_file "${ELIST}"     "[ERR] No ebuild list!"
     check_file "${ELIST}.use" "[ERR] No ebuild list!"
     check_file "${ELIST}.accept_keywords" "[ERR] No ebuild list!"
     check_file "${STAGE3}"  "[ERR] No stage3 archive!"
     check_file "${KERNEL_CONFIG}" "[ERR] No kernel configuration file!"
 
-    ${LOG[*]} <<< $(cp -f "${STAGE3}" "$2" 2>&1 \
-                        | xargs echo "[INF] Moving ${STAGE3} to $2")
+    ${LOG[*]} <<< $(cp -f "${STAGE3}" "$1" 2>&1 \
+                        | xargs echo "[INF] Moving ${STAGE3} to $1")
     if_fails $? "[ERR] Could not move ${STAGE3}"
 
-    ${LOG[*]} <<< $(cp -f scripts/mkvm${1}.sh "$2"  2>&1 \
-                        | xargs echo "[INF] Moving mkvm$1.sh")
+    ${LOG[*]} <<< $(cp -f scripts/mkvm.sh "$1"  2>&1 \
+                        | xargs echo "[INF] Moving mkvm.sh")
     if_fails $? "[ERR] Could not move ${STAGE3}"
 
-    ${LOG[*]} <<< $(chmod +x "$2"/mkvm${1}.sh 2>&1 \
+    ${LOG[*]} <<< $(chmod +x "$1"/mkvm.sh 2>&1 \
                         | xargs echo "[INF] Changing permissions")
     if_fails $? "[ERR] Could not move mkvm.sh"
 
-    ${LOG[*]} <<< $(cp -f scripts/mkvm_chroot${1}.sh "$2" 2>&1 \
-                        | xargs echo "[INF] Moving mkvm_chroot$1.sh")
+    ${LOG[*]} <<< $(cp -f scripts/mkvm_chroot.sh "$1" 2>&1 \
+                        | xargs echo "[INF] Moving mkvm_chroot.sh")
     if_fails $? "[ERR] Could not move mkvm_chroot.sh"
 
-    ${LOG[*]} <<< $(chmod +x "$2"/mkvm_chroot${1}.sh \
+    ${LOG[*]} <<< $(chmod +x "$1"/mkvm_chroot.sh \
                         | xargs echo "[INF] changing permissions")
     if_fails $? "[ERR] Could not change permissions"
 
     ${LOG[*]} <<< $(cp -f "${ELIST}" "${ELIST}.use" \
-                       "${ELIST}.accept_keywords" "$2" 2>&1 \
+                       "${ELIST}.accept_keywords" "$1" 2>&1 \
                         | xargs echo "[INF] Moving ebuild lists")
     if_fails $? "[ERR] Could not move ebuild lists"
 
-    ${LOG[*]} <<< $(cp -f "${KERNEL_CONFIG}" "$2" 2>&1 \
+    ${LOG[*]} <<< $(cp -f "${KERNEL_CONFIG}" "$1" 2>&1 \
                         | xargs echo "[INF] Moving kernel config")
     if_fails $? "[ERR] Could not move kernel config file"
 
@@ -1120,7 +1127,7 @@ make_boot_from_livecd() {
     local sqrt="${ROOT_LIVE}/squashfs-root/root/"
     check_dir  "${sqrt}"
 
-    move_auxiliary_files "$1" "${sqrt}"
+    move_auxiliary_files "${sqrt}"
     cd "${sqrt}" || exit 2
 
     prepare_bash_rc
@@ -1129,7 +1136,7 @@ make_boot_from_livecd() {
     # and fired on by .bashrc sourcing once the liveCD exits the boot process
     # into root shell
 
-    echo  "/bin/bash $1"  >> ${rc}
+    echo  "/bin/bash mkvm.sh"  >> ${rc}
 
     # -------------------------------------------------------------- #
     #  Now restore the squashfs filesystem to recreate a new live CD
@@ -1183,6 +1190,7 @@ prepare_bash_rc() {
         "${VERBOSE}" && ${LOG[*]} "${expstring}"
         echo "${expstring}" >> ${rc}
     done
+    chmod +x ${rc}
 }
 
 # ---------------------------------------------------------------------------- #
@@ -1378,6 +1386,11 @@ create_vm() {
     export PATH="${PATH}":"${VBPATH}"
     check_dir "${VMPATH}"
     cd "${VMPATH}"
+    if [ -z "$1" ]
+    then
+        ${LOG[*]} "[ERR] virtual machine name vm=${VM} must not be empty."
+        cleanup
+    fi
     delete_vm "${1}" "vdi"
 
     # create and register VM
@@ -2333,12 +2346,7 @@ generate_Gentoo() {
     then
         fetch_preprocessed_gentoo_install
         LIVECD=preprocessed_gentoo_install.iso
-        ISO=${LIVECD}
-        if "${TEST_EMERGE}"
-        then
-            ${LOG[*]} "[INF] Testing whether packages will be emerged..."
-            test_emerge_step
-        fi
+        ISO=
     else
         ${LOG[*]} "[INF] Fetching live CD..."
         fetch_livecd
@@ -2365,7 +2373,7 @@ with VirtualBox guest additions."
     fi
 
     ${LOG[*]} "[INF] Creating VM"
-    if ! create_vm
+    if ! create_vm "${VM}"
     then
         ${LOG[*]} "[ERR] VM failed to be created!"
         exit 1

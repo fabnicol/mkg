@@ -570,7 +570,7 @@ unbind_filesystem() {
 
 checksums() {
 
-    if [ -f "${LIVECD}" ]
+    if [ -f "${VMPATH}/${LIVECD}" ]
     then
         echo "[MSG] Workflow created file ${LIVECD}."
         echo "      with following checksums:"
@@ -578,6 +578,6 @@ checksums() {
         echo "      sha1sum: $(sha1sum ${LIVECD})"     | tee -a checksums.txt
         echo "      sha256sum: $(sha256sum ${LIVECD})" | tee -a checksums.txt
     else
-        echo "[ERR] Workflow failed to create file ${LIVECD}."
+        echo "[ERR] Workflow failed to create file ${VMPATH}/${LIVECD}."
     fi
 }

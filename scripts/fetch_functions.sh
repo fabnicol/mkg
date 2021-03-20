@@ -221,10 +221,10 @@ fetch_preprocessed_gentoo_install() {
 
 local verb=""
 ! "${VERBOSE}" && verb="-s"
-
+sleep 3
 ${LOG[*]} "[INF] Downloading Gentoo minimal install ISO updated with MKG scripts \
 from Github Actions..."
-
+sleep 3
 ${LOG[*]} <<< "$(curl -L  ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}/\
 downloaded.iso  -o preprocessed_gentoo_install.iso ${verb} 2>&1 | xargs echo '[INF]')"
 
