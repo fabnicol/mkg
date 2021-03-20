@@ -1259,6 +1259,7 @@ clean: " reply || reply="Y"
 ## @fn delete_vm()
 ## @param vm VM name
 ## @param ext virtual disk extension, without dot (defaults to "vdi").
+## @param mode "" for standard VM or "ISO_STAGE" for ISO-creating VM.
 ## @brief Powers off, possibly with emergency stop,
 ##        the VM names as first argument.
 ## @details @li Unregisters it
@@ -1364,6 +1365,7 @@ delete_vm() {
 ## @li Wait for the VM to complete its task. Check that it is still running
 ## every minute.
 ## @li Finally compact it.
+## @param VM Name of the virtual machine.
 ## @note VM may be visible (vm type=gui) or without GUI (vm type=headless,
 ## currently to be fixed)
 ## @bug     VB bug note
