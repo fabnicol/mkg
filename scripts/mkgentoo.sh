@@ -372,37 +372,6 @@ the same time"
     # Configuration tests
 
     local do_exit=false
-    [ -z "$(VBoxManage --version)" ] \
-        && { ${LOG[*]} "[ERR] Did not find a proper VirtualBox install. \
-Reinstall Virtualbox version >= 6.1"; do_exit=true; }
-    [ -z "$(uuid)" ] \
-        && { ${LOG[*]} "[ERR] Did not find uuid. Intall the uuid package"
-             do_exit=true; }
-    [ -z "$(mkisofs -version)" ] \
-        && { ${LOG[*]} "[ERR] Did not find mkisofs. Install the cdrtools \
-package (see Wiki)"; do_exit=true; }
-    [ -z "$(mksquashfs -version)" ] \
-        && { ${LOG[*]} "[ERR] Did not find squashfs. Install the squashfs \
-package."; do_exit=true; }
-    [ -z "$(xz --version)" ] \
-        && { ${LOG[*]} "[ERR] Did not find xz. Install xz and its libraries"
-             do_exit=true; }
-    [ -z "$(curl --version)" ] \
-        && { ${LOG[*]} "[ERR] Did not find curl. Please install it now."
-             do_exit=true; }
-    [ -z "$(md5sum --version)" ] \
-        && { ${LOG[*]} "[ERR] Did not find md5sum. Install the coreutils \
-package."; do_exit=true; }
-    [ -z "$(tar --version)" ] \
-        && { ${LOG[*]} "[ERR] Did not find tar."; do_exit=true; }
-    { [ -z "$(mountpoint --version)" ] || [ -z "$(findmnt --version)" ]; } && {
-        ${LOG[*]} "[ERR] Did not find mountpoint/findmnt. Install util-linux."
-        do_exit=true; }
-    [ -z "$(sed --version)" ] && { ${LOG[*]} "[ERR] Did not find sed."
-                                   do_exit=true; }
-    [ -z "$(which xorriso)" ] \
-        && { ${LOG[*]} "[ERR] Did not find xorriso (libburnia project)"
-             do_exit=true; }
 
     # Check VirtualBox version
 
@@ -1474,7 +1443,15 @@ UUID: ${MEDIUM_UUID}"
     MEDIUM_UUID=$(VBoxManage showmediuminfo "${1}.vdi"  | head -n1 \
                       | sed -E 's/UUID: *([0-9a-z\-]+)$/\1/')
 
-    [ -z "${MEDIUM_UUID}" ] && MEDIUM_UUID=`uuid`
+    if [ -z "${MEDIUM_UUID}" ]
+    then
+        if uuid
+        then
+            MEDIUM_UUID=$(uuid)
+        else
+            MEDIUM_UUID=$(uuidgen)
+        fi
+    fi
 
     # set disk UUID once and for all to avoid serious debugging issues
     # whilst several VMS are around, some in zombie state, with
@@ -2443,8 +2420,16 @@ main() {
 
     get_options $@
 
-    check_tool "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
-               "VBoxManage" "curl" "grep" "lsblk" "awk" "uuid" \
+    # Gentoo has uuidgen while Ubuntu has uuid
+
+    if [ -z "$(uuid)" ] && [ -z "$(uuidgen)" ]
+    then
+        {${LOG[*]} "[ERR] Did not find uuid or uuidgen. Intall the uuid package"
+         exit 1
+    fi
+
+    check_tool "sed" "tar" "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
+               "VBoxManage" "curl" "grep" "lsblk" "awk" \
                "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
 
     test_cli_pre
