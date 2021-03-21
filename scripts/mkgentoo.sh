@@ -1423,7 +1423,7 @@ create_vm() {
                                --vtxvpid ${VTXVPID} \
                                --paravirtprovider ${PARAVIRTPROVIDER} \
                                --rtcuseutc ${RTCUSEUTC} \
-                               --firmware ${FIRMWARE} 2>&1 \
+                               --firmware "bios" 2>&1 \
                         | xargs echo "[INF] Adding VM parameters.")
 
 
