@@ -1445,13 +1445,16 @@ UUID: ${MEDIUM_UUID}"
 
     if [ -z "${MEDIUM_UUID}" ]
     then
-        if uuid
+        if $(which uuid)
         then
             MEDIUM_UUID=$(uuid)
         else
             MEDIUM_UUID=$(uuidgen)
         fi
     fi
+
+    [ -z "${MEDIUM_UUID}" ] \
+        && ${LOG[*]} "[ERR] Could not set uuid of ${1}" && exit 1
 
     # set disk UUID once and for all to avoid serious debugging issues
     # whilst several VMS are around, some in zombie state, with
@@ -2422,9 +2425,9 @@ main() {
 
     # Gentoo has uuidgen while Ubuntu has uuid
 
-    if [ -z "$(uuid)" ] && [ -z "$(uuidgen)" ]
+    if ! $(which uuid) && ! $(which uuidgen)
     then
-        {${LOG[*]} "[ERR] Did not find uuid or uuidgen. Intall the uuid package"
+        ${LOG[*]} "[ERR] Did not find uuid or uuidgen. Intall the uuid package"
          exit 1
     fi
 
