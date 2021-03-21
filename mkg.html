@@ -15,14 +15,21 @@ current directory or in vmpath if specified.</p>
 <p>Arguments with white space (like <code>cflags="-O2 -march=..."</code>) should be<br />
 written in list form with commas and no spaces: <code>cflags=[-O2,-march=...]</code><br />
 The same holds for paths with white space.</p>
-<p>As of tag 1st March, 2021, part of the build is performed<br />
+<p>As of March, 2021, part of the build is performed<br />
 by <em>Github Actions</em> automatically. An ISO file of CloneZilla<br />
 supplemented with VirtualBox guest additions will be downloaded<br />
 from the resulting automated Github release. To disable this behavior<br />
-you can add <code>use_workflow=false</code> to command line, or build the<br />
+you can add <code>use_clonezilla_workflow=false</code> to command line, or build the<br />
 custom ISO file beforehand using the companion project<br />
 <strong>clonezilla_with_virtualbox</strong>. In this case, add:<br />
 <code>custom_clonezilla=your_build.iso</code><br />
+to command line.<br />
+A similar procedure also applies to the minimal Gentoo install ISO.<br />
+MKG scripts and the stage3 archive are added within its squashfs filesystem<br />
+by the <em>Github Actions</em> workflow of the MKG Github site.<br />
+An ISO file labelled <strong>downloaded.iso</strong> is automatically released<br />
+by the workflow. It will be downloaded from the MKG Github release section.<br />
+To disable this behavior you can add <code>use_mkg_workflow=false</code><br />
 to command line.</p>
 <p><strong>Options:</strong></p>
 <p>Boolean values are either <code>true</code> or <code>false</code>. For example, to build<br />
@@ -33,7 +40,7 @@ or simply: <code>minimal</code> as <code>true</code> can be omitted (unlike <cod
 <p><code># ./mkg pdfpage</code><br />
 <code># ./mkg debug_mode verbose from_vm vm=Gentoo.iso gentoo_small.iso</code>   <code>ext_device=sdc device_installer blank burn cleanup=false</code><br />
 <code># ./mkg download_arch=false download=false download_clonezilla=false</code>   <code>custom_clonezilla=clonezilla_cached.iso nonroot_user=phil</code><br />
-<code># nohup ./mkg plot plot_color=red plot_period=10 plot_pause=7</code>   <code>compact minimal minimal_size  gui=false elist=myebuilds</code>   <code>email=my.name@gmail.com email_passwd='mypasswd' &amp;</code><br />
+<code># nohup ./mkg plot plot_color=red plot_period=10 plot_pause=7</code>   <code>compact minimal minimal_size=false  gui=false elist=myebuilds</code>   <code>email=my.name@gmail.com email_passwd='mypasswd' &amp;</code><br />
 <code># nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &amp;</code></p>
 <p><strong>Type Conventions:</strong><br />
 b: true/false Boolean<br />
@@ -46,7 +53,8 @@ s: String<br />
 u: URL</p>
 <p>When a field depends on another, a colon separates the type and<br />
 the name of the dependency. dep is a reserved word for dummy defaults of dependencies i.e.<br />
-optional strings that may remain unspecified.</p>
+optional strings that may remain unspecified.<br />
+Some options are incompatible, e.g. <code>test_only</code> and <code>use_mkg_workflow</code></p>
 <table>
 <colgroup>
 <col style="width: 19%" />
@@ -125,7 +133,7 @@ optional strings that may remain unspecified.</p>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">cloning_method</td>
-<td style="text-align: left;">Method used by hot_install ext_device=… to intall Gentoo to disk. One of: ‘guestfish’ (default), ‘with-raw-buffer’ (slower) or ‘vbox-img’ (currently unavailable)</td>
+<td style="text-align: left;">Method used by hot_install ext_device=… to intall Gentoo to disk. One of: ‘guestfish’ (default) or ‘qemu’</td>
 <td style="text-align: center;">[ guestfish ]</td>
 <td style="text-align: center;">s:ext_device</td>
 </tr>
@@ -166,99 +174,111 @@ optional strings that may remain unspecified.</p>
 <td style="text-align: center;"></td>
 </tr>
 <tr class="even">
+<td style="text-align: center;">disconnect</td>
+<td style="text-align: left;">Unmount guest virtual disk from host.</td>
+<td style="text-align: center;">[ true ]</td>
+<td style="text-align: center;">b</td>
+</tr>
+<tr class="odd">
 <td style="text-align: center;">disable_md5_check</td>
 <td style="text-align: left;">Disable MD5 checkums verification after downloads. Boolean.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">download</td>
 <td style="text-align: left;">Download install ISO image from Gentoo mirror. Boolean.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">download_arch</td>
 <td style="text-align: left;">Download and install stage3 archive to virtual disk. Booelan.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">download_clonezilla</td>
 <td style="text-align: left;">Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">download_clonezilla_path</td>
 <td style="text-align: left;">Download the following CloneZilla ISO</td>
 <td style="text-align: center;">[ path1 ]</td>
 <td style="text-align: center;">u</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">elist</td>
 <td style="text-align: left;">File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the ‘elist’.accept_keywords and ‘elist’.use files</td>
 <td style="text-align: center;">[ ebuilds.list ]</td>
 <td style="text-align: center;">f</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">email</td>
 <td style="text-align: left;">Email address to send a warning to upon build completion. Note: you will have to accept so-called <em>insecure software</em> with some providers. It is not insecure if you are using your private PC throughout.</td>
 <td style="text-align: center;">[ ]</td>
 <td style="text-align: center;">e</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">email_passwd</td>
 <td style="text-align: left;">Email password</td>
 <td style="text-align: center;">[ ]</td>
 <td style="text-align: center;">s:email</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">emirrors</td>
 <td style="text-align: left;">Mirror sites for downloading ebuilds</td>
 <td style="text-align: center;">[ path2 ]</td>
 <td style="text-align: center;">u</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">ext_device</td>
 <td style="text-align: left;">Create Gentoo OS on external device. Argument is either a device label (e.g. sdb, hdb), or a mountpoint directory (if mounted), or a few consecutive letters of the vendor name (e.g. ‘Samsu’, ‘PNY’ or ‘Kingst’), if there is just one such. Requires <em>hot_install</em> on commandline.</td>
 <td style="text-align: center;">[ ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">force</td>
 <td style="text-align: left;">Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">from_device</td>
 <td style="text-align: left;">Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b:ext_device</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">from_iso</td>
 <td style="text-align: left;">Do not generate Gentoo but use the bootable ISO given on commandline.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">from_vm</td>
 <td style="text-align: left;">Do not generate Gentoo but use the VM. Boolean.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">full_cleanup</td>
 <td style="text-align: left;">Remove virtual disk, archives and ISO files on clean-up</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">github_release_path</td>
 <td style="text-align: left;">URL to Github Release of clonezilla_with_virtualbox.iso</td>
 <td style="text-align: center;">[ path3 ]</td>
+<td style="text-align: center;">s</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">github_release_path2</td>
+<td style="text-align: left;">URL to Github Release of preprocessed_gentoo_install.iso</td>
+<td style="text-align: center;">[ path4 ]</td>
 <td style="text-align: center;">s</td>
 </tr>
 <tr class="even">
@@ -310,58 +330,58 @@ optional strings that may remain unspecified.</p>
 <td style="text-align: center;">f</td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">lineno_patch</td>
-<td style="text-align: left;">Line patched against vbox-img.cpp in virtualbox source code</td>
-<td style="text-align: center;">[ 797 ]</td>
-<td style="text-align: center;">n</td>
-</tr>
-<tr class="odd">
 <td style="text-align: center;">livecd</td>
 <td style="text-align: left;">Path to the live CD that will start the VM</td>
 <td style="text-align: center;">[ gentoo.iso ]</td>
 <td style="text-align: center;">f</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">logging</td>
 <td style="text-align: left;">Activate logging</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">manpage</td>
 <td style="text-align: left;">Create manpage mkg.1</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">mem</td>
 <td style="text-align: left;">VM RAM memory in MiB</td>
 <td style="text-align: center;">[ 8000 ]</td>
 <td style="text-align: center;">n</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">minimal</td>
 <td style="text-align: left;">Remove <em>libreoffice</em> and <em>data science tools</em> from default list of installed software. Boolean.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">minimal_size</td>
 <td style="text-align: left;">Remove kernel sources to minimize packaging. Not advised for personal use but OK for deployment and distribution.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">mirror</td>
 <td style="text-align: left;">Mirror site for downloading of stage3 tarball</td>
 <td style="text-align: center;">[ path2 ]</td>
 <td style="text-align: center;">u</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">ncpus</td>
 <td style="text-align: left;">Number of VM CPUs. By default the third of available threads.</td>
 <td style="text-align: center;">[ count ]</td>
 <td style="text-align: center;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">no_run</td>
+<td style="text-align: left;">If using <strong>share_root=‘r’ or ‘w’</strong>, do not run the virtual machine but use the VDI disk corresponding to vm=… Otherwise start 15 minutes later.</td>
+<td style="text-align: center;">[ true ]</td>
+<td style="text-align: center;">b</td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">nonroot_user</td>
@@ -460,6 +480,18 @@ optional strings that may remain unspecified.</p>
 <td style="text-align: center;">s</td>
 </tr>
 <tr class="odd">
+<td style="text-align: center;">shared_dir</td>
+<td style="text-align: left;">Host mount point for guest virtual disk filesystem</td>
+<td style="text-align: center;">[ /vdi ]</td>
+<td style="text-align: center;">s</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">share_root</td>
+<td style="text-align: left;">Mount guest virtual disk to host folder <strong>shared_folder</strong>. Argument is ‘w’ to enable write I/O otherwise read-only mode is assumed. May raise security issues, see Wiki.</td>
+<td style="text-align: center;">[ dep ]</td>
+<td style="text-align: center;">s:shared_dir</td>
+</tr>
+<tr class="odd">
 <td style="text-align: center;">size</td>
 <td style="text-align: left;">Dynamic disc size</td>
 <td style="text-align: center;">[ 55000 ]</td>
@@ -480,7 +512,7 @@ optional strings that may remain unspecified.</p>
 <tr class="even">
 <td style="text-align: center;">test_emerge</td>
 <td style="text-align: left;">Test whether emerge will be able to install packages in the VM before starting it.</td>
-<td style="text-align: center;">[ true ]</td>
+<td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
 <tr class="odd">
@@ -490,28 +522,40 @@ optional strings that may remain unspecified.</p>
 <td style="text-align: center;">b</td>
 </tr>
 <tr class="even">
+<td style="text-align: center;">timezone</td>
+<td style="text-align: left;">Set timezone. See /usr/share/zoneinfo for formats.</td>
+<td style="text-align: center;">[ US/Eastern ]</td>
+<td style="text-align: center;">s</td>
+</tr>
+<tr class="odd">
 <td style="text-align: center;">usbehci</td>
 <td style="text-align: left;">Activate USB2 driver: on/off</td>
 <td style="text-align: center;">[ off ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">usbxhci</td>
 <td style="text-align: left;">Activate USB3 driver: on/off. Note: if on, needs extension pack.</td>
 <td style="text-align: center;">[ off ]</td>
 <td style="text-align: center;">o</td>
 </tr>
+<tr class="odd">
+<td style="text-align: center;">use_qemu</td>
+<td style="text-align: left;">Use qemu instead of guestfish for installing Gentoo to block device with <strong>hot_install</strong> or with <strong>share_root</strong></td>
+<td style="text-align: center;">[ false ]</td>
+<td style="text-align: center;">b</td>
+</tr>
 <tr class="even">
-<td style="text-align: center;">use_workflow</td>
+<td style="text-align: center;">use_clonezilla_workflow</td>
 <td style="text-align: left;">Use Github Actions workflow to add virtualbox guest additions to CloneZilla ISO.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;">vm</td>
-<td style="text-align: left;">Virtual Machine name. Unless ‘force=true’ is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name.</td>
-<td style="text-align: center;">[ Gentoo ]</td>
-<td style="text-align: center;">vm</td>
+<td style="text-align: center;">use_mkg_workflow</td>
+<td style="text-align: left;">Use Github Actions workflow to preprocess minimal Gentoo ISO by adding MKG scripts inside the squashfs filesystem.</td>
+<td style="text-align: center;">[ true ]</td>
+<td style="text-align: center;">b</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">vbox_version</td>
@@ -532,27 +576,39 @@ optional strings that may remain unspecified.</p>
 <td style="text-align: center;">d</td>
 </tr>
 <tr class="odd">
+<td style="text-align: center;">vm</td>
+<td style="text-align: left;">Virtual Machine name. Unless ‘force=true’ is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name.</td>
+<td style="text-align: center;">[ Gentoo ]</td>
+<td style="text-align: center;">vm</td>
+</tr>
+<tr class="even">
 <td style="text-align: center;">vm_language</td>
 <td style="text-align: left;">Add support for non-US English language as a default. Use standard abbreviations (fr for french, es for spanish) etc.</td>
 <td style="text-align: center;">[ us ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">vmpath</td>
 <td style="text-align: left;">Path to VM base directory</td>
 <td style="text-align: center;">[ $PWD ]</td>
 <td style="text-align: center;">d</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">vtxvpid</td>
 <td style="text-align: left;">Activate VTXVPID: on/off</td>
 <td style="text-align: center;">[ on ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">workflow_tag</td>
 <td style="text-align: left;">Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by Github Actions</td>
 <td style="text-align: center;">[ v1.8 ]</td>
+<td style="text-align: center;">s</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">workflow_tag2</td>
+<td style="text-align: left;">Tag version (vX.Y) of the release of file preprocessed_gentoo_install.iso by Github Actions (MKG site)</td>
+<td style="text-align: center;">[ master ]</td>
 <td style="text-align: center;">s</td>
 </tr>
 </tbody>
@@ -560,4 +616,5 @@ optional strings that may remain unspecified.</p>
 <p><strong>path1:</strong> https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download<br />
 <strong>path2:</strong> http://gentoo.mirrors.ovh.net/gentoo-distfiles/<br />
 <strong>path3:</strong> https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/<br />
+<strong>path4:</strong> https://github.com/fabnicol/mkg/releases/download<br />
 <strong>count:</strong> nproc –all / 3</p>

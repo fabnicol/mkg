@@ -1,4 +1,4 @@
-.TH "mkgentoo.sh" 3 "Mon Mar 15 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "mkgentoo.sh" 3 "Sun Mar 21 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -73,11 +73,11 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .br
 .RI "Force-clean root VirtualBox registry\&. "
 .ti -1c
-.RI "\fBdelete_vm\fP (vm, ext)"
+.RI "\fBdelete_vm\fP (vm, ext, mode)"
 .br
 .RI "Powers off, possibly with emergency stop, the VM names as first argument\&. "
 .ti -1c
-.RI "\fBcreate_vm\fP ()"
+.RI "\fBcreate_vm\fP (VM)"
 .br
 .RI "Create main VirtualBox machine using VBoxManage commandline\&. "
 .ti -1c
@@ -89,29 +89,21 @@ mkgentoo.sh \- Process options, create Gentoo VirtualBox machine and optionally 
 .br
 .RI "Create the new VirtualBox machine aimed at converting the VDI virtualdisk containing the Gentoo Linux distribution into an XZ-compressed clonezilla image uneder \fBISOFILES/home/partimag/image\fP\&. "
 .ti -1c
+.RI "\fBmount_vdi\fP ('w')"
+.br
+.RI "Use qemu to mount VDI file to host folder\&. "
+.ti -1c
+.RI "\fBunmount_vdi\fP (mountpoint)"
+.br
+.RI "Unmount connection to virtual disk (using qemu) to host folder\&. "
+.ti -1c
 .RI "\fBclone_vm_to_device\fP (mode)"
 .br
 .RI "Directly clone Gentoo VM to USB stick (or any using block device) "
 .ti -1c
-.RI "\fBclone_vm_to_raw\fP ()"
-.br
-.RI "Use\&. "
-.ti -1c
-.RI "\fBdd_to_usb\fP ()"
-.br
-.RI "Bare-metal copy of temporary RAW disk to external device\&. "
-.ti -1c
-.RI "\fBvbox_img_works\fP ()"
-.br
-.RI "Test if \fBvbox-img\fP is functional\&. "
-.ti -1c
 .RI "\fBcreate_device_system\fP (Mode)"
 .br
 .RI "Clone VDI virtual disk to external device (USB device or hard drive) "
-.ti -1c
-.RI "\fBgenerate_Gentoo\fP ()"
-.br
-.RI "Launch routines: fetch install IO, starge3 archive, create VM\&. "
 .ti -1c
 .RI "\fBclonezilla_to_iso\fP (iso, dir)"
 .br
@@ -138,6 +130,10 @@ Upgrade it with virtualbox guest additions\&. "
 .RI "\fBprepare_for_iso_vm\fP ()"
 .br
 .ti -1c
+.RI "\fBgenerate_Gentoo\fP ()"
+.br
+.RI "Launch routines: fetch install IO, starge3 archive, create VM\&. "
+.ti -1c
 .RI "\fBmain\fP ()"
 .br
 .RI "Main function launching routines\&. "
@@ -159,8 +155,15 @@ Upgrade it with virtualbox guest additions\&. "
 .ti -1c
 .RI "Exported String \fBISOLINUX_DIR\fP = isolinux"
 .br
+.RI "---- PATCH ---- "
 .ti -1c
 .RI "Exported String \fBPATH\fP = '${PATH}':'${VBPATH}'"
+.br
+.ti -1c
+.RI "Exported String \fBSHARE_ROOT\fP"
+.br
+.ti -1c
+.RI "Exported String \fBSHARED_DIR\fP"
 .br
 .in -1c
 .SH "Detailed Description"
@@ -258,28 +261,89 @@ ext_device="Sams" my_gentoo_image\&.iso
 Definition in file \fBmkgentoo\&.sh\fP\&.
 .SH "Function Documentation"
 .PP 
+.SS "mount_vdi ('w')"
+
+.PP
+Use qemu to mount VDI file to host folder\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIw\fP for enabling read-write mode, otherwise read-only\&. 
+.RE
+.PP
+\fBWarning\fP
+.RS 4
+May involve security issues, especially if 'w' is enabled\&. 
+.RE
+.PP
+\fBNote\fP
+.RS 4
+Uses global variable ${SHARED_ROOT_DIR} 
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+Guestfish and qemu websites for security issues\&. 
+.RE
+.PP
+
+.PP
+Definition at line 1789 of file mkgentoo\&.sh\&.
 .SS "move_auxiliary_files ()"
 
 .PP
-Definition at line 1010 of file mkgentoo\&.sh\&.
+Definition at line 1038 of file mkgentoo\&.sh\&.
 .SS "prepare_bash_rc ()"
 Prepare the \&.bashrc file by exporting the environment this will be placed under /root in the VM 
 .PP
-Definition at line 1146 of file mkgentoo\&.sh\&.
+Definition at line 1173 of file mkgentoo\&.sh\&.
+.SS "unmount_vdi (mountpoint)"
+
+.PP
+Unmount connection to virtual disk (using qemu) to host folder\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fImountpoint\fP Optional mountpoint path parameter\&. 
+.RE
+.PP
+\fBNote\fP
+.RS 4
+Uses global variable ${SHARED_ROOT_DIR} 
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+Guestfish and qemu websites for security issues\&. 
+.RE
+.PP
+
+.PP
+Definition at line 1875 of file mkgentoo\&.sh\&.
 .SH "Variable Documentation"
 .PP 
 .SS "Exported String ISOLINUX_DIR = isolinux"
 
 .PP
-Definition at line 950 of file mkgentoo\&.sh\&.
+---- PATCH ---- ---- End of patch ---- 
+.PP
+Definition at line 977 of file mkgentoo\&.sh\&.
 .SS "Exported String LOG"
 
 .PP
-Definition at line 279 of file mkgentoo\&.sh\&.
+Definition at line 288 of file mkgentoo\&.sh\&.
 .SS "Exported String PATH = '${PATH}':'${VBPATH}'"
 
 .PP
-Definition at line 1357 of file mkgentoo\&.sh\&.
+Definition at line 1388 of file mkgentoo\&.sh\&.
+.SS "Exported String SHARE_ROOT"
+
+.PP
+Definition at line 2467 of file mkgentoo\&.sh\&.
+.SS "Exported String SHARED_DIR"
+
+.PP
+Definition at line 2468 of file mkgentoo\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for mkg from the source code\&.
