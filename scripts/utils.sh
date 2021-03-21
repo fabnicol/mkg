@@ -147,7 +147,7 @@ send_mail() {
 ## @ingroup auxiliaryFunctions
 
 list_block_devices() {
-    echo  "$(lsblk -a -n -o KNAME | grep -v loop)"
+    echo  "$(lsblk -a -n -o KNAME | grep -v loop | xargs)"
 }
 
 ## @fn find_device_by_vendor()
@@ -176,19 +176,21 @@ is_block_device() {
 }
 
 ## @fn get_mountpoint()
-## @brief Gives mount folder from device label input
+## @param dev block device
+## @brief Gives mount directory of block device, if any.
+## @retval Path string. On error exit value is 1.
 ## @ingroup auxiliaryFunctions
 
 get_mountpoint() {
     if ! is_block_device "$1"
     then
-        ${LOG[*]} "[ERR] $1  is not a block device!"
-        ${LOG[*]} "[MSG] Device labels should be in the following \
-list:"
-        ${LOG[*]} $(list_block_devices)
+        logger -s "[ERR] $1  is not a block device!"
+        logger -s "[MSG] Device labels should be in the following list:"
+        logger -s "[MSG] $(list_block_devices)"
         exit 1
     fi
-    local res=$(findmnt --raw --first -a -n -c "$1" | cut -f1 -d' ')
+    local res=$(findmnt --raw -a -n -c /dev/"$1" \
+                    | grep -v nodev | cut -f1 -d' ')
     echo "${res}"
 }
 
@@ -503,10 +505,11 @@ cleanup() {
 	[ -f "${VM}.vdi" ] && rm ${verb} -f "${VM}.vdi"
         rm ${verb} -f *.xz
         rm ${verb} -f *.txt
-        rm ${verb} -f *clonezilla*.iso downloaded.iso install*.iso
+        rm ${verb} -f "${CLONEZILLACD}" "${CACHED_ISO} *clonezilla*iso *install*iso"
     fi
     return 0
 }
+
 
 ## @fn bind_filesystem()
 ## @brief Bind-mounts the host live filesystem (proc/sys/dev/run) to a
@@ -562,5 +565,19 @@ unbind_filesystem() {
     if mountpoint -q "$1"
     then
         umount -R -l  "$1"
+    fi
+}
+
+checksums() {
+
+    if [ -f "${VMPATH}/${LIVECD}" ]
+    then
+        echo "[MSG] Workflow created file ${LIVECD}."
+        echo "      with following checksums:"
+        echo "      md5sum: $(md5sum ${LIVECD})"       | tee checksums.txt
+        echo "      sha1sum: $(sha1sum ${LIVECD})"     | tee -a checksums.txt
+        echo "      sha256sum: $(sha256sum ${LIVECD})" | tee -a checksums.txt
+    else
+        echo "[ERR] Workflow failed to create file ${VMPATH}/${LIVECD}."
     fi
 }

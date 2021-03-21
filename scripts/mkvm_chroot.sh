@@ -79,6 +79,16 @@ adjust_environment() {
         return 1
     fi
 
+    # There is an intractable circular dependency that
+    # can be broken by pre-emerging python
+
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
+    if [ $? != 0 ]
+    then
+        echo "emerge python failed!" | tee -a emerge.build
+        return 1
+    fi
+
     emerge -1 -u sys-app/portage
 
     # select profile (most recent plasma desktop)
@@ -100,7 +110,7 @@ adjust_environment() {
        /etc/portage/package.accept_keywords/ \
         | tee emerge.build
 
-    cp -vf "${ELIST}.use"             /etc/portage/package.use/ \
+    cp -vf "${ELIST}.use" /etc/portage/package.use/ \
         |  tee emerge.build
 
     cp -vf "${ELIST}.accept_keywords" \
@@ -126,11 +136,6 @@ adjust_environment() {
        return 1
     fi
 
-    # There is an intractable circular dependency that
-    # can be broken by pre-emerging python
-
-    USE="-sqlite -bluetooth" emerge -1 dev-lang/python
-
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours
     # as syslogd is not yet there we tee a custom build log
@@ -138,11 +143,22 @@ adjust_environment() {
 
     emerge sys-devel/gcc
     emerge sys-libs/glibc
-    emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
+    ## ---- PATCH ----
+    #
+    # This is temporarily necessary while display-manager is not
+    # stabilized in the portage tree (March 2021)
+    # NOTE: should be retrieved later on
 
+    emerge -q --unmerge sys-apps/sysvinit | tee -a emerge.build
+
+    ## ---- End of patch ----
+
+    emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
     [ $? != 0 ] && {
         echo "[ERR] emerge @world failed!"  | tee -a emerge.build
         return 1; }
+
+    emerge -q -u sys-apps/sysvinit
 
     # Networking in the new environment
 
@@ -159,9 +175,11 @@ adjust_environment() {
         echo "keymap=${VM_LANGUAGE}" >  /etc/conf.d/keymaps
         echo 'keymap="us"' >> /etc/conf.d/keymaps
     else
-        echo 'keymap="us"' >  /etc/conf.d/keymaps  
+        echo 'keymap="us"' >  /etc/conf.d/keymaps
     fi
     sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
+    echo "${TIMEZONE}" > /etc/timezone
+    emerge -u --config sys-libs/timezone-data | tee -a emerge.build
 
     # Localization.
 
@@ -169,7 +187,7 @@ adjust_environment() {
     echo "fr_FR ISO-8859-15" >> /etc/locale.gen
     echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
     echo "en_US ISO-8859-1"  >> /etc/locale.gen
-    locale-gen
+    locale-gen | tee -a emerge.build
     eselect locale set 1
     env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 }
@@ -214,8 +232,8 @@ build_kernel() {
         return 1
     fi
 
-    genkernel --install initramfs
-    emerge sys-kernel/linux-firmware
+    genkernel --install initramfs     | tee -a kernel.log
+    emerge sys-kernel/linux-firmware  | tee -a kernel.log
     make clean
 
     if [ -f /boot/vmlinuz* ]
@@ -292,14 +310,16 @@ install_software() {
 
     if ! "${MINIMAL}"
     then
+        # this test is for second-chance debugging runs
+
         if ! Rscript -e "library(ggplot2)"
         then
             echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
 'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" \
-               > libs.R
+             > libs.R
             Rscript libs.R 2>&1 | tee Rlibs.log
             rm -f libs.R
-       fi
+        fi
     fi
 
     # update environment
@@ -310,7 +330,7 @@ install_software() {
     if [ "${res_install}" != "0" ]
     then
         echo "[ERR] Main package build step failed" \
-            | tee -a log_install_software.log
+             | tee -a log_install_software.log
         return 1
     fi
 }
@@ -319,8 +339,8 @@ install_software() {
 ## @details @li Cleanup log, distfiles (for deployment),
 ##          kernel build sources and objects
 ## @li Log this into \b log_uninstall_software
-## @li Update \b eix cache. Sets displaymanager for \b xdm.
-## @li Add services: <b>sysklog, cronie, xdm, dbus, elogind</b>
+## @li Update \b eix cache. Sets display for \b display-manager.
+## @li Add services: <b>sysklog, cronie, display-manager, dbus, elogind</b>
 ## @li Substitute \b NetworkManager to temporary networking setup.
 ## @li Adjust group and \b sudo settings for non-root user and \b sddm
 ## @li Install \b grub in EFI mode.
@@ -331,13 +351,22 @@ install_software() {
 
 global_config() {
 
-    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="gdm"/' \
-        /etc/conf.d/xdm
+    # Configuration --- sddm
+
+    echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
+        | tee -a sddm.log
+    echo "setxkbmap ${VM_LANGUAGE},us" > /usr/share/sddm/scripts/Xsetup \
+        | tee -a sddm.log
+    chmod +x /usr/share/sddm/scripts/Xsetup
+    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
+        /etc/conf.d/display-manager | tee -a sddm.log
+
+    gpasswd -a sddm video
 
     #--- Services
 
     rc-update add cronie default
-    rc-update add xdm default
+    rc-update add display-manager default
     rc-update add dbus default
     rc-update add elogind boot
 
@@ -358,7 +387,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not useradd root" | tee useradd.log
+        echo "[ERR] Could not useradd user ${NONROOT_USER}" | tee useradd.log
     fi
 
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
@@ -445,13 +474,10 @@ finalize() {
 
     [ -n "$(which eix-update)" ] && eix-update
 
-    # prepare to compact with vbox-img comp act --filename
-    # ${VMPATH}/${VM}.vdi
-
     cat /dev/zero > zeros ; sync ; rm zeros
 }
 
-# Normally a non-op 
+# Normally a non-op
 source .bashrc
 
 declare -i res=0

@@ -1,15 +1,30 @@
+##
+# Copyright (c) 2020-2021 Fabrice Nicol <fabrnicol@gmail.com>
+#
+# This file is part of mkg.
+#
+# mkg is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 3 of the License, or (at your option) any later version.
+#
+# FFmpeg is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with FFmpeg; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301
+##
+
 #!/bin/bash
 
 ## @fn build_virtualbox()
 ## @brief Build VirtualBox from source using an unsquashed clonezilla CD as a
 ##        chrooted environment.
 ## @details Build scripts are copied from \b clonezilla/build
-## @note This stage is only necessay if \b vbox-img is to be used to directly
-##       convert the VDI virtual disk into a block device, on account of a bug
-##       in Oracle source code (ticket #19901). @n
-## This is only needed to reduce disk space requirements and avoid a temporary
-## RAW file on disk of about 50 GB.
-## Otherwise it is simpler to use the distribution stock version.
 ## @ingroup createInstaller
 
 build_virtualbox() {
@@ -59,7 +74,6 @@ cd VirtualBox || exit 2
 ./configure --disable-hardening
 chmod +x ./env.sh
 source ./env.sh
-sed -i "${LINENO_PATCH}d" src/VBox/Storage/testcase/vbox-img.cpp
 echo Building...Please wait...
 kmk all >/dev/null 2>&1
 echo Packing...
@@ -93,12 +107,4 @@ modprobe vboxdrv
 EOF
     chmod +x VirtualBox
     chown $USER VirtualBox
-    cat > vbox-img << EOF
-#!/bin/bash
-export LD_LIBRARY_PATH="virtualbox/VirtualBox/out/linux.amd64/release/bin/\
-:virtualbox/lib:virtualbox/lib32:virtualbox/lib64"
-./virtualbox/VirtualBox/out/linux.amd64/release/bin/vbox-img \$*
-EOF
-    chmod +x vbox-img
-    chown $USER vbox-img
 }
