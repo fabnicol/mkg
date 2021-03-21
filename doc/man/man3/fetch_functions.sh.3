@@ -1,4 +1,4 @@
-.TH "fetch_functions.sh" 3 "Mon Mar 15 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "fetch_functions.sh" 3 "Sun Mar 21 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -25,6 +25,10 @@ fetch_functions.sh
 .RI "\fBfetch_process_clonezilla_iso\fP ()"
 .br
 .RI "Download clonezilla ISO file and process it\&. "
+.ti -1c
+.RI "\fBfetch_preprocessed_gentoo_install\fP ()"
+.br
+.RI "Download automatic output of preprocessed_gentoo_install\&.iso from Github Actions at fabnicol/mkg\&.git\&. "
 .ti -1c
 .RI "\fBfetch_clonezilla_with_virtualbox\fP ()"
 .br
@@ -74,7 +78,7 @@ URL is: GITHUB_RELEASE_PATH/WORKFLOW_TAG
 .PP
 
 .PP
-Definition at line 220 of file fetch_functions\&.sh\&.
+Definition at line 261 of file fetch_functions\&.sh\&.
 .SS "fetch_gentoo_install_iso ()"
 
 .PP
@@ -93,7 +97,20 @@ Downloads Gentoo install CD\&. Caches it as ${ISO}
 .PP
 
 .PP
-Definition at line 260 of file fetch_functions\&.sh\&.
+Definition at line 301 of file fetch_functions\&.sh\&.
+.SS "fetch_preprocessed_gentoo_install ()"
+
+.PP
+Download automatic output of preprocessed_gentoo_install\&.iso from Github Actions at fabnicol/mkg\&.git\&. 
+.PP
+\fBNote\fP
+.RS 4
+URL is: GITHUB_RELEASE_PATH2/WORKFLOW_TAG2 
+.RE
+.PP
+
+.PP
+Definition at line 220 of file fetch_functions\&.sh\&.
 .SS "fetch_process_clonezilla_iso ()"
 
 .PP
@@ -132,7 +149,7 @@ Definition at line 169 of file fetch_functions\&.sh\&.
 .PP
 Downloads a fresh stage3 Gentoo archive\&. Caches it as ${STAGE3} 
 .PP
-Definition at line 308 of file fetch_functions\&.sh\&.
+Definition at line 349 of file fetch_functions\&.sh\&.
 .SH "Variable Documentation"
 .PP 
 .SS "Exported String CLONEZILLACD = '${clonezilla_iso}'"

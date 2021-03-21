@@ -81,7 +81,7 @@ written in list form with commas and no spaces:
 The same holds for paths with white space.
 .PP
 .br
-As of tag 1st March, 2021, part of the build is performed
+As of March, 2021, part of the build is performed
 .PD 0
 .P
 .PD
@@ -103,7 +103,8 @@ To disable this behavior
 .P
 .PD
 .br
-you can add \f[C]use_workflow=false\f[R] to command line, or build the
+you can add \f[C]use_clonezilla_workflow=false\f[R] to command line, or
+build the
 .PD 0
 .P
 .PD
@@ -120,6 +121,43 @@ In this case, add:
 .PD
 .br
 \f[C]custom_clonezilla=your_build.iso\f[R]
+.PD 0
+.P
+.PD
+.br
+to command line.
+.PD 0
+.P
+.PD
+.br
+A similar procedure also applies to the minimal Gentoo install ISO.
+.PD 0
+.P
+.PD
+.br
+MKG scripts and the stage3 archive are added within its squashfs
+filesystem
+.PD 0
+.P
+.PD
+.br
+by the \f[I]Github Actions\f[R] workflow of the MKG Github site.
+.PD 0
+.P
+.PD
+.br
+An ISO file labelled \f[B]downloaded.iso\f[R] is automatically released
+.PD 0
+.P
+.PD
+.br
+by the workflow.
+It will be downloaded from the MKG Github release section.
+.PD 0
+.P
+.PD
+.br
+To disable this behavior you can add \f[C]use_mkg_workflow=false\f[R]
 .PD 0
 .P
 .PD
@@ -171,7 +209,9 @@ or simply: \f[C]minimal\f[R] as \f[C]true\f[R] can be omitted (unlike
 .PD
 .br
 \f[C]# nohup ./mkg plot plot_color=red plot_period=10 plot_pause=7\f[R]
-\  \f[C]compact minimal minimal_size  gui=false elist=myebuilds\f[R] \ 
+\ 
+\f[C]compact minimal minimal_size=false  gui=false elist=myebuilds\f[R]
+\ 
 \f[C]email=my.name\[at]gmail.com email_passwd=\[aq]mypasswd\[aq] &\f[R]
 .PD 0
 .P
@@ -235,11 +275,17 @@ dep is a reserved word for dummy defaults of dependencies i.e.
 .PD
 .br
 optional strings that may remain unspecified.
+.PD 0
+.P
+.PD
+.br
+Some options are incompatible, e.g.\ \f[C]test_only\f[R] and
+\f[C]use_mkg_workflow\f[R]
 .PP
 .br
 .TS
 tab(@);
-cw(14.0n) cw(20.0n) cw(14.0n) cw(22.0n).
+cw(13.3n) lw(21.7n) cw(25.0n) cw(10.0n).
 T{
 Option
 T}@T{
@@ -355,8 +401,7 @@ T{
 cloning_method
 T}@T{
 Method used by hot_install ext_device=\&... to intall Gentoo to disk.
-One of: `guestfish' (default), `with-raw-buffer' (slower) or `vbox-img'
-(currently unavailable)
+One of: `guestfish' (default) or `qemu'
 T}@T{
 [ guestfish ]
 T}@T{
@@ -418,6 +463,15 @@ Create Gentoo clone installer on external device.
 T}@T{
 [ ]
 T}@T{
+T}
+T{
+disconnect
+T}@T{
+Unmount guest virtual disk from host.
+T}@T{
+[ true ]
+T}@T{
+b
 T}
 T{
 disable_md5_check
@@ -585,6 +639,15 @@ T}@T{
 s
 T}
 T{
+github_release_path2
+T}@T{
+URL to Github Release of preprocessed_gentoo_install.iso
+T}@T{
+[ path4 ]
+T}@T{
+s
+T}
+T{
 gui
 T}@T{
 Binary: true corresponds to VBoxManage startvm \&... \[en]type=gui,
@@ -661,15 +724,6 @@ T}@T{
 f
 T}
 T{
-lineno_patch
-T}@T{
-Line patched against vbox-img.cpp in virtualbox source code
-T}@T{
-[ 797 ]
-T}@T{
-n
-T}
-T{
 livecd
 T}@T{
 Path to the live CD that will start the VM
@@ -722,7 +776,7 @@ T}@T{
 Remove kernel sources to minimize packaging.
 Not advised for personal use but OK for deployment and distribution.
 T}@T{
-[ false ]
+[ true ]
 T}@T{
 b
 T}
@@ -744,6 +798,17 @@ T}@T{
 [ count ]
 T}@T{
 n
+T}
+T{
+no_run
+T}@T{
+If using \f[B]share_root=`r' or `w'\f[R], do not run the virtual machine
+but use the VDI disk corresponding to vm=\&... Otherwise start 15
+minutes later.
+T}@T{
+[ true ]
+T}@T{
+b
 T}
 T{
 nonroot_user
@@ -894,6 +959,26 @@ T}@T{
 s
 T}
 T{
+shared_dir
+T}@T{
+Host mount point for guest virtual disk filesystem
+T}@T{
+[ /vdi ]
+T}@T{
+s
+T}
+T{
+share_root
+T}@T{
+Mount guest virtual disk to host folder \f[B]shared_folder\f[R].
+Argument is `w' to enable write I/O otherwise read-only mode is assumed.
+May raise security issues, see Wiki.
+T}@T{
+[ dep ]
+T}@T{
+s:shared_dir
+T}
+T{
 size
 T}@T{
 Dynamic disc size
@@ -927,7 +1012,7 @@ T}@T{
 Test whether emerge will be able to install packages in the VM before
 starting it.
 T}@T{
-[ true ]
+[ false ]
 T}@T{
 b
 T}
@@ -940,6 +1025,16 @@ T}@T{
 [ false ]
 T}@T{
 b
+T}
+T{
+timezone
+T}@T{
+Set timezone.
+See /usr/share/zoneinfo for formats.
+T}@T{
+[ US/Eastern ]
+T}@T{
+s
 T}
 T{
 usbehci
@@ -961,7 +1056,17 @@ T}@T{
 o
 T}
 T{
-use_workflow
+use_qemu
+T}@T{
+Use qemu instead of guestfish for installing Gentoo to block device with
+\f[B]hot_install\f[R] or with \f[B]share_root\f[R]
+T}@T{
+[ false ]
+T}@T{
+b
+T}
+T{
+use_clonezilla_workflow
 T}@T{
 Use Github Actions workflow to add virtualbox guest additions to
 CloneZilla ISO.
@@ -971,15 +1076,14 @@ T}@T{
 b
 T}
 T{
-vm
+use_mkg_workflow
 T}@T{
-Virtual Machine name.
-Unless `force=true' is used, a time stamp will be appended to avoid
-registry issues with prior VMs of the same name.
+Use Github Actions workflow to preprocess minimal Gentoo ISO by adding
+MKG scripts inside the squashfs filesystem.
 T}@T{
-[ Gentoo ]
+[ true ]
 T}@T{
-vm
+b
 T}
 T{
 vbox_version
@@ -1007,6 +1111,17 @@ T}@T{
 [ /usr/bin ]
 T}@T{
 d
+T}
+T{
+vm
+T}@T{
+Virtual Machine name.
+Unless `force=true' is used, a time stamp will be appended to avoid
+registry issues with prior VMs of the same name.
+T}@T{
+[ Gentoo ]
+T}@T{
+vm
 T}
 T{
 vm_language
@@ -1046,6 +1161,16 @@ T}@T{
 T}@T{
 s
 T}
+T{
+workflow_tag2
+T}@T{
+Tag version (vX.Y) of the release of file
+preprocessed_gentoo_install.iso by Github Actions (MKG site)
+T}@T{
+[ master ]
+T}@T{
+s
+T}
 .TE
 .PP
 .br
@@ -1062,6 +1187,11 @@ https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20
 .br
 \f[B]path3:\f[R]
 https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/
+.PD 0
+.P
+.PD
+.br
+\f[B]path4:\f[R] https://github.com/fabnicol/mkg/releases/download
 .PD 0
 .P
 .PD

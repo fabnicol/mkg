@@ -19,7 +19,7 @@ and emerge software.
 \mbox{\hyperlink{group__mk_file_system_gaa8c398850ee5921a441408b92f32d477}{adjust\+\_\+environment}} ()
 \item 
 \mbox{\hyperlink{group__mk_file_system_ga0a168c36e3839b754f641e6639ff2472}{build\+\_\+kernel}} ()
-\item 
+\begin{DoxyCompactList}\small\item\em -\/--- P\+A\+T\+CH -\/--- \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__mk_file_system_gab693423f511d21225dbc60b2782190c3}{install\+\_\+software}} ()
 \item 
 \mbox{\hyperlink{group__mk_file_system_ga30f3fc39fcff53af9710fea740f38109}{global\+\_\+config}} ()
@@ -59,6 +59,12 @@ Definition at line 40 of file mkvm\+\_\+chroot.\+sh.
 \doxysubsubsection{\texorpdfstring{build\_kernel()}{build\_kernel()}}
 {\footnotesize\ttfamily build\+\_\+kernel (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
 
+
+
+-\/--- P\+A\+T\+CH -\/--- 
+
+-\/--- End of patch -\/---
+
 \begin{DoxyItemize}
 \item Emerge {\bfseries{gentoo-\/sources}}, {\bfseries{genkernel}}, {\bfseries{pciutils}} and {\bfseries{linux-\/firmware}} \item Mount /dev/sda2 to /boot/ \item Build kernel and initramfs. Log into kernel.\+log. 
 \begin{DoxyRetVals}{Return values}
@@ -68,7 +74,7 @@ Definition at line 40 of file mkvm\+\_\+chroot.\+sh.
 \end{DoxyItemize}
 
 
-Definition at line 186 of file mkvm\+\_\+chroot.\+sh.
+Definition at line 204 of file mkvm\+\_\+chroot.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_ga9caaa1f5ea6177e55f13ebe7dec2bd60}\label{group__mk_file_system_ga9caaa1f5ea6177e55f13ebe7dec2bd60}} 
 \index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!finalize@{finalize}}
@@ -93,13 +99,13 @@ Definition at line 311 of file mkvm.\+sh.
 {\footnotesize\ttfamily global\+\_\+config (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
 
 \begin{DoxyItemize}
-\item Cleanup log, distfiles (for deployment), kernel build sources and objects \item Log this into {\bfseries{log\+\_\+uninstall\+\_\+software}} \item Update {\bfseries{eix}} cache. Sets displaymanager for {\bfseries{xdm}}. \item Add services\+: {\bfseries{sysklog, cronie, xdm, dbus, elogind}} \item Substitute {\bfseries{Network\+Manager}} to temporary networking setup. \item Adjust group and {\bfseries{sudo}} settings for non-\/root user and {\bfseries{sddm}} \item Install {\bfseries{grub}} in E\+FI mode. \item Set passwords for root and non-\/root user. \begin{DoxyWarning}{Warning}
+\item Cleanup log, distfiles (for deployment), kernel build sources and objects \item Log this into {\bfseries{log\+\_\+uninstall\+\_\+software}} \item Update {\bfseries{eix}} cache. Sets display for {\bfseries{display-\/manager}}. \item Add services\+: {\bfseries{sysklog, cronie, display-\/manager, dbus, elogind}} \item Substitute {\bfseries{Network\+Manager}} to temporary networking setup. \item Adjust group and {\bfseries{sudo}} settings for non-\/root user and {\bfseries{sddm}} \item Install {\bfseries{grub}} in E\+FI mode. \item Set passwords for root and non-\/root user. \begin{DoxyWarning}{Warning}
 Fix {\bfseries{sddm}} startup keyboard issue using {\ttfamily  setxkbmap} 
 \end{DoxyWarning}
 \end{DoxyItemize}
 
 
-Definition at line 329 of file mkvm\+\_\+chroot.\+sh.
+Definition at line 350 of file mkvm\+\_\+chroot.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_gab693423f511d21225dbc60b2782190c3}\label{group__mk_file_system_gab693423f511d21225dbc60b2782190c3}} 
 \index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!install\_software@{install\_software}}
@@ -118,7 +124,7 @@ Definition at line 329 of file mkvm\+\_\+chroot.\+sh.
 \end{DoxyItemize}
 
 
-Definition at line 247 of file mkvm\+\_\+chroot.\+sh.
+Definition at line 265 of file mkvm\+\_\+chroot.\+sh.
 
 \mbox{\Hypertarget{group__mk_file_system_ga57eb97a585b6daafed0d93e57b96cca3}\label{group__mk_file_system_ga57eb97a585b6daafed0d93e57b96cca3}} 
 \index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!install\_stage3@{install\_stage3}}

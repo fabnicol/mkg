@@ -1,4 +1,4 @@
-.TH "mkFileSystem" 3 "Mon Mar 15 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "mkFileSystem" 3 "Sun Mar 21 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -31,6 +31,7 @@ mkFileSystem \- and emerge software\&.
 .ti -1c
 .RI "\fBbuild_kernel\fP ()"
 .br
+.RI "---- PATCH ---- "
 .ti -1c
 .RI "\fBinstall_software\fP ()"
 .br
@@ -81,8 +82,10 @@ Add more regional options by parametrization of commandline
 Definition at line 40 of file mkvm_chroot\&.sh\&.
 .SS "build_kernel ()"
 
+.PP
+---- PATCH ---- ---- End of patch ----
+.PP
 .PD 0
-
 .IP "\(bu" 2
 Emerge \fBgentoo-sources\fP, \fBgenkernel\fP, \fBpciutils\fP and \fBlinux-firmware\fP 
 .IP "\(bu" 2
@@ -99,7 +102,7 @@ Build kernel and initramfs\&. Log into kernel\&.log\&.
 .PP
 
 .PP
-Definition at line 186 of file mkvm_chroot\&.sh\&.
+Definition at line 204 of file mkvm_chroot\&.sh\&.
 .SS "finalize ()"
 
 .PP
@@ -125,9 +128,9 @@ Cleanup log, distfiles (for deployment), kernel build sources and objects
 .IP "\(bu" 2
 Log this into \fBlog_uninstall_software\fP 
 .IP "\(bu" 2
-Update \fBeix\fP cache\&. Sets displaymanager for \fBxdm\fP\&. 
+Update \fBeix\fP cache\&. Sets display for \fBdisplay-manager\fP\&. 
 .IP "\(bu" 2
-Add services: \fBsysklog, cronie, xdm, dbus, elogind\fP 
+Add services: \fBsysklog, cronie, display-manager, dbus, elogind\fP 
 .IP "\(bu" 2
 Substitute \fBNetworkManager\fP to temporary networking setup\&. 
 .IP "\(bu" 2
@@ -146,7 +149,7 @@ Fix \fBsddm\fP startup keyboard issue using \fC setxkbmap\fP
 .PP
 
 .PP
-Definition at line 329 of file mkvm_chroot\&.sh\&.
+Definition at line 350 of file mkvm_chroot\&.sh\&.
 .SS "install_software ()"
 
 .PD 0
@@ -170,7 +173,7 @@ Add a script to build R dependencies
 .PP
 
 .PP
-Definition at line 247 of file mkvm_chroot\&.sh\&.
+Definition at line 265 of file mkvm_chroot\&.sh\&.
 .SS "install_stage3 ()"
 
 .PD 0
