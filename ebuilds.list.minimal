@@ -5,6 +5,7 @@
  app-portage/gentoolkit
  dev-libs/re2
  dev-vcs/git
+ gui-libs/display-manager-init
  kde-plasma/sddm-kcm
  net-misc/dhcpcd
  net-wireless/iw 

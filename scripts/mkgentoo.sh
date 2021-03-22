@@ -592,7 +592,7 @@ test_cli_post() {
     # use FORCE on mounting VM with qemu
     # just to avoid time stamps
 
-    "${SHARE_ROOT}" && FORCE=true
+    [ -n "${SHARE_ROOT}" ] && [ "${SHARE_ROOT}" != "dep" ] && && FORCE=true
 
     # Tests existence of GNUPlot on system
 
