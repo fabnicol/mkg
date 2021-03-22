@@ -11,7 +11,10 @@ https://github.com/fabnicol/mkg/wiki/Frequently-Asked-Questions-(FAQ)#what-depen
 ### Portability source code
 
 The auxiliary tool `uuid` is an obligatory dependency of MKG.   
-The source package of the `uuid` auxiliary tool has been added to enhance
+On Debian-style platforms, use `sudo apt install uuid`.   
+On Gentoo itself as a host, use `emerge -u sys-apps/util-linux`.    
+MKG will then make use of `uuidgen` instead of `uuid`.    
+For other platforms, the source package of the `uuid` auxiliary tool has been added to enhance
 portability.   
 Should you need to install it, please perform installation as follows:
    
