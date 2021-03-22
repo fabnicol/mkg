@@ -1,6 +1,6 @@
 name: Publish Docker image
 on:
-  release:
+  release: release-gnome 
     types: [published]
 jobs:
   push_to_registry:
