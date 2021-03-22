@@ -353,7 +353,7 @@ global_config() {
 
     echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
         | tee -a sddm.log
-    echo "setxkbmap ${VM_LANGUAGE},us" > /usr/share/sddm/scripts/Xsetup \
+    echo "setxkbmap ${VM_LANGUAGE},us" >> /usr/share/sddm/scripts/Xsetup \
         | tee -a sddm.log
     chmod +x /usr/share/sddm/scripts/Xsetup
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \

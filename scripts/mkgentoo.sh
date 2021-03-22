@@ -589,6 +589,11 @@ for ${sw}"
 
 test_cli_post() {
 
+    # use FORCE on mounting VM with qemu
+    # just to avoid time stamps
+
+    "${SHARE_ROOT}" && FORCE=true
+
     # Tests existence of GNUPlot on system
 
     if "${PLOT}"
@@ -2424,7 +2429,7 @@ main() {
                "VBoxManage" "curl" "grep" "lsblk" "awk" \
                "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
 
-    if ! $(which uuid) && ! $(which uuidgen)
+    if ! $(which uuid) && ! $(which uuidgen) >/dev/null
     then
         ${LOG[*]} "[ERR] Did not find uuid or uuidgen. Intall the uuid package"
         exit 1
@@ -2447,11 +2452,11 @@ main() {
     # machine
 
     # Delayed daemonized script for mounting VDI disk to ${SHARED_DIR}
-
     if [ "${SHARE_ROOT}" != "dep" ]
     then
         export SHARE_ROOT
         export SHARED_DIR
+        "${VERBOSE}" && ${LOG[*]} "[MSG] Trying to mount ${VM} to ${SHARE_ROOT_DIR}"
         if "${NO_RUN}"
         then
             mount_shared_dir_daemon
