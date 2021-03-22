@@ -1,18 +1,19 @@
 # System and management
+ app-portage/eix
  app-admin/sudo
  app-admin/sysklogd
  app-portage/gentoolkit
- sys-process/cronie
- sys-apps/mlocate
- sys-fs/e2fsprogs
- sys-fs/dosfstools
+ dev-libs/re2
+ dev-vcs/git
+ gui-libs/display-manager-init
  net-misc/dhcpcd
  net-wireless/iw 
  net-wireless/wpa_supplicant
- app-portage/eix
- dev-libs/re2
+ sys-apps/mlocate
  sys-boot/grub:2
- dev-vcs/git
+ sys-fs/e2fsprogs
+ sys-fs/dosfstools
+ virtual/cron
  x11-apps/xdm
  
 ## GNOME
