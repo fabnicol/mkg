@@ -287,18 +287,17 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN --with-bdeps=y --keep-going ${packages}  2>&1 \
-    | tee -a log_install_software.log
+        | tee -a log_install_software.log
     local res_install=$?
+
+    emerge gdm
 
     if [ "${res_install}" != "0" ]
     then
-	# one more chance, who knows
-	emerge --resume | tee -a log_install_software.log
-    res_install=$?
+	    # one more chance, who knows
+  	    emerge --resume | tee -a log_install_software.log
         res_install=$?
     fi
-
-    emerge gdm
 
     if [ $? != 0 ]
     then
@@ -351,17 +350,8 @@ install_software() {
 
 global_config() {
 
-    # Configuration --- sddm
-
-    echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
-        | tee -a sddm.log
-    echo "setxkbmap ${VM_LANGUAGE},us" > /usr/share/sddm/scripts/Xsetup \
-        | tee -a sddm.log
-    chmod +x /usr/share/sddm/scripts/Xsetup
-    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
-        /etc/conf.d/display-manager | tee -a sddm.log
-
-    gpasswd -a sddm video
+    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="gdm"/' \
+                /etc/conf.d/display-manager | tee -a gdm.log
 
     #--- Services
 
