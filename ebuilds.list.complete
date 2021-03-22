@@ -1,21 +1,21 @@
 # System and management
  app-admin/sudo
  app-admin/sysklogd
+ app-portage/eix
  app-portage/gentoolkit
- sys-process/cronie
- sys-apps/mlocate
- sys-fs/e2fsprogs
- sys-fs/dosfstools
+ dev-libs/re2
+ dev-vcs/git
+ kde-plasma/sddm-kcm
  net-misc/dhcpcd
  net-wireless/iw 
  net-wireless/wpa_supplicant
- app-portage/eix
- dev-libs/re2
- dev-vcs/git
+ sys-apps/mlocate
+ sys-fs/dosfstools
+ sys-fs/e2fsprogs
  sys-boot/grub:2
- x11-apps/xdm
+ virtual/cron
  x11-misc/sddm 
- kde-plasma/sddm-kcm
+ x11-apps/xdm
  
 # Data science
 
@@ -40,12 +40,12 @@
 
  app-office/libreoffice
  kate
- konsole
  kde-apps/dolphin
  konqueror
+ konsole
 
 ## PDF-related
  
- okular
- dev-texlive/texlive-latex
  app-text/texlive
+ dev-texlive/texlive-latex
+ okular
