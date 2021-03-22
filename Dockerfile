@@ -9,7 +9,6 @@ RUN apt-get update && \
     apt-get install --no-install-recommends -y \
           libguestfs-tools \
           qemu-utils \
-          linux-image-generic \
           uuid \
           dos2unix \
           squashfs-tools \
@@ -19,7 +18,10 @@ RUN apt-get update && \
           util-linux \
           xorriso \
           xz-utils \
-          virtualbox
+          virtualbox \
+          rsync \
+          curl
+              
 
 ENV LIBGUESTFS_BACKEND=direct \
     HOME=/root
