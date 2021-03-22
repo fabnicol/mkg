@@ -1,6 +1,6 @@
 name: Publish Docker image
 on:
-  release:
+  release: release-master
     types: [published]
 jobs:
   push_to_registry:
