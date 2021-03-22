@@ -36,7 +36,7 @@ jobs:
       - uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
           delete_release: true # default: false
-          tag_name: master # tag name to delete
+          tag_name: master-release # tag name to delete
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -47,7 +47,7 @@ jobs:
             for asset in checksums.txt latest-install-amd64-minimal.txt latest-stage3-amd64.txt downloaded.iso; do
             assets+=("-a" "$asset")
             done
-            tag_name="${GITHUB_REF##*/}"
+            tag_name="master-release"
             hub release create  "${assets[@]}" \
             -m "Release $tag_name" \
             -m "This release was automatically created by the Git Actions workflow corresponding to directory .github in the repository." \
