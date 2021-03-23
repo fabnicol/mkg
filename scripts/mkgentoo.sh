@@ -1774,6 +1774,12 @@ ${VMPATH}/ISOFILES/home/partimag"
 
 mount_vdi() {
 
+    if [ "$1" != "w" ] && [ "$1" != "r" ]
+    then
+        ${LOG[*]} "[ERR] share_root must have 'w' or 'r' as argument"
+        exit 1
+    fi
+
     cd "${VMPATH}" || exit 2
     if ! [ -d "${SHARED_ROOT_DIR}" ]
     then
@@ -1804,7 +1810,6 @@ so that **modprobe nbd** succeeds."
         then
             "${QEMU_NBD_BINARY}" -c /dev/nbd${j} -f vdi "${VM}.vdi"
         else
-            echo "j=$j"
             "${QEMU_NBD_BINARY}" --read-only -c /dev/nbd${j} -f vdi "${VM}.vdi"
         fi
         local res=$?
@@ -1820,7 +1825,12 @@ so that **modprobe nbd** succeeds."
 
         sync
         sleep 2
-        mount /dev/nbd${j}p4 "${SHARED_ROOT_DIR}"
+        if [ "$1" = "w" ]
+        then
+            mount /dev/nbd${j}p4 "${SHARED_ROOT_DIR}"
+        else
+            mount -o ro,norecovery /dev/nbd${j}p4 "${SHARED_ROOT_DIR}"
+        fi
 
         if [ $? != 0 ]
         then
@@ -1832,7 +1842,12 @@ to ${SHARED_ROOT_DIR}."
             continue
         fi
 
-        mount /dev/nbd${j}p2 "${SHARED_ROOT_DIR}/boot"
+        if [ "$1" = "w" ]
+        then
+            mount /dev/nbd${j}p2 "${SHARED_ROOT_DIR}/boot"
+        else
+            mount -o ro /dev/nbd${j}p2 "${SHARED_ROOT_DIR}/boot"
+        fi
 
         if [ $? != 0 ]
         then
@@ -1896,13 +1911,23 @@ ${SHARED_ROOT_DIR} for /dev/nbd${j}p4"
 
     if [ -n "${SHARED_ROOT_DIR}" ] && [ -d "${SHARED_ROOT_DIR}" ]
     then
-        umount  /dev/nbd${j}p2
-        umount  /dev/nbd${j}p4
-        sync
+        if mountpoint -q "${SHARED_ROOT_DIR}/boot"
+        then
+            umount -l "${SHARED_ROOT_DIR}/boot"
+        fi
+        if mountpoint -q "${SHARED_ROOT_DIR}"
+        then
+            umount -l  "${SHARED_ROOT_DIR}"
+        fi
+
         if_fails $? "[ERR] Failed to unmount ${res}. \
 Proceed manually."
+        sync
+
         [ -z "${QEMU_NBD_BINARY}" ] && QEMU_NBD_BINARY="$(which qemu-nbd)"
+
         "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
+
         if_fails $? "[ERR] Failed to disconnect loop device /dev/nbd${j}. \
 Proceed manually."
         sync
@@ -2427,7 +2452,8 @@ main() {
 
     # Gentoo has uuidgen while Ubuntu has uuid
 
-    if ! $(which uuid) && ! $(which uuidgen)
+    if ! $(which uuid) >/dev/null 2>&1 \
+           && ! $(which uuidgen) >/dev/null 2>&1
     then
         ${LOG[*]} "[ERR] Did not find uuid or uuidgen. Intall the uuid package"
          exit 1
