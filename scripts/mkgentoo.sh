@@ -592,7 +592,7 @@ test_cli_post() {
     # use FORCE on mounting VM with qemu
     # just to avoid time stamps
 
-    [ -n "${SHARE_ROOT}" ] && [ "${SHARE_ROOT}" != "dep" ] && && FORCE=true
+    [ -n "${SHARE_ROOT}" ] && [ "${SHARE_ROOT}" != "dep" ] && FORCE=true
 
     # Tests existence of GNUPlot on system
 
@@ -1776,15 +1776,15 @@ mount_vdi() {
     cd "${VMPATH}" || exit 2
     if ! [ -d "${SHARED_ROOT_DIR}" ]
     then
-        logger -s "[ERR] \"${SHARED_ROOT_DIR}\" is not a directory."
+        ${LOG[*]}  "[ERR] \"${SHARED_ROOT_DIR}\" is not a directory."
         exit 1
     fi
 
     if [ "$1" = "w" ]
     then
-        logger -s "[WAR] Enabling write mode for VDI mount."
-        logger -s "[WAR] This may cause security issues: take care of I/O and"
-        logger -s "[WAR] networking security."
+        ${LOG[*]} "[WAR] Enabling write mode for VDI mount."
+        ${LOG[*]} "[WAR] This may cause security issues: take care of I/O and"
+        ${LOG[*]} "[WAR] networking security."
     fi
 
     check_tool qemu-nbd
@@ -1797,47 +1797,62 @@ so that **modprobe nbd** succeeds."
 
     declare -i j=1
 
-    while [ $j -le 10 ]
+    while [ $j -le 50 ]
     do
         if [ "$1" = "w" ]
         then
-            "${QEMU_NBD_BINARY}" -c /dev/nbd${j} -f vdi "${VM}.vdi"
+            "${QEMU_NBD_BINARY}" -c /dev/nbd${j} -f vdi "${VM}.vdi" >/dev/null 2>&1
         else
-            echo "j=$j"
-            "${QEMU_NBD_BINARY}" --read-only -c /dev/nbd${j} -f vdi "${VM}.vdi"
+            "${QEMU_NBD_BINARY}" --read-only -c /dev/nbd${j} -f vdi "${VM}.vdi" >/dev/null 2>&1
         fi
         local res=$?
         if [ $res = 0 ]
         then
-            echo "[MSG] Connected /dev/nbd${j}"
+            ${LOG[*]} "[MSG] Connected /dev/nbd${j}"
         else
-            echo "[WAR] Could not connect VDI disk, qemu exit code: $res"
-            echo "      looping nbd${j}..."
+            if [ "${VERBOSE}" = "true" ]
+            then
+                 ${LOG[*]} "[WAR] Could not connect VDI disk, qemu exit code: $res"
+                 ${LOG[*]} "[WAR] Looping nbd${j}..."
+            fi
             j=j+1
             continue
         fi
 
         sync
         sleep 2
-        mount /dev/nbd${j}p4 "${SHARED_ROOT_DIR}"
+        if [ "$1" = "w" ]
+        then
+            mount /dev/nbd${j}p4 "${SHARED_ROOT_DIR}" >/dev/null 2>&1
+        else
+            mount -o ro,norecovery /dev/nbd${j}p4 "${SHARED_ROOT_DIR}" >/dev/null 2>&1
+        fi
 
         if [ $? != 0 ]
         then
-            echo "[WAR] Failed to mount virtual disk ${VM}.vdi root \
+            if [ "${VERBOSE}" = "true" ]
+            then
+                ${LOG[*]} "[WAR] Failed to mount virtual disk ${VM}.vdi root \
 to ${SHARED_ROOT_DIR}."
-            echo "      Looping nbd${j}..."
+                ${LOG[*]} "[WAR] Looping nbd${j}..."
+            fi
+
             j=j+1
             "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
             continue
         fi
 
-        mount /dev/nbd${j}p2 "${SHARED_ROOT_DIR}/boot"
+        mount /dev/nbd${j}p2 "${SHARED_ROOT_DIR}/boot" >/dev/null 2>&1
 
         if [ $? != 0 ]
         then
-            echo "[WAR] Failed to mount virtual disk ${VM}.vdi kernel \
+            if [ "${VERBOSE}" = "true" ]
+            then
+                ${LOG[*]} "[WAR] Failed to mount virtual disk ${VM}.vdi kernel \
 to ${SHARED_ROOT_DIR} boot directory."
-            echo "      Looping nbd${j}..."
+                ${LOG[*]} "[WAR] Looping nbd${j}..."
+            fi
+
             j=j+1
             "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
             continue
@@ -1866,7 +1881,7 @@ unmount_vdi() {
 do you want to disconnect?" res || res="$1"
         if ! [ -n "${res}" ]
         then
-            logger -s "[ERR] Enter an explicit value for \
+            ${LOG[*]} "[ERR] Enter an explicit value for \
 mountpoint."
             exit 1
         fi
@@ -1877,33 +1892,61 @@ mountpoint."
         SHARED_ROOT_DIR="${res}"
     else
         declare -i j=1
-        while [ $j -le 10 ]
+        while [ $j -le 50 ]
         do
             SHARED_ROOT_DIR="$(get_mountpoint nbd${j}p4)"
             if [ -z "${SHARED_ROOT_DIR}" ] || ! [ -d "${SHARED_ROOT_DIR}" ]
             then
-                logger -s "[WAR] Could not find mountpoint \
+                if [ "${VERBOSE}" = "true" ]
+                then
+                    ${LOG[*]} "[WAR] Could not find mountpoint \
 directory for /dev/nbd${j}p4"
+                fi
             else
-                logger -s "[MSG] Found mountpoint \
+                if [ "${VERBOSE}" = "true" ]
+                then
+                    ${LOG[*]} "[MSG] Found mountpoint \
 ${SHARED_ROOT_DIR} for /dev/nbd${j}p4"
+                fi
                 break
             fi
             j=j+1
         done
     fi
 
-    if [ -n "${SHARED_ROOT_DIR}" ] && [ -d "${SHARED_ROOT_DIR}" ]
+    if [ -n "${SHARED_ROOT_DIR}" ] && [ -d "${SHARED_ROOT_DIR}" ] >/dev/null 2>&1
     then
-        umount  /dev/nbd${j}p2
-        umount  /dev/nbd${j}p4
-        sync
+        if mountpoint -q "${SHARED_ROOT_DIR}/boot"
+        then
+            umount -l "${SHARED_ROOT_DIR}/boot"
+        fi
+        if mountpoint -q "${SHARED_ROOT_DIR}"
+        then
+            umount -l  "${SHARED_ROOT_DIR}"
+        fi
+
         if_fails $? "[ERR] Failed to unmount ${res}. \
 Proceed manually."
+        sync
         [ -z "${QEMU_NBD_BINARY}" ] && QEMU_NBD_BINARY="$(which qemu-nbd)"
-        "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
+
+        "${QEMU_NBD_BINARY}" -d /dev/nbd${j} 2>&1 | xargs logger -s "[MSG] "
+
         if_fails $? "[ERR] Failed to disconnect loop device /dev/nbd${j}. \
 Proceed manually."
+
+        # double check in /proc/mounts
+        # experience shows that "/proc/mounts pollution" may happen
+        declare -i j=1
+        while [ $j -le 50 ]
+        do
+            if findmnt  /dev/nbd${j}p4 >/dev/null 2>&1
+            then
+                umount -l /dev/nbd${j}p4 >/dev/null 2>&1
+            fi
+            j=j+1
+        done
+
         sync
         sleep 2
         exit 0
@@ -2429,7 +2472,8 @@ main() {
                "VBoxManage" "curl" "grep" "lsblk" "awk" \
                "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
 
-    if ! $(which uuid) && ! $(which uuidgen) >/dev/null
+    if ! $(which uuid) >/dev/null 2>&1 \
+           && ! $(which uuidgen) >/dev/null 2>&1
     then
         ${LOG[*]} "[ERR] Did not find uuid or uuidgen. Intall the uuid package"
         exit 1
