@@ -591,6 +591,8 @@ for ${sw}"
 
 test_cli_post() {
 
+    [ -n "${SHARE_ROOT}" ] && [ "${SHARE_ROOT}" != "dep" ] && FORCE=true
+
     # Tests existence of GNUPlot on system
 
     if "${PLOT}"
