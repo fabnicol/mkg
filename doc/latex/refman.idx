@@ -80,37 +80,37 @@
 \indexentry{partition@{partition}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{26}
 \indexentry{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}!setup\_network@{setup\_network}|hyperpage}{26}
 \indexentry{setup\_network@{setup\_network}!Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}|hyperpage}{26}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{28}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{27}
 \indexentry{Auxiliary functions to check@{Auxiliary functions to check}!bind\_filesystem@{bind\_filesystem}|hyperpage}{28}
 \indexentry{bind\_filesystem@{bind\_filesystem}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{28}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!burn\_iso@{burn\_iso}|hyperpage}{29}
-\indexentry{burn\_iso@{burn\_iso}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{29}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_dir@{check\_dir}|hyperpage}{29}
-\indexentry{check\_dir@{check\_dir}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{29}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!burn\_iso@{burn\_iso}|hyperpage}{28}
+\indexentry{burn\_iso@{burn\_iso}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{28}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_dir@{check\_dir}|hyperpage}{28}
+\indexentry{check\_dir@{check\_dir}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{28}
 \indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_file@{check\_file}|hyperpage}{29}
 \indexentry{check\_file@{check\_file}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{29}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_files@{check\_files}|hyperpage}{30}
-\indexentry{check\_files@{check\_files}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{30}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_files@{check\_files}|hyperpage}{29}
+\indexentry{check\_files@{check\_files}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{29}
 \indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_md5sum@{check\_md5sum}|hyperpage}{30}
 \indexentry{check\_md5sum@{check\_md5sum}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{30}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_tool@{check\_tool}|hyperpage}{31}
-\indexentry{check\_tool@{check\_tool}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{31}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!check\_tool@{check\_tool}|hyperpage}{30}
+\indexentry{check\_tool@{check\_tool}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{30}
 \indexentry{Auxiliary functions to check@{Auxiliary functions to check}!cleanup@{cleanup}|hyperpage}{31}
 \indexentry{cleanup@{cleanup}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{31}
 \indexentry{Auxiliary functions to check@{Auxiliary functions to check}!create\_install\_ext\_device@{create\_install\_ext\_device}|hyperpage}{31}
 \indexentry{create\_install\_ext\_device@{create\_install\_ext\_device}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{31}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!create\_options\_array@{create\_options\_array}|hyperpage}{32}
-\indexentry{create\_options\_array@{create\_options\_array}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{32}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!if\_fails@{if\_fails}|hyperpage}{32}
-\indexentry{if\_fails@{if\_fails}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{32}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}|hyperpage}{33}
-\indexentry{recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{33}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!send\_mail@{send\_mail}|hyperpage}{33}
-\indexentry{send\_mail@{send\_mail}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{33}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!create\_options\_array@{create\_options\_array}|hyperpage}{31}
+\indexentry{create\_options\_array@{create\_options\_array}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{31}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!if\_fails@{if\_fails}|hyperpage}{31}
+\indexentry{if\_fails@{if\_fails}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{31}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}|hyperpage}{32}
+\indexentry{recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{32}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!send\_mail@{send\_mail}|hyperpage}{32}
+\indexentry{send\_mail@{send\_mail}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{32}
 \indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_numeric@{test\_numeric}|hyperpage}{33}
 \indexentry{test\_numeric@{test\_numeric}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{33}
-\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_URL@{test\_URL}|hyperpage}{34}
-\indexentry{test\_URL@{test\_URL}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{34}
+\indexentry{Auxiliary functions to check@{Auxiliary functions to check}!test\_URL@{test\_URL}|hyperpage}{33}
+\indexentry{test\_URL@{test\_URL}!Auxiliary functions to check@{Auxiliary functions to check}|hyperpage}{33}
 \indexentry{build\_virtualbox.sh@{build\_virtualbox.sh}|hyperpage}{35}
 \indexentry{build\_virtualbox.sh@{build\_virtualbox.sh}!DEBIAN\_FRONTEND@{DEBIAN\_FRONTEND}|hyperpage}{35}
 \indexentry{DEBIAN\_FRONTEND@{DEBIAN\_FRONTEND}!build\_virtualbox.sh@{build\_virtualbox.sh}|hyperpage}{35}

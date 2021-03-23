@@ -9,22 +9,22 @@
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{21}
   \item {ARRAY\_LENGTH}
     \subitem {utils.sh}, \hyperpage{47}
-  \item {Auxiliary functions to check}, \hyperpage{28}
+  \item {Auxiliary functions to check}, \hyperpage{27}
     \subitem {bind\_filesystem}, \hyperpage{28}
-    \subitem {burn\_iso}, \hyperpage{29}
-    \subitem {check\_dir}, \hyperpage{29}
+    \subitem {burn\_iso}, \hyperpage{28}
+    \subitem {check\_dir}, \hyperpage{28}
     \subitem {check\_file}, \hyperpage{29}
-    \subitem {check\_files}, \hyperpage{30}
+    \subitem {check\_files}, \hyperpage{29}
     \subitem {check\_md5sum}, \hyperpage{30}
-    \subitem {check\_tool}, \hyperpage{31}
+    \subitem {check\_tool}, \hyperpage{30}
     \subitem {cleanup}, \hyperpage{31}
     \subitem {create\_install\_ext\_device}, \hyperpage{31}
-    \subitem {create\_options\_array}, \hyperpage{32}
-    \subitem {if\_fails}, \hyperpage{32}
-    \subitem {recreate\_liveCD\_ISO}, \hyperpage{33}
-    \subitem {send\_mail}, \hyperpage{33}
+    \subitem {create\_options\_array}, \hyperpage{31}
+    \subitem {if\_fails}, \hyperpage{31}
+    \subitem {recreate\_liveCD\_ISO}, \hyperpage{32}
+    \subitem {send\_mail}, \hyperpage{32}
     \subitem {test\_numeric}, \hyperpage{33}
-    \subitem {test\_URL}, \hyperpage{34}
+    \subitem {test\_URL}, \hyperpage{33}
 
   \indexspace
 
@@ -40,22 +40,22 @@
   \item {build\_virtualbox.sh}, \hyperpage{35}
     \subitem {DEBIAN\_FRONTEND}, \hyperpage{35}
   \item {burn\_iso}
-    \subitem {Auxiliary functions to check}, \hyperpage{29}
+    \subitem {Auxiliary functions to check}, \hyperpage{28}
 
   \indexspace
 
   \item {cache\_uncache\_clonezilla\_iso}
     \subitem {fetch\_functions.sh}, \hyperpage{36}
   \item {check\_dir}
-    \subitem {Auxiliary functions to check}, \hyperpage{29}
+    \subitem {Auxiliary functions to check}, \hyperpage{28}
   \item {check\_file}
     \subitem {Auxiliary functions to check}, \hyperpage{29}
   \item {check\_files}
-    \subitem {Auxiliary functions to check}, \hyperpage{30}
+    \subitem {Auxiliary functions to check}, \hyperpage{29}
   \item {check\_md5sum}
     \subitem {Auxiliary functions to check}, \hyperpage{30}
   \item {check\_tool}
-    \subitem {Auxiliary functions to check}, \hyperpage{31}
+    \subitem {Auxiliary functions to check}, \hyperpage{30}
   \item {cleanup}
     \subitem {Auxiliary functions to check}, \hyperpage{31}
   \item {clone\_vm\_to\_device}
@@ -118,7 +118,7 @@
   \item {create\_iso\_vm}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{15}
   \item {create\_options\_array}
-    \subitem {Auxiliary functions to check}, \hyperpage{32}
+    \subitem {Auxiliary functions to check}, \hyperpage{31}
   \item {create\_vm}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{15}
 
@@ -185,7 +185,7 @@
   \indexspace
 
   \item {if\_fails}
-    \subitem {Auxiliary functions to check}, \hyperpage{32}
+    \subitem {Auxiliary functions to check}, \hyperpage{31}
   \item {install\_software}
     \subitem {Create Gentoo linux filesystem on VM disk}, 
 		\hyperpage{25}
@@ -252,7 +252,7 @@
   \indexspace
 
   \item {recreate\_liveCD\_ISO}
-    \subitem {Auxiliary functions to check}, \hyperpage{33}
+    \subitem {Auxiliary functions to check}, \hyperpage{32}
   \item {res}
     \subitem {mkvm\_chroot.sh}, \hyperpage{45}
   \item {run\_mount\_shared\_dir.sh}, \hyperpage{45}
@@ -261,7 +261,7 @@
   \indexspace
 
   \item {send\_mail}
-    \subitem {Auxiliary functions to check}, \hyperpage{33}
+    \subitem {Auxiliary functions to check}, \hyperpage{32}
   \item {setup\_network}
     \subitem {Create Gentoo linux filesystem on VM disk}, 
 		\hyperpage{26}
@@ -285,7 +285,7 @@
   \item {test\_numeric}
     \subitem {Auxiliary functions to check}, \hyperpage{33}
   \item {test\_URL}
-    \subitem {Auxiliary functions to check}, \hyperpage{34}
+    \subitem {Auxiliary functions to check}, \hyperpage{33}
   \item {test\_vm\_running}
     \subitem {Create Gentoo linux image and installer.}, \hyperpage{20}
 
