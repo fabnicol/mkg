@@ -304,9 +304,10 @@ install_software() {
 	emerge --resume | tee -a log_install_software.log
     fi
 
+    # do not assume true/false unlike in mkgentoo.sh
     # do not use \ to continue line below:
 
-    if ! "${MINIMAL}"
+    if [ "${MINIMAL}" = "false" ]
     then
         # this test is for second-chance debugging runs
 
@@ -316,7 +317,6 @@ install_software() {
 'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" \
              > libs.R
             Rscript libs.R 2>&1 | tee Rlibs.log
-            rm -f libs.R
         fi
     fi
 
@@ -464,7 +464,7 @@ finalize() {
 
     # Final steps: cleaning up
 
-    if ! "${DEBUG_MODE}"
+    if [ "${DEBUG_MODE}" = "false" ]
     then
         rm -rf /var/log/*
         find . -maxdepth 1 -type f -delete
