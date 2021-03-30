@@ -742,6 +742,8 @@ Allowing a 10 second break for second thoughts."
     fi
 
     "${TEST_ONLY}" && TEST_EMERGE=true && USE_MKG_WORKFLOW=false
+    ! "${CREATE_ISO}" && USE_BSDTAR=false
+    "${USE_BSDTAR}" && check_tool "bsdtar"
 
 }
 
@@ -2323,6 +2325,28 @@ CloneZilla CD with VirtualBox and guest additions."
         [ -d ISOFILES ] && rm -rf ISOFILES
         mkdir -p ISOFILES/home/partimag
         check_dir ISOFILES/home/partimag
+        # Using bsdtar make it possible to extract CloneZilla CD from workflows
+        # without having to mount. This is useful within containers as loop mount is
+        # not easily possible in such contexts.
+
+        if "${USE_BSDTAR}"
+        then
+            "${VERBOSE}" && ${LOG[*]} "[MSG] Using bsdtar to extract CloneZilla ISO"
+            local BSDTAR_BINARY="$(which bsdtar)"
+            if [ $? != 0 ] || [ -z "${BSDTAR_BINARY}" ]
+            then
+                ${LOG[*]} "[MSG] bsdtar was not found."
+                USE_BSDTAR=false
+            fi
+        fi
+        if "${USE_BSDTAR}"
+        then
+            cd ISOFILES
+            "${BSDTAR_BINARY}" xpf ../"${CLONEZILLACD}"
+            if_fails $? "[ERR] Could not extract ${CLONEZILLACD} using bsdtar."
+            cd -
+            return 0
+        fi
 
 	    if [ -d mnt2 ]
 	    then
