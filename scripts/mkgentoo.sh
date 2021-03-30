@@ -2382,6 +2382,7 @@ generate_Gentoo() {
     then
         fetch_preprocessed_gentoo_install
         LIVECD=preprocessed_gentoo_install.iso
+        "${DOWNLOAD_ONLY}" && return 0
         ISO=
     else
         ${LOG[*]} "[INF] Fetching live CD..."
@@ -2389,6 +2390,8 @@ generate_Gentoo() {
 
         ${LOG[*]} "[INF] Fetching stage3 tarball..."
         fetch_stage3
+        "${DOWNLOAD_ONLY}" && return 0
+
         if "${TEST_EMERGE}"
         then
             ${LOG[*]} "[INF] Testing whether packages will be emerged..."

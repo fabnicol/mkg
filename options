@@ -39,6 +39,7 @@
      "download_arch"      "Download and install stage3 archive to virtual disk. Booelan."                                         "true" "b"
      "download_clonezilla""Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean" "true" "b"
      "download_clonezilla_path" "Download the following CloneZilla ISO"                                                          "path1" "u"
+     "download_only"      "Only download the Gentoo minimal install ISO and stage3 archive of the day, then exit."               "false" "b"
      "elist"              "File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the 'elist'.accept_keywords and 'elist'.use files" "ebuilds.list" "f"
      "email"              "Email address to send a warning to upon build completion. Note: you will have to accept so-called *insecure software* with some providers. It is not insecure if you are using your private PC throughout."  "" "e"
      "email_passwd"       "Email password"                                                                                      "" "s:email"
