@@ -744,6 +744,8 @@ Allowing a 10 second break for second thoughts."
 
     "${TEST_ONLY}" && TEST_EMERGE=true && USE_MKG_WORKFLOW=false
 
+    ! "${CREATE_ISO}" && USE_BSDTAR=false
+    "${USE_BSDTAR}" && check_tool "bsdtar"
 }
 
 # ---------------------------------------------------------------------------- #
@@ -2342,7 +2344,30 @@ CloneZilla CD with VirtualBox and guest additions."
         mkdir -p ISOFILES/home/partimag
         check_dir ISOFILES/home/partimag
 
-	    if [ -d mnt2 ]
+        # Using bsdtar make it possible to extract CloneZilla CD from workflows
+        # without having to mount. This is useful within containers as loop mount is
+        # not easily possible in such contexts.
+
+        if "${USE_BSDTAR}"
+        then
+            "${VERBOSE}" && ${LOG[*]} "[MSG] Using bsdtar to extract CloneZilla ISO"
+            local BSDTAR_BINARY="$(which bsdtar)"
+            if [ $? != 0 ] || [ -z "${BSDTAR_BINARY}" ]
+            then
+                ${LOG[*]} "[MSG] bsdtar was not found."
+                USE_BSDTAR=false
+            fi
+        fi
+        if "${USE_BSDTAR}"
+        then
+            cd ISOFILES
+            "${BSDTAR_BINARY}" xpf ../"${CLONEZILLACD}"
+            if_fails $? "[ERR] Could not extract ${CLONEZILLACD} using bsdtar."
+            cd -
+            return 0
+        fi
+
+        if [ -d mnt2 ]
 	    then
 		    rm -rf mnt2/
 	        if_fails $? "[ERR] Could not remove directory mnt2. \
@@ -2376,6 +2401,7 @@ generate_Gentoo() {
     then
         fetch_preprocessed_gentoo_install
         LIVECD=preprocessed_gentoo_install.iso
+        "${DOWNLOAD_ONLY}" && return 0
         ISO=
     else
         ${LOG[*]} "[INF] Fetching live CD..."
@@ -2383,17 +2409,19 @@ generate_Gentoo() {
 
         ${LOG[*]} "[INF] Fetching stage3 tarball..."
         fetch_stage3
+        "${DOWNLOAD_ONLY}" && return 0
+
         if "${TEST_EMERGE}"
         then
             ${LOG[*]} "[INF] Testing whether packages will be emerged..."
             test_emerge_step
         fi
         ${LOG[*]} "[INF] Tweaking live CD..."
+        "${TEST_ONLY}" && return 0
         make_boot_from_livecd
     fi
 
     checksums
-    "${TEST_ONLY}" && return 0
 
     if ! "${USE_CLONEZILLA_WORKFLOW}" && "${CREATE_ISO}"
     then

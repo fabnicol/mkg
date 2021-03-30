@@ -1,5 +1,4 @@
 FROM ubuntu:20.04
-MAINTAINER Fabrice Nicol <fabrnicol@gmail.com>
 
 WORKDIR /root
 
@@ -22,7 +21,6 @@ RUN apt-get update && \
           rsync \
           curl
               
-
 ENV LIBGUESTFS_BACKEND=direct \
     HOME=/root
 
