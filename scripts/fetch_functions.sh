@@ -230,7 +230,7 @@ downloaded.iso  -o preprocessed_gentoo_install.iso ${verb} 2>&1 | xargs echo '[I
 
 if_fails $? "[ERR] Could not download preprocessed Gentoo install ISO from URL \
 ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
-
+[ -f checksums.txt ] && rm -f checksums.txt
 ${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}/\
 checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
 
@@ -240,7 +240,6 @@ ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
 if ! ${DISABLE_MD5_CHECK}
 then
   local md5=$(md5sum "preprocessed_gentoo_install.iso" | cut -f 1 -d' ')
-  [ -f checksums.txt ] && rm -f checksums.txt
   local md5_=cat 'checksums.txt' |  xargs | cut -f2 -d' '
   if [ ${md5} != ${md5_} ]
   then
