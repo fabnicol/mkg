@@ -2417,11 +2417,11 @@ generate_Gentoo() {
             test_emerge_step
         fi
         ${LOG[*]} "[INF] Tweaking live CD..."
-        "${TEST_ONLY}" && return 0
         make_boot_from_livecd
     fi
 
     checksums
+    "${TEST_ONLY}" && return 0
 
     if ! "${USE_CLONEZILLA_WORKFLOW}" && "${CREATE_ISO}"
     then
