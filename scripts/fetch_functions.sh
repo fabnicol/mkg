@@ -122,17 +122,17 @@ fetch_clonezilla_iso() {
     local verb=""
     ${LOG[*]} "[INF] Downloading CloneZilla..."
     local clonezilla_file="$(sed -E 's/.*\/(.*)\/download/\1/' \
-                                <<< ${DOWNLOAD_CLONEZILLA_PATH}/releases/download)"
+                                <<< ${DOWNLOAD_CLONEZILLA_PATH})"
     ! "${VERBOSE}" && verb="-s"
-    if ! curl -L "${DOWNLOAD_CLONEZILLA_PATH}/releases/download" \
+    if ! curl -L "${DOWNLOAD_CLONEZILLA_PATH}" \
          -o "${clonezilla_file}" ${verb}
     then
-        ${LOG[*]} "Could not download CloneZilla iso from ${DOWNLOAD_CLONEZILLA_PATH}\
-/releases/download"
+        ${LOG[*]} "Could not download CloneZilla iso from ${DOWNLOAD_CLONEZILLA_PATH}"
         exit 1
     fi
 
     local clonezilla_iso="$(ls clonezilla-live*${PROCESSOR}.iso)"
+    if_fails $? "[ERR] Could not download CloneZilla CD."
 
     if ! "${DISABLE_CHECKSUM}"
     then
