@@ -2342,6 +2342,7 @@ CloneZilla CD with VirtualBox and guest additions."
         if "${USE_BSDTAR}"
         then
             cd ISOFILES
+            if_fails $? "[ERR] Could not cd to ISOFILES directory."
             "${BSDTAR_BINARY}" xpf ../"${CLONEZILLACD}"
             if_fails $? "[ERR] Could not extract ${CLONEZILLACD} using bsdtar."
             cd -

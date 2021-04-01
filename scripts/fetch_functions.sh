@@ -310,24 +310,26 @@ local verb=""
 ! "${VERBOSE}" && verb="-s"
 
 ${LOG[*]} "[INF] Downloading CloneZilla with virtualbox from Github Actions..."
-
+"${VERBOSE}" && ${LOG[*]} "[MSG] URL: ${GITHUB_RELEASE_PATH}/releases/download/${WORKFLOW_TAG}/\
+clonezilla_with_virtualbox.iso"
 ${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/releases/download/${WORKFLOW_TAG}/\
 clonezilla_with_virtualbox.iso  ${verb} 2>&1 | xargs echo '[INF]')"
 
 if_fails $? "[ERR] Could not download stage3 from URL \
 ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}"
 [ -f checksums.txt ] && rm -f checksums.txt
+
 ${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/releases/download/${WORKFLOW_TAG}/\
 checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
 
 if_fails $? "[ERR] Could not download checksums.txt from URL \
 ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}"
 
-if ! ${DISABLE_CHECKSUM}
+if ! "${DISABLE_CHECKSUM}"
 then
   local md5=$(md5sum "clonezilla_with_virtualbox.iso" | cut -f 1 -d' ')
-  local md5_=cat 'checksums.txt' |  xargs | cut -f2 -d' '
-  if [ ${md5} = ${md5_} ]
+  local md5_=$(grep -o -E 'md5sum: [0-9a-z]+' checksums.txt | cut -f2 -d' ')
+  if [ "${md5}" = "${md5_}" ]
   then
       ${LOG[*]} "[MSG] Verified checksum for clonezilla_with_virtualbox.iso"
   else
