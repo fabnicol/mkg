@@ -66,13 +66,33 @@ latest-install-${PROCESSOR}-minimal.txt | sed -E 's/iso.*$/iso/' )"
     then
         curl -L -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" \
              ${verb}
+        curl -L "${MIRROR}/releases/${PROCESSOR}/autobuilds/\
+${current}.DIGESTS.asc" ${verb} -o checksums_install.txt
     else
         ${LOG[*]} "[ERR] Could not download current install iso."
         exit 1
     fi
 
     [ $? != 0 ] && ${LOG[*]} "[ERR] Could not download live CD" && exit 1
-    ! "${DISABLE_MD5_CHECK}" && check_md5sum "${downloaded}"
+
+    if ! "${DISABLE_CHECKSUM}" && [ -f checksums_install.txt ]
+    then
+        sha512=$(sha512sum  "${downloaded}" | cut -f 1 -d ' ')
+        sha512_=$(grep "${downloaded}" checksums_install.txt \
+                      | head -n1 | cut -f 1 -d ' ')
+        if [ -n "${sha512}" ] && [ -n "${sha512_}" ] \
+               &&  [ "${sha512}" != "${sha521_}" ]
+        then
+            ${LOG[*]} "[MSG] Verified SHA512SUM of ${downloaded}."
+        else
+            ${LOG[*]} "[MSG] SHA512SUM of ${downloaded} did not match digest."
+            ${LOG[*]} "[MSG] Computed sha512sum of file: ${sha512}"
+            ${LOG[*]} "[MSG] Digest sha512sum of file: ${sha512_}"
+            exit 1
+        fi
+        rm -f checksums_install.txt
+    fi
+
     if [ -f "${downloaded}" ]
     then
           verb=""
@@ -93,7 +113,6 @@ latest-install-${PROCESSOR}-minimal.txt | sed -E 's/iso.*$/iso/' )"
     fi
 }
 
-
 ## @fn fetch_clonezilla_iso()
 ## @brief Download clonezilla ISO file and caches it.
 ## @ingroup fetchFunctions
@@ -103,15 +122,41 @@ fetch_clonezilla_iso() {
     local verb=""
     ${LOG[*]} "[INF] Downloading CloneZilla..."
     local clonezilla_file="$(sed -E 's/.*\/(.*)\/download/\1/' \
-                                <<< ${DOWNLOAD_CLONEZILLA_PATH})"
+                                <<< ${DOWNLOAD_CLONEZILLA_PATH}/releases/download)"
     ! "${VERBOSE}" && verb="-s"
-    if ! curl -L "${DOWNLOAD_CLONEZILLA_PATH}" -o "${clonezilla_file}" ${verb}
+    if ! curl -L "${DOWNLOAD_CLONEZILLA_PATH}/releases/download" \
+         -o "${clonezilla_file}" ${verb}
     then
-        ${LOG[*]} "Could not download CloneZilla iso from ${DOWNLOAD_CLONEZILLA_PATH}"
+        ${LOG[*]} "Could not download CloneZilla iso from ${DOWNLOAD_CLONEZILLA_PATH}\
+/releases/download"
         exit 1
     fi
+
     local clonezilla_iso="$(ls clonezilla-live*${PROCESSOR}.iso)"
-    [ ${DISABLE_MD5_CHECK} = "false" ] && check_md5sum "${clonezilla_iso}"
+
+    if ! "${DISABLE_CHECKSUM}"
+    then
+       if ! curl -L -O "${GITHUB_RELEASE_PATH}/blob/master/SUMS.txt" ${verb}
+        then
+            ${LOG[*]} "Could not download CloneZilla checksums."
+            exit 1
+        else
+            md5="$(grep -o -E 'MD5SUM: ([0-9a-z]+)' SUMS.txt | cut -f 2 -d' ')"
+            md5_=$(md5sum "${clonezilla_iso}"| cut -f 1 -d' ')
+
+            if [ -n "${md5}" ] && [ -n "${md5_}" ] && [ "${md5}" = "${md5_}" ]
+            then
+                ${LOG[*]} "[MSG] Verified checksum for ${clonezilla_iso}"
+            else
+                ${LOG[*]} "[ERR] Checksum for ${clonezilla_iso} did not match digest:"
+                ${LOG[*]} "[MSG] Computed md5sum of file: ${md5_}"
+                ${LOG[*]} "[MSG] Digest md5sum of file: ${md5}"
+                exit 1
+            fi
+            rm -f SUMS.txt
+        fi
+    fi
+
     export CLONEZILLACD="${clonezilla_iso}"
 
     # first cache it
