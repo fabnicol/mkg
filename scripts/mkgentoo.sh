@@ -213,7 +213,7 @@ help_md() {
 clonezilla_live_alternative/20200703-focal/\
 clonezilla-live-20200703-focal-amd64.iso/download  "
     echo "**path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           "
-    echo "**path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/  "
+    echo "**path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox  "
     echo "**path4:**  https://github.com/fabnicol/mkg/releases/download  "
     echo "**count:** nproc --all / 3  "
 }
@@ -2401,7 +2401,7 @@ generate_Gentoo() {
     then
         fetch_preprocessed_gentoo_install
         LIVECD=preprocessed_gentoo_install.iso
-        "${DOWNLOAD_ONLY}" && return 0
+        "${DOWNLOAD_ONLY}" && exit 0
         ISO=
     else
         ${LOG[*]} "[INF] Fetching live CD..."
@@ -2409,7 +2409,7 @@ generate_Gentoo() {
 
         ${LOG[*]} "[INF] Fetching stage3 tarball..."
         fetch_stage3
-        "${DOWNLOAD_ONLY}" && return 0
+        "${DOWNLOAD_ONLY}" && exit 0
 
         if "${TEST_EMERGE}"
         then
@@ -2421,7 +2421,7 @@ generate_Gentoo() {
     fi
 
     checksums
-    "${TEST_ONLY}" && return 0
+    "${TEST_ONLY}" && exit 0
 
     if ! "${USE_CLONEZILLA_WORKFLOW}" && "${CREATE_ISO}"
     then

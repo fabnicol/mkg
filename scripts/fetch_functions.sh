@@ -66,13 +66,31 @@ latest-install-${PROCESSOR}-minimal.txt | sed -E 's/iso.*$/iso/' )"
     then
         curl -L -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" \
              ${verb}
+        curl -L "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}.DIGESTS.asc" \
+             ${verb} -o checksums_install.txt
     else
         ${LOG[*]} "[ERR] Could not download current install iso."
         exit 1
     fi
 
     [ $? != 0 ] && ${LOG[*]} "[ERR] Could not download live CD" && exit 1
-    ! "${DISABLE_MD5_CHECK}" && check_md5sum "${downloaded}"
+    if ! "${DISABLE_CHECKSUM}" && [ -f checksums_install.txt ]
+    then
+        sha512=$(sha512sum  "${downloaded}" | cut -f 1 -d ' ')
+        sha512_=$(grep "${downloaded}" checksums_install.txt | head -n1 | cut -f 1 -d ' ')
+
+        if [ -n "${sha512}" ] && [ -n "${sha512_}" ] &&  [ "${sha512}" != "${sha521_}" ]
+        then
+            ${LOG[*]} "[MSG] Verified SHA512SUM of ${downloaded}."
+        else
+            ${LOG[*]} "[MSG] SHA512SUM of ${downloaded} did not match digest."
+            ${LOG[*]} "[MSG] Computed sha512sum of file: ${sha512}"
+            ${LOG[*]} "[MSG] Digest sha512sum of file: ${sha512_}"
+            exit 1
+        fi
+        rm -f checksums_install.txt
+    fi
+
     if [ -f "${downloaded}" ]
     then
           verb=""
@@ -103,15 +121,40 @@ fetch_clonezilla_iso() {
     local verb=""
     ${LOG[*]} "[INF] Downloading CloneZilla..."
     local clonezilla_file="$(sed -E 's/.*\/(.*)\/download/\1/' \
-                                <<< ${DOWNLOAD_CLONEZILLA_PATH})"
+                                <<< ${DOWNLOAD_CLONEZILLA_PATH}/releases/download)"
     ! "${VERBOSE}" && verb="-s"
-    if ! curl -L "${DOWNLOAD_CLONEZILLA_PATH}" -o "${clonezilla_file}" ${verb}
+    if ! curl -L "${DOWNLOAD_CLONEZILLA_PATH}/releases/download" \
+         -o "${clonezilla_file}" ${verb}
     then
-        ${LOG[*]} "Could not download CloneZilla iso from ${DOWNLOAD_CLONEZILLA_PATH}"
+        ${LOG[*]} "Could not download CloneZilla iso \
+from ${DOWNLOAD_CLONEZILLA_PATH}/releases/download"
         exit 1
     fi
     local clonezilla_iso="$(ls clonezilla-live*${PROCESSOR}.iso)"
-    [ ${DISABLE_MD5_CHECK} = "false" ] && check_md5sum "${clonezilla_iso}"
+
+    if ! "${DISABLE_CHECKSUM}"
+    then
+        if ! curl -L -O "${GITHUB_RELEASE_PATH}/blob/master/SUMS.txt" ${verb}
+        then
+            ${LOG[*]} "Could not download CloneZilla checksums."
+            exit 1
+        else
+            md5="$(grep -o -E 'MD5SUM: ([0-9a-z]+)' SUMS.txt | cut -f 2 -d' ')"
+            md5_=$(md5sum "${clonezilla_iso}"| cut -f 1 -d' ')
+
+            if [ -n "${md5}" ] && [ -n "${md5_}" ] && [ "${md5}" = "${md5_}" ]
+            then
+                ${LOG[*]} "[MSG] Verified checksum for ${clonezilla_iso}"
+            else
+                ${LOG[*]} "[ERR] Checksum for ${clonezilla_iso} did not match digest:"
+                ${LOG[*]} "[MSG] Computed md5sum of file: ${md5_}"
+                ${LOG[*]} "[MSG] Digest md5sum of file: ${md5}"
+                exit 1
+            fi
+            rm -f SUMS.txt
+        fi
+    fi
+
     export CLONEZILLACD="${clonezilla_iso}"
 
     # first cache it
@@ -237,7 +280,7 @@ checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
 if_fails $? "[ERR] Could not download checksums.txt from URL \
 ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
 
-if ! ${DISABLE_MD5_CHECK}
+if ! ${DISABLE_CHECKSUM}
 then
   local md5=$(md5sum "preprocessed_gentoo_install.iso" | cut -f 1 -d' ')
   [ -f checksums.txt ] && rm -f checksums.txt
@@ -255,7 +298,7 @@ fi
 ## @fn fetch_clonezilla_with_virtualbox()
 ## @brief Download automatic output of
 ## Github Actions at fabnicol/clonezila_with_virtualbox.Github
-## @note URL is: GITHUB_RELEASE_PATH/WORKFLOW_TAG
+## @note URL is: GITHUB_RELEASE_PATH/release/download/WORKFLOW_TAG
 ## @ingroup fetchFunctions
 
 fetch_clonezilla_with_virtualbox() {
@@ -265,19 +308,19 @@ local verb=""
 
 ${LOG[*]} "[INF] Downloading CloneZilla with virtualbox from Github Actions..."
 
-${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}/\
-clonezilla_with_virtualbox.iso  ${verb} 2>&1 | xargs echo '[INF]')"
+${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/release/download/\
+${WORKFLOW_TAG}/clonezilla_with_virtualbox.iso  ${verb} 2>&1 | xargs echo '[INF]')"
 
 if_fails $? "[ERR] Could not download stage3 from URL \
 ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}"
 [ -f checksums.txt ] && rm -f checksums.txt
-${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}/\
-checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
+${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/release/download/\
+${WORKFLOW_TAG}/checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
 
 if_fails $? "[ERR] Could not download checksums.txt from URL \
 ${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}"
 
-if ! ${DISABLE_MD5_CHECK}
+if ! ${DISABLE_CHECKSUM}
 then
   local md5=$(md5sum "clonezilla_with_virtualbox.iso" | cut -f 1 -d' ')
   local md5_=cat 'checksums.txt' |  xargs | cut -f2 -d' '
@@ -288,7 +331,6 @@ could not be checked against downloaded file."
       exit 2
   fi
 fi
-
 }
 
 ## @fn fetch_livecd()
@@ -390,7 +432,31 @@ autobuilds/${current} ${verb1} 2>&1 | xargs echo '[INF]')"
         if_fails $? "[ERR] Could not download stage3 tarball from mirror:\
  ${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}"
 
-        ! ${DISABLE_MD5_CHECK} && check_md5sum $(basename ${current})
+        if ! "${DISABLE_CHECKSUM}"
+        then
+            ${LOG[*]} "[MSG] Downloading ${current}.DIGESTS.asc"
+            curl -L "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}.DIGESTS.asc" \
+                 ${verb1} -o checksums_stage3.txt
+            if_fails $? "[ERR] Could not download current install iso."
+
+            ! [ -f checksums_stage3.txt ] \
+                && ${LOG[*]} "[ERR] Could not download stage3 sums." && exit 1
+
+            sha512=$(sha512sum  "$(basename ${current})" | cut -f 1 -d ' ')
+            sha512_=$(grep -o -E "[a-z0-9 ]+ $(basename ${current})" checksums_stage3.txt | head -n1 | cut -f 1 -d ' ')
+
+            if [ -n "${sha512}" ] && [ -n "${sha512_}" ] &&  [ "${sha512}" != "${sha521_}" ]
+            then
+                ${LOG[*]} "[MSG] Verified SHA512SUM of $(basename ${current})."
+            else
+                ${LOG[*]} "[MSG] SHA512SUM of ${current} did not match digest."
+                ${LOG[*]} "[MSG] Digest value is: ${sha512_}"
+                ${LOG[*]} "[MSG] Computed value is: ${sha512}"
+                exit 1
+            fi
+            rm -f checksums_stage3.txt
+        fi
+
         ${LOG[*]} "[INF] Caching ${current} to ${CACHED_STAGE3}"
         cp ${verb2} -f "$(echo -s ${current} \
                              | sed s/.*stage3/stage3/)"  "${CACHED_STAGE3}"

@@ -33,7 +33,7 @@
      "create_squashfs"    "(Re)create the squashfs filesystem. Boolean."                                                          "true" "b"
      "custom_clonezilla"   "Use this previously created custom CloneZilla ISO with added VirtualBox and guest additions."       "dep"    "s"
      "device_installer"   "Create Gentoo clone installer on external device.  **ext_device** value must be specified."             ""    ""
-     "disable_md5_check"  "Disable MD5 checkums verification after downloads. Boolean."                                           "false" "b"
+     "disable_checksum"  "Disable checkum verification after downloads. Boolean."                                           "false" "b"
      "disconnect"         "Unmount guest virtual disk from host."                             "true" "b"
      "download"           "Download install ISO image from Gentoo mirror. Boolean."                                               "true" "b"
      "download_arch"      "Download and install stage3 archive to virtual disk. Booelan."                                         "true" "b"
@@ -112,6 +112,6 @@
 
 # **path1:**  https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download    
 # **path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           
-# **path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/
+# **path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox
 # **path4:**  https://github.com/fabnicol/mkg/releases/download
 # **count:**  $((`nproc --all`/3))  
