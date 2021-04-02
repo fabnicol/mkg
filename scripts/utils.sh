@@ -565,3 +565,11 @@ checksums() {
         echo "[ERR] Workflow failed to create file ${VMPATH}/${LIVECD}."
     fi
 }
+
+need_root() {
+    if [ "$(whoami)" != "root" ]
+    then
+        ${LOG[*]} "[ERR] must be root to continue."
+        exit 1
+    fi
+}

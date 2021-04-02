@@ -369,16 +369,6 @@ test_cli_pre() {
 the same time"
              exit 1; }
 
-    # do not use ${}  as true/false in this function as vars. are not all set
-
-    [ "$(whoami)" != "root" ] && { ${LOG[*]} "[ERR] must be root to continue"
-                                   exit 1; }
-    [ -L /home/partimag ] && rm     /home/partimag
-    [ -d /home/partimag ] && rm -rf /home/partimag
-
-    mkdir -p /home/partimag
-    if_fails $? "[ERR] Could not create partimag directory under /home"
-
     # Configuration tests
 
     local do_exit=false
@@ -753,6 +743,26 @@ Allowing a 10 second break for second thoughts."
         exit 1
     fi
 
+    ###############################################################################
+    #  Elevated rights                                                            #
+    #                                                                             #
+    #  root is necessary for mksquashfs/unsquashfs and mount.                     #
+    #  bsdtar, when used, makes it possible to avoid mounts hence elevated rights #
+    #  but this works only is 3rd-party workflows are used or if a custom         #
+    #  CloneZilla CD has been previously obtained.                                #
+    #  root is also necxessary when chroot is used (TEST_EMERGE) and/or using     #
+    #  another block device with dd or ocs-sr                                     #
+    ###############################################################################
+
+    if ! "${USE_MKG_WORKFLOW}" || (! "${USE_CLONEZILLA_WORKFLOW}" \
+                                    && ([ -z "${CUSTOM_CLONEZILLA}" ] \
+                                       || [ "${CUSTOM_CLONEZILLA}" = "dep" ]))
+            || ! "${USE_BSDTAR}" || "${TEST_EMERGE}" || "${HOT_INSTALL}" \
+            || "${FROM_DEVICE}"
+    then
+        need_root
+    fi
+
     "${TEST_ONLY}" && TEST_EMERGE=true && USE_MKG_WORKFLOW=false
 
     ! "${CREATE_ISO}" && USE_BSDTAR=false
@@ -952,10 +962,14 @@ stage3 archive are cached in the directory after prior downloads"
     "${VERBOSE}" && verb="-v"
     mountpoint -q mnt && umount -l mnt
     [ -d mnt ] && rm -rf mnt
-    mkdir mnt
-    check_dir mnt
-    mount -oloop "${ISO}" mnt/  2>/dev/null
-    ! mountpoint -q mnt && ${LOG[*]} "[ERR] ISO not mounted!" && exit 1
+
+    if ! "${USE_BSDTAR}"
+    then
+        mkdir mnt
+        check_dir mnt
+        mount -oloop "${ISO}" mnt/  2>/dev/null
+        ! mountpoint -q mnt && ${LOG[*]} "[ERR] ISO not mounted!" && exit 1
+    fi
 
     #parameter adjustment to account for Gentoo/CloneZilla differences
 
@@ -973,13 +987,22 @@ stage3 archive are cached in the directory after prior downloads"
 
     mkdir mnt2/
     check_dir mnt2
-    ! [ -d mnt ] && mkdir mnt
-    check_dir mnt
 
-    # get a copy with write access
+    if "${USE_BSDTAR}"
+    then
+        cd mnt2
+        BSDTAR_BINARY="$(which bsdtar)" >/dev/null 2>&1
+        if_fails $? "[ERR] Could not find bsdtar."
+        "${BSDTAR_BINARY}" ../"${ISO}"
+        if_fails $? "[ERR] bsdtar failed to extract ${ISO}."
+        "${VERBOSE}" && ${LOG[*]} "[MSG] ${ISO} was extracted under mnt2."
+        cd -
+    else
+        # get a copy with write access
 
-    "${VERBOSE}" && ${LOG[*]} "[INF] Syncing mnt2 with ISO mountpoint..."
-    rsync -a mnt/ mnt2
+        "${VERBOSE}" && ${LOG[*]} "[INF] Syncing mnt2 with ISO mountpoint..."
+        rsync -a mnt/ mnt2
+    fi
 
     # now unsquashfs the liveCD filesystem
 
@@ -987,7 +1010,7 @@ stage3 archive are cached in the directory after prior downloads"
 
     "${VERBOSE}" && ${LOG[*]} "[INF] Unsquashing filesystem..." \
         && unsquashfs "${SQUASHFS_FILESYSTEM}"  \
-            ||  unsquashfs -q  "${SQUASHFS_FILESYSTEM}" 2>&1 >/dev/null
+             ||  unsquashfs -q  "${SQUASHFS_FILESYSTEM}" 2>&1 >/dev/null
 
     if_fails $? "[ERR] unsquashfs failed!"
     cd "${VMPATH}"
@@ -2249,6 +2272,14 @@ unmount_clonezilla_iso() {
 
 clonezilla_device_to_image() {
 
+    # do not use ${}  as true/false in this function as vars. are not all set
+
+    [ -L /home/partimag ] && rm     /home/partimag
+    [ -d /home/partimag ] && rm -rf /home/partimag
+
+    mkdir -p /home/partimag
+    if_fails $? "[ERR] Could not create partimag directory under /home"
+
     # At this stage EXT_DEVICE can no longer be a mountpoint as it has
     # been previously converted to device label
 
@@ -2276,7 +2307,7 @@ $(get_mountpoint ${EXT_DEVICE})"
         exit 1
     fi
 
-    # if no platform-installed ocs-sr, try to bootstrap it from clonezill iso
+    # if no platform-installed ocs-sr, try to bootstrap it from clonezilla iso
 
     if $(which ocs-sr)
     then
@@ -2349,7 +2380,7 @@ prepare_for_iso_vm() {
 	    ${LOG[*]} "[INF] Using ${CLONEZILLACD} as custom-made \
 CloneZilla CD with VirtualBox and guest additions."
 
-            # copy to ISOFILES as a skeletton for ISO recovery image authoring
+        # copy to ISOFILES as a skeletton for ISO recovery image authoring
 
         [ -d ISOFILES ] && rm -rf ISOFILES
         mkdir -p ISOFILES/home/partimag
@@ -2385,17 +2416,30 @@ CloneZilla CD with VirtualBox and guest additions."
 Unmount it and remove it manually then restart."
 	    fi
 
+        if "${USE_CLONEZILLA_WORKFLOW}" \
+                || ([ -n "${CUSTOM_CLONEZILLA}" ] && [ "${CUSTOM_CLONEZILLA}" != "dep" ])
+        then
+            return 0
+        fi
+
 	    mkdir mnt2
         check_dir mnt2
 
-	    mount -oloop "${CLONEZILLACD}" mnt2/
-	    if_fails $? "[ERR] Could not mount ${CLONEZILLACD} to mnt2"
-
-        rsync -a mnt2/ ISOFILES
-	    if_fails $? "[ERR] Could not sync files between mnt2 and ISOFILES"
-
-	    umount mnt2
-	    if_fails $? "[ERR] Could not unmount mnt2"
+        if "${USE_BSDTAR}"
+        then
+          cd mnt2
+          "${BSDTAR_BINARY}" xpf ../"${CLONEZILLACD}"
+          if_fails $? "[ERR] Could not extract ${CLONEZILLACD} using bsdtar."
+          cd -
+        else
+            need_root
+	        mount -oloop "${CLONEZILLACD}" mnt2/
+	        if_fails $? "[ERR] Could not mount ${CLONEZILLACD} to mnt2"
+            rsync -a mnt2/ ISOFILES
+	        if_fails $? "[ERR] Could not sync files between mnt2 and ISOFILES"
+	        umount mnt2
+	        if_fails $? "[ERR] Could not unmount mnt2"
+        fi
 }
 
 # -----------------------------------------------------------------------------#
