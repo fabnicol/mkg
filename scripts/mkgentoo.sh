@@ -123,99 +123,110 @@ declare -x CREATE_ISO=false
 
 help_md() {
 
-    local count=$(($(nproc --all)/3))
-    echo "**USAGE:**  "
-    echo "**mkg**                                        [1]  "
-    echo "**mkg**  [[switch=argument]...]  filename.iso  [2]  "
-    echo "**mkg**  [[switch=argument]...]                [3]  "
-    echo "**mkg**  help[=md]                             [4]  "
-    echo "  "
-    echo "Usage [1] and [2] create a bootable ISO output file with a current  "
-    echo "Gentoo distribution.  "
-    echo "For [1], implicit ISO output name is **gentoo.iso**  "
-    echo "Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine  "
-    echo "with name Gentoo.  "
-    echo "Usage [4] prints this help, in markdown form if argument 'md' is  "
-    echo "specified.  "
-    echo "Warning: you should have at least 55 GB of free disk space in the  "
-    echo "current directory or in vmpath if specified.  "
-    echo "  "
-    echo "Arguments with white space (like \`cflags=\"-O2 -march=...\"\`) should be  "
-    echo "written in list form with commas and no spaces: \`cflags=[-O2,-march=...]\`  "
-    echo "The same holds for paths with white space.  "
-    echo "  "
-    echo "As of March, 2021, part of the build is performed  "
-    echo "by *Github Actions* automatically. An ISO file of CloneZilla  "
-    echo "supplemented with VirtualBox guest additions will be downloaded  "
-    echo "from the resulting automated Github release. To disable this behavior  "
-    echo "you can add \`use_clonezilla_workflow=false\` to command line, or build the  "
-    echo "custom ISO file beforehand using the companion project  "
-    echo "**clonezilla_with_virtualbox**. In this case, add:  "
-    echo "\`custom_clonezilla=your_build.iso\`  "
-    echo "to command line.  "
-    echo "A similar procedure also applies to the minimal Gentoo install ISO.  "
-    echo "MKG scripts and the stage3 archive are added within its squashfs filesystem  "
-    echo "by the *Github Actions* workflow of the MKG Github site.  "
-    echo "An ISO file labelled **downloaded.iso** is automatically released  "
-    echo "by the workflow. It will be downloaded from the MKG Github release section.  "
-    echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
-    echo "to command line.   "
-    echo "  "
-    echo "**Options:**  "
-    echo "  "
-    echo "Boolean values are either \`true\` or \`false\`. For example, to build  "
-    echo "a minimal distribution, add to command line:   "
-    echo "\`minimal=true\`   "
-    echo "or simply: \`minimal\` as \`true\` can be omitted (unlike \`false\`).  "
-    echo "      "
-    echo "**Examples**   "
-    echo "  "
-    echo "\`# ./mkg pdfpage\`  "
-    echo "\`# ./mkg debug_mode verbose from_vm vm=Gentoo.iso gentoo_small.iso\` \  "
-    echo "    \`ext_device=sdc device_installer blank burn cleanup=false\`   "
-    echo "\`# ./mkg download_arch=false download=false download_clonezilla=false\` \  "
-    echo "    \`custom_clonezilla=clonezilla_cached.iso nonroot_user=phil\`  "
-    echo "\`# nohup ./mkg plot plot_color="'red'" plot_period=10 plot_pause=7\` \  "
-    echo "      \`compact minimal minimal_size=false  gui=false elist=myebuilds\` \  "
-    echo "        \`email=my.name@gmail.com email_passwd='mypasswd' &\`  "
-    echo "\`# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\`  "
-    echo "  "
-    echo "**Type Conventions:**  "
-    echo "b: true/false Boolean  "
-    echo "o: on/off Boolean  "
-    echo "n: Integer  "
-    echo "f: Filepath  "
-    echo "d: Directory path  "
-    echo "e: Email address  "
-    echo "s: String  "
-    echo "u: URL  "
-    echo
-    echo "When a field depends on another, a colon separates the type and  "
-    echo "the name of the dependency."
-    echo "dep is a reserved word for dummy defaults of dependencies i.e.  "
-    echo "optional strings that may remain unspecified.  "
-    echo "Some options are incompatible, e.g. \`test_only\` and \`use_mkg_workflow\`  "
-    echo "   "
-    echo "   "
-    echo " | Option | Description | Default value | Type |  "
-    echo " |:------:|:------------|:-------------:|:----:|  "
-    declare -i i
-    for ((i=0; i<ARRAY_LENGTH; i++)); do
-        declare -i sw=i*4       # no spaces!
-        declare -i desc=i*4+1
-        declare -i def=i*4+2
-        declare -i type=i*4+3
-        echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [ ${ARR[def]} ] | ${ARR[type]}|"
-    done
-    echo "  "
-    echo "  "
-    echo "**path1:**  https://sourceforge.net/projects/clonezilla/files/\
+local count=$(($(nproc --all)/3))
+echo "**USAGE:**  "
+echo "**mkg**                                        [1]  "
+echo "**mkg**  [[switch=argument]...]  filename.iso  [2]  "
+echo "**mkg**  [[switch=argument]...]                [3]  "
+echo "**mkg**  help[=md]                             [4]  "
+echo "  "
+echo "Usage [1] and [2] create a bootable ISO output file with a current  "
+echo "Gentoo distribution.  "
+echo "For [1], implicit ISO output name is **gentoo.iso**  "
+echo "Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine  "
+echo "with name Gentoo.  "
+echo "Usage [4] prints this help, in markdown form if argument 'md' is  "
+echo "specified.  "
+echo "Warning: you should have at least 55 GB of free disk space in the  "
+echo "current directory or in vmpath if specified.  "
+echo "  "
+echo "Arguments with white space (like \`cflags=\"-O2 -march=...\"\`) \
+should be  "
+echo "written in list form with commas and no spaces: \
+\`cflags=[-O2,-march=...]\`  "
+echo "The same holds for paths with white space.  "
+echo "  "
+echo "As of March, 2021, part of the build is performed  "
+echo "by *Github Actions* automatically. An ISO file of CloneZilla  "
+echo "supplemented with VirtualBox guest additions will be downloaded  "
+echo "from the resulting automated Github release. To disable this behavior  "
+echo "you can add \`use_clonezilla_workflow=false\` to command line, or \
+build the  "
+echo "custom ISO file beforehand using the companion project  "
+echo "**clonezilla_with_virtualbox**. In this case, add:  "
+echo "\`custom_clonezilla=your_build.iso\`  "
+echo "to command line.  "
+echo "A similar procedure also applies to the minimal Gentoo install ISO.  "
+echo "MKG scripts and the stage3 archive are added within its squashfs \
+filesystem  "
+echo "by the *Github Actions* workflow of the MKG Github site.  "
+echo "An ISO file labelled **downloaded.iso** is automatically released  "
+echo "by the workflow. It will be downloaded from the MKG Github release \
+section.  "
+echo "This preprocessed ISO has build parameter presets. It builds the full \
+desktop.  "
+echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
+echo "to command line. You will need to do so if you do not use OS build \
+presets.  "
+echo "  "
+echo "**Options:**  "
+echo "  "
+echo "Boolean values are either \`true\` or \`false\`. For example, to build  "
+echo "a minimal distribution, add to command line:   "
+echo "\`minimal=true\`   "
+echo "or simply: \`minimal\` as \`true\` can be omitted (unlike \`false\`).  "
+echo "      "
+echo "**Examples**   "
+echo "  "
+echo "\`# ./mkg pdfpage\`  "
+echo "\`# ./mkg debug_mode verbose from_vm vm=Gentoo.iso gentoo_small.iso\` \  "
+echo "    \`ext_device=sdc device_installer blank burn cleanup=false\`   "
+echo "\`# ./mkg download_arch=false download=false \
+download_clonezilla=false\` \  "
+echo "    \`custom_clonezilla=clonezilla_cached.iso nonroot_user=phil\`  "
+echo "\`# nohup ./mkg plot plot_color="'red'" plot_period=10 plot_pause=7\` \  "
+echo "      \`compact minimal minimal_size=false  gui=false \
+elist=myebuilds\` \  "
+echo "        \`email=my.name@gmail.com email_passwd='mypasswd' &\`  "
+echo "\`# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\`  "
+echo "  "
+echo "**Type Conventions:**  "
+echo "b: true/false Boolean  "
+echo "o: on/off Boolean  "
+echo "n: Integer  "
+echo "f: Filepath  "
+echo "d: Directory path  "
+echo "e: Email address  "
+echo "s: String  "
+echo "u: URL  "
+echo
+echo "When a field depends on another, a colon separates the type and  "
+echo "the name of the dependency."
+echo "dep is a reserved word for dummy defaults of dependencies i.e.  "
+echo "optional strings that may remain unspecified.  "
+echo "Some options are incompatible, e.g. \`test_only\` \
+and \`use_mkg_workflow\`  "
+echo "   "
+echo "   "
+echo " | Option | Description | Default value | Type |  "
+echo " |:------:|:------------|:-------------:|:----:|  "
+declare -i i
+for ((i=0; i<ARRAY_LENGTH; i++)); do
+    declare -i sw=i*4       # no spaces!
+    declare -i desc=i*4+1
+    declare -i def=i*4+2
+    declare -i type=i*4+3
+    echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [ ${ARR[def]} ] | ${ARR[type]}|"
+done
+echo "  "
+echo "  "
+echo "**path1:**  https://sourceforge.net/projects/clonezilla/files/\
 clonezilla_live_alternative/20200703-focal/\
 clonezilla-live-20200703-focal-amd64.iso/download  "
-    echo "**path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           "
-    echo "**path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox  "
-    echo "**path4:**  https://github.com/fabnicol/mkg/releases/download  "
-    echo "**count:** nproc --all / 3  "
+echo "**path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           "
+echo "**path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox  "
+echo "**path4:**  https://github.com/fabnicol/mkg/releases/download  "
+echo "**count:** nproc --all / 3  "
 }
 
 ## @fn help_()
@@ -2399,7 +2410,33 @@ generate_Gentoo() {
 
     if "${USE_MKG_WORKFLOW}"
     then
+        ${LOG[*]} "[MSG] You chose to use the output of MKG GitHub Actions."
+        ${LOG[*]} "[MSG] The downloaded ISO has been preprocessed.\n\
+      It has a number of fixed default parameters."
+        ${LOG[*]} "[MSG] You can only fix the following command line items:\n\
+        burn, cdrecord, cloning_method, custom_clonezilla, device_installer, disable_checksum,\n\
+ext_device, force, full_cleanup, gui, hot_install, interactive, plot,\n\
+plot_color, plot_pause, plot_period, plot_position, plot_span, quiet_mode,\n\
+size, smtp_url, use_bsdtar, use_clonezilla_workflow, workflow_tag, workflow_tag2\n"
+        ${LOG[*]} "[MSG] In particular, all build-specific parameters will be set."
+        ${LOG[*]} "[MSG] If you need to specify these parameters, run again with\n\
+      use_mkg_workflow=false."
+
+        local rep="N"
+        if "${INTERACTIVE}"
+        then
+            read -p "[MSG] Please confirm that you are ready to use build presets [Y]:" rep
+            if [ "${rep}" = "N" ]
+            then
+                ${LOG[*]} "[INF] Exiting."
+                exit 0
+            fi
+        else
+            sleep 5
+        fi
+
         fetch_preprocessed_gentoo_install
+
         LIVECD=preprocessed_gentoo_install.iso
         "${DOWNLOAD_ONLY}" && exit 0
         ISO=
