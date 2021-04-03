@@ -770,7 +770,6 @@ Allowing a 10 second break for second thoughts."
 
     "${TEST_ONLY}" && TEST_EMERGE=true && USE_MKG_WORKFLOW=false
 
-    ! "${CREATE_ISO}" && USE_BSDTAR=false
     "${USE_BSDTAR}" && check_tool "bsdtar"
 }
 
