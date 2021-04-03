@@ -165,6 +165,10 @@ echo "by the workflow. It will be downloaded from the MKG Github release \
 section.  "
 echo "This preprocessed ISO has build parameter presets. It builds the full \
 desktop.  "
+echo "In particular, the following command line options will be ignored:  "
+echo "\`bios, cflags, clonezilla_install, debug_mode, elist, emirrors, \`  "
+echo "\`kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd,\`  "
+echo "\`processor, rootpasswd, stage3, vm_language.\`  "
 echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
 echo "to command line. You will need to do so if you do not use OS build \
 presets.  "
@@ -178,14 +182,15 @@ echo "or simply: \`minimal\` as \`true\` can be omitted (unlike \`false\`).  "
 echo "      "
 echo "**Examples**   "
 echo "  "
-echo "\`# ./mkg pdfpage\`  "
-echo "\`# ./mkg debug_mode verbose from_vm vm=Gentoo.iso gentoo_small.iso\` \  "
+echo "\`$ ./mkg pdfpage\`  "
+echo "\`$ ./mkg debug_mode verbose from_vm vm=Gentoo  gentoo_small.iso\` \  "
 echo "    \`ext_device=sdc device_installer blank burn cleanup=false\`   "
 echo "\`# ./mkg download_arch=false download=false \
 download_clonezilla=false\` \  "
-echo "    \`custom_clonezilla=clonezilla_cached.iso nonroot_user=phil\`  "
+echo "    \`custom_clonezilla=clonezilla_cached.iso use_mkg_workflow=false \
+nonroot_user=phil\`  "
 echo "\`# nohup ./mkg plot plot_color="'red'" plot_period=10 plot_pause=7\` \  "
-echo "      \`compact minimal minimal_size=false  gui=false \
+echo "      \`compact minimal minimal_size=false use_mkg_workflow=false gui=false \
 elist=myebuilds\` \  "
 echo "        \`email=my.name@gmail.com email_passwd='mypasswd' &\`  "
 echo "\`# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\`  "
@@ -756,7 +761,7 @@ Allowing a 10 second break for second thoughts."
 
     if ! "${USE_MKG_WORKFLOW}" || (! "${USE_CLONEZILLA_WORKFLOW}" \
                                     && ([ -z "${CUSTOM_CLONEZILLA}" ] \
-                                       || [ "${CUSTOM_CLONEZILLA}" = "dep" ]))
+                                       || [ "${CUSTOM_CLONEZILLA}" = "dep" ])) \
             || ! "${USE_BSDTAR}" || "${TEST_EMERGE}" || "${HOT_INSTALL}" \
             || "${FROM_DEVICE}"
     then
@@ -2457,14 +2462,20 @@ generate_Gentoo() {
         ${LOG[*]} "[MSG] You chose to use the output of MKG GitHub Actions."
         ${LOG[*]} "[MSG] The downloaded ISO has been preprocessed.\n\
       It has a number of fixed default parameters."
-        ${LOG[*]} "[MSG] You can only fix the following command line items:\n\
-        burn, cdrecord, cloning_method, custom_clonezilla, device_installer, disable_checksum,\n\
-ext_device, force, full_cleanup, gui, hot_install, interactive, plot,\n\
-plot_color, plot_pause, plot_period, plot_position, plot_span, quiet_mode,\n\
-size, smtp_url, use_bsdtar, use_clonezilla_workflow, workflow_tag, workflow_tag2\n"
-        ${LOG[*]} "[MSG] In particular, all build-specific parameters will be set."
-        ${LOG[*]} "[MSG] If you need to specify these parameters, run again with\n\
-      use_mkg_workflow=false."
+        ${LOG[*]} "[MSG] The following command line options will be ignored:\n\
+      bios, cflags, clonezilla_install, debug_mode, elist, emirrors, gui, \n\
+      kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd, \n\
+      processor, rootpasswd, stage3, vm_language\n"
+        ${LOG[*]} "[MSG] In particular, all build-specific parameters will be\
+set."
+        ${LOG[*]} "[MSG] If you need to specify these parameters, run again \n\
+      with use_mkg_workflow=false."
+        ${LOG[*]} "[MSG] You can however fix the following command line items:\n\
+      burn, cdrecord, cloning_method, custom_clonezilla, device_installer,\n\
+      disable_checksum, ext_device, force, full_cleanup, gui, hot_install,\n\
+      interactive, plot, plot_color, plot_pause, plot_period, plot_position,\n\
+      plot_span, quiet_mode, size, smtp_url, use_bsdtar, \n\
+      use_clonezilla_workflow, workflow_tag, workflow_tag2\n"
 
         local rep="N"
         if "${INTERACTIVE}"
