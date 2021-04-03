@@ -25,7 +25,7 @@ jobs:
       - name: update 
         run: |
              sudo apt update 
-             sudo apt install uuid dos2unix libarchive
+             sudo apt install uuid dos2unix libarchive-tools
              sudo apt install squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
              sudo apt install virtualbox    
       
