@@ -156,6 +156,8 @@ echo "custom ISO file beforehand using the companion project  "
 echo "**clonezilla_with_virtualbox**. In this case, add:  "
 echo "\`custom_clonezilla=your_build.iso\`  "
 echo "to command line.  "
+echo "Within containers, \`use_clonezilla_workflow\`, \`build_virtualbox\`  "
+echo "and \`test_emerge\` are not (yet) supported and will fail.  "
 echo "A similar procedure also applies to the minimal Gentoo install ISO.  "
 echo "MKG scripts and the stage3 archive are added within its squashfs \
 filesystem  "
