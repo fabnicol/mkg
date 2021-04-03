@@ -237,15 +237,26 @@ fetch_process_clonezilla_iso() {
 
     [ ! -d mnt2 ] &&  mkdir mnt2  ||  { rm ${verb} -rf mnt2 && mkdir mnt2; }
 
-    "${VERBOSE}"  && ${LOG[*]} "[INF] Mounting CloneZilla CD ${CLONEZILLACD}"
-    mount -oloop "${CLONEZILLACD}" ./mnt  \
-     	|| { ${LOG[*]} "[ERR] Could not mount ${CLONEZILLACD} to mnt"
-             exit 1; }
-    "${VERBOSE}" \
-        && ${LOG[*]} "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."
-    rsync ${verb} -a ./mnt/ mnt2 \
-    	|| { ${LOG[*]} "[ERR] Could not copy clonezilla files to mnt2"
-             exit 1; }
+    if "${USE_BSDTAR}"
+    then
+       cd mnt2
+       BSDTAR_BINARY="$(which bsdtar)"
+       if_fails $? "[ERR] Could not find bsdtar."
+       "${BSDTAR_BINARY}" xpf ../"${CLONEZILLACD}"
+       if_fails $? "[ERR] Could not extract ${CLONEZILLACD} to mnt2 using bsdtar."
+       cd -
+    else
+        "${VERBOSE}"  && ${LOG[*]} "[INF] Mounting CloneZilla CD ${CLONEZILLACD}"
+        mount -oloop "${CLONEZILLACD}" ./mnt  \
+     	    || { ${LOG[*]} "[ERR] Could not mount ${CLONEZILLACD} to mnt"
+                 exit 1; }
+        "${VERBOSE}" \
+            && ${LOG[*]} "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."
+        rsync ${verb} -a ./mnt/ mnt2 \
+    	    || { ${LOG[*]} "[ERR] Could not copy clonezilla files to mnt2"
+                 exit 1; }
+    fi
+
     cd mnt2/live || exit 2
     unsquashfs filesystem.squashfs \
       || { ${LOG[*]} "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"
