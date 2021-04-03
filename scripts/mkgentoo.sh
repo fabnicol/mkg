@@ -2462,22 +2462,23 @@ generate_Gentoo() {
     if "${USE_MKG_WORKFLOW}"
     then
         ${LOG[*]} "[MSG] You chose to use the output of MKG GitHub Actions."
-        ${LOG[*]} "[MSG] The downloaded ISO has been preprocessed.\n\
-      It has a number of fixed default parameters."
-        ${LOG[*]} "[MSG] The following command line options will be ignored:\n\
-      bios, cflags, clonezilla_install, debug_mode, elist, emirrors, gui, \n\
-      kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd, \n\
-      processor, rootpasswd, stage3, vm_language\n"
-        ${LOG[*]} "[MSG] In particular, all build-specific parameters will be\
-set."
-        ${LOG[*]} "[MSG] If you need to specify these parameters, run again \n\
-      with use_mkg_workflow=false."
-        ${LOG[*]} "[MSG] You can however fix the following command line items:\n\
-      burn, cdrecord, cloning_method, custom_clonezilla, device_installer,\n\
-      disable_checksum, ext_device, force, full_cleanup, gui, hot_install,\n\
-      interactive, plot, plot_color, plot_pause, plot_period, plot_position,\n\
-      plot_span, quiet_mode, size, smtp_url, use_bsdtar, \n\
-      use_clonezilla_workflow, workflow_tag, workflow_tag2\n"
+        ${LOG[*]} "[MSG] The downloaded ISO has been preprocessed."
+        ${LOG[*]}        "It has a number of fixed default parameters."
+        ${LOG[*]} "[MSG] The following command line options will be ignored:"
+        ${LOG[*]} "      bios, cflags, clonezilla_install, debug_mode, elist"
+        ${LOG[*]} "      emirrors, gui, kernel_config, minimal, minimal_size"
+        ${LOG[*]} "      ncpus, nonroot_user, passwd, processor, rootpasswd"
+        ${LOG[*]} "      stage3, vm_language"
+        ${LOG[*]} "[MSG] In particular, all build-specific parameters will be set."
+        ${LOG[*]} "[MSG] If you need to specify these parameters, run again"
+        ${LOG[*]} "      with use_mkg_workflow=false."
+        ${LOG[*]} "[MSG] You can however fix the following command line items:"
+        ${LOG[*]} "      burn, cdrecord, cloning_method, custom_clonezilla"
+        ${LOG[*]} "      device_installer, disable_checksum, ext_device, force"
+        ${LOG[*]} "      full_cleanup, gui, hot_install, interactive, plot"
+        ${LOG[*]} "      plot_color, plot_pause, plot_period, plot_position"
+        ${LOG[*]} "      plot_span, quiet_mode, size, smtp_url, use_bsdtar"
+        ${LOG[*]} "      use_clonezilla_workflow, workflow_tag, workflow_tag2."
 
         local rep="N"
         if "${INTERACTIVE}"
