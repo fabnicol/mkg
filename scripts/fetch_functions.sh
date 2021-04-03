@@ -285,26 +285,24 @@ downloaded.iso  -o preprocessed_gentoo_install.iso ${verb} 2>&1 | xargs echo '[I
 
 if_fails $? "[ERR] Could not download preprocessed Gentoo install ISO from URL \
 ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
-
+[ -f checksums.txt ] && rm -f checksums.txt
 ${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}/\
 checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
 
 if_fails $? "[ERR] Could not download checksums.txt from URL \
 ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
 
-if ! ${DISABLE_CHECKSUM}
+if ! "${DISABLE_CHECKSUM}"
 then
   local md5=$(md5sum "preprocessed_gentoo_install.iso" | cut -f 1 -d' ')
-  [ -f checksums.txt ] && rm -f checksums.txt
   local md5_=cat 'checksums.txt' |  xargs | cut -f2 -d' '
-  if [ ${md5} != ${md5_} ]
+  if [ "${md5}" != "${md5_}" ]
   then
       ${LOG[*]} "[ERR] MD5 sum of preprocessed_gentoo_install.iso from Github Actions \
 could not be checked against downloaded file."
       exit 2
   fi
 fi
-
 }
 
 ## @fn fetch_clonezilla_with_virtualbox()
