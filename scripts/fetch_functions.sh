@@ -362,9 +362,9 @@ fetch_livecd() {
         "${CLONEZILLA_INSTALL}" && ISO="${CLONEZILLACD}"
     else
         if ! ${USE_CLONEZILLA_WORKFLOW}
-	then
+	    then
             [ -f "clonezilla.iso" ] && CLONEZILLACD="clonezilla.iso" \
-            || { ${LOG[*]} "[ERR] CloneZilla ISO has not been cached. \
+                    || { ${LOG[*]} "[ERR] CloneZilla ISO has not been cached. \
 Run with download=true" ; exit 1; }
         fi
     fi

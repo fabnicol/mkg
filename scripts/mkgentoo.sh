@@ -758,6 +758,7 @@ Allowing a 10 second break for second thoughts."
     #  root is also necxessary when chroot is used (TEST_EMERGE) and/or using     #
     #  another block device with dd or ocs-sr                                     #
     ###############################################################################
+    "${USE_CLONEZILLA_WORKFLOW}" && DOWNLOAD_CLONEZILLA=false
 
     if ! "${USE_MKG_WORKFLOW}" || (! "${USE_CLONEZILLA_WORKFLOW}" \
                                     && ([ -z "${CUSTOM_CLONEZILLA}" ] \
@@ -2423,6 +2424,8 @@ Unmount it and remove it manually then restart."
         if "${USE_CLONEZILLA_WORKFLOW}" \
                 || ([ -n "${CUSTOM_CLONEZILLA}" ] && [ "${CUSTOM_CLONEZILLA}" != "dep" ])
         then
+            # presuming that custom clonezilla comes from workflow
+            # or anyhow giving priority
             return 0
         fi
 
