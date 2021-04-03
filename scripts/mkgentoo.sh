@@ -998,7 +998,7 @@ stage3 archive are cached in the directory after prior downloads"
         cd mnt2
         BSDTAR_BINARY="$(which bsdtar)" >/dev/null 2>&1
         if_fails $? "[ERR] Could not find bsdtar."
-        "${BSDTAR_BINARY}" ../"${ISO}"
+        "${BSDTAR_BINARY}" xpf ../"${ISO}"
         if_fails $? "[ERR] bsdtar failed to extract ${ISO}."
         "${VERBOSE}" && ${LOG[*]} "[MSG] ${ISO} was extracted under mnt2."
         cd -
