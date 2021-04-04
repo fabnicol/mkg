@@ -1,97 +1,67 @@
 
-build_virtualbox.sh,123
-build_virtualbox() {build_virtualbox30,1042
-    cat > run.sh << EOFEOF40,1370
-    cat > VirtualBox << EOFEOF101,3823
+build_virtualbox.sh,26
+build_virtualbox(30,1042
 
-fetch_functions.sh,497
-fetch_gentoo_install_iso() {fetch_gentoo_install_iso29,979
-fetch_clonezilla_iso() {fetch_clonezilla_iso101,3004
-cache_uncache_clonezilla_iso() {cache_uncache_clonezilla_iso128,3902
-fetch_process_clonezilla_iso() {fetch_process_clonezilla_iso169,5176
-fetch_preprocessed_gentoo_install() {fetch_preprocessed_gentoo_install220,6747
-fetch_clonezilla_with_virtualbox() {fetch_clonezilla_with_virtualbox261,8055
-fetch_livecd() {fetch_livecd301,9238
-fetch_stage3() {fetch_stage3349,10550
+fetch_functions.sh,278
+fetch_gentoo_install_iso(29,979
+fetch_clonezilla_iso(119,3772
+cache_uncache_clonezilla_iso(172,5528
+fetch_process_clonezilla_iso(213,6802
+fetch_preprocessed_gentoo_install(275,8708
+fetch_clonezilla_with_virtualbox(314,10068
+fetch_livecd(354,11424
+fetch_stage3(402,12748
 
-mkgentoo.sh,1843
-help_md() {help_md124,4310
-help_() {help_226,9261
-manpage() {manpage234,9425
-htmlpage() {htmlpage243,9616
-pdfpage() {pdfpage252,9766
-validate_option() {validate_option268,10221
-get_options() {get_options281,10435
-test_cli_pre() {test_cli_pre353,12330
-test_cli() {test_cli467,16480
-test_cli_post() {test_cli_post621,21451
-mount_live_cd() {mount_live_cd777,26449
-test_emerge_step() {test_emerge_step796,26944
-    cat > portage_test.sh << EOFEOF855,28915
-prepare_chroot() {prepare_chroot938,31231
-remove_chroot() {remove_chroot1004,33258
-move_auxiliary_files() {move_auxiliary_files1031,34055
-make_boot_from_livecd() {make_boot_from_livecd1092,36461
-prepare_bash_rc() {prepare_bash_rc1166,38645
-test_vm_running() {test_vm_running1198,39537
-deep_clean() {deep_clean1208,39784
-delete_vm() {delete_vm1264,41781
-create_vm() {create_vm1376,45882
-    ascii2hex() { echo -n 0x; od -A n --endian little -t x4 | sed 's/ //g'; }ascii2hex1427,47920
-log_loop() {log_loop1555,53092
-create_iso_vm() {create_iso_vm1631,55480
-mount_vdi() {mount_vdi1774,61294
-unmount_vdi() {unmount_vdi1860,63677
-clone_vm_to_device() {clone_vm_to_device1920,65246
-create_device_system() {create_device_system1972,66928
-clonezilla_to_iso() {clonezilla_to_iso2002,67843
-add_guest_additions_to_clonezilla_iso() {add_guest_additions_to_clonezilla_iso2052,69537
-    cat > squashfs-root/update_clonezilla.sh << EOFEOF2056,69611
-bind_mount_clonezilla_iso() {bind_mount_clonezilla_iso2123,71852
-unmount_clonezilla_iso() {unmount_clonezilla_iso2172,73104
-clonezilla_device_to_image() {clonezilla_device_to_image2194,73788
-        cat > squashfs-root/create_backup_iso.sh << EOFEOF2244,75301
-prepare_for_iso_vm() {prepare_for_iso_vm2289,76495
-generate_Gentoo() {generate_Gentoo2330,77641
-main() {main2385,79093
+mkgentoo.sh,269
+declare -x ISO=105,3722
+help_(244,9524
+manpage(252,9688
+htmlpage(261,9879
+pdfpage(270,10029
+validate_option(286,10484
+get_options(299,10698
+test_cli_pre(371,12593
+test_cli(444,14813
+test_cli_post(598,19784
+mount_live_cd(788,26417
+test_emerge_step(807,26912
 
-mkvm_chroot.sh,210
-adjust_environment() {adjust_environment40,1743
-build_kernel() {build_kernel204,6807
-install_software() {install_software265,8380
-global_config() {global_config350,10752
-finalize() {finalize438,12960
+mkvm_chroot.sh,123
+adjust_environment(40,1743
+build_kernel(204,6807
+install_software(265,8380
+global_config(350,10792
+finalize(438,13001
 
-mkvm.sh,147
-setup_network() {setup_network29,1068
-partition() {partition95,3890
-install_stage3() {install_stage3180,6547
-finalize() {finalize311,10531
+mkvm.sh,67
+setup_network(29,1068
+partition(95,3890
+install_stage3(180,6547
 
-run_mount_shared_dir.sh,57
-mount_shared_dir_daemon() {mount_shared_dir_daemon3,13
+run_mount_shared_dir.sh,30
+mount_shared_dir_daemon(3,13
 
-utils.sh,953
-create_options_array() {create_options_array71,2700
-check_md5sum() {check_md5sum93,3266
-test_numeric() {test_numeric109,3733
-test_URL() {test_URL119,3973
-send_mail() {send_mail133,4469
-list_block_devices() {list_block_devices149,4900
-find_device_by_vendor() {find_device_by_vendor158,5140
-is_block_device() {is_block_device172,5529
-get_mountpoint() {get_mountpoint184,5832
-get_device() {get_device204,6482
-test_cdrecord() {test_cdrecord253,8097
-recreate_liveCD_ISO() {recreate_liveCD_ISO271,8632
-burn_iso() {burn_iso310,9805
-create_install_ext_device() {create_install_ext_device360,11201
-check_dir() {check_dir388,12117
-check_file() {check_file409,12694
-check_files() {check_files429,13158
-check_tool() {check_tool449,13639
-if_fails() {if_fails470,14238
-cleanup() {cleanup491,14754
-bind_filesystem() {bind_filesystem520,15629
-unbind_filesystem() {unbind_filesystem538,16050
-checksums() {checksums571,16688
+utils.sh,559
+create_options_array(71,2700
+test_numeric(93,3235
+test_URL(103,3475
+send_mail(117,3971
+list_block_devices(133,4402
+find_device_by_vendor(142,4642
+is_block_device(156,5031
+get_mountpoint(168,5334
+get_device(188,5984
+test_cdrecord(237,7599
+recreate_liveCD_ISO(255,8134
+burn_iso(294,9307
+create_install_ext_device(344,10703
+check_dir(372,11619
+check_file(393,12196
+check_files(413,12660
+check_tool(433,13141
+if_fails(454,13740
+cleanup(475,14256
+bind_filesystem(504,15131
+unbind_filesystem(522,15552
+checksums(555,16190
+need_root(569,16674

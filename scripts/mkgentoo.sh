@@ -382,18 +382,34 @@ the same time"
 
     # Check VirtualBox version
 
-    declare -r vbox_version=$(VBoxManage -v)
-    declare -r version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< "${vbox_version}")
-    declare -r version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
-                                   <<< "${vbox_version}")
-    declare -r version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/' \
-                                   <<< "${vbox_version}")
-    if [ "${version_major}" -lt 6 ] || [ "${version_minor}" -lt 1 ] \
-           || [ "${version_index}" -lt 10 ]
+    declare -r vbox_version="$(VBoxManage -v)"
+
+    if [ $? = 0 ]
     then
-        ${LOG[*]} "[ERR] VirtualBox must be at least version 6.1.10"
-        ${LOG[*]} "[ERR] Please update and reinstall"
-        do_exit=true
+        [ "${VERBOSE}" = "true" ] && ${LOG[*]} "[MSG] VirtualBox version: ${vbox_version}"
+
+        declare -i version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< ${vbox_version})
+        declare -i version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
+                                       <<< ${vbox_version})
+        declare -i version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/' \
+                                       <<< ${vbox_version})
+        if [ ${version_major} -lt 6 ] || [ ${version_minor} -lt 1 ] \
+               || [ ${version_index} -lt 10 ]
+        then
+            ${LOG[*]} "[ERR] VirtualBox must be at least version 6.1.10"
+            ${LOG[*]} "[ERR] Please update and reinstall"
+            do_exit=true
+        else
+            ${LOG[*]} "[MSG] Found adequate VirtualBox version."
+        fi
+    else
+        # Balking out of version control.
+        ${LOG[*]} "[ERR] Could not check VirtualBox version with user rights."
+        ${LOG[*]} "[ERR] It is the user's responsability to check that \
+VirtualBox version is at least 6.1.10."
+        ${LOG[*]} "[WAR] This may be caused by the fact that you are not an active"
+        ${LOG[*]} "      member of group vboxusers. Run 'sudo usermod -a -G vboxusers'"
+        ${LOG[*]} "      then log out and log in again."
     fi
 
     #--- do_exit:
@@ -2465,7 +2481,7 @@ generate_Gentoo() {
     then
         ${LOG[*]} "[MSG] You chose to use the output of MKG GitHub Actions."
         ${LOG[*]} "[MSG] The downloaded ISO has been preprocessed."
-        ${LOG[*]}        "It has a number of fixed default parameters."
+        ${LOG[*]} "      It has a number of fixed default parameters."
         ${LOG[*]} "[MSG] The following command line options will be ignored:"
         ${LOG[*]} "      bios, cflags, clonezilla_install, debug_mode, elist"
         ${LOG[*]} "      emirrors, gui, kernel_config, minimal, minimal_size"
@@ -2592,6 +2608,9 @@ main() {
     # Analyse commandline and source auxiliary files
 
     get_options $@
+    ${LOG[*]} "% ----------------------------------------------------------- %"
+    ${LOG[*]} "[MSG] MKG was run with the following options: $@"
+    ${LOG[*]} "% ----------------------------------------------------------- %"
 
     check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
                "VBoxManage" "curl" "grep" "lsblk" "awk" \

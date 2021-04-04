@@ -35,7 +35,6 @@
      "device_installer"   "Create Gentoo clone installer on external device. **ext_device** value must be specified." "false" "b:ext_device"
      "disable_checksum"   "Disable checkum verification after downloads. Boolean."                                          "false" "b"
      "disconnect"         "Unmount guest virtual disk from host."                                                                 "true" "b"
-
      "download"           "Download install ISO image from Gentoo mirror. Boolean."                                               "true" "b"
      "download_arch"      "Download and install stage3 archive to virtual disk. Booelan."                                         "true" "b"
      "download_clonezilla""Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean" "true" "b"
@@ -105,7 +104,6 @@
      "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.14a"  "s"
      "vbpath"             "Path to VirtualBox directory"                                                                      "/usr/bin" "d"
      "vm"                 "Virtual Machine name. Unless 'force=true' is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name."  "Gentoo" "vm"
-
      "vm_language"        "Add support for non-US English language as a default. Use standard abbreviations (fr for french, es for spanish) etc."  "us"         "s"
      "vmpath"             "Path to VM base directory"                                                                         "$PWD"     "d"
      "vtxvpid"            "Activate VTXVPID: on/off"                                                                          "on"       "o"
