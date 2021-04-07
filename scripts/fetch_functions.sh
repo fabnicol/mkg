@@ -479,3 +479,58 @@ autobuilds/${current} ${verb1} 2>&1 | xargs echo '[INF]')"
     ${LOG[*]} "[INF] Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}"
     cp ${verb2} -f ${CACHED_STAGE3} "${STAGE3}"
 }
+
+## @fn fetch_docker_image()
+## @brief Download and uncompress an automated Github Actions
+##        release of a compressed Docker image to run MKG within.
+## @details
+## @li Download from https://github.com/fabnicol/
+## mkg_docker_image/releases/latest
+## @li Uncompress using xz -d.
+## @li Load into docker.
+## @retval ID of loaded image.
+## @ingroup fetchFunctions
+
+fetch_docker_image() {
+
+check_tool xz docker
+
+need_root
+
+local image=mygentoo-${WORKFLOW_TAG2}.tar
+
+local DOCKER_URL="${DOCKER_IMAGE_PATH}/${WORKFLOW_TAG2}/${image}.xz"
+local DOCKER_CHECKSUMS="${DOCKER_IMAGE_PATH}/${WORKFLOW_TAG2}/checksums.txt"
+
+curl -L -O "${DOCKER_URL}"
+if_fails $? "[ERR] Could not download Docker image from ${DOCKER_URL}"
+${LOG[*]} "[MSG] Downloaded Docker image for tag ${WORKFLOW_TAG2}."
+
+curl -L -O "${DOCKER_CHECKSUMS}"
+if_fails $? "[ERR] Could not download checksums.txt from ${DOCKER_URL}."
+${LOG[*]} "[MSG] Downloaded Docker image checksums for tag ${WORKFLOW_TAG2}."
+
+local B2SUM=$(grep -o -E 'b2sum: *([a-z0-9]+)' checksums.txt \
+                  | cut -f 2 -d' ')
+local B2SUM_=$(b2sum "${image}.xz" | cut -f 1 -d' ')
+
+if [ "${B2SUM}" = "${B2SUM_}" ]
+then
+    ${LOG[*]} "[MSG] Verified Docker image checksum OK."
+else
+    ${LOG[*]} "[ERR] blake2b sum of downloaded image ${image}.xz is:"
+    ${LOG[*]} "${B2SUM_}"
+    ${LOG[*]} "[ERR] It does not match checksum manifest b2sum value:"
+    ${LOG[*]} "${B2SUM}."
+    exit 1
+fi
+
+xz -df "${image}.xz"
+
+if_fails $? "[ERR] Could not uncompress ${image}"
+${LOG[*]} "[MSG] Uncompressed Docker image for tag ${WORKFLOW_TAG2}."
+
+docker load -i "${image}"  >/dev/null 2>&1
+if_fails $? "[ERR] Could not load image ${image} into Docker."
+${LOG[*]} "[MSG] Loaded Docker image for tag ${WORKFLOW_TAG2}."
+}

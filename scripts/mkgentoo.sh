@@ -192,10 +192,13 @@ download_clonezilla=false\` \  "
 echo "    \`custom_clonezilla=clonezilla_cached.iso use_mkg_workflow=false \
 nonroot_user=phil\`  "
 echo "\`# nohup ./mkg plot plot_color="'red'" plot_period=10 plot_pause=7\` \  "
-echo "      \`compact minimal minimal_size=false use_mkg_workflow=false gui=false \
-elist=myebuilds\` \  "
+echo "      \`compact minimal minimal_size=false use_mkg_workflow=false \
+gui=false elist=myebuilds\` \  "
 echo "        \`email=my.name@gmail.com email_passwd='mypasswd' &\`  "
 echo "\`# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\`  "
+echo "\'# ./mkg dockerize minimal use_mkg_workflow=false ncpus=5 mem=10000 \
+gentoo.iso\`  "
+echo "  "
 echo "  "
 echo "**Type Conventions:**  "
 echo "b: true/false Boolean  "
@@ -732,6 +735,12 @@ third-party applications for this mail to be sent."
         ${LOG[*]} "[MSG] Deactivated cleanup"
     fi
 
+    "${BUILD_VIRTUALBOX}" \
+        && USE_MKG_WORKFLOW=false \
+        && USE_CLONEZILLA_WORKFLOW=false \
+        && DOWNLOAD_ARCH=false \
+        && CLONEZILLA_INSTALL=true
+
     if "${HOT_INSTALL}" && "${DEVICE_INSTALLER}"
     then
         ${LOG[*]} "[ERR] Either use hot_install or device_installer \
@@ -776,12 +785,16 @@ Allowing a 10 second break for second thoughts."
     #  root is also necxessary when chroot is used (TEST_EMERGE) and/or using     #
     #  another block device with dd or ocs-sr                                     #
     ###############################################################################
+
     "${USE_CLONEZILLA_WORKFLOW}" && DOWNLOAD_CLONEZILLA=false
 
-    if ! "${USE_MKG_WORKFLOW}" || (! "${USE_CLONEZILLA_WORKFLOW}" \
-                                    && ([ -z "${CUSTOM_CLONEZILLA}" ] \
-                                       || [ "${CUSTOM_CLONEZILLA}" = "dep" ])) \
-            || ! "${USE_BSDTAR}" || "${TEST_EMERGE}" || "${HOT_INSTALL}" \
+    if ! "${USE_MKG_WORKFLOW}" \
+            || (! "${USE_CLONEZILLA_WORKFLOW}" \
+                && ([ -z "${CUSTOM_CLONEZILLA}" ] \
+                    || [ "${CUSTOM_CLONEZILLA}" = "dep" ])) \
+            || ! "${USE_BSDTAR}" \
+            || "${TEST_EMERGE}" \
+            || "${HOT_INSTALL}" \
             || "${FROM_DEVICE}"
     then
         need_root
@@ -790,7 +803,54 @@ Allowing a 10 second break for second thoughts."
     "${TEST_ONLY}" && TEST_EMERGE=true && USE_MKG_WORKFLOW=false
 
     "${USE_BSDTAR}" && check_tool "bsdtar"
+
+    # This must come at the end of this function as there are absolute overrides
+    if  "${DOCKERIZE}" && ( "${TEST_EMERGE}" \
+                    || "${HOT_INSTALL}" \
+                    || ! "${USE_CLONEZILLA_WORKFLOW}" \
+                    || "${BUILD_VIRTUALBOX}" \
+                    || [ "${SHARE_ROOT}" != "dep" ] \
+                    || "${DO_GNU_PLOT}")
+    then
+        ${LOG[*]} "[ERR] Cannot dockerize with X11 display or mounts within \
+container: "
+        ${LOG[*]} "      The following options cannot be used:"
+        ${LOG[*]} "      build_virtualbox, disconnect, gui, hot_install, plot, \
+share_root, test_emerge, use_clonezilla_workflow=false"
+        exit 1
+    else
+        GUI=false
+        INTERACTIVE=false
+    fi
 }
+
+## @fn run_docker_container()
+## @brief Run the downloaded Docker image.
+## @details
+## @li Run the MKG command line within the container.
+## @warning Needs administrative rights to load the image.
+## @retval The Docker ID of the container started by @code docker run @endcode
+## @ingroup createInstaller
+
+run_docker_container() {
+
+    check_tool docker
+
+    need_root
+
+    local cli=$(sed -r "/dockerize/d" <<< "$@")
+
+    ${LOG[*]} "[INF] Starting container with command line: "
+    ${LOG[*]} "${cli}"
+
+    docker run -dit  -v /dev/log:/dev/log \
+                  --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
+                  "${cli}"
+
+    if_fails $? "[ERR] Could not start container mygentoo:${WORKFLOW_TAG2}"
+    ${LOG[*]} "[MSG] Started Docker container for tag ${WORKFLOW_TAG2}."
+}
+
 
 # ---------------------------------------------------------------------------- #
 # SQUASHFS/UNSQUASHFS operations
@@ -2630,6 +2690,15 @@ main() {
 
     source scripts/fetch_functions.sh
     source scripts/build_virtualbox.sh
+
+    # containerization first
+
+    if "${DOCKERIZE}"
+    then
+        fetch_docker_image
+        run_docker_container
+        exit 0
+    fi
 
     # optional VirtualBox build
 

@@ -35,6 +35,8 @@
      "device_installer"   "Create Gentoo clone installer on external device.  **ext_device** value must be specified."             ""    ""
      "disable_checksum"  "Disable checkum verification after downloads. Boolean."                                           "false" "b"
      "disconnect"         "Unmount guest virtual disk from host."                             "true" "b"
+     "dockerize"          "Use a pre-built Docker image to run MKG into. Incompatible with e.g. 'gui', 'hot_install', 'plot', 'test_emerge'"    "false" "b"
+     "docker_image_path" "URL to ../'${WORKFLOW_TAG2}'/mygentoo-'${WORKFLOW_TAG2}'.tar.xz"                                          "path5" "s:workflow_tag2"          
      "download"           "Download install ISO image from Gentoo mirror. Boolean."                                               "true" "b"
      "download_arch"      "Download and install stage3 archive to virtual disk. Booelan."                                         "true" "b"
      "download_clonezilla""Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean" "true" "b"
@@ -99,8 +101,8 @@
      "use_clonezilla_workflow" "Use Github Actions workflow to add virtualbox guest additions to CloneZilla ISO."                 "true" "b"
      "use_mkg_workflow" "Use Github Actions workflow to preprocess minimal Gentoo ISO by adding MKG scripts inside the squashfs filesystem."  "true" "b"
      "use_qemu"           "Use qemu instead of guestfish for installing Gentoo to block device with **hot_install** or with **share_root**" "false" "b" 
-     "vbox_version"       "Virtualbox version"                                                                                "6.1.14"   "s"
-     "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.14a"  "s"
+     "vbox_version"       "Virtualbox version"                                                                                "6.1.16"   "s"
+     "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.16"  "s"
      "vbpath"             "Path to VirtualBox directory"                                                                      "/usr/bin" "d"
      "vm"                 "Virtual Machine name. Unless 'force=true' is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name."  "Gentoo" "vm"
 
@@ -114,4 +116,5 @@
 # **path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           
 # **path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox
 # **path4:**  https://github.com/fabnicol/mkg/releases/download
+# **path5**   https://github.com/fabnicol/mkg_docker_image/releases/download
 # **count:**  $((`nproc --all`/3))  
