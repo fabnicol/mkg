@@ -26,36 +26,36 @@ get_options() {get_options302,10801
 test_cli_pre() {test_cli_pre374,12696
 test_cli() {test_cli463,15629
 test_cli_post() {test_cli_post617,20600
-run_docker_container() {run_docker_container837,28196
-mount_live_cd() {mount_live_cd861,28908
-test_emerge_step() {test_emerge_step880,29403
-    cat > portage_test.sh << EOFEOF939,31370
-prepare_chroot() {prepare_chroot1022,33686
-remove_chroot() {remove_chroot1101,36099
-move_auxiliary_files() {move_auxiliary_files1128,36896
-make_boot_from_livecd() {make_boot_from_livecd1189,39270
-prepare_bash_rc() {prepare_bash_rc1263,41454
-test_vm_running() {test_vm_running1296,42365
-deep_clean() {deep_clean1306,42612
-delete_vm() {delete_vm1363,44679
-create_vm() {create_vm1476,48822
-    ascii2hex() { echo -n 0x; od -A n --endian little -t x4 | sed 's/ //g'; }ascii2hex1532,50981
-log_loop() {log_loop1671,56376
-create_iso_vm() {create_iso_vm1747,58764
-mount_vdi() {mount_vdi1890,64578
-unmount_vdi() {unmount_vdi1991,67438
-clone_vm_to_device() {clone_vm_to_device2079,69757
-create_device_system() {create_device_system2131,71439
-clonezilla_to_iso() {clonezilla_to_iso2161,72354
-add_guest_additions_to_clonezilla_iso() {add_guest_additions_to_clonezilla_iso2211,74048
-    cat > squashfs-root/update_clonezilla.sh << EOFEOF2215,74122
-bind_mount_clonezilla_iso() {bind_mount_clonezilla_iso2282,76363
-unmount_clonezilla_iso() {unmount_clonezilla_iso2331,77615
-clonezilla_device_to_image() {clonezilla_device_to_image2353,78299
-        cat > squashfs-root/create_backup_iso.sh << EOFEOF2411,80096
-prepare_for_iso_vm() {prepare_for_iso_vm2456,81290
-generate_Gentoo() {generate_Gentoo2535,83820
-main() {main2621,86858
+run_docker_container() {run_docker_container835,28141
+mount_live_cd() {mount_live_cd864,28968
+test_emerge_step() {test_emerge_step883,29463
+    cat > portage_test.sh << EOFEOF942,31430
+prepare_chroot() {prepare_chroot1025,33746
+remove_chroot() {remove_chroot1104,36159
+move_auxiliary_files() {move_auxiliary_files1131,36956
+make_boot_from_livecd() {make_boot_from_livecd1192,39330
+prepare_bash_rc() {prepare_bash_rc1266,41514
+test_vm_running() {test_vm_running1299,42425
+deep_clean() {deep_clean1309,42672
+delete_vm() {delete_vm1366,44739
+create_vm() {create_vm1479,48882
+    ascii2hex() { echo -n 0x; od -A n --endian little -t x4 | sed 's/ //g'; }ascii2hex1535,51041
+log_loop() {log_loop1674,56436
+create_iso_vm() {create_iso_vm1750,58824
+mount_vdi() {mount_vdi1893,64638
+unmount_vdi() {unmount_vdi1994,67498
+clone_vm_to_device() {clone_vm_to_device2082,69817
+create_device_system() {create_device_system2134,71499
+clonezilla_to_iso() {clonezilla_to_iso2164,72414
+add_guest_additions_to_clonezilla_iso() {add_guest_additions_to_clonezilla_iso2214,74108
+    cat > squashfs-root/update_clonezilla.sh << EOFEOF2218,74182
+bind_mount_clonezilla_iso() {bind_mount_clonezilla_iso2285,76423
+unmount_clonezilla_iso() {unmount_clonezilla_iso2334,77675
+clonezilla_device_to_image() {clonezilla_device_to_image2356,78359
+        cat > squashfs-root/create_backup_iso.sh << EOFEOF2414,80156
+prepare_for_iso_vm() {prepare_for_iso_vm2459,81350
+generate_Gentoo() {generate_Gentoo2538,83880
+main() {main2624,86918
 
 mkvm_chroot.sh,210
 adjust_environment() {adjust_environment40,1743

@@ -1,0 +1,263 @@
+<h1 id="mkg-cheatsheet">MKG Cheatsheet</h1>
+<table>
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 54%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Running MKG in containers</strong></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code># mkg dockerize</code></td>
+<td style="text-align: left;">Running a container for Plasma.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>$ git checkout gnome</code></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code># mkg dockerize gentoo.iso</code></td>
+<td style="text-align: left;">Running a container for Gnome.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code># docker exec -it ID bash</code></td>
+<td style="text-align: left;">Check job log</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>cont# tail -f nohup.out</code></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">or:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>grep -E '\[\w{3}\]' /var/log/syslog</code></td>
+<td style="text-align: left;">Host log search. Also echoes container logs.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Use <code>syslog.x</code> for older logs.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code># docker cp ID:/mkg/gentoo.iso .</code></td>
+<td style="text-align: left;">Fetch back MKG installer from container.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Running MKG with custom options</strong></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code># mkg use_mkg_workflow=false [...]</code></td>
+<td style="text-align: left;">Do not use preprocessed live install CD from</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Github Actions workflow. You may use:</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>ncpus=X,</code> <code>bios, cflags, clonezilla_install</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>debug_mode, elist, emirrors, kernel_config</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>minimal, minimal_size, ncpus, nonroot_user</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>passwd, processor, rootpasswd, stage3</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>vm_language.</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Main options:</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>minimal</code>: just build a minimal desktop.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>cflags=[...,...,...]</code>: CFLAGS options in list form.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><code>vm_language=..</code>: set platform language if non US-English (<code>fr</code>, <code>de</code>, etc.)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code># mkg use_clonezilla_workflow=false [...]</code></td>
+<td style="text-align: left;">Do not use preprocessed cclonezilla live CD from Github Actions workflow.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Rebuild this CD again incorporating VirtualBox</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">from current Ubuntu repositories.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 41%" />
+<col style="width: 58%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Reusing artifacts previously downloaded</strong></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>$ mkg custom_clonezilla=file [...]</code></td>
+<td style="text-align: left;">Use this file as CloneZilla live CD.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>$ mkg download_clonezilla=false [...]</code></td>
+<td style="text-align: left;">Use cached CloneZilla live CD from prior downloads.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>$ mkg download_arch=false [...]</code></td>
+<td style="text-align: left;">Use cached stage3 archive from prior downloads.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>$ mkg download=false [...]</code></td>
+<td style="text-align: left;">Use cached Gentoo minimal install CD from prior downloads.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Input/Output and Backup options</strong></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>$ mkg [...] burn</code></td>
+<td style="text-align: left;">Burn Gentoo installer to DVD when processed.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code># mkg [...] hot_install ext_device=sdX</code></td>
+<td style="text-align: left;">Install Gentoo onto partition <strong>/dev/sdX</strong>.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code># mkg from_device ext_device=sdX \ gentoo.iso</code></td>
+<td style="text-align: left;">Backup partition <strong>/dev/sdX</strong> into a CloneZilla installer <strong>gentoo.iso</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code># mkg [...] from_iso gentoo.iso burn</code></td>
+<td style="text-align: left;">Burn <strong>gentoo.iso</strong> to disk.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code># mkg [...] from_iso gentoo.iso \ ext_device=sdX</code></td>
+<td style="text-align: left;">Create USB stick or any block device installer from <strong>gentoo.iso</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code># mkg [...] from_vm vm=... \ gentoo.iso</code></td>
+<td style="text-align: left;">Create CloneZilla installer image from VM (after VM completed processes and stopped.)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code># mkg [...] from_vm vm=... \ hot_install ext_device=sdX</code></td>
+<td style="text-align: left;">Directly install Gentoo to partition <strong>/dev/sdX</strong> from VM (after VM completed processes and stopped.)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 69%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Graphic display and Interaction</strong></th>
+<th style="text-align: left;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>$ mkg [...] gui=false</code></td>
+<td style="text-align: left;">Do not display VirtualBox guest in GUI.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>$ mkg [...] interactive=false</code></td>
+<td style="text-align: left;">Do not interact with user. To be used in scripts and containers, with caution.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>$ mkg [...] email=...@... \ email_passwd=...</code></td>
+<td style="text-align: left;">Send a meesage to email address with given user password upon completion. Not to be used in public networks.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>

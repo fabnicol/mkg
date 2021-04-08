@@ -101,7 +101,7 @@
      "use_bsdtar"         "Use 'bsdtar' (from libarchive) to extract CloneZilla ISO files if creating an ISO installer."          "true" "b"
      "use_clonezilla_workflow" "Use Github Actions workflow to add virtualbox guest additions to CloneZilla ISO."                 "true" "b"
      "use_mkg_workflow" "Use Github Actions workflow to preprocess minimal Gentoo ISO by adding MKG scripts inside the squashfs filesystem."  "true" "b"
-     "use_qemu"           "Use qemu instead of guestfish for installing Gentoo to block device with **hot_install** or with **share_root**" "false" "b" 
+     "use_qemu"           "Use qemu instead of guestfish for installing Gentoo to block device with **hot_install**"             "false" "b" 
      "vbox_version"       "Virtualbox version"                                                                                "6.1.16"   "s"
      "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.16"  "s"
      "vbpath"             "Path to VirtualBox directory"                                                                      "/usr/bin" "d"
