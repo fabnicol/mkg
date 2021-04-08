@@ -49,16 +49,16 @@
 |                                           |                                                            |
    
    
-| **Input/Output and Backup options**                       |                                                                                                       |
-|:----------------------------------------------------------|:------------------------------------------------------------------------------------------------------|
-| `$ mkg [...] burn`                                        | Burn Gentoo installer to DVD when processed.                                                          |
-| `# mkg [...] hot_install ext_device=sdX`                  | Install Gentoo onto partition **/dev/sdX**.                                                           |
-| `# mkg from_device ext_device=sdX \ gentoo.iso`           | Backup partition **/dev/sdX** into a CloneZilla installer **gentoo.iso**                              |
-| `# mkg [...] from_iso gentoo.iso burn`                    | Burn **gentoo.iso** to disk.                                                                          |
-| `# mkg [...] from_iso gentoo.iso \ ext_device=sdX`        | Create USB stick or any block device installer from **gentoo.iso**                                    |
-| `# mkg [...] from_vm vm=... \ gentoo.iso`                 | Create CloneZilla installer image from VM (after VM completed processes and stopped.)                 |
-| `# mkg [...] from_vm vm=... \ hot_install ext_device=sdX` | Directly install Gentoo to partition **/dev/sdX** from VM (after VM completed processes and stopped.) |
-|                                                           |                                                                                                       |
+| **Input/Output and Backup options**                                 |                                                                                                       |
+|:--------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------|
+| `$ mkg [...] burn`                                                  | Burn Gentoo installer to DVD when processed.                                                          |
+| `# mkg [...] hot_install ext_device=sdX`                          | Install Gentoo onto partition **/dev/sdX** after completion of VM processes.                          |
+| `# mkg from_device ext_device=sdX \ gentoo.iso`                     | Backup partition **/dev/sdX** into a CloneZilla installer **gentoo.iso**                              |
+| `# mkg [...] from_iso gentoo.iso burn`                              | Burn **gentoo.iso** to disk.                                                                          |
+| `# mkg [...] from_iso gentoo.iso \ device_installer ext_device=sdX` | Create USB stick or any block device installer from **gentoo.iso**                                    |
+| `# mkg [...] from_vm vm=... \ gentoo.iso`                           | Create CloneZilla installer image from VM (after VM completed processes and stopped.)                 |
+| `# mkg [...] from_vm vm=... \ hot_install ext_device=sdX`           | Directly install Gentoo to partition **/dev/sdX** from VM (after VM completed processes and stopped.) |
+|                                                                     |                                                                                                       |
 
 
 | **Graphic display and Interaction**            |                                                                                                              |

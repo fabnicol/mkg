@@ -2752,7 +2752,7 @@ main() {
     # Process the virtual disk into a clonezilla image
 
     if [ -f "${VM}.vdi" ] \
-       && ("${CREATE_ISO}" || "${FROM_VM}") \
+       && "${CREATE_ISO}" \
        && ! "${FROM_DEVICE}"
     then
         # Now create a new VM from clonezilla ISO to retrieve
