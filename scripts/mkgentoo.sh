@@ -843,7 +843,10 @@ run_docker_container() {
     ${LOG[*]} "[INF] Starting container with command line: "
     ${LOG[*]} "${cli}"
 
-    docker run -dit  -v /dev/log:/dev/log \
+    # Experimental, undocumented environment variable
+    # DOCKER_RUN_OPTS
+
+    docker run "${DOCKER_RUN_OPTS}" -dit  -v /dev/log:/dev/log \
                   --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
                   "${cli}"
 
