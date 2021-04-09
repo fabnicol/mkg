@@ -36,7 +36,7 @@ build_virtualbox() {
     mount_live_cd
     ${LOG[*]} "[MSG] VERSION: ${VBOX_VERSION_FULL}"
     cp -vf /etc/resolv.conf squashfs-root/etc
-    for i in proc sys dev run; do mount -B "/$i" "squashfs-root/$i"; done
+    bind_filesystem "squashfs-root"
     cat > run.sh << EOF
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
@@ -90,13 +90,14 @@ EOF
     chmod +x run.sh
     cp -vf run.sh squashfs-root/
     chroot squashfs-root ./run.sh
-    for i in proc sys dev run; do umount -l squashfs-root/$i; done
+    unbind_filesystem "squashfs-root"
     cd "${VMPATH}" || exit 2
     [ -d virtualbox ] && rm -rf virtualbox
     mkdir virtualbox
     rsync -aH mnt2/live/squashfs-root/ virtualbox
     chown -R $USER virtualbox
     rm -rf mnt2/live/squashfs-root
+    rm -rf mnt2
     rm VirtualBox
     cat > VirtualBox << EOF
 #!/bin/bash

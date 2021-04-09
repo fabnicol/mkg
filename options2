@@ -26,16 +26,17 @@
      "cflags"             "GCC CFLAGS options for ebuilds"                                                         "[-march=native,-O2]" "s"     
      "cleanup"            "Clean up archives, temporary images and virtual machine after successful completion. Boolean."         "true" "b"
      "clonezilla_install" "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false" "b"
-     "cloning_method"     "Method used by hot_install ext_device=... to intall Gentoo to disk. One of: 'guestfish' or 'qemu'" "guestfish"  "s:ext_device"
+     "cloning_method"     "Method used by hot_install ext_device=... to intall Gentoo to disk. One of: 'guestfish' or 'qemu'" "guestfish" "s:ext_device"
      "compact"            "Compact virtual disk after VM building. Caution: this may impede hot_install and ext_device."          "false" "b"
      "cpuexecutioncap"    "Maximum percentage of CPU per core (0 to 100)"                                                          "100" "n"
      "CRAN_REPOS"	  "CRAN repository URL for downloading extra R packages"                           "https://cloud.r-project.org" "s"
      "create_squashfs"    "(Re)create the squashfs filesystem. Boolean."                                                          "true" "b"
      "custom_clonezilla"  "Use this previously created custom CloneZilla ISO with added VirtualBox and guest additions."          "dep"  "s"
      "device_installer"   "Create Gentoo clone installer on external device. **ext_device** value must be specified." "false" "b:ext_device"
-     "disable_checksum"  "Disable MD5 checkums verification after downloads. Boolean."                                           "false" "b"
-     "disconnect"         "Unmount guest virtual disk from host."                             "true" "b"
-
+     "disable_checksum"   "Disable checkum verification after downloads. Boolean."                                          "false" "b"
+     "disconnect"         "Unmount guest virtual disk from host."                                                                 "true" "b"
+     "dockerize"          "Use a pre-built Docker image to run MKG into. Incompatible with e.g. 'gui', 'hot_install', 'plot', 'test_emerge'" "false" "b"
+     "docker_image_path"  "URL to ../'${WORKFLOW_TAG2}'/mygentoo-'${WORKFLOW_TAG2}'.tar.xz" "https://github.com/fabnicol/mkg_docker_image/releases/download" "s:workflow_tag2"          
      "download"           "Download install ISO image from Gentoo mirror. Boolean."                                               "true" "b"
      "download_arch"      "Download and install stage3 archive to virtual disk. Booelan."                                         "true" "b"
      "download_clonezilla""Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean" "true" "b"
@@ -51,12 +52,11 @@
      "from_iso"           "Do not generate Gentoo but use the bootable ISO given on commandline."                                "false" "b"
      "from_vm"            "Do not generate Gentoo but use the VM. Boolean."                                                      "false" "b"
      "full_cleanup"       "Remove virtual disk, archives and ISO files on clean-up"                                              "false" "b"
-     "github_release_path" "URL to Github Release of clonezilla_with_virtualbox.iso"                                             "https://github.com/fabnicol/clonezilla_with_virtualbox" "s"
-     "github_release_path2" "URL to Github Release of preprocessed_gentoo_install.iso"                                             "https://github.com/fabnicol/mkg/releases/download" "s"     
-
+     "github_release_path" "URL to Github Release of clonezilla_with_virtualbox.iso" "https://github.com/fabnicol/clonezilla_with_virtualbox" "s"
+     "github_release_path2" "URL to Github Release of preprocessed_gentoo_install.iso" "https://github.com/fabnicol/mkg/releases/download" "s"     
      "gui"                "Binary: true corresponds to VBoxManage startvm ... --type=gui, false to --type=headless"               "true" "b"
      "help"               "This help"                                                                                                ""  ""
-     "hot_install"        "Intall to Gentoo attached device (like /dev/sdb) possibly mounted (like /media/USER/567EAF). To be used with *ext_device=...*"        "false"  "b:ext_device"
+     "hot_install"        "Intall to Gentoo attached device (like /dev/sdb) possibly mounted (like /media/USER/567EAF). To be used with *ext_device=...*" "false" "b:ext_device"
      "htmlpage"           "Create HTML help page"                                                                                "false" "b"     
      "hwvirtex"           "Activate HWVIRTEX: on/off"                                                                               "on" "o"
      "interactive"        "Allow interaction with user. This may cause deadlock if process is detached from the console (*nohup* or other methods)" "true" "b"
@@ -67,7 +67,7 @@
      "mem"                "VM RAM memory in MiB"                                                                            "8000"       "n"
      "minimal"            "Remove *libreoffice* and *data science tools* from default list of installed software. Boolean."      "false" "b"
      "minimal_size"       "Remove kernel sources to minimize packaging. Not advised for personal use but OK for deployment and distribution." "true" "b"
-     "mirror"             "Mirror site for downloading of stage3 tarball"                                                        "http://gentoo.mirrors.ovh.net/gentoo-distfiles/" "u"
+     "mirror"             "Mirror site for downloading of stage3 tarball"              "http://gentoo.mirrors.ovh.net/gentoo-distfiles/" "u"
      "ncpus"              "Number of VM CPUs. By default the third of available threads."                                        "$((`nproc --all`/3))" "n"
      "no_run"             "If using **share_root='r' or 'w'**, do not run the virtual machine but use the VDI disk corresponding to vm=... Otherwise start 15 minutes later."   "true"  "b"
      "nonroot_user"       "Non-root user"                                                                                          "fab" "s"
@@ -101,12 +101,11 @@
      "use_bsdtar"         "Use 'bsdtar' (from libarchive) to extract CloneZilla ISO files if creating an ISO installer."          "true" "b"
      "use_clonezilla_workflow" "Use Github Actions workflow to add virtualbox guest additions to CloneZilla ISO."                 "true" "b"
      "use_mkg_workflow" "Use Github Actions workflow to preprocess minimal Gentoo ISO by adding MKG scripts inside the squashfs filesystem."  "true" "b"
-     "use_qemu"           "Use qemu instead of guestfish for installing Gentoo to block device with **hot_install** or with **share_root**" "false" "b" 
-     "vbox_version"       "Virtualbox version"                                                                                "6.1.14"   "s"
-     "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.14a"  "s"
+     "use_qemu"           "Use qemu instead of guestfish for installing Gentoo to block device with **hot_install**"             "false" "b" 
+     "vbox_version"       "Virtualbox version"                                                                                "6.1.16"   "s"
+     "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.16"  "s"
      "vbpath"             "Path to VirtualBox directory"                                                                      "/usr/bin" "d"
      "vm"                 "Virtual Machine name. Unless 'force=true' is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name."  "Gentoo" "vm"
-
      "vm_language"        "Add support for non-US English language as a default. Use standard abbreviations (fr for french, es for spanish) etc."  "us"         "s"
      "vmpath"             "Path to VM base directory"                                                                         "$PWD"     "d"
      "vtxvpid"            "Activate VTXVPID: on/off"                                                                          "on"       "o"
@@ -116,6 +115,7 @@
     
 # **path1:**  https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download    
 # **path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           
-# **path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox/
+# **path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox
 # **path4:**  https://github.com/fabnicol/mkg/releases/download
+# **path5**   https://github.com/fabnicol/mkg_docker_image/releases/download
 # **count:**  $((`nproc --all`/3))  

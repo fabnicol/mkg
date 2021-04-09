@@ -84,22 +84,6 @@ create_options_array() {
     IFS=" "
 }
 
-## @fn check_md5sum()
-## @param filename Local name of file to be checked for md5sum.
-## @brief Check md5sums in file MD5SUMS
-## @retval Return 0 on success otherwise -1 on exit
-## @ingroup auxiliaryFunctions
-
-check_md5sum() {
-    check_tool "md5sum"
-    local ref=$(cat MD5SUMS | grep "$1" | cut -f 1 -d' ')
-    downloaded=$(md5sum $1 | cut -f 1 -d' ')
-    [ ${downloaded} = ${ref} ] && return 0
-    ${LOG[*]} "[ERR] MD5 checkum for $1 is not correct. \
-Please download manually..."
-    exit 1
-}
-
 ## @fn test_numeric()
 ## @brief Test whether the input value is numeric
 ## @param number in string form
@@ -579,5 +563,13 @@ checksums() {
         echo "      sha256sum: $(sha256sum ${LIVECD})" | tee -a checksums.txt
     else
         echo "[ERR] Workflow failed to create file ${VMPATH}/${LIVECD}."
+    fi
+}
+
+need_root() {
+    if [ "$(whoami)" != "root" ]
+    then
+        ${LOG[*]} "[ERR] must be root to continue."
+        exit 1
     fi
 }

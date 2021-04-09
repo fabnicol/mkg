@@ -123,100 +123,120 @@ declare -x CREATE_ISO=false
 
 help_md() {
 
-    local count=$(($(nproc --all)/3))
-    echo "**USAGE:**  "
-    echo "**mkg**                                        [1]  "
-    echo "**mkg**  [[switch=argument]...]  filename.iso  [2]  "
-    echo "**mkg**  [[switch=argument]...]                [3]  "
-    echo "**mkg**  help[=md]                             [4]  "
-    echo "  "
-    echo "Usage [1] and [2] create a bootable ISO output file with a current  "
-    echo "Gentoo distribution.  "
-    echo "For [1], implicit ISO output name is **gentoo.iso**  "
-    echo "Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine  "
-    echo "with name Gentoo.  "
-    echo "Usage [4] prints this help, in markdown form if argument 'md' is  "
-    echo "specified.  "
-    echo "Warning: you should have at least 55 GB of free disk space in the  "
-    echo "current directory or in vmpath if specified.  "
-    echo "  "
-    echo "Arguments with white space (like \`cflags=\"-O2 -march=...\"\`) should be  "
-    echo "written in list form with commas and no spaces: \`cflags=[-O2,-march=...]\`  "
-    echo "The same holds for paths with white space.  "
-    echo "  "
-    echo "As of March, 2021, part of the build is performed  "
-    echo "by *Github Actions* automatically. An ISO file of CloneZilla  "
-    echo "supplemented with VirtualBox guest additions will be downloaded  "
-    echo "from the resulting automated Github release. To disable this behavior  "
-    echo "you can add \`use_clonezilla_workflow=false\` to command line, or build the  "
-    echo "custom ISO file beforehand using the companion project  "
-    echo "**clonezilla_with_virtualbox**. In this case, add:  "
-    echo "\`custom_clonezilla=your_build.iso\`  "
-    echo "to command line.  "
-    echo "A similar procedure also applies to the minimal Gentoo install ISO.  "
-    echo "MKG scripts and the stage3 archive are added within its squashfs filesystem  "
-    echo "by the *Github Actions* workflow of the MKG Github site.  "
-    echo "An ISO file labelled **downloaded.iso** is automatically released  "
-    echo "by the workflow. It will be downloaded from the MKG Github release section.  "
-    echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
-    echo "to command line.   "
-    echo "  "
-    echo "**Options:**  "
-    echo "  "
-    echo "Boolean values are either \`true\` or \`false\`. For example, to build  "
-    echo "a minimal distribution, add to command line:   "
-    echo "\`minimal=true\`   "
-    echo "or simply: \`minimal\` as \`true\` can be omitted (unlike \`false\`).  "
-    echo "      "
-    echo "**Examples**   "
-    echo "  "
-    echo "\`# ./mkg pdfpage\`  "
-    echo "\`# ./mkg debug_mode verbose from_vm vm=Gentoo.iso gentoo_small.iso\` \  "
-    echo "    \`ext_device=sdc device_installer blank burn cleanup=false\`   "
-    echo "\`# ./mkg download_arch=false download=false download_clonezilla=false\` \  "
-    echo "    \`custom_clonezilla=clonezilla_cached.iso nonroot_user=phil\`  "
-    echo "\`# nohup ./mkg plot plot_color="'red'" plot_period=10 plot_pause=7\` \  "
-    echo "      \`compact minimal minimal_size=false  gui=false elist=myebuilds\` \  "
-    echo "        \`email=my.name@gmail.com email_passwd='mypasswd' &\`  "
-    echo "\`# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\`  "
-    echo "  "
-    echo "**Type Conventions:**  "
-    echo "b: true/false Boolean  "
-    echo "o: on/off Boolean  "
-    echo "n: Integer  "
-    echo "f: Filepath  "
-    echo "d: Directory path  "
-    echo "e: Email address  "
-    echo "s: String  "
-    echo "u: URL  "
-    echo
-    echo "When a field depends on another, a colon separates the type and  "
-    echo "the name of the dependency."
-    echo "dep is a reserved word for dummy defaults of dependencies i.e.  "
-    echo "optional strings that may remain unspecified.  "
-    echo "Some options are incompatible, e.g. \`test_only\` and \`use_mkg_workflow\`  "
-    echo "   "
-    echo "   "
-    echo " | Option | Description | Default value |   Type    |  "
-    echo " |:------:|:------------|:-------------:|:---------:|  "
-    declare -i i
-    for ((i=0; i<ARRAY_LENGTH; i++))
-    do
-        declare -i sw=i*4       # no spaces!
-        declare -i desc=i*4+1
-        declare -i def=i*4+2
-        declare -i type=i*4+3
-        echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [ ${ARR[def]} ] | ${ARR[type]}|"
-    done
-    echo "  "
-    echo "  "
-    echo "**path1:**  https://sourceforge.net/projects/clonezilla/files/\
+local count=$(($(nproc --all)/3))
+echo "**USAGE:**  "
+echo "**mkg**                                        [1]  "
+echo "**mkg**  [[switch=argument]...]  filename.iso  [2]  "
+echo "**mkg**  [[switch=argument]...]                [3]  "
+echo "**mkg**  help[=md]                             [4]  "
+echo "  "
+echo "Usage [1] and [2] create a bootable ISO output file with a current  "
+echo "Gentoo distribution.  "
+echo "For [1], implicit ISO output name is **gentoo.iso**  "
+echo "Usage [3] creates a VirtualBox VDI dynamic disk and a virtual machine  "
+echo "with name Gentoo.  "
+echo "Usage [4] prints this help, in markdown form if argument 'md' is  "
+echo "specified.  "
+echo "Warning: you should have at least 55 GB of free disk space in the  "
+echo "current directory or in vmpath if specified.  "
+echo "  "
+echo "Arguments with white space (like \`cflags=\"-O2 -march=...\"\`) \
+should be  "
+echo "written in list form with commas and no spaces: \
+\`cflags=[-O2,-march=...]\`  "
+echo "The same holds for paths with white space.  "
+echo "  "
+echo "As of March, 2021, part of the build is performed  "
+echo "by *Github Actions* automatically. An ISO file of CloneZilla  "
+echo "supplemented with VirtualBox guest additions will be downloaded  "
+echo "from the resulting automated Github release. To disable this behavior  "
+echo "you can add \`use_clonezilla_workflow=false\` to command line, or \
+build the  "
+echo "custom ISO file beforehand using the companion project  "
+echo "**clonezilla_with_virtualbox**. In this case, add:  "
+echo "\`custom_clonezilla=your_build.iso\`  "
+echo "to command line.  "
+echo "Within containers, \`use_clonezilla_workflow\`, \`build_virtualbox\`  "
+echo "and \`test_emerge\` are not (yet) supported and will fail.  "
+echo "A similar procedure also applies to the minimal Gentoo install ISO.  "
+echo "MKG scripts and the stage3 archive are added within its squashfs \
+filesystem  "
+echo "by the *Github Actions* workflow of the MKG Github site.  "
+echo "An ISO file labelled **downloaded.iso** is automatically released  "
+echo "by the workflow. It will be downloaded from the MKG Github release \
+section.  "
+echo "This preprocessed ISO has build parameter presets. It builds the full \
+desktop.  "
+echo "In particular, the following command line options will be ignored:  "
+echo "\`bios, cflags, clonezilla_install, debug_mode, elist, emirrors, \`  "
+echo "\`kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd,\`  "
+echo "\`processor, rootpasswd, stage3, vm_language.\`  "
+echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
+echo "to command line. You will need to do so if you do not use OS build \
+presets.  "
+echo "  "
+echo "**Options:**  "
+echo "  "
+echo "Boolean values are either \`true\` or \`false\`. For example, to build  "
+echo "a minimal distribution, add to command line:   "
+echo "\`minimal=true\`   "
+echo "or simply: \`minimal\` as \`true\` can be omitted (unlike \`false\`).  "
+echo "      "
+echo "**Examples**   "
+echo "  "
+echo "\`$ ./mkg pdfpage\`  "
+echo "\`$ ./mkg debug_mode verbose from_vm vm=Gentoo  gentoo_small.iso\` \  "
+echo "    \`ext_device=sdc device_installer blank burn cleanup=false\`   "
+echo "\`# ./mkg download_arch=false download=false \
+download_clonezilla=false\` \  "
+echo "    \`custom_clonezilla=clonezilla_cached.iso use_mkg_workflow=false \
+nonroot_user=phil\`  "
+echo "\`# nohup ./mkg plot plot_color="'red'" plot_period=10 plot_pause=7\` \  "
+echo "      \`compact minimal minimal_size=false use_mkg_workflow=false \
+gui=false elist=myebuilds\` \  "
+echo "        \`email=my.name@gmail.com email_passwd='mypasswd' &\`  "
+echo "\`# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\`  "
+echo "\'# ./mkg dockerize minimal use_mkg_workflow=false ncpus=5 mem=10000 \
+gentoo.iso\`  "
+echo "  "
+echo "  "
+echo "**Type Conventions:**  "
+echo "b: true/false Boolean  "
+echo "o: on/off Boolean  "
+echo "n: Integer  "
+echo "f: Filepath  "
+echo "d: Directory path  "
+echo "e: Email address  "
+echo "s: String  "
+echo "u: URL  "
+echo
+echo "When a field depends on another, a colon separates the type and  "
+echo "the name of the dependency."
+echo "dep is a reserved word for dummy defaults of dependencies i.e.  "
+echo "optional strings that may remain unspecified.  "
+echo "Some options are incompatible, e.g. \`test_only\` \
+and \`use_mkg_workflow\`  "
+echo "   "
+echo "   "
+echo " | Option | Description | Default value | Type |  "
+echo " |:------:|:------------|:-------------:|:----:|  "
+declare -i i
+for ((i=0; i<ARRAY_LENGTH; i++)); do
+    declare -i sw=i*4       # no spaces!
+    declare -i desc=i*4+1
+    declare -i def=i*4+2
+    declare -i type=i*4+3
+    echo -e "| ${ARR[sw]} \t| ${ARR[desc]} \t| [ ${ARR[def]} ] | ${ARR[type]}|"
+done
+echo "  "
+echo "  "
+echo "**path1:**  https://sourceforge.net/projects/clonezilla/files/\
 clonezilla_live_alternative/20200703-focal/\
 clonezilla-live-20200703-focal-amd64.iso/download  "
-    echo "**path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           "
-    echo "**path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/  "
-    echo "**path4:**  https://github.com/fabnicol/mkg/releases/download  "
-    echo "**count:** nproc --all / 3  "
+echo "**path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           "
+echo "**path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox  "
+echo "**path4:**  https://github.com/fabnicol/mkg/releases/download  "
+echo "**count:** nproc --all / 3  "
 }
 
 ## @fn help_()
@@ -297,7 +317,7 @@ get_options() {
 
     while (( "$#" ))
     do
-        if grep '=' <<< "$1" 2>/dev/null 1>/dev/null
+        if grep -q '=' <<< "$1"
         then
             left=$(sed -E 's/([^=]*)=(.*)/\1/'  <<< "$1")
             right=$(sed -E 's/([^=]*)=(.*)$/\2/' <<< "$1")
@@ -311,7 +331,7 @@ get_options() {
                 fi
             fi
         else
-            if  grep "\.iso"  <<< "$1" 2>/dev/null 1>/dev/null
+            if  grep -q "\.iso"  <<< "$1"
             then
                 ISO_OUTPUT="$1"
                 CREATE_ISO=true
@@ -359,34 +379,40 @@ test_cli_pre() {
 the same time"
              exit 1; }
 
-    # do not use ${}  as true/false in this function as vars. are not all set
-
-    [ "$(whoami)" != "root" ] && { ${LOG[*]} "[ERR] must be root to continue"
-                                   exit 1; }
-    [ -L /home/partimag ] && rm     /home/partimag
-    [ -d /home/partimag ] && rm -rf /home/partimag
-
-    mkdir -p /home/partimag
-    if_fails $? "[ERR] Could not create partimag directory under /home"
-
     # Configuration tests
 
     local do_exit=false
 
     # Check VirtualBox version
 
-    declare -r vbox_version=$(VBoxManage -v)
-    declare -r version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< "${vbox_version}")
-    declare -r version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
-                                   <<< "${vbox_version}")
-    declare -r version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/' \
-                                   <<< "${vbox_version}")
-    if [ "${version_major}" -lt 6 ] || [ "${version_minor}" -lt 1 ] \
-           || [ "${version_index}" -lt 10 ]
+    declare -r vbox_version="$(VBoxManage -v)"
+
+    if [ $? = 0 ]
     then
-        ${LOG[*]} "[ERR] VirtualBox must be at least version 6.1.10"
-        ${LOG[*]} "[ERR] Please update and reinstall"
-        do_exit=true
+        [ "${VERBOSE}" = "true" ] && ${LOG[*]} "[MSG] VirtualBox version: ${vbox_version}"
+
+        declare -i version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< ${vbox_version})
+        declare -i version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
+                                       <<< ${vbox_version})
+        declare -i version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/' \
+                                       <<< ${vbox_version})
+        if [ ${version_major} -lt 6 ] || [ ${version_minor} -lt 1 ] \
+               || [ ${version_index} -lt 10 ]
+        then
+            ${LOG[*]} "[ERR] VirtualBox must be at least version 6.1.10"
+            ${LOG[*]} "[ERR] Please update and reinstall"
+            do_exit=true
+        else
+            ${LOG[*]} "[MSG] Found adequate VirtualBox version."
+        fi
+    else
+        # Balking out of version control.
+        ${LOG[*]} "[ERR] Could not check VirtualBox version with user rights."
+        ${LOG[*]} "[ERR] It is the user's responsability to check that \
+VirtualBox version is at least 6.1.10."
+        ${LOG[*]} "[WAR] This may be caused by the fact that you are not an active"
+        ${LOG[*]} "      member of group vboxusers. Run 'sudo usermod -a -G vboxusers'"
+        ${LOG[*]} "      then log out and log in again."
     fi
 
     #--- do_exit:
@@ -580,7 +606,6 @@ for ${sw}"
 
    # exporting is made necessary by usage in companion scripts.
 
-    [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} "[MSG] Export: ${V}=${!V}"
     export "${V}"
 }
 
@@ -590,6 +615,9 @@ for ${sw}"
 ## @ingroup createInstaller
 
 test_cli_post() {
+
+    # use FORCE on mounting VM with qemu
+    # just to avoid time stamps
 
     [ -n "${SHARE_ROOT}" ] && [ "${SHARE_ROOT}" != "dep" ] && FORCE=true
 
@@ -633,7 +661,7 @@ Resetting *interactive* to *true*."
         # forcing INTERACTIVE as false only for background jobs.
 
         case $(ps -o stat= -p $$) in
-            *+*) echo "[MSG] Running in foreground with interactive=${INTERACTIVE}." ;;
+            *+*) echo "[MSG] Running in foreground with interactive=${INTERACTIVE}."               ;;
             *) echo "[MSG] Running in background in non-interactive mode."
                INTERACTIVE=false
                ;;
@@ -707,6 +735,12 @@ third-party applications for this mail to be sent."
         ${LOG[*]} "[MSG] Deactivated cleanup"
     fi
 
+    "${BUILD_VIRTUALBOX}" \
+        && USE_MKG_WORKFLOW=false \
+        && USE_CLONEZILLA_WORKFLOW=false \
+        && DOWNLOAD_ARCH=false \
+        && CLONEZILLA_INSTALL=true
+
     if "${HOT_INSTALL}" && "${DEVICE_INSTALLER}"
     then
         ${LOG[*]} "[ERR] Either use hot_install or device_installer \
@@ -741,11 +775,85 @@ Allowing a 10 second break for second thoughts."
         exit 1
     fi
 
+    ###############################################################################
+    #  Elevated rights                                                            #
+    #                                                                             #
+    #  root is necessary for mksquashfs/unsquashfs and mount.                     #
+    #  bsdtar, when used, makes it possible to avoid mounts hence elevated rights #
+    #  but this works only is 3rd-party workflows are used or if a custom         #
+    #  CloneZilla CD has been previously obtained.                                #
+    #  root is also necxessary when chroot is used (TEST_EMERGE) and/or using     #
+    #  another block device with dd or ocs-sr                                     #
+    ###############################################################################
+
+    "${USE_CLONEZILLA_WORKFLOW}" && DOWNLOAD_CLONEZILLA=false
+
+    if ! "${USE_MKG_WORKFLOW}" \
+            || (! "${USE_CLONEZILLA_WORKFLOW}" \
+                && ([ -z "${CUSTOM_CLONEZILLA}" ] \
+                    || [ "${CUSTOM_CLONEZILLA}" = "dep" ])) \
+            || ! "${USE_BSDTAR}" \
+            || "${TEST_EMERGE}" \
+            || "${HOT_INSTALL}" \
+            || "${FROM_DEVICE}"
+    then
+        need_root
+    fi
+
     "${TEST_ONLY}" && TEST_EMERGE=true && USE_MKG_WORKFLOW=false
-    ! "${CREATE_ISO}" && USE_BSDTAR=false
+
     "${USE_BSDTAR}" && check_tool "bsdtar"
 
+    # This must come at the end of this function as there are absolute overrides
+    if  "${DOCKERIZE}" && ( "${TEST_EMERGE}" \
+                    || "${HOT_INSTALL}" \
+                    || ! "${USE_CLONEZILLA_WORKFLOW}" \
+                    || "${BUILD_VIRTUALBOX}" \
+                    || [ "${SHARE_ROOT}" != "dep" ] \
+                    || "${DO_GNU_PLOT}")
+    then
+        ${LOG[*]} "[ERR] Cannot dockerize with X11 display or mounts within \
+container: "
+        ${LOG[*]} "      The following options cannot be used:"
+        ${LOG[*]} "      build_virtualbox, disconnect, gui, hot_install, plot, \
+share_root, test_emerge, use_clonezilla_workflow=false"
+        exit 1
+    else
+        GUI=false
+        INTERACTIVE=false
+    fi
 }
+
+## @fn run_docker_container()
+## @brief Run the downloaded Docker image.
+## @details
+## @li Run the MKG command line within the container.
+## @warning Needs administrative rights to load the image.
+## @retval The Docker ID of the container started by @code docker run @endcode
+## @ingroup createInstaller
+
+run_docker_container() {
+
+    check_tool docker
+
+    need_root
+
+    local cli=$(sed -r "/dockerize/d" <<< "$@")
+
+    ${LOG[*]} "[INF] Starting container with command line: "
+    ${LOG[*]} "${cli}"
+
+    # Experimental, undocumented environment variable
+    # DOCKER_RUN_OPTS
+
+    docker run "${DOCKER_RUN_OPTS}" -dit  -v /dev/log:/dev/log \
+                  --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
+                  "${cli}"
+
+    if_fails $? "[ERR] Could not start container mygentoo:${WORKFLOW_TAG2}"
+    ${LOG[*]} "[MSG] Started Docker container for tag ${WORKFLOW_TAG2}."
+}
+
 
 # ---------------------------------------------------------------------------- #
 # SQUASHFS/UNSQUASHFS operations
@@ -940,10 +1048,14 @@ stage3 archive are cached in the directory after prior downloads"
     "${VERBOSE}" && verb="-v"
     mountpoint -q mnt && umount -l mnt
     [ -d mnt ] && rm -rf mnt
-    mkdir mnt
-    check_dir mnt
-    mount -oloop "${ISO}" mnt/  2>/dev/null
-    ! mountpoint -q mnt && ${LOG[*]} "[ERR] ISO not mounted!" && exit 1
+
+    if ! "${USE_BSDTAR}"
+    then
+        mkdir mnt
+        check_dir mnt
+        mount -oloop "${ISO}" mnt/  2>/dev/null
+        ! mountpoint -q mnt && ${LOG[*]} "[ERR] ISO not mounted!" && exit 1
+    fi
 
     #parameter adjustment to account for Gentoo/CloneZilla differences
 
@@ -961,13 +1073,22 @@ stage3 archive are cached in the directory after prior downloads"
 
     mkdir mnt2/
     check_dir mnt2
-    ! [ -d mnt ] && mkdir mnt
-    check_dir mnt
 
-    # get a copy with write access
+    if "${USE_BSDTAR}"
+    then
+        cd mnt2
+        BSDTAR_BINARY="$(which bsdtar)" >/dev/null 2>&1
+        if_fails $? "[ERR] Could not find bsdtar."
+        "${BSDTAR_BINARY}" xpf ../"${ISO}"
+        if_fails $? "[ERR] bsdtar failed to extract ${ISO}."
+        "${VERBOSE}" && ${LOG[*]} "[MSG] ${ISO} was extracted under mnt2."
+        cd -
+    else
+        # get a copy with write access
 
-    "${VERBOSE}" && ${LOG[*]} "[INF] Syncing mnt2 with ISO mountpoint..."
-    rsync -a mnt/ mnt2
+        "${VERBOSE}" && ${LOG[*]} "[INF] Syncing mnt2 with ISO mountpoint..."
+        rsync -a mnt/ mnt2
+    fi
 
     # now unsquashfs the liveCD filesystem
 
@@ -975,7 +1096,7 @@ stage3 archive are cached in the directory after prior downloads"
 
     "${VERBOSE}" && ${LOG[*]} "[INF] Unsquashing filesystem..." \
         && unsquashfs "${SQUASHFS_FILESYSTEM}"  \
-            ||  unsquashfs -q  "${SQUASHFS_FILESYSTEM}" 2>&1 >/dev/null
+             ||  unsquashfs -q  "${SQUASHFS_FILESYSTEM}" 2>&1 >/dev/null
 
     if_fails $? "[ERR] unsquashfs failed!"
     cd "${VMPATH}"
@@ -1104,6 +1225,7 @@ make_boot_from_livecd() {
 
     move_auxiliary_files "${sqrt}"
     cd "${sqrt}" || exit 2
+
     prepare_bash_rc
 
     # the whole platform-making process will be launched by mkvm.sh under /root/
@@ -1437,7 +1559,6 @@ create_vm() {
                                    --size ${SIZE} \
                                    --variant Standard 2>&1 \
                              | xargs echo "[INF] Adding virtual disk.")
-
     else
         ${LOG[*]} "[MSG] Using again old VDI disk: ${1}.vdi, \
 UUID: ${MEDIUM_UUID}"
@@ -1468,7 +1589,6 @@ UUID: ${MEDIUM_UUID}"
     ${LOG[*]} <<< $(VBoxManage internalcommands sethduuid "${1}.vdi" \
                                ${MEDIUM_UUID} 2>&1 \
                         | xargs echo "[INF] Setting UUID to ${MEDIUM_UUID}" )
-
 
     # add storage controllers
 
@@ -1520,7 +1640,6 @@ UUID: ${MEDIUM_UUID}"
                                --type dvddrive \
                                --medium emptydrive  2>&1 \
                         | xargs echo "[INF] Attaching empty drive.")
-
 
     # Starting VM
 
@@ -1776,24 +1895,18 @@ ${VMPATH}/ISOFILES/home/partimag"
 
 mount_vdi() {
 
-    if [ "$1" != "w" ] && [ "$1" != "r" ]
-    then
-        ${LOG[*]} "[ERR] share_root must have 'w' or 'r' as argument"
-        exit 1
-    fi
-
     cd "${VMPATH}" || exit 2
     if ! [ -d "${SHARED_ROOT_DIR}" ]
     then
-        logger -s "[ERR] \"${SHARED_ROOT_DIR}\" is not a directory."
+        ${LOG[*]}  "[ERR] \"${SHARED_ROOT_DIR}\" is not a directory."
         exit 1
     fi
 
     if [ "$1" = "w" ]
     then
-        logger -s "[WAR] Enabling write mode for VDI mount."
-        logger -s "[WAR] This may cause security issues: take care of I/O and"
-        logger -s "[WAR] networking security."
+        ${LOG[*]} "[WAR] Enabling write mode for VDI mount."
+        ${LOG[*]} "[WAR] This may cause security issues: take care of I/O and"
+        ${LOG[*]} "[WAR] networking security."
     fi
 
     check_tool qemu-nbd
@@ -1806,21 +1919,24 @@ so that **modprobe nbd** succeeds."
 
     declare -i j=1
 
-    while [ $j -le 10 ]
+    while [ $j -le 50 ]
     do
         if [ "$1" = "w" ]
         then
-            "${QEMU_NBD_BINARY}" -c /dev/nbd${j} -f vdi "${VM}.vdi"
+            "${QEMU_NBD_BINARY}" -c /dev/nbd${j} -f vdi "${VM}.vdi" >/dev/null 2>&1
         else
-            "${QEMU_NBD_BINARY}" --read-only -c /dev/nbd${j} -f vdi "${VM}.vdi"
+            "${QEMU_NBD_BINARY}" --read-only -c /dev/nbd${j} -f vdi "${VM}.vdi" >/dev/null 2>&1
         fi
         local res=$?
         if [ $res = 0 ]
         then
-            echo "[MSG] Connected /dev/nbd${j}"
+            ${LOG[*]} "[MSG] Connected /dev/nbd${j}"
         else
-            echo "[WAR] Could not connect VDI disk, qemu exit code: $res"
-            echo "      looping nbd${j}..."
+            if [ "${VERBOSE}" = "true" ]
+            then
+                 ${LOG[*]} "[WAR] Could not connect VDI disk, qemu exit code: $res"
+                 ${LOG[*]} "[WAR] Looping nbd${j}..."
+            fi
             j=j+1
             continue
         fi
@@ -1829,33 +1945,36 @@ so that **modprobe nbd** succeeds."
         sleep 2
         if [ "$1" = "w" ]
         then
-            mount /dev/nbd${j}p4 "${SHARED_ROOT_DIR}"
+            mount /dev/nbd${j}p4 "${SHARED_ROOT_DIR}" >/dev/null 2>&1
         else
-            mount -o ro,norecovery /dev/nbd${j}p4 "${SHARED_ROOT_DIR}"
+            mount -o ro,norecovery /dev/nbd${j}p4 "${SHARED_ROOT_DIR}" >/dev/null 2>&1
         fi
 
         if [ $? != 0 ]
         then
-            echo "[WAR] Failed to mount virtual disk ${VM}.vdi root \
+            if [ "${VERBOSE}" = "true" ]
+            then
+                ${LOG[*]} "[WAR] Failed to mount virtual disk ${VM}.vdi root \
 to ${SHARED_ROOT_DIR}."
-            echo "      Looping nbd${j}..."
+                ${LOG[*]} "[WAR] Looping nbd${j}..."
+            fi
+
             j=j+1
             "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
             continue
         fi
 
-        if [ "$1" = "w" ]
-        then
-            mount /dev/nbd${j}p2 "${SHARED_ROOT_DIR}/boot"
-        else
-            mount -o ro /dev/nbd${j}p2 "${SHARED_ROOT_DIR}/boot"
-        fi
+        mount /dev/nbd${j}p2 "${SHARED_ROOT_DIR}/boot" >/dev/null 2>&1
 
         if [ $? != 0 ]
         then
-            echo "[WAR] Failed to mount virtual disk ${VM}.vdi kernel \
+            if [ "${VERBOSE}" = "true" ]
+            then
+                ${LOG[*]} "[WAR] Failed to mount virtual disk ${VM}.vdi kernel \
 to ${SHARED_ROOT_DIR} boot directory."
-            echo "      Looping nbd${j}..."
+                ${LOG[*]} "[WAR] Looping nbd${j}..."
+            fi
+
             j=j+1
             "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
             continue
@@ -1884,7 +2003,7 @@ unmount_vdi() {
 do you want to disconnect?" res || res="$1"
         if ! [ -n "${res}" ]
         then
-            logger -s "[ERR] Enter an explicit value for \
+            ${LOG[*]} "[ERR] Enter an explicit value for \
 mountpoint."
             exit 1
         fi
@@ -1895,23 +2014,29 @@ mountpoint."
         SHARED_ROOT_DIR="${res}"
     else
         declare -i j=1
-        while [ $j -le 10 ]
+        while [ $j -le 50 ]
         do
             SHARED_ROOT_DIR="$(get_mountpoint nbd${j}p4)"
             if [ -z "${SHARED_ROOT_DIR}" ] || ! [ -d "${SHARED_ROOT_DIR}" ]
             then
-                logger -s "[WAR] Could not find mountpoint \
+                if [ "${VERBOSE}" = "true" ]
+                then
+                    ${LOG[*]} "[WAR] Could not find mountpoint \
 directory for /dev/nbd${j}p4"
+                fi
             else
-                logger -s "[MSG] Found mountpoint \
+                if [ "${VERBOSE}" = "true" ]
+                then
+                    ${LOG[*]} "[MSG] Found mountpoint \
 ${SHARED_ROOT_DIR} for /dev/nbd${j}p4"
+                fi
                 break
             fi
             j=j+1
         done
     fi
 
-    if [ -n "${SHARED_ROOT_DIR}" ] && [ -d "${SHARED_ROOT_DIR}" ]
+    if [ -n "${SHARED_ROOT_DIR}" ] && [ -d "${SHARED_ROOT_DIR}" ] >/dev/null 2>&1
     then
         if mountpoint -q "${SHARED_ROOT_DIR}/boot"
         then
@@ -1925,13 +2050,25 @@ ${SHARED_ROOT_DIR} for /dev/nbd${j}p4"
         if_fails $? "[ERR] Failed to unmount ${res}. \
 Proceed manually."
         sync
-
         [ -z "${QEMU_NBD_BINARY}" ] && QEMU_NBD_BINARY="$(which qemu-nbd)"
 
-        "${QEMU_NBD_BINARY}" -d /dev/nbd${j}
+        "${QEMU_NBD_BINARY}" -d /dev/nbd${j} 2>&1 | xargs logger -s "[MSG] "
 
         if_fails $? "[ERR] Failed to disconnect loop device /dev/nbd${j}. \
 Proceed manually."
+
+        # double check in /proc/mounts
+        # experience shows that "/proc/mounts pollution" may happen
+        declare -i j=1
+        while [ $j -le 50 ]
+        do
+            if findmnt  /dev/nbd${j}p4 >/dev/null 2>&1
+            then
+                umount -l /dev/nbd${j}p4 >/dev/null 2>&1
+            fi
+            j=j+1
+        done
+
         sync
         sleep 2
         exit 0
@@ -2188,6 +2325,7 @@ folder ISOFILES"
     cd mnt2/live
 
     bind_filesystem squashfs-root
+
 }
 
 ## @fn unmount_clonezilla_iso()
@@ -2219,6 +2357,14 @@ unmount_clonezilla_iso() {
 ## @ingroup createInstaller
 
 clonezilla_device_to_image() {
+
+    # do not use ${}  as true/false in this function as vars. are not all set
+
+    [ -L /home/partimag ] && rm     /home/partimag
+    [ -d /home/partimag ] && rm -rf /home/partimag
+
+    mkdir -p /home/partimag
+    if_fails $? "[ERR] Could not create partimag directory under /home"
 
     # At this stage EXT_DEVICE can no longer be a mountpoint as it has
     # been previously converted to device label
@@ -2320,11 +2466,12 @@ prepare_for_iso_vm() {
 	    ${LOG[*]} "[INF] Using ${CLONEZILLACD} as custom-made \
 CloneZilla CD with VirtualBox and guest additions."
 
-            # copy to ISOFILES as a skeletton for ISO recovery image authoring
+        # copy to ISOFILES as a skeletton for ISO recovery image authoring
 
         [ -d ISOFILES ] && rm -rf ISOFILES
         mkdir -p ISOFILES/home/partimag
         check_dir ISOFILES/home/partimag
+
         # Using bsdtar make it possible to extract CloneZilla CD from workflows
         # without having to mount. This is useful within containers as loop mount is
         # not easily possible in such contexts.
@@ -2342,31 +2489,45 @@ CloneZilla CD with VirtualBox and guest additions."
         if "${USE_BSDTAR}"
         then
             cd ISOFILES
-            if_fails $? "[ERR] Could not cd to ISOFILES directory."
             "${BSDTAR_BINARY}" xpf ../"${CLONEZILLACD}"
             if_fails $? "[ERR] Could not extract ${CLONEZILLACD} using bsdtar."
             cd -
             return 0
         fi
 
-	    if [ -d mnt2 ]
+        if [ -d mnt2 ]
 	    then
 		    rm -rf mnt2/
 	        if_fails $? "[ERR] Could not remove directory mnt2. \
 Unmount it and remove it manually then restart."
 	    fi
 
+        if "${USE_CLONEZILLA_WORKFLOW}" \
+                || ([ -n "${CUSTOM_CLONEZILLA}" ] && [ "${CUSTOM_CLONEZILLA}" != "dep" ])
+        then
+            # presuming that custom clonezilla comes from workflow
+            # or anyhow giving priority
+            return 0
+        fi
+
 	    mkdir mnt2
         check_dir mnt2
 
-	    mount -oloop "${CLONEZILLACD}" mnt2/
-	    if_fails $? "[ERR] Could not mount ${CLONEZILLACD} to mnt2"
-
-        rsync -a mnt2/ ISOFILES
-	    if_fails $? "[ERR] Could not sync files between mnt2 and ISOFILES"
-
-	    umount mnt2
-	    if_fails $? "[ERR] Could not unmount mnt2"
+        if "${USE_BSDTAR}"
+        then
+          cd mnt2
+          "${BSDTAR_BINARY}" xpf ../"${CLONEZILLACD}"
+          if_fails $? "[ERR] Could not extract ${CLONEZILLACD} using bsdtar."
+          cd -
+        else
+            need_root
+	        mount -oloop "${CLONEZILLACD}" mnt2/
+	        if_fails $? "[ERR] Could not mount ${CLONEZILLACD} to mnt2"
+            rsync -a mnt2/ ISOFILES
+	        if_fails $? "[ERR] Could not sync files between mnt2 and ISOFILES"
+	        umount mnt2
+	        if_fails $? "[ERR] Could not unmount mnt2"
+        fi
 }
 
 # -----------------------------------------------------------------------------#
@@ -2381,9 +2542,42 @@ generate_Gentoo() {
 
     if "${USE_MKG_WORKFLOW}"
     then
+        ${LOG[*]} "[MSG] You chose to use the output of MKG GitHub Actions."
+        ${LOG[*]} "[MSG] The downloaded ISO has been preprocessed."
+        ${LOG[*]} "      It has a number of fixed default parameters."
+        ${LOG[*]} "[MSG] The following command line options will be ignored:"
+        ${LOG[*]} "      bios, cflags, clonezilla_install, debug_mode, elist"
+        ${LOG[*]} "      emirrors, gui, kernel_config, minimal, minimal_size"
+        ${LOG[*]} "      ncpus, nonroot_user, passwd, processor, rootpasswd"
+        ${LOG[*]} "      stage3, vm_language"
+        ${LOG[*]} "[MSG] In particular, all build-specific parameters will be set."
+        ${LOG[*]} "[MSG] If you need to specify these parameters, run again"
+        ${LOG[*]} "      with use_mkg_workflow=false."
+        ${LOG[*]} "[MSG] You can however fix the following command line items:"
+        ${LOG[*]} "      burn, cdrecord, cloning_method, custom_clonezilla"
+        ${LOG[*]} "      device_installer, disable_checksum, ext_device, force"
+        ${LOG[*]} "      full_cleanup, gui, hot_install, interactive, plot"
+        ${LOG[*]} "      plot_color, plot_pause, plot_period, plot_position"
+        ${LOG[*]} "      plot_span, quiet_mode, size, smtp_url, use_bsdtar"
+        ${LOG[*]} "      use_clonezilla_workflow, workflow_tag, workflow_tag2."
+
+        local rep="N"
+        if "${INTERACTIVE}"
+        then
+            read -p "[MSG] Please confirm that you are ready to use build presets [Y]:" rep
+            if [ "${rep}" = "N" ]
+            then
+                ${LOG[*]} "[INF] Exiting."
+                exit 0
+            fi
+        else
+            sleep 5
+        fi
+
         fetch_preprocessed_gentoo_install
+
         LIVECD=preprocessed_gentoo_install.iso
-        "${DOWNLOAD_ONLY}" && return 0
+        "${DOWNLOAD_ONLY}" && exit 0
         ISO=
     else
         ${LOG[*]} "[INF] Fetching live CD..."
@@ -2391,7 +2585,7 @@ generate_Gentoo() {
 
         ${LOG[*]} "[INF] Fetching stage3 tarball..."
         fetch_stage3
-        "${DOWNLOAD_ONLY}" && return 0
+        "${DOWNLOAD_ONLY}" && exit 0
 
         if "${TEST_EMERGE}"
         then
@@ -2403,7 +2597,7 @@ generate_Gentoo() {
     fi
 
     checksums
-    "${TEST_ONLY}" && return 0
+    "${TEST_ONLY}" && exit 0
 
     if ! "${USE_CLONEZILLA_WORKFLOW}" && "${CREATE_ISO}"
     then
@@ -2453,17 +2647,17 @@ main() {
     then
         create_options_array options
         manpage
-        exit 0
+	    exit 0
     elif grep -q 'htmlpage' <<< "$@"
     then
         create_options_array options
-        htmlpage
+	    htmlpage
 	    exit 0
     elif grep -q 'pdfpage' <<< "$@"
     then
         create_options_array options
-        pdfpage
-        exit 0
+	    pdfpage
+	    exit 0
     elif grep -q 'disconnect' <<< "$@"
     then
         unmount_vdi
@@ -2477,19 +2671,20 @@ main() {
     # Analyse commandline and source auxiliary files
 
     get_options $@
+    ${LOG[*]} "% ----------------------------------------------------------- %"
+    ${LOG[*]} "[MSG] MKG was run with the following options: $@"
+    ${LOG[*]} "% ----------------------------------------------------------- %"
 
-    # Gentoo has uuidgen while Ubuntu has uuid
+    check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
+               "VBoxManage" "curl" "grep" "lsblk" "awk" \
+               "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
 
     if ! $(which uuid) >/dev/null 2>&1 \
            && ! $(which uuidgen) >/dev/null 2>&1
     then
         ${LOG[*]} "[ERR] Did not find uuid or uuidgen. Intall the uuid package"
-         exit 1
+        exit 1
     fi
-
-    check_tool "sed" "tar" "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
-               "VBoxManage" "curl" "grep" "lsblk" "awk" \
-               "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
 
     test_cli_pre
     for ((i=0; i<ARRAY_LENGTH; i++)); do test_cli $i; done
@@ -2498,6 +2693,15 @@ main() {
 
     source scripts/fetch_functions.sh
     source scripts/build_virtualbox.sh
+
+    # containerization first
+
+    if "${DOCKERIZE}"
+    then
+        fetch_docker_image
+        run_docker_container
+        exit 0
+    fi
 
     # optional VirtualBox build
 
@@ -2508,11 +2712,11 @@ main() {
     # machine
 
     # Delayed daemonized script for mounting VDI disk to ${SHARED_DIR}
-
     if [ "${SHARE_ROOT}" != "dep" ]
     then
         export SHARE_ROOT
         export SHARED_DIR
+        "${VERBOSE}" && ${LOG[*]} "[MSG] Trying to mount ${VM} to ${SHARE_ROOT_DIR}"
         if "${NO_RUN}"
         then
             mount_shared_dir_daemon
@@ -2541,6 +2745,7 @@ main() {
     fi
 
     # You can bypass generation by setting vm= on commandline
+
     if [ -n "${VM}" ] && ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}"
     then
         generate_Gentoo
@@ -2550,7 +2755,7 @@ main() {
     # Process the virtual disk into a clonezilla image
 
     if [ -f "${VM}.vdi" ] \
-       && ("${CREATE_ISO}" || "${FROM_VM}") \
+       && "${CREATE_ISO}" \
        && ! "${FROM_DEVICE}"
     then
         # Now create a new VM from clonezilla ISO to retrieve
@@ -2607,17 +2812,13 @@ clonezilla image..."
         if clonezilla_to_iso "${ISO_OUTPUT}" ISOFILES
         then
             ${LOG[*]} "[MSG] Done."
-            if [ -f "${ISO_OUTPUT}" ]
-            then
-                ${LOG[*]}\
-                    "[MSG] ISO install medium was created here: ${ISO_OUTPUT}"
-            else
-                ${LOG[*]} \
-                    "[ERR] ISO install medium failed to be created."
-            fi
+            [ -f "${ISO_OUTPUT}" ] \
+                && ${LOG[*]} "[MSG] ISO install medium was created here:\
+                       ${ISO_OUTPUT}"  \
+                    || ${LOG[*]} "[ERR] ISO install medium failed to be created."
         else
-           ${LOG[*]} "[ERR] ISO install medium failed to be created!"
-           exit 1
+            ${LOG[*]} "[ERR] ISO install medium failed to be created!"
+            exit 1
         fi
     fi
 
@@ -2646,7 +2847,7 @@ clonezilla image..."
     if "${CLEANUP}"
     then
         ${LOG[*]} <<< $(cleanup 2>&1 | xargs echo '[INF] Cleaning up.')
-    	cleanup
+	cleanup
     fi
 
     # send wake-up call

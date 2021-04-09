@@ -66,22 +66,20 @@ latest-install-${PROCESSOR}-minimal.txt | sed -E 's/iso.*$/iso/' )"
     then
         curl -L -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" \
              ${verb}
-        curl -L "${MIRROR}/releases/${PROCESSOR}/autobuilds/\
-${current}.DIGESTS.asc" ${verb} -o checksums_install.txt
+        curl -L "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}.DIGESTS.asc" \
+             ${verb} -o checksums_install.txt
     else
         ${LOG[*]} "[ERR] Could not download current install iso."
         exit 1
     fi
 
     [ $? != 0 ] && ${LOG[*]} "[ERR] Could not download live CD" && exit 1
-
     if ! "${DISABLE_CHECKSUM}" && [ -f checksums_install.txt ]
     then
         sha512=$(sha512sum  "${downloaded}" | cut -f 1 -d ' ')
-        sha512_=$(grep "${downloaded}" checksums_install.txt \
-                      | head -n1 | cut -f 1 -d ' ')
-        if [ -n "${sha512}" ] && [ -n "${sha512_}" ] \
-               &&  [ "${sha512}" != "${sha521_}" ]
+        sha512_=$(grep "${downloaded}" checksums_install.txt | head -n1 | cut -f 1 -d ' ')
+
+        if [ -n "${sha512}" ] && [ -n "${sha512_}" ] &&  [ "${sha512}" != "${sha521_}" ]
         then
             ${LOG[*]} "[MSG] Verified SHA512SUM of ${downloaded}."
         else
@@ -113,6 +111,7 @@ ${current}.DIGESTS.asc" ${verb} -o checksums_install.txt
     fi
 }
 
+
 ## @fn fetch_clonezilla_iso()
 ## @brief Download clonezilla ISO file and caches it.
 ## @ingroup fetchFunctions
@@ -127,16 +126,16 @@ fetch_clonezilla_iso() {
     if ! curl -L "${DOWNLOAD_CLONEZILLA_PATH}" \
          -o "${clonezilla_file}" ${verb}
     then
-        ${LOG[*]} "Could not download CloneZilla iso from ${DOWNLOAD_CLONEZILLA_PATH}"
+        ${LOG[*]} "Could not download CloneZilla iso \
+from ${DOWNLOAD_CLONEZILLA_PATH}"
         exit 1
     fi
-
     local clonezilla_iso="$(ls clonezilla-live*${PROCESSOR}.iso)"
     if_fails $? "[ERR] Could not download CloneZilla CD."
 
     if ! "${DISABLE_CHECKSUM}"
     then
-       if ! curl -L -O "${GITHUB_RELEASE_PATH}/blob/master/SUMS.txt" ${verb}
+        if ! curl -L -O "${GITHUB_RELEASE_PATH}/blob/master/SUMS.txt" ${verb}
         then
             ${LOG[*]} "Could not download CloneZilla checksums."
             exit 1
@@ -238,19 +237,30 @@ fetch_process_clonezilla_iso() {
 
     [ ! -d mnt2 ] &&  mkdir mnt2  ||  { rm ${verb} -rf mnt2 && mkdir mnt2; }
 
-    "${VERBOSE}"  && ${LOG[*]} "[INF] Mounting CloneZilla CD ${CLONEZILLACD}"
-    mount -oloop "${CLONEZILLACD}" ./mnt  \
-     	|| { ${LOG[*]} "[ERR] Could not mount ${CLONEZILLACD} to mnt"
-             exit 1; }
-    "${VERBOSE}" \
-        && ${LOG[*]} "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."
-    rsync ${verb} -a ./mnt/ mnt2 \
-    	|| { ${LOG[*]} "[ERR] Could not copy clonezilla files to mnt2"
-             exit 1; }
+    if "${USE_BSDTAR}"
+    then
+       cd mnt2
+       BSDTAR_BINARY="$(which bsdtar)"
+       if_fails $? "[ERR] Could not find bsdtar."
+       "${BSDTAR_BINARY}" xpf ../"${CLONEZILLACD}"
+       if_fails $? "[ERR] Could not extract ${CLONEZILLACD} to mnt2 using bsdtar."
+       cd -
+    else
+        "${VERBOSE}"  && ${LOG[*]} "[INF] Mounting CloneZilla CD ${CLONEZILLACD}"
+        mount -oloop "${CLONEZILLACD}" ./mnt  \
+     	    || { ${LOG[*]} "[ERR] Could not mount ${CLONEZILLACD} to mnt"
+                 exit 1; }
+        "${VERBOSE}" \
+            && ${LOG[*]} "[INF] Now syncing CloneZilla CD to mnt2 in rw mode."
+        rsync ${verb} -a ./mnt/ mnt2 \
+    	    || { ${LOG[*]} "[ERR] Could not copy clonezilla files to mnt2"
+                 exit 1; }
+    fi
+
     cd mnt2/live || exit 2
     unsquashfs filesystem.squashfs \
       || { ${LOG[*]} "[ERR] Failed to unsquash clonezilla's filesystem.squashfs"
-           exit 1; }
+             exit 1; }
     cp ${verb} --dereference /etc/resolv.conf squashfs-root/etc
     cd "${VMPATH}"
     return 0
@@ -282,20 +292,17 @@ checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
 if_fails $? "[ERR] Could not download checksums.txt from URL \
 ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
 
-if ! ${DISABLE_CHECKSUM}
+if ! "${DISABLE_CHECKSUM}"
 then
   local md5=$(md5sum "preprocessed_gentoo_install.iso" | cut -f 1 -d' ')
-  local md5_=cat 'checksums.txt' |  xargs | cut -f2 -d' '
-  if [ ${md5} = ${md5_} ]
+  local md5_=$(cat 'checksums.txt' |  xargs | cut -f2 -d' ')
+  if [ "${md5}" != "${md5_}" ]
   then
-      ${LOG[*]} "[MSG] Verified checksum for preprocessed_gentoo_install.iso"
-  else
       ${LOG[*]} "[ERR] MD5 sum of preprocessed_gentoo_install.iso from Github Actions \
 could not be checked against downloaded file."
       exit 2
   fi
 fi
-
 }
 
 ## @fn fetch_clonezilla_with_virtualbox()
@@ -310,22 +317,20 @@ local verb=""
 ! "${VERBOSE}" && verb="-s"
 
 ${LOG[*]} "[INF] Downloading CloneZilla with virtualbox from Github Actions..."
-"${VERBOSE}" && ${LOG[*]} "[MSG] URL: ${GITHUB_RELEASE_PATH}/releases/download/${WORKFLOW_TAG}/\
-clonezilla_with_virtualbox.iso"
-${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/releases/download/${WORKFLOW_TAG}/\
-clonezilla_with_virtualbox.iso  ${verb} 2>&1 | xargs echo '[INF]')"
+
+${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/releases/download/\
+${WORKFLOW_TAG}/clonezilla_with_virtualbox.iso  ${verb} 2>&1 | xargs echo '[INF]')"
 
 if_fails $? "[ERR] Could not download stage3 from URL \
-${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}"
+${GITHUB_RELEASE_PATH}/releases/download/${WORKFLOW_TAG}"
 [ -f checksums.txt ] && rm -f checksums.txt
-
-${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/releases/download/${WORKFLOW_TAG}/\
-checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
+${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH}/releases/download/\
+${WORKFLOW_TAG}/checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
 
 if_fails $? "[ERR] Could not download checksums.txt from URL \
-${GITHUB_RELEASE_PATH}/${WORKFLOW_TAG}"
+${GITHUB_RELEASE_PATH}/releases/download/${WORKFLOW_TAG}"
 
-if ! "${DISABLE_CHECKSUM}"
+if ! ${DISABLE_CHECKSUM}
 then
   local md5=$(md5sum "clonezilla_with_virtualbox.iso" | cut -f 1 -d' ')
   local md5_=$(grep -o -E 'md5sum: [0-9a-z]+' checksums.txt | cut -f2 -d' ')
@@ -338,7 +343,6 @@ could not be checked against downloaded file."
       exit 2
   fi
 fi
-
 }
 
 ## @fn fetch_livecd()
@@ -367,9 +371,9 @@ fetch_livecd() {
         "${CLONEZILLA_INSTALL}" && ISO="${CLONEZILLACD}"
     else
         if ! ${USE_CLONEZILLA_WORKFLOW}
-	then
+	    then
             [ -f "clonezilla.iso" ] && CLONEZILLACD="clonezilla.iso" \
-            || { ${LOG[*]} "[ERR] CloneZilla ISO has not been cached. \
+                    || { ${LOG[*]} "[ERR] CloneZilla ISO has not been cached. \
 Run with download=true" ; exit 1; }
         fi
     fi
@@ -474,4 +478,59 @@ autobuilds/${current} ${verb1} 2>&1 | xargs echo '[INF]')"
                                    "[ERR] Rerun with download_stage3=true"
     ${LOG[*]} "[INF] Uncaching stage3 from ${CACHED_STAGE3} to ${STAGE3}"
     cp ${verb2} -f ${CACHED_STAGE3} "${STAGE3}"
+}
+
+## @fn fetch_docker_image()
+## @brief Download and uncompress an automated Github Actions
+##        release of a compressed Docker image to run MKG within.
+## @details
+## @li Download from https://github.com/fabnicol/
+## mkg_docker_image/releases/latest
+## @li Uncompress using xz -d.
+## @li Load into docker.
+## @retval ID of loaded image.
+## @ingroup fetchFunctions
+
+fetch_docker_image() {
+
+check_tool xz docker
+
+need_root
+
+local image=mygentoo-${WORKFLOW_TAG2}.tar
+
+local DOCKER_URL="${DOCKER_IMAGE_PATH}/${WORKFLOW_TAG2}/${image}.xz"
+local DOCKER_CHECKSUMS="${DOCKER_IMAGE_PATH}/${WORKFLOW_TAG2}/checksums.txt"
+
+curl -L -O "${DOCKER_URL}"
+if_fails $? "[ERR] Could not download Docker image from ${DOCKER_URL}"
+${LOG[*]} "[MSG] Downloaded Docker image for tag ${WORKFLOW_TAG2}."
+
+curl -L -O "${DOCKER_CHECKSUMS}"
+if_fails $? "[ERR] Could not download checksums.txt from ${DOCKER_URL}."
+${LOG[*]} "[MSG] Downloaded Docker image checksums for tag ${WORKFLOW_TAG2}."
+
+local B2SUM=$(grep -o -E 'b2sum: *([a-z0-9]+)' checksums.txt \
+                  | cut -f 2 -d' ')
+local B2SUM_=$(b2sum "${image}.xz" | cut -f 1 -d' ')
+
+if [ "${B2SUM}" = "${B2SUM_}" ]
+then
+    ${LOG[*]} "[MSG] Verified Docker image checksum OK."
+else
+    ${LOG[*]} "[ERR] blake2b sum of downloaded image ${image}.xz is:"
+    ${LOG[*]} "${B2SUM_}"
+    ${LOG[*]} "[ERR] It does not match checksum manifest b2sum value:"
+    ${LOG[*]} "${B2SUM}."
+    exit 1
+fi
+
+xz -df "${image}.xz"
+
+if_fails $? "[ERR] Could not uncompress ${image}"
+${LOG[*]} "[MSG] Uncompressed Docker image for tag ${WORKFLOW_TAG2}."
+
+docker load -i "${image}"  >/dev/null 2>&1
+if_fails $? "[ERR] Could not load image ${image} into Docker."
+${LOG[*]} "[MSG] Loaded Docker image for tag ${WORKFLOW_TAG2}."
 }
