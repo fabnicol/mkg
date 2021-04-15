@@ -478,6 +478,7 @@ cleanup() {
     local verb=""
     ${VERBOSE} && verb="-v"
     cd "${VMPATH}" || exit 2
+    [ -d ISOFILES ] && chmod -R +w ISOFILES
     rm ${verb} -rf ISOFILES/ mnt2/
     [ -d mnt ]  && mountpoint mnt && umount -l mnt/
     [ -d mnt ]  && rm ${verb} -rf mnt
