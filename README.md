@@ -1,6 +1,6 @@
-### Dependencies
+#### Dependencies
 
-For MKG installation and guidelines, please refer to the companion Wiki:   
+For MKG installation and guidelines, please refer to the **companion Wiki**:   
 
 https://github.com/fabnicol/mkg/wiki
 
@@ -8,7 +8,9 @@ More specifically for dependencies:
 
 https://github.com/fabnicol/mkg/wiki/Frequently-Asked-Questions-(FAQ)#what-dependencies-should-be-installed
 
-### Portability source code
+Docker images should be not be fetched in the Packages section of this site, but as Releases in the [**mkg_docker_image**](https://github.com/fabnicol/mkg_docker_image/releases) repository.
+
+#### Portability source code
 
 The auxiliary tool `uuid` is an obligatory dependency of MKG.   
 On Debian-style platforms, use `sudo apt install uuid`.   
