@@ -846,9 +846,9 @@ run_docker_container() {
     # Experimental, undocumented environment variable
     # DOCKER_RUN_OPTS
 
-    docker run "${DOCKER_RUN_OPTS}" -dit  -v /dev/log:/dev/log \
+    docker run  -dit  -v /dev/log:/dev/log \
                   --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
-                  "${cli}"
+                  ${cli}
 
     if_fails $? "[ERR] Could not start container mygentoo:${WORKFLOW_TAG2}"
     ${LOG[*]} "[MSG] Started Docker container for tag ${WORKFLOW_TAG2}."
