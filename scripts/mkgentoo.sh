@@ -843,12 +843,10 @@ run_docker_container() {
     ${LOG[*]} "[INF] Starting container with command line: "
     ${LOG[*]} "${cli}"
 
-    # Experimental, undocumented environment variable
-    # DOCKER_RUN_OPTS
-
-    docker run  -dit  -v /dev/log:/dev/log \
-                  --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
-                  ${cli}
+    docker run  -dit --privileged \
+           -v /dev/cdrom:/dev/cdrom -v /dev/sr0:/dev/sr0  -v /dev/log:/dev/log \
+           --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
+		   ${cli}
 
     if_fails $? "[ERR] Could not start container mygentoo:${WORKFLOW_TAG2}"
     ${LOG[*]} "[MSG] Started Docker container for tag ${WORKFLOW_TAG2}."
