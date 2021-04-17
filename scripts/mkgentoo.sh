@@ -80,7 +80,7 @@
 ## @li Only create the VM and virtual disk, in debug mode,
 ## without R and set new passwords, for a French-language platform.
 ## Use 8 cores.
-## @code mkg vm_language=fr minimal debug_mode ncpus=8
+## @code mkg vm_language=fr_FR minimal debug_mode ncpus=8
 ## nonroot_user=ken passwd='util!Hx&32F' rootpasswd='Hk_32!_CD' cleanup=false
 ## @endcode
 ## @li Create ISO clonezilla image of Gentoo linux, burn it to DVD, create an
@@ -170,7 +170,7 @@ desktop.  "
 echo "In particular, the following command line options will be ignored:  "
 echo "\`bios, cflags, clonezilla_install, debug_mode, elist, emirrors, \`  "
 echo "\`kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd,\`  "
-echo "\`processor, rootpasswd, stage3, vm_language.\`  "
+echo "\`processor, rootpasswd, stage3, vm_keyboard, vm_language.\`  "
 echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
 echo "to command line. You will need to do so if you do not use OS build \
 presets.  "
@@ -822,6 +822,12 @@ share_root, test_emerge, use_clonezilla_workflow=false"
         GUI=false
         INTERACTIVE=false
     fi
+
+    grep -q -E '[a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*' <<< "${VM_LANGUAGE}"
+
+    if_fails $? "[ERR] vm_language must have at least 5 characters and follow \
+this regular expression: [a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*"
+
 }
 
 ## @fn run_docker_container()
@@ -940,7 +946,6 @@ pre-test of package merging"
     ${LOG[*]} "[MSG] Using CFLAGS=${CFLAGS}"
     sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS=\"${CFLAGS} -pipe\"/g"  ${m_conf}
     echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
-    echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
     echo "LINGUAS=\"${VM_LANGUAGE} en\"" >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
     echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
@@ -2573,7 +2578,7 @@ generate_Gentoo() {
         ${LOG[*]} "      bios, cflags, clonezilla_install, debug_mode, elist"
         ${LOG[*]} "      emirrors, gui, kernel_config, minimal, minimal_size"
         ${LOG[*]} "      ncpus, nonroot_user, passwd, processor, rootpasswd"
-        ${LOG[*]} "      stage3, vm_language"
+        ${LOG[*]} "      stage3, vm_keymap, vm_language"
         ${LOG[*]} "[MSG] In particular, all build-specific parameters will be set."
         ${LOG[*]} "[MSG] If you need to specify these parameters, run again"
         ${LOG[*]} "      with use_mkg_workflow=false."
