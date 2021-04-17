@@ -187,8 +187,20 @@ adjust_environment() {
     echo "fr_FR ISO-8859-15" >> /etc/locale.gen
     echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
     echo "en_US ISO-8859-1"  >> /etc/locale.gen
+
     locale-gen | tee -a emerge.build
-    eselect locale set 1
+
+    # gnome-specific. Missing LC_ALL blocks gnome-terminal startup.
+    # Known gnome-terminal moot point. Useless on Plasma.
+    # To be placed after call to locale-gen.
+
+    echo "LC_ALL=en_US.UTF-8" >> /etc/env.d/02locale
+
+    [ -n "{VM_LANGUAGE}" ] \
+      && eselect locale set \
+            $(eselect locale list | \
+                  grep -i -o -E "${VM_LANGUAGE}[_a-zA-Z0-9.]*" | head -1)
+
     env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 }
 
