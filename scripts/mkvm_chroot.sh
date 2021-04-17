@@ -168,38 +168,64 @@ adjust_environment() {
     cd - || exit 2
     rc-update add net.${iface} default
 
-    # Set keymaps and time
+    # Localization: we now generate all locales.
 
-    if [ -n "${VM_LANGUAGE}" ]
+    locale-gen -A -j ${NCPUS} | tee -a emerge.build
+
+    # Note: VM_LANGUAGE must be at least 5 characters, like fr_FR, fr_BE etc.
+
+    [ -z "${VM_LANGUAGE}" ] && VM_LANGUAGE="en_US.utf8"
+
+    LOCALE_FOUND=$(eselect locale list | \
+                       grep -i -o -E \
+                            "${VM_LANGUAGE}[@_a-zA-Z0-9.]*" | head -1)
+
+    if [ -n "${LOCALE_FOUND}" ]
     then
-        echo "keymap=${VM_LANGUAGE}" >  /etc/conf.d/keymaps
-        echo 'keymap="us"' >> /etc/conf.d/keymaps
+        eselect locale set ${LOCALE_FOUND}
+        if [ $? = 0 ]
+        then
+            LOCALE_UTF8=$(sed -E \
+                              's/([a-z_A-Z]{2,5})\.?([@a-z_A-Z.0-9]*)/\1.UTF-8/' \
+                              <<< ${LOCALE_FOUND})
+        else
+            # fallback
+            eselect locale set en_US.utf8
+        fi
     else
-        echo 'keymap="us"' >  /etc/conf.d/keymaps
+        # fallback
+        eselect locale set en_US.utf8
     fi
-    sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
-    echo "${TIMEZONE}" > /etc/timezone
-    emerge -u --config sys-libs/timezone-data | tee -a emerge.build
 
-    # Localization.
-
-    echo "fr_FR.UTF-8 UTF-8" > /etc/locale.gen
-    echo "fr_FR ISO-8859-15" >> /etc/locale.gen
-    echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-    echo "en_US ISO-8859-1"  >> /etc/locale.gen
-
-    locale-gen | tee -a emerge.build
-
-    # gnome-specific. Missing LC_ALL blocks gnome-terminal startup.
+    # Gnome-specific. Missing LC_ALL blocks gnome-terminal startup.
     # Known gnome-terminal moot point. Useless on Plasma.
     # To be placed after call to locale-gen.
 
-    echo "LC_ALL=en_US.UTF-8" >> /etc/env.d/02locale
+    if [ -n "${LOCALE_UTF8}" ]
+    then
+        echo "LC_ALL=${LOCALE_UTF8}" >> /etc/env.d/02locale
+    else
+        echo "LC_ALL=en_US.UTF8" >> /etc/env.d/02locale
+    fi
 
-    [ -n "{VM_LANGUAGE}" ] \
-      && eselect locale set \
-            $(eselect locale list | \
-                  grep -i -o -E "${VM_LANGUAGE}[_a-zA-Z0-9.]*" | head -1)
+    # Set keymaps and time
+    # Check keymap existence
+
+    KEYMAP_FOUND=$(ls -R /usr/share/keymaps | grep  ^${VM_KEYMAP}.map.gz \
+                       | head -1)
+
+    # Fallback
+
+    [ -z "${KEYMAP_FOUND}" ] && KEYMAP_FOUND="us"
+
+    echo "keymap=${KEYMAP_FOUND}" >  /etc/conf.d/keymaps
+
+    sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
+    echo "${TIMEZONE}" > /etc/timezone
+
+    emerge -u --config sys-libs/timezone-data | tee -a emerge.build
+
+    # endof Gnome-specific
 
     env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 }
