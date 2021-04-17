@@ -2714,8 +2714,8 @@ main() {
                "VBoxManage" "curl" "grep" "lsblk" "awk" \
                "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
 
-    if ! $(which uuid) >/dev/null 2>&1 \
-           && ! $(which uuidgen) >/dev/null 2>&1
+    if ! which uuid >/dev/null 2>&1 \
+           && ! which uuidgen >/dev/null 2>&1
     then
         ${LOG[*]} "[ERR] Did not find uuid or uuidgen. Intall the uuid package"
         exit 1
@@ -2899,5 +2899,6 @@ clonezilla image..."
     fi
 
     ${LOG[*]} "[MSG] Gentoo building process ended."
+
     exit 0
 }
