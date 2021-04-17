@@ -236,7 +236,7 @@ block device"
 
 test_cdrecord() {
     ${LOG[*]} "[MSG] cdrecord scanbus test."
-    if ! "${CDRECORD}" -scanbus 2>&1 1>/dev/null
+    if ! "${CDRECORD}" -scanbus >/dev/null 2>&1
     then
         ${LOG[*]} "[ERR] cdrecord version is not functional"
         ${LOG[*]} "[MSG] Try reinstalling cdrecord"
@@ -419,7 +419,6 @@ check_files() {
             exit 3
         fi
         shift
-
     done
 }
 
@@ -433,7 +432,7 @@ check_files() {
 check_tool() {
     while [ -n "$1" ]
     do
-        if [ -z "$(whereis $1)" ]
+        if ! which "$1" >/dev/null 2>&1
         then
             ${LOG[*]} "[ERR] You should first install $1, \
 which is used by this program."
