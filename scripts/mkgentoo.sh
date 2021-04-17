@@ -843,13 +843,37 @@ run_docker_container() {
     ${LOG[*]} "[INF] Starting container with command line: "
     ${LOG[*]} "${cli}"
 
-    docker run  -dit --privileged \
+    local DOCKER_ID=$(docker run ${DOCKER_RUN_OPTS} -dit --privileged \
            -v /dev/cdrom:/dev/cdrom -v /dev/sr0:/dev/sr0  -v /dev/log:/dev/log \
            --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
-		   ${cli}
+		   ${cli})
 
     if_fails $? "[ERR] Could not start container mygentoo:${WORKFLOW_TAG2}"
     ${LOG[*]} "[MSG] Started Docker container for tag ${WORKFLOW_TAG2}."
+
+    # Every minute, check if the above container is still running.
+
+    while docker inspect ${DOCKER_ID} | grep -q '"Running": true'
+    do
+        sleep 60
+    done
+
+    ! "{CREATE_ISO}" && return 0
+
+    # Once stopped, check if ISO was created and fetch it back.
+
+    if docker exec ${DOCKER_ID} test -f "${ISO_OUTPUT}"
+    then
+        if docker cp -f ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
+        then
+            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} was retrieved from Docker image."
+        else
+            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} could not be retrieved from Docker image. Check manually."
+        fi
+    else
+        ${LOG[*]} "[ERR] Dockerized process failed to create ISO installer."
+        return 1
+    fi
 }
 
 
