@@ -225,7 +225,12 @@ install_stage3() {
     local m_conf="etc/portage/make.conf"
     sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS=\"${CFLAGS} -pipe\"/g"  ${m_conf}
     echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
-    echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
+
+    # For L10N we select only the first main two characters of vm_language
+    # as the zone tag (-PT, -CA,...) is not necessarily correlated with
+    # the zone tag (_BE, _FR, ...) of the LINGUAS locale-like encoding format.
+
+    echo "L10N=\"${VM_LANGUAGE::2} en\""    >> ${m_conf}
     echo "LINGUAS=\"${VM_LANGUAGE} en\"" >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
     echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
