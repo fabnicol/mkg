@@ -852,13 +852,20 @@ run_docker_container() {
     # Experimental, undocumented environment variable
     # DOCKER_RUN_OPTS
 
-    docker run  -dit --privileged \
+    DOCKER_ID=$(docker run  ${DOCKER_RUN_OPTS} -dit --privileged \
            -v /dev/cdrom:/dev/cdrom -v /dev/sr0:/dev/sr0  -v /dev/log:/dev/log \
                   --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
-		  ${cli}
+		  ${cli})
 
     if_fails $? "[ERR] Could not start container mygentoo:${WORKFLOW_TAG2}"
-    ${LOG[*]} "[MSG] Started Docker container for tag ${WORKFLOW_TAG2}."
+    if [ -z "${DOCKER_ID}" ]
+    then
+        ${LOG[*]} "[ERR] Docker crashed on launch."
+        exit 1
+    else
+        ${LOG[*]} "[MSG] Started Docker container for tag ${WORKFLOW_TAG2}."
+    fi
+
     # Every minute, check if the above container is still running.
 
     while docker inspect ${DOCKER_ID} | grep -q '"Running": true'
@@ -866,7 +873,7 @@ run_docker_container() {
         sleep 60
     done
 
-    ! "{CREATE_ISO}" && return 0
+    ! "${CREATE_ISO}" && return 0
 
     # Once stopped, check if ISO was created and fetch it back.
 
