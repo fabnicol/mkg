@@ -1596,7 +1596,7 @@ UUID: ${MEDIUM_UUID}"
 
     if [ -z "${MEDIUM_UUID}" ]
     then
-        if $(which uuid)
+        if which uuid >/dev/null 2>&1
         then
             MEDIUM_UUID=$(uuid)
         else
@@ -2421,7 +2421,7 @@ $(get_mountpoint ${EXT_DEVICE})"
 
     # if no platform-installed ocs-sr, try to bootstrap it from clonezilla iso
 
-    if $(which ocs-sr)
+    if which ocs-sr
     then
         # clonezilla has been installed on platform
 
@@ -2752,7 +2752,7 @@ main() {
             check_tool at
             ${LOG[*]} "[WAR] You should have a functional 'atd' service"
             ${LOG[*]} "[WAR] Operation will not work otherwise/"
-            if $(which rc-service)
+            if which rc-service
             then
                 rc-service restart atd
                 if_fails $? "[ERR] Could not restart atd service (Openrc)"
