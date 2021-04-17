@@ -36,7 +36,7 @@
      "disable_checksum"   "Disable checkum verification after downloads. Boolean."                                          "false" "b"
      "disconnect"         "Unmount guest virtual disk from host."                                                                 "true" "b"
      "dockerize"          "Use a pre-built Docker image to run MKG into. Incompatible with e.g. 'gui', 'hot_install', 'plot', 'test_emerge'" "false" "b"
-     "docker_image_path"  "URL to ../'${WORKFLOW_TAG2}'/mygentoo-'${WORKFLOW_TAG2}'.tar.xz" "https://github.com/fabnicol/mkg_docker_image/releases/download" "s:workflow_tag2"          
+     "docker_image_path" "URL to ../'workflow_tag2'/mygentoo-'workflow_tag2'.tar.xz"                                          "path5" "s:workflow_tag2"          
      "download"           "Download install ISO image from Gentoo mirror. Boolean."                                               "true" "b"
      "download_arch"      "Download and install stage3 archive to virtual disk. Booelan."                                         "true" "b"
      "download_clonezilla""Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean" "true" "b"

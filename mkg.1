@@ -130,6 +130,17 @@ to command line.
 .P
 .PD
 .br
+Within containers, \f[C]use_clonezilla_workflow\f[R],
+\f[C]build_virtualbox\f[R]
+.PD 0
+.P
+.PD
+.br
+and \f[C]test_emerge\f[R] are not (yet) supported and will fail.
+.PD 0
+.P
+.PD
+.br
 A similar procedure also applies to the minimal Gentoo install ISO.
 .PD 0
 .P
@@ -157,12 +168,39 @@ It will be downloaded from the MKG Github release section.
 .P
 .PD
 .br
+This preprocessed ISO has build parameter presets.
+It builds the full desktop.
+.PD 0
+.P
+.PD
+.br
+In particular, the following command line options will be ignored:
+.PD 0
+.P
+.PD
+.br
+\f[C]bios, cflags, clonezilla_install, debug_mode, elist, emirrors,\f[R]
+.PD 0
+.P
+.PD
+.br
+\f[C]kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd,\f[R]
+.PD 0
+.P
+.PD
+.br
+\f[C]processor, rootpasswd, stage3, vm_keymap, vm_language.\f[R]
+.PD 0
+.P
+.PD
+.br
 To disable this behavior you can add \f[C]use_mkg_workflow=false\f[R]
 .PD 0
 .P
 .PD
 .br
 to command line.
+You will need to do so if you do not use OS build presets.
 .PP
 .br
 \f[B]Options:\f[R]
@@ -191,26 +229,27 @@ or simply: \f[C]minimal\f[R] as \f[C]true\f[R] can be omitted (unlike
 \f[B]Examples\f[R]
 .PP
 .br
-\f[C]# ./mkg pdfpage\f[R]
+\f[C]$ ./mkg pdfpage\f[R]
 .PD 0
 .P
 .PD
 .br
-\f[C]# ./mkg debug_mode verbose from_vm vm=Gentoo.iso gentoo_small.iso\f[R]
+\f[C]$ ./mkg debug_mode verbose from_vm vm=Gentoo  gentoo_small.iso\f[R]
 \  \f[C]ext_device=sdc device_installer blank burn cleanup=false\f[R]
 .PD 0
 .P
 .PD
 .br
 \f[C]# ./mkg download_arch=false download=false download_clonezilla=false\f[R]
-\  \f[C]custom_clonezilla=clonezilla_cached.iso nonroot_user=phil\f[R]
+\ 
+\f[C]custom_clonezilla=clonezilla_cached.iso use_mkg_workflow=false nonroot_user=phil\f[R]
 .PD 0
 .P
 .PD
 .br
 \f[C]# nohup ./mkg plot plot_color=red plot_period=10 plot_pause=7\f[R]
 \ 
-\f[C]compact minimal minimal_size=false  gui=false elist=myebuilds\f[R]
+\f[C]compact minimal minimal_size=false use_mkg_workflow=false gui=false elist=myebuilds\f[R]
 \ 
 \f[C]email=my.name\[at]gmail.com email_passwd=\[aq]mypasswd\[aq] &\f[R]
 .PD 0
@@ -218,6 +257,12 @@ or simply: \f[C]minimal\f[R] as \f[C]true\f[R] can be omitted (unlike
 .PD
 .br
 \f[C]# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\f[R]
+.PD 0
+.P
+.PD
+.br
+\[aq]# ./mkg dockerize minimal use_mkg_workflow=false ncpus=5 mem=10000
+gentoo.iso\[ga]
 .PP
 .br
 \f[B]Type Conventions:\f[R]
@@ -465,6 +510,16 @@ T}@T{
 T}@T{
 T}
 T{
+disable_checksum
+T}@T{
+Disable checkum verification after downloads.
+Boolean.
+T}@T{
+[ false ]
+T}@T{
+b
+T}
+T{
 disconnect
 T}@T{
 Unmount guest virtual disk from host.
@@ -474,14 +529,23 @@ T}@T{
 b
 T}
 T{
-disable_md5_check
+dockerize
 T}@T{
-Disable MD5 checkums verification after downloads.
-Boolean.
+Use a pre-built Docker image to run MKG into.
+Incompatible with e.g.\ `gui', `hot_install', `plot', `test_emerge'
 T}@T{
-[ true ]
+[ false ]
 T}@T{
 b
+T}
+T{
+docker_image_path
+T}@T{
+URL to ../`workflow_tag2'/mygentoo-`workflow_tag2'.tar.xz
+T}@T{
+[ path5 ]
+T}@T{
+s:workflow_tag2
 T}
 T{
 download
@@ -523,6 +587,16 @@ T}@T{
 [ path1 ]
 T}@T{
 u
+T}
+T{
+download_only
+T}@T{
+Only download the Gentoo minimal install ISO and stage3 archive of the
+day, then exit.
+T}@T{
+[ false ]
+T}@T{
+b
 T}
 T{
 elist
@@ -1056,12 +1130,12 @@ T}@T{
 o
 T}
 T{
-use_qemu
+use_bsdtar
 T}@T{
-Use qemu instead of guestfish for installing Gentoo to block device with
-\f[B]hot_install\f[R] or with \f[B]share_root\f[R]
+Use `bsdtar' (from libarchive) to extract CloneZilla ISO files if
+creating an ISO installer.
 T}@T{
-[ false ]
+[ true ]
 T}@T{
 b
 T}
@@ -1086,11 +1160,21 @@ T}@T{
 b
 T}
 T{
+use_qemu
+T}@T{
+Use qemu instead of guestfish for installing Gentoo to block device with
+\f[B]hot_install\f[R]
+T}@T{
+[ false ]
+T}@T{
+b
+T}
+T{
 vbox_version
 T}@T{
 Virtualbox version
 T}@T{
-[ 6.1.14 ]
+[ 6.1.16 ]
 T}@T{
 s
 T}
@@ -1099,7 +1183,7 @@ vbox_version_full
 T}@T{
 Virtualbox full version
 T}@T{
-[ 6.1.14a ]
+[ 6.1.16 ]
 T}@T{
 s
 T}
@@ -1124,12 +1208,23 @@ T}@T{
 vm
 T}
 T{
+vm_keymap
+T}@T{
+Add support for non-US English keymaps.
+Use values in /usr/share/keymaps, e.g.\ fr, de, us.
+T}@T{
+[ us ]
+T}@T{
+s
+T}
+T{
 vm_language
 T}@T{
 Add support for non-US English language as a default.
-Use standard abbreviations (fr for french, es for spanish) etc.
+Use standard abbreviations.
+Must be at least 5 characters: e.g.\ fr_FR, de_DE, fr_FR.utf8
 T}@T{
-[ us ]
+[ en_US.utf8 ]
 T}@T{
 s
 T}
@@ -1167,7 +1262,7 @@ T}@T{
 Tag version (vX.Y) of the release of file
 preprocessed_gentoo_install.iso by Github Actions (MKG site)
 T}@T{
-[ master ]
+[ release-master or release-gnome ]
 T}@T{
 s
 T}
@@ -1185,8 +1280,7 @@ https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20
 .P
 .PD
 .br
-\f[B]path3:\f[R]
-https://github.com/fabnicol/clonezilla_with_virtualbox/releases/download/
+\f[B]path3:\f[R] https://github.com/fabnicol/clonezilla_with_virtualbox
 .PD 0
 .P
 .PD
