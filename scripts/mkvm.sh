@@ -191,7 +191,7 @@ install_stage3() {
        "${ELIST}.use" \
        mkvm_chroot.sh \
        "${KERNEL_CONFIG}"  /mnt/gentoo/
-    cp -vf .bashrc /mnt/gentoo/bashrc_temp
+»    cp -vf .bashrc /mnt/gentoo/bashrc_temp
 
     # cd to target OS and extract stage3 archive
 
@@ -233,7 +233,7 @@ install_stage3() {
     echo "L10N=\"${VM_LANGUAGE::2} en\""    >> ${m_conf}
     echo "LINGUAS=\"${VM_LANGUAGE} en\"" >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
-    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
+    echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist networkmanager \
 elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
