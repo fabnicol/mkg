@@ -186,7 +186,7 @@ adjust_environment() {
         if [ $? = 0 ]
         then
             LOCALE_UTF8=$(sed -E \
-                              's/([a-z_A-Z]{2,5})\.?([@a-z_A-Z.0-9]*)/\1.UTF-8/' \
+                              's/([a-z_A-Z]{2,5})\.?([@a-z_A-Z.0-9]*)/\1.UTF8/' \
                               <<< ${LOCALE_FOUND})
         else
             # fallback
