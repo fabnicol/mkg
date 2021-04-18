@@ -83,7 +83,6 @@
      "plot_span"          "Number of minutes of virtual disk processing to be plotted, back in time"                              "1200" "n"
      "processor"          "Processor type"                                                                                       "amd64" "s"
      "pull"               "Invoke 'git pull' in  mkg local repository on startup."                                               "false" "b"
-
      "quiet_mode"         "Silence output except for the most severe errors."                                                    "false" "b"
      "logging"            "Activate logging"                                                                                     "true" "b"
      "remove_vdi"         "Remove virtual disk on clean-up"                                                                      "false" "b"

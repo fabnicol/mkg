@@ -2661,6 +2661,20 @@ with VirtualBox guest additions."
 
 main() {
 
+    if grep -q 'pull=true' <<< "$@"
+    then
+        git pull
+        if [ $? = 0 ]
+        then
+            syslog -s "[ERR] Could not pull from repository."
+            syslog -s "[MSG] Continuing with current HEAD."
+        else
+            syslog -s "[MSG] Updated local repository."
+            # Respawn script with fresh code ans same options.
+            exec "./mkg" "$@"
+        fi
+    fi
+
     source scripts/utils.sh
     source scripts/run_mount_shared_dir.sh
 
