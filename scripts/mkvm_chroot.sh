@@ -392,7 +392,7 @@ global_config() {
     echo 'DisplayCommand=/etc/sddm/scripts/Xsetup' >> /etc/sddm.conf.d/sddm.conf
 
     # Numlock now set to 'on' on startup
-    sed -i 's/Numlock=.*/Numlock=on/'  /usr/share/sddm/sddm.conf.d/00default.conf
+    sed -i 's/Numlock=.*/Numlock=on/' /usr/share/sddm/sddm.conf.d/00default.conf
 
     gpasswd -a sddm video
 
@@ -402,6 +402,7 @@ global_config() {
     rc-update add display-manager default
     rc-update add dbus default
     rc-update add elogind boot
+    rc-update add keymaps boot
 
     #--- Networkmanager
 
