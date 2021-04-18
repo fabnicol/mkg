@@ -378,11 +378,21 @@ global_config() {
 
     echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
         | tee -a sddm.log
-    echo "setxkbmap ${VM_LANGUAGE},us" >> /usr/share/sddm/scripts/Xsetup \
+
+    # only the first two letters are reliable here.
+    echo "setxkbmap ${VM_KEYMAP::2},us" >> /usr/share/sddm/scripts/Xsetup \
         | tee -a sddm.log
-    chmod +x /usr/share/sddm/scripts/Xsetup
+
+    chmod a+x /usr/share/sddm/scripts/Xsetup
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
         /etc/conf.d/display-manager | tee -a sddm.log
+
+    # SDDM language config now is no longer under /etc/sddm.conf
+    echo '[X11]' >> /etc/sddm.conf.d/sddm.conf
+    echo 'DisplayCommand=/etc/sddm/scripts/Xsetup' >> /etc/sddm.conf.d/sddm.conf
+
+    # Numlock now set to 'on' on startup
+    sed -i 's/Numlock=.*/Numlock=on/'  /usr/share/sddm/sddm.conf.d/00default.conf
 
     gpasswd -a sddm video
 
