@@ -15,6 +15,7 @@
  sys-fs/dosfstools
  virtual/cron
  x11-apps/xdm
+ x11-terms/gnome-terminal
  
 ## GNOME
 
