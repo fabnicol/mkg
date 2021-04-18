@@ -82,7 +82,8 @@ adjust_environment() {
     # There is an intractable circular dependency that
     # can be broken by pre-emerging python
 
-    USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python \
+        | tee -a emerge.build
     if [ $? != 0 ]
     then
         echo "emerge python failed!" | tee -a emerge.build
@@ -186,7 +187,7 @@ adjust_environment() {
         if [ $? = 0 ]
         then
             LOCALE_UTF8=$(sed -E \
-                              's/([a-z_A-Z]{2,5})\.?([@a-z_A-Z.0-9]*)/\1.UTF8/' \
+                           's/([a-z_A-Z]{2,5})\.?([@a-z_A-Z.0-9]*)/\1.UTF8/' \
                               <<< ${LOCALE_FOUND})
         else
             # fallback
@@ -218,7 +219,7 @@ adjust_environment() {
 
     [ -z "${KEYMAP_FOUND}" ] && KEYMAP_FOUND="us"
 
-    echo "keymap=${KEYMAP_FOUND}" >  /etc/conf.d/keymaps
+    echo "keymap=${KEYMAP_FOUND}" >>  /etc/conf.d/keymaps
 
     sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
     echo "${TIMEZONE}" > /etc/timezone
@@ -328,7 +329,7 @@ install_software() {
         | tee -a log_install_software.log
     local res_install=$?
 
-    emerge gdm
+    emerge -u gdm
 
     if [ "${res_install}" != "0" ]
     then
@@ -396,6 +397,7 @@ global_config() {
     rc-update add display-manager default
     rc-update add dbus default
     rc-update add elogind boot
+    rc-update add keymaps boot
 
     #--- Networkmanager
 
