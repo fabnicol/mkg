@@ -844,10 +844,9 @@ run_docker_container() {
 
     need_root
 
-    local cli=$(sed -r "/dockerize/d" <<< "$@")
-
+    local cli=$(sed -r 's/(.*)dockerize(.*)/\1 \2/' <<< "$@")
     ${LOG[*]} "[INF] Starting container with command line: "
-    ${LOG[*]} "${cli}"
+    ${LOG[*]} "[MSG] ${cli}"
 
     # Experimental, undocumented environment variable
     # DOCKER_RUN_OPTS
@@ -2749,7 +2748,7 @@ main() {
     if "${DOCKERIZE}"
     then
         fetch_docker_image
-        run_docker_container
+        run_docker_container "$@"
         exit 0
     fi
 
