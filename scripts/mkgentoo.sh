@@ -874,9 +874,12 @@ run_docker_container() {
 
     # Once stopped, check if ISO was created and fetch it back.
 
-    if docker exec ${DOCKER_ID} test -f "${ISO_OUTPUT}"
+    # For this it is necessary to restart.
+
+    if docker start ${DOCKER_ID} \
+            && docker exec ${DOCKER_ID} test -f "${ISO_OUTPUT}"
     then
-        if docker cp -f ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
+        if docker cp ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
         then
             ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} was retrieved from Docker image."
         else
@@ -2663,10 +2666,10 @@ main() {
         git pull
         if [ $? = 0 ]
         then
-            syslog -s "[ERR] Could not pull from repository."
-            syslog -s "[MSG] Continuing with current HEAD."
+            logger -s "[ERR] Could not pull from repository."
+            logger -s "[MSG] Continuing with current HEAD."
         else
-            syslog -s "[MSG] Updated local repository."
+            logger -s "[MSG] Updated local repository."
             # Respawn script with fresh code ans same options.
             exec "./mkg" "$@"
         fi
