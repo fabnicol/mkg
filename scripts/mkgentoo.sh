@@ -956,7 +956,7 @@ pre-test of package merging"
     echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
     echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
-elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
+elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
     echo 'ACCEPT_LICENSE="-* @FREE MPEG-4 linux-fw-redistributable \
 no-source-code bh-luxi"' >> ${m_conf}

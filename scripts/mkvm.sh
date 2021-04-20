@@ -236,7 +236,7 @@ install_stage3() {
 
     # -bindist is requested by internationalization in kde-apps-meta.
     echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
-elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
+elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
     # note linux-fw-redistributable no-source-code for genkernel
