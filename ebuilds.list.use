@@ -7,13 +7,11 @@ app-text/xmlto text
 >=dev-lang/python-2.7.18-r1:2.7 sqlite
 >=dev-qt/qtcore-5.14.2 icu
 >=dev-qt/qtgui-5.14.2-r1 jpeg egl
-dev-qt/qtnetwork bindist
 >=dev-qt/qtwebengine-5.14.2 widgets
 >=dev-qt/qtwebchannel-5.14.2 qml
 >=dev-qt/qtprintsupport-5.14.2 cups
 >=dev-libs/libpcre2-10.35 pcre16
 >=dev-libs/libxml2-2.9.10-r1 icu
-dev-libs/openssl bindist
 >=dev-libs/xmlsec-1.2.30 nss
 >=dev-texlive/texlive-latex-2020 xetex
 >=kde-frameworks/kitemmodels-5.74.0 qml

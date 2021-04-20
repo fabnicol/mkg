@@ -21,6 +21,8 @@
 ## KDE
  
  plasma-meta
+# For internationalization
+ kde-apps/kde-apps-meta
 
 # X
 

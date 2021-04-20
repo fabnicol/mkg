@@ -233,15 +233,18 @@ install_stage3() {
     echo "L10N=\"${VM_LANGUAGE::2} en\""    >> ${m_conf}
     echo "LINGUAS=\"${VM_LANGUAGE} en\"" >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
-    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
+
+    # -bindist is requested by internationalization in kde-apps-meta.
+    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
 elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
     # note linux-fw-redistributable no-source-code for genkernel
     # note bh-luxi for font-bh-* requested by xorg-x11
 
-    echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code \
-bh-luxi"' >> ${m_conf}
+    # MPEG-4 is apparently requested by faac, itself requested by kde-apps-meta.
+    echo 'ACCEPT_LICENSE="-* @FREE MPEG-4 linux-fw-redistributable \
+ no-source-code bh-luxi"' >> ${m_conf}
     if [ "${BIOS}" = "true" ]
     then
         echo 'GRUB_PLATFORMS="i386-pc"' >> ${m_conf}

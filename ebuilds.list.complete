@@ -32,6 +32,9 @@
  qtgui
  plasma-meta
 
+# For internationalization
+ kde-apps/kde-apps-meta
+
 # X
 
  x11-base/xorg-x11
