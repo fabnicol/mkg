@@ -772,7 +772,7 @@ Allowing a 10 second break for second thoughts."
     if ("${TEST_ONLY}" || "${TEST_EMERGE}") && "${USE_MKG_WORKFLOW}"
     then
         ${LOG[*]} "Options use_mkg_workflow and test_... are incompatible."
-        exit 1
+        ${LOG[*]} "Run again with use_mkg_workflow=false test_only test_emerge"        
     fi
 
     ###############################################################################
@@ -955,11 +955,11 @@ pre-test of package merging"
     echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
     echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
-    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
+    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
 elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
-    echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code \
-bh-luxi"' >> ${m_conf}
+    echo 'ACCEPT_LICENSE="-* @FREE MPEG-4 linux-fw-redistributable \
+no-source-code bh-luxi"' >> ${m_conf}
     if [ "${BIOS}" = "true" ]
     then
         echo 'GRUB_PLATFORMS="i386-pc"' >> ${m_conf}
