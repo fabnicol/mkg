@@ -2666,12 +2666,12 @@ main() {
         git pull
         if [ $? = 0 ]
         then
-            logger -s "[ERR] Could not pull from repository."
-            logger -s "[MSG] Continuing with current HEAD."
-        else
             logger -s "[MSG] Updated local repository."
             # Respawn script with fresh code ans same options.
             exec "./mkg" "$@"
+        else
+            logger -s "[ERR] Could not pull from repository."
+            logger -s "[MSG] Continuing with current HEAD."
         fi
     fi
 
