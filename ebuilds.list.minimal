@@ -22,7 +22,7 @@
  
  plasma-meta
 # For internationalization
- kde-apps/kde-apps-meta
+ kde-frameworks/ki18n
 
 # X
 
