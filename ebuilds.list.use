@@ -26,4 +26,5 @@ sys-auth/polkit  introspection nls pam
 >=sys-cluster/openmpi-2.0.4 threads cxx
 >=sys-libs/zlib-1.2.11-r2 minizip
 >=virtual/mpi-2.0-r4 threads cxx
-
+# to enable chpasswd
+sys-apps/shadow -pam 
