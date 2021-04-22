@@ -1,8 +1,6 @@
 name: Publish Docker image
 on:
   release: 
-  workflow_dispatch:
-  
 jobs:
   push_to_registry:
     name: Push Docker image to GitHub Packages
@@ -16,5 +14,5 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: fabnicol/mkg/release-master
+          repository: fabnicol/mkg/mkg-${GITHUB_REF##*/}
           tag_with_ref: true

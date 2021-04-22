@@ -1,5 +1,10 @@
 \hypertarget{group__mk_file_system}{}\doxysection{Create Gentoo linux filesystem on VM disk}
 \label{group__mk_file_system}\index{Create Gentoo linux filesystem on VM disk@{Create Gentoo linux filesystem on VM disk}}
+
+
+and emerge software.  
+
+
 \doxysubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -14,7 +19,7 @@
 \mbox{\hyperlink{group__mk_file_system_gaa8c398850ee5921a441408b92f32d477}{adjust\+\_\+environment}} ()
 \item 
 \mbox{\hyperlink{group__mk_file_system_ga0a168c36e3839b754f641e6639ff2472}{build\+\_\+kernel}} ()
-\begin{DoxyCompactList}\small\item\em -\/--- PATCH -\/--- \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em -\/--- P\+A\+T\+CH -\/--- \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__mk_file_system_gab693423f511d21225dbc60b2782190c3}{install\+\_\+software}} ()
 \item 
 \mbox{\hyperlink{group__mk_file_system_ga30f3fc39fcff53af9710fea740f38109}{global\+\_\+config}} ()
@@ -23,6 +28,8 @@
 
 \doxysubsection{Detailed Description}
 and emerge software. 
+
+
 
 \doxysubsection{Function Documentation}
 \mbox{\Hypertarget{group__mk_file_system_gaa8c398850ee5921a441408b92f32d477}\label{group__mk_file_system_gaa8c398850ee5921a441408b92f32d477}} 
@@ -54,7 +61,7 @@ Definition at line 40 of file mkvm\+\_\+chroot.\+sh.
 
 
 
--\/--- PATCH -\/--- 
+-\/--- P\+A\+T\+CH -\/--- 
 
 -\/--- End of patch -\/---
 
@@ -92,7 +99,7 @@ Definition at line 311 of file mkvm.\+sh.
 {\footnotesize\ttfamily global\+\_\+config (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
 
 \begin{DoxyItemize}
-\item Cleanup log, distfiles (for deployment), kernel build sources and objects \item Log this into {\bfseries{log\+\_\+uninstall\+\_\+software}} \item Update {\bfseries{eix}} cache. Sets display for {\bfseries{display-\/manager}}. \item Add services\+: {\bfseries{sysklog, cronie, display-\/manager, dbus, elogind}} \item Substitute {\bfseries{Network\+Manager}} to temporary networking setup. \item Adjust group and {\bfseries{sudo}} settings for non-\/root user and {\bfseries{sddm}} \item Install {\bfseries{grub}} in EFI mode. \item Set passwords for root and non-\/root user. \begin{DoxyWarning}{Warning}
+\item Cleanup log, distfiles (for deployment), kernel build sources and objects \item Log this into {\bfseries{log\+\_\+uninstall\+\_\+software}} \item Update {\bfseries{eix}} cache. Sets display for {\bfseries{display-\/manager}}. \item Add services\+: {\bfseries{sysklog, cronie, display-\/manager, dbus, elogind}} \item Substitute {\bfseries{Network\+Manager}} to temporary networking setup. \item Adjust group and {\bfseries{sudo}} settings for non-\/root user and {\bfseries{sddm}} \item Install {\bfseries{grub}} in E\+FI mode. \item Set passwords for root and non-\/root user. \begin{DoxyWarning}{Warning}
 Fix {\bfseries{sddm}} startup keyboard issue using {\ttfamily  setxkbmap} 
 \end{DoxyWarning}
 \end{DoxyItemize}
@@ -107,13 +114,13 @@ Definition at line 350 of file mkvm\+\_\+chroot.\+sh.
 {\footnotesize\ttfamily install\+\_\+software (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
 
 \begin{DoxyItemize}
-\item Emerge list of ebuilds on top of stage3 and system utils already merged. \item Optionaly download and build RStudio 
+\item Emerge list of ebuilds on top of stage3 and system utils already merged. \item Optionaly download and build R\+Studio 
 \begin{DoxyRetVals}{Return values}
 {\em -\/1} & on building errors \\
 \hline
 \end{DoxyRetVals}
 \begin{DoxyRefDesc}{Todo}
-\item[\mbox{\hyperlink{todo__todo000004}{Todo}}]Add a script to build R dependencies\end{DoxyRefDesc}
+\item[\mbox{\hyperlink{todo__todo000004}{Todo}}]Add a script to build R dependencies \end{DoxyRefDesc}
 \end{DoxyItemize}
 
 
@@ -147,9 +154,9 @@ Create file {\bfseries{partition}}. ~\newline
 The VM needs time to recognize /dev/sda in some cases, for unclear reasons. This may be a kernel issue or a Virtual\+Box issue. 
 \end{DoxyWarning}
 \begin{DoxyRefDesc}{Bug}
-\item[\mbox{\hyperlink{bug__bug000002}{Bug}}]Same issue with mkswap and swapon. Cleaning VBox config/settings, syncing and a bit of sleep fixed these issues for the {\itshape net-\/setup} method. 
+\item[\mbox{\hyperlink{bug__bug000002}{Bug}}]Same issue with mkswap and swapon. Cleaning V\+Box config/settings, syncing and a bit of sleep fixed these issues for the {\itshape net-\/setup} method. 
 
-However if vm type is {\itshape \textquotesingle{}headless\textquotesingle{}} the {\itshape dhcpcd} method is consistently hampered by a VBox bug, which is tentatively circumvented by sending a {\ttfamily controlvm keyboardputscancode 1c} instruction. Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a {\ttfamily read}command, all falls back into place. This is why using the net-\/setup script, which forces user input, circumvents the issue. This may be caused by an aging kernel and/or incompatibilities with virtualization. Using a Clone\+Zilla CD as a replacement solved the issue completely. It might be better to use a beefed-\/up Gentoo install CD. \end{DoxyRefDesc}
+However if vm type is {\itshape \textquotesingle{}headless\textquotesingle{}} the {\itshape dhcpcd} method is consistently hampered by a V\+Box bug, which is tentatively circumvented by sending a {\ttfamily controlvm keyboardputscancode 1c} instruction. Tests show that this is linked to a requested user keyboard or mouse input by the Gentoo minimal install CD. This cannot be simulated owing to the lack of /dev/uinput. The reason why user input is requested has not been found. Without it, /dev/sda2 and/or sda4 are mistakenly identified as being mounted and/or busy, while this cannot be the case. With even a single keystroke for a {\ttfamily read}command, all falls back into place. This is why using the net-\/setup script, which forces user input, circumvents the issue. This may be caused by an aging kernel and/or incompatibilities with virtualization. Using a Clone\+Zilla CD as a replacement solved the issue completely. It might be better to use a beefed-\/up Gentoo install CD. \end{DoxyRefDesc}
 \begin{DoxyNote}{Note}
 It might be necessary with older machines to increase the amount of sleep. 
 \end{DoxyNote}

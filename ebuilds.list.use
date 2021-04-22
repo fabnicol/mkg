@@ -1,31 +1,36 @@
 app-arch/p7zip -kde -wxwidgets
-app-editors/emacs athena Xaw3d
->=app-crypt/gcr-3.36 gtk
+>=app-crypt/gcr-3.36.0 gtk
+>=app-crypt/pinentry-1.1.0-r4 gnome-keyring
+app-editors/emacs gtk
+>=app-i18n/ibus-1.5.22 gtk
 >=app-text/ghostscript-gpl-9.52-r1 cups
->=app-text/texlive-core-2020 xetex
 app-text/xmlto text
->=dev-lang/python-2.7.18-r1:2.7 sqlite
->=dev-qt/qtcore-5.14.2 icu
->=dev-qt/qtgui-5.14.2-r1 jpeg egl
-dev-qt/qtnetwork bindist
->=dev-qt/qtwebengine-5.14.2 widgets
->=dev-qt/qtwebchannel-5.14.2 qml
->=dev-qt/qtprintsupport-5.14.2 cups
+>=dev-libs/folks-0.14.0 eds
+dev-libs/gjs -sysprof
+>=dev-libs/libgdata-0.17.12 gnome-online-accounts
+>=dev-libs/libical-3.0.9 vala
 >=dev-libs/libpcre2-10.35 pcre16
+>=dev-libs/libpeas-1.26.0-r100 gtk
 >=dev-libs/libxml2-2.9.10-r1 icu
-dev-libs/openssl bindist
 >=dev-libs/xmlsec-1.2.30 nss
->=dev-texlive/texlive-latex-2020 xetex
->=kde-frameworks/kitemmodels-5.74.0 qml
->=kde-frameworks/prison-5.77.0 qml
->=media-libs/harfbuzz-2.6.7 icu
+>=dev-lang/python-2.7.18-r1:2.7 sqlite
+>=gnome-extra/evolution-data-server-3.36.5 gtk vala
+kde-frameworks/kitemmodels qml
+kde-frameworks/prison qml
+media-libs/clutter-gtk gtk
+media-libs/clutter gtk
+>=media-libs/gegl-0.4.26-r1 raw
 >=media-libs/gd-2.3.0 png
->=media-libs/mesa-20.0.8 wayland
->=media-video/vlc-3.0.11.1 vorbis ogg
+>=media-libs/gst-plugins-base-1.16.3 theora
+>=media-libs/harfbuzz-2.6.7 icu
 >=media-libs/libvpx-1.7.0-r1 svc
+>=media-libs/mesa-20.0.8 wayland
+>=media-plugins/alsa-plugins-1.2.2 pulseaudio
+>=media-plugins/grilo-plugins-0.3.11 tracker
+>=media-video/vlc-3.0.11.1 vorbis ogg
 sys-apps/util-linux caps
-sys-auth/polkit  introspection nls pam 
+sys-auth/polkit  introspection nls pam
 >=sys-cluster/openmpi-2.0.4 threads cxx
 >=sys-libs/zlib-1.2.11-r2 minizip
 >=virtual/mpi-2.0-r4 threads cxx
-
+x11-terms/gnome-terminal nautilus -debug

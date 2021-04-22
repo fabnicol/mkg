@@ -1,40 +1,32 @@
 # System and management
+ app-portage/eix
  app-admin/sudo
  app-admin/sysklogd
- app-portage/eix
  app-portage/gentoolkit
  dev-libs/re2
  dev-vcs/git
  gui-libs/display-manager-init
- kde-plasma/sddm-kcm
  net-misc/dhcpcd
  net-wireless/iw 
  net-wireless/wpa_supplicant
  sys-apps/mlocate
- sys-fs/dosfstools
- sys-fs/e2fsprogs
  sys-boot/grub:2
+ sys-fs/e2fsprogs
+ sys-fs/dosfstools
  virtual/cron
  x11-apps/xdm
- x11-misc/sddm 
+ x11-terms/gnome-terminal
  
-## KDE
- 
- plasma-meta
+## GNOME
+
+ gnome-desktop
+ gnome-base/gnome
 
 # X
 
  x11-base/xorg-x11
  x11-base/xorg-drivers
- 
-# Other desktop
+ x11-terms/guake
+ x11-terms/xterm
 
- kate
- kde-apps/dolphin
- konqueror
- konsole
-
-## PDF-related
- 
- okular
 

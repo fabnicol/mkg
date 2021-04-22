@@ -82,7 +82,8 @@ adjust_environment() {
     # There is an intractable circular dependency that
     # can be broken by pre-emerging python
 
-    USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python \
+        | tee -a emerge.build
     if [ $? != 0 ]
     then
         echo "emerge python failed!" | tee -a emerge.build
@@ -95,7 +96,7 @@ adjust_environment() {
 
     local profile=$(eselect --color=no --brief profile list \
                         | grep desktop \
-                        | grep plasma \
+                        | grep gnome \
                         | grep ${PROCESSOR} \
                         | grep -v systemd \
                         | head -n 1)
@@ -186,7 +187,7 @@ adjust_environment() {
         if [ $? = 0 ]
         then
             LOCALE_UTF8=$(sed -E \
-                              's/([a-z_A-Z]{2,5})\.?([@a-z_A-Z.0-9]*)/\1.UTF8/' \
+                           's/([a-z_A-Z]{2,5})\.?([@a-z_A-Z.0-9]*)/\1.UTF8/' \
                               <<< ${LOCALE_FOUND})
         else
             # fallback
@@ -195,6 +196,17 @@ adjust_environment() {
     else
         # fallback
         eselect locale set en_US.utf8
+    fi
+
+    # Gnome-specific. Missing LC_ALL blocks gnome-terminal startup.
+    # Known gnome-terminal moot point. Useless on Plasma.
+    # To be placed after call to locale-gen.
+
+    if [ -n "${LOCALE_UTF8}" ]
+    then
+        echo "LC_ALL=${LOCALE_UTF8}" >> /etc/env.d/02locale
+    else
+        echo "LC_ALL=en_US.UTF8" >> /etc/env.d/02locale
     fi
 
     # Set keymaps and time
@@ -207,12 +219,14 @@ adjust_environment() {
 
     [ -z "${KEYMAP_FOUND}" ] && KEYMAP_FOUND="us"
 
-    echo "keymap=${KEYMAP_FOUND}" >  /etc/conf.d/keymaps
+    echo "keymap=${KEYMAP_FOUND}" >>  /etc/conf.d/keymaps
 
     sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
     echo "${TIMEZONE}" > /etc/timezone
 
     emerge -u --config sys-libs/timezone-data | tee -a emerge.build
+
+    # endof Gnome-specific
 
     env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 }
@@ -312,24 +326,24 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN --with-bdeps=y --keep-going ${packages}  2>&1 \
-    | tee -a log_install_software.log
+        | tee -a log_install_software.log
     local res_install=$?
+
+    emerge -u gdm
 
     if [ "${res_install}" != "0" ]
     then
-	# one more chance, who knows
-	emerge --resume | tee -a log_install_software.log
-    res_install=$?
+	    # one more chance, who knows
+  	    emerge --resume | tee -a log_install_software.log
         res_install=$?
     fi
 
     if [ $? != 0 ]
     then
 	# one more chance, who knows
-	emerge --resume | tee -a log_install_software.log
+	    emerge --resume | tee -a log_install_software.log
     fi
 
-    # do not assume true/false unlike in mkgentoo.sh
     # do not use \ to continue line below:
 
     if [ "${MINIMAL}" = "false" ]
@@ -374,27 +388,8 @@ install_software() {
 
 global_config() {
 
-    # Configuration --- sddm
-
-    echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
-        | tee -a sddm.log
-
-    # only the first two letters are reliable here.
-    echo "setxkbmap ${VM_KEYMAP::2},us" >> /usr/share/sddm/scripts/Xsetup \
-        | tee -a sddm.log
-
-    chmod a+x /usr/share/sddm/scripts/Xsetup
-    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
-        /etc/conf.d/display-manager | tee -a sddm.log
-
-    # SDDM language config now is no longer under /etc/sddm.conf
-    echo '[X11]' >> /etc/sddm.conf.d/sddm.conf
-    echo 'DisplayCommand=/etc/sddm/scripts/Xsetup' >> /etc/sddm.conf.d/sddm.conf
-
-    # Numlock now set to 'on' on startup
-    sed -i 's/Numlock=.*/Numlock=on/' /usr/share/sddm/sddm.conf.d/00default.conf
-
-    gpasswd -a sddm video
+    sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="gdm"/' \
+                /etc/conf.d/display-manager | tee -a gdm.log
 
     #--- Services
 

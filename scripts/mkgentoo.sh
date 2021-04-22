@@ -827,6 +827,7 @@ share_root, test_emerge, use_clonezilla_workflow=false"
 
     if_fails $? "[ERR] vm_language must have at least 5 characters and follow \
 this regular expression: [a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*"
+
 }
 
 ## @fn run_docker_container()
@@ -842,6 +843,7 @@ run_docker_container() {
     check_tool docker
 
     need_root
+
     local cli=$(sed -r 's/(.*)dockerize(.*)/\1 \2/' <<< "$@")
     ${LOG[*]} "[INF] Starting container with command line: "
     ${LOG[*]} "[MSG] ${cli}"
@@ -849,7 +851,7 @@ run_docker_container() {
     # Experimental, undocumented environment variable
     # DOCKER_RUN_OPTS
 
-    local DOCKER_ID=$(docker run  ${DOCKER_RUN_OPTS} -dit --privileged \
+    DOCKER_ID=$(docker run  ${DOCKER_RUN_OPTS} -dit --privileged \
            -v /dev/cdrom:/dev/cdrom -v /dev/sr0:/dev/sr0  -v /dev/log:/dev/log \
                   --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
 		  ${cli})
@@ -873,17 +875,18 @@ run_docker_container() {
     ! "${CREATE_ISO}" && return 0
 
     # Once stopped, check if ISO was created and fetch it back.
-
     # For this it is necessary to restart.
 
     if docker start ${DOCKER_ID} \
             && docker exec ${DOCKER_ID} test -f "${ISO_OUTPUT}"
     then
-        if docker cp ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
+        if docker cp  ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
         then
-            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} was retrieved from Docker image."
+            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} was retrieved \
+from Docker image."
         else
-            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} could not be retrieved from Docker image. Check manually."
+            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} could not \
+be retrieved from Docker image. Check manually."
         fi
     else
         ${LOG[*]} "[ERR] Dockerized process failed to create ISO installer."
@@ -953,10 +956,10 @@ pre-test of package merging"
     ${LOG[*]} "[MSG] Using CFLAGS=${CFLAGS}"
     sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS=\"${CFLAGS} -pipe\"/g"  ${m_conf}
     echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
-    echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
+    echo "LINGUAS=\"${VM_LANGUAGE} en\"" >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
     echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
-elogind -consolekit -systemd mpi dbus X"' >>  ${m_conf}
+elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
     echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code \
 bh-luxi"' >> ${m_conf}
@@ -1557,6 +1560,7 @@ create_vm() {
                                --rtcuseutc ${RTCUSEUTC} \
                                --firmware "bios" 2>&1 \
                         | xargs echo "[INF] Adding VM parameters.")
+
 
     grep -E '^[[:digit:]abcdef]{8} ' <<< $(VBoxManage list hostcpuids) |\
 	while read -r line
@@ -2584,7 +2588,7 @@ generate_Gentoo() {
         ${LOG[*]} "      bios, cflags, clonezilla_install, debug_mode, elist"
         ${LOG[*]} "      emirrors, gui, kernel_config, minimal, minimal_size"
         ${LOG[*]} "      ncpus, nonroot_user, passwd, processor, rootpasswd"
-        ${LOG[*]} "      stage3, vm_keyboard, vm_language"
+        ${LOG[*]} "      stage3, vm_keymap, vm_language"
         ${LOG[*]} "[MSG] In particular, all build-specific parameters will be set."
         ${LOG[*]} "[MSG] If you need to specify these parameters, run again"
         ${LOG[*]} "      with use_mkg_workflow=false."
@@ -2666,12 +2670,12 @@ main() {
         git pull
         if [ $? = 0 ]
         then
+            logger -s "[MSG] Updated local repository."
+            # Respawn script with fresh code and same options.
+            exec "./mkg" $(sed '/pull=true/d' "$@")
+        else
             logger -s "[ERR] Could not pull from repository."
             logger -s "[MSG] Continuing with current HEAD."
-        else
-            logger -s "[MSG] Updated local repository."
-            # Respawn script with fresh code ans same options.
-            exec "./mkg" "$@"
         fi
     fi
 
@@ -2913,6 +2917,5 @@ clonezilla image..."
     fi
 
     ${LOG[*]} "[MSG] Gentoo building process ended."
-
     exit 0
 }

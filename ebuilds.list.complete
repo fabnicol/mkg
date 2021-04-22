@@ -1,22 +1,21 @@
 # System and management
- app-admin/sudo
- app-admin/sysklogd
  app-portage/eix
  app-portage/gentoolkit
+ app-admin/sudo
+ app-admin/sysklogd
  dev-libs/re2
  dev-vcs/git
  gui-libs/display-manager-init
- kde-plasma/sddm-kcm
  net-misc/dhcpcd
  net-wireless/iw 
  net-wireless/wpa_supplicant
  sys-apps/mlocate
+ sys-boot/grub:2
  sys-fs/dosfstools
  sys-fs/e2fsprogs
- sys-boot/grub:2
- virtual/cron
- x11-misc/sddm 
  x11-apps/xdm
+ x11-terms/gnome-terminal
+ virtual/cron
  
 # Data science
 
@@ -24,29 +23,19 @@
  app-editors/emacs
  app-editors/vim
 
-## KDE
+## GNOME
 
- qtcore
- qtwidgets
- qtxml
- qtgui
- plasma-meta
+ gnome-base/gnome-desktop
+ gnome-base/gnome
 
 # X
 
  x11-base/xorg-x11
  x11-base/xorg-drivers
+ x11-terms/guake
+ x11-terms/xterm
  
 # Other desktop
 
  app-office/libreoffice
- kate
- kde-apps/dolphin
- konqueror
- konsole
-
-## PDF-related
- 
- app-text/texlive
- dev-texlive/texlive-latex
- okular
+ app-editors/gedit
