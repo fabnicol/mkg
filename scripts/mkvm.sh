@@ -235,7 +235,7 @@ install_stage3() {
     sed  -i 's/USE=".*"//g'    ${m_conf}
 
     # -bindist is requested by internationalization in kde-apps-meta.
-    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
+    echo 'USE="-gtk -gnome bindist qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
 elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
