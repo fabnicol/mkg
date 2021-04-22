@@ -955,7 +955,7 @@ pre-test of package merging"
     echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
     echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
-    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
+    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
 elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
     echo 'ACCEPT_LICENSE="-* @FREE MPEG-4 linux-fw-redistributable \

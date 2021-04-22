@@ -23,6 +23,8 @@ dev-libs/openssl bindist
 >=media-libs/mesa-20.0.8 wayland
 >=media-video/vlc-3.0.11.1 vorbis ogg
 >=media-libs/libvpx-1.7.0-r1 svc
+net-wireless/wpa_supplicant bindist
+net-misc/openssh bindist
 sys-apps/util-linux caps
 sys-auth/polkit  introspection nls pam 
 >=sys-cluster/openmpi-2.0.4 threads cxx
