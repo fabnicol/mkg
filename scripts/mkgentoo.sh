@@ -2579,7 +2579,7 @@ Unmount it and remove it manually then restart."
 
 generate_Gentoo() {
 
-    if "${USE_MKG_WORKFLOW}"
+    if "${USE_MKG_WORKFLOW}" && ! "${DOCKERIZE}"
     then
         ${LOG[*]} "[MSG] You chose to use the output of MKG GitHub Actions."
         ${LOG[*]} "[MSG] The downloaded ISO has been preprocessed."
