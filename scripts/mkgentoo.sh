@@ -2668,7 +2668,7 @@ main() {
         then
             logger -s "[MSG] Updated local repository."
             # Respawn script with fresh code ans same options.
-            exec "./mkg" "$@"
+            exec "./mkg" $(sed '/pull=true/d' "$@")
         else
             logger -s "[ERR] Could not pull from repository."
             logger -s "[MSG] Continuing with current HEAD."

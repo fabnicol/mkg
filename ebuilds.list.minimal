@@ -11,6 +11,7 @@
  net-wireless/iw 
  net-wireless/wpa_supplicant
  sys-apps/mlocate
+ sys-apps/shadow
  sys-fs/dosfstools
  sys-fs/e2fsprogs
  sys-boot/grub:2
