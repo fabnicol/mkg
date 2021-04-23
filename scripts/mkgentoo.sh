@@ -2667,12 +2667,18 @@ main() {
 
     if grep -q 'pull=true' <<< "$@"
     then
+        git config user.email root@docker.container
+        git config user.name "docker container"
         git pull
         if [ $? = 0 ]
         then
             logger -s "[MSG] Updated local repository."
-            # Respawn script with fresh code and same options.
-            exec "./mkg" $(sed '/pull=true/d' "$@")
+            export CLI_PULL=$(sed -r 's/(.*)pull=true(.*)/\1\2/g' <<< "$@")
+            logger -s "[INF] Restarting with command line:"
+            logger -s "[INF] ${CLI_PULL}"
+
+            # Respawn script with fresh code ans same options.
+            exec "./mkg" ${CLI_PULL}
         else
             logger -s "[ERR] Could not pull from repository."
             logger -s "[MSG] Continuing with current HEAD."
