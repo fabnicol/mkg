@@ -389,12 +389,14 @@ the same time"
 
     if [ $? = 0 ]
     then
-        [ "${VERBOSE}" = "true" ] && ${LOG[*]} "[MSG] VirtualBox version: ${vbox_version}"
+        [ "${VERBOSE}" = "true" ] \
+            && ${LOG[*]} "[MSG] VirtualBox version: ${vbox_version}"
 
-        declare -i version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< ${vbox_version})
+        declare -i version_major=$(sed -E 's/([0-9]+)\..*/\1/' \
+                                       <<< ${vbox_version})
         declare -i version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
                                        <<< ${vbox_version})
-        declare -i version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/' \
+        declare -i version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/'\
                                        <<< ${vbox_version})
         if [ ${version_major} -lt 6 ] || [ ${version_minor} -lt 1 ] \
                || [ ${version_index} -lt 10 ]
@@ -410,8 +412,10 @@ the same time"
         ${LOG[*]} "[ERR] Could not check VirtualBox version with user rights."
         ${LOG[*]} "[ERR] It is the user's responsability to check that \
 VirtualBox version is at least 6.1.10."
-        ${LOG[*]} "[WAR] This may be caused by the fact that you are not an active"
-        ${LOG[*]} "      member of group vboxusers. Run 'sudo usermod -a -G vboxusers'"
+        ${LOG[*]} "[WAR] This may be caused by the fact that you are \
+not an active"
+        ${LOG[*]} "      member of group vboxusers.\
+Run 'sudo usermod -a -G vboxusers'"
         ${LOG[*]} "      then log out and log in again."
     fi
 
@@ -761,8 +765,8 @@ for a given ext_device"
             read -p "      Please confirm by entering uppercase Y: " rep
             [ "${rep}" != "Y" ] && exit 0
         else
-            echo "[WAR] CAUTION: non-interactive mode is on. Device ${EXT_DEVICE} \
-will be erased and written to upon completion. \
+            echo "[WAR] CAUTION: non-interactive mode is on. Device \
+${EXT_DEVICE} will be erased and written to upon completion. \
 You may want to abort this process just now (it should be time). \
 Allowing a 10 second break for second thoughts."
             echo sleep 10
@@ -772,19 +776,20 @@ Allowing a 10 second break for second thoughts."
     if ("${TEST_ONLY}" || "${TEST_EMERGE}") && "${USE_MKG_WORKFLOW}"
     then
         ${LOG[*]} "Options use_mkg_workflow and test_... are incompatible."
-        ${LOG[*]} "Run again with use_mkg_workflow=false test_only test_emerge"        
+        ${LOG[*]} "Run again with use_mkg_workflow=false test_only test_emerge"
     fi
 
-    ###############################################################################
-    #  Elevated rights                                                            #
-    #                                                                             #
-    #  root is necessary for mksquashfs/unsquashfs and mount.                     #
-    #  bsdtar, when used, makes it possible to avoid mounts hence elevated rights #
-    #  but this works only is 3rd-party workflows are used or if a custom         #
-    #  CloneZilla CD has been previously obtained.                                #
-    #  root is also necxessary when chroot is used (TEST_EMERGE) and/or using     #
-    #  another block device with dd or ocs-sr                                     #
-    ###############################################################################
+    ###########################################################################
+    #  Elevated rights                                                        #
+    #                                                                         #
+    #  root is necessary for mksquashfs/unsquashfs and mount.                 #
+    #  bsdtar, when used, makes it possible to avoid mounts                   #
+    #  hence elevated rights but this works only is 3rd-party workflows are   #
+    #  used or if a custom CloneZilla CD has been previously obtained.        #
+    #                                                                         #
+    #  root is also necxessary when chroot is used (TEST_EMERGE) and/or using #
+    #  another block device with dd or ocs-sr                                 #
+    ###########################################################################
 
     "${USE_CLONEZILLA_WORKFLOW}" && DOWNLOAD_CLONEZILLA=false
 
@@ -864,10 +869,11 @@ run_docker_container() {
     fi
 
     # Every minute, check if the above container is still running.
-
+    sleep 120
     while docker inspect ${DOCKER_ID} | grep -q '"Running": true'
     do
         sleep 60
+	${LOG[*]} "[MSG] Container running."
     done
 
     ! "${CREATE_ISO}" && return 0
@@ -881,9 +887,11 @@ run_docker_container() {
     then
         if docker cp ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
         then
-            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} was retrieved from Docker image."
+            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} was retrieved \
+from Docker image."
         else
-            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} could not be retrieved from Docker image. Check manually."
+            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} could not be \
+retrieved from Docker image. Check manually."
         fi
     else
         ${LOG[*]} "[ERR] Dockerized process failed to create ISO installer."
@@ -1152,8 +1160,9 @@ remove_chroot() {
                 || mountpoint -q "${ROOT_LIVE}/squashfs-root/sys"
 	    then
             unbind_filesystem "${ROOT_LIVE}/squashfs-root"
-            if_fails $? "[ERR] Failed to unmount and wipe out ${ROOT_LIVE}/squashfs-root" \
-                     "      Please see to this manually. You may have to reboot."
+            if_fails $? "[ERR] Failed to unmount and wipe out \
+${ROOT_LIVE}/squashfs-root\      Please see to this manually.\
+      You may have to reboot."
 	    fi
     else
         "${VERBOSE}" && echo "No directory: ${ROOT_LIVE}/squashfs-root"
@@ -1958,9 +1967,11 @@ so that **modprobe nbd** succeeds."
     do
         if [ "$1" = "w" ]
         then
-            "${QEMU_NBD_BINARY}" -c /dev/nbd${j} -f vdi "${VM}.vdi" >/dev/null 2>&1
+            "${QEMU_NBD_BINARY}" -c /dev/nbd${j} -f vdi "${VM}.vdi" \
+                                 >/dev/null 2>&1
         else
-            "${QEMU_NBD_BINARY}" --read-only -c /dev/nbd${j} -f vdi "${VM}.vdi" >/dev/null 2>&1
+            "${QEMU_NBD_BINARY}" --read-only -c /dev/nbd${j} -f vdi "${VM}.vdi" \
+                                 >/dev/null 2>&1
         fi
         local res=$?
         if [ $res = 0 ]
@@ -1969,7 +1980,8 @@ so that **modprobe nbd** succeeds."
         else
             if [ "${VERBOSE}" = "true" ]
             then
-                 ${LOG[*]} "[WAR] Could not connect VDI disk, qemu exit code: $res"
+                 ${LOG[*]} "[WAR] Could not connect VDI disk, qemu exit code: \
+$res"
                  ${LOG[*]} "[WAR] Looping nbd${j}..."
             fi
             j=j+1
@@ -1982,7 +1994,8 @@ so that **modprobe nbd** succeeds."
         then
             mount /dev/nbd${j}p4 "${SHARED_ROOT_DIR}" >/dev/null 2>&1
         else
-            mount -o ro,norecovery /dev/nbd${j}p4 "${SHARED_ROOT_DIR}" >/dev/null 2>&1
+            mount -o ro,norecovery /dev/nbd${j}p4 "${SHARED_ROOT_DIR}" \
+                  >/dev/null 2>&1
         fi
 
         if [ $? != 0 ]
@@ -2071,7 +2084,8 @@ ${SHARED_ROOT_DIR} for /dev/nbd${j}p4"
         done
     fi
 
-    if [ -n "${SHARED_ROOT_DIR}" ] && [ -d "${SHARED_ROOT_DIR}" ] >/dev/null 2>&1
+    if [ -n "${SHARED_ROOT_DIR}" ] && [ -d "${SHARED_ROOT_DIR}" ] \
+                                          >/dev/null 2>&1
     then
         if mountpoint -q "${SHARED_ROOT_DIR}/boot"
         then
@@ -2154,7 +2168,8 @@ clone_vm_to_device() {
     fi
 
     sync
-    if_fails $? "[ERR] Could not convert dynamic virtual disk to external block device!"
+    if_fails $? "[ERR] Could not convert dynamic virtual disk to external \
+block device!"
     return 0
 }
 
@@ -2508,12 +2523,14 @@ CloneZilla CD with VirtualBox and guest additions."
         check_dir ISOFILES/home/partimag
 
         # Using bsdtar make it possible to extract CloneZilla CD from workflows
-        # without having to mount. This is useful within containers as loop mount is
+        # without having to mount.
+        # This is useful within containers as loop mount is
         # not easily possible in such contexts.
 
         if "${USE_BSDTAR}"
         then
-            "${VERBOSE}" && ${LOG[*]} "[MSG] Using bsdtar to extract CloneZilla ISO"
+            "${VERBOSE}" \
+                && ${LOG[*]} "[MSG] Using bsdtar to extract CloneZilla ISO"
             local BSDTAR_BINARY="$(which bsdtar)"
             if [ $? != 0 ] || [ -z "${BSDTAR_BINARY}" ]
             then
@@ -2538,7 +2555,8 @@ Unmount it and remove it manually then restart."
 	    fi
 
         if "${USE_CLONEZILLA_WORKFLOW}" \
-                || ([ -n "${CUSTOM_CLONEZILLA}" ] && [ "${CUSTOM_CLONEZILLA}" != "dep" ])
+                || ([ -n "${CUSTOM_CLONEZILLA}" ] \
+                        && [ "${CUSTOM_CLONEZILLA}" != "dep" ])
         then
             # presuming that custom clonezilla comes from workflow
             # or anyhow giving priority
@@ -2585,7 +2603,8 @@ generate_Gentoo() {
         ${LOG[*]} "      emirrors, gui, kernel_config, minimal, minimal_size"
         ${LOG[*]} "      ncpus, nonroot_user, passwd, processor, rootpasswd"
         ${LOG[*]} "      stage3, vm_keyboard, vm_language"
-        ${LOG[*]} "[MSG] In particular, all build-specific parameters will be set."
+        ${LOG[*]} "[MSG] In particular, all build-specific parameters \
+will be set."
         ${LOG[*]} "[MSG] If you need to specify these parameters, run again"
         ${LOG[*]} "      with use_mkg_workflow=false."
         ${LOG[*]} "[MSG] You can however fix the following command line items:"
@@ -2599,7 +2618,8 @@ generate_Gentoo() {
         local rep="N"
         if "${INTERACTIVE}"
         then
-            read -p "[MSG] Please confirm that you are ready to use build presets [Y]:" rep
+            read -p "[MSG] Please confirm that you are ready to use \
+build presets [Y]:" rep
             if [ "${rep}" = "N" ]
             then
                 ${LOG[*]} "[INF] Exiting."
@@ -2663,6 +2683,8 @@ main() {
 
     if grep -q 'pull=true' <<< "$@"
     then
+        git config user.email root@docker.container
+	git config user.name "docker container"
         git pull
         if [ $? = 0 ]
         then
@@ -2724,8 +2746,8 @@ main() {
     ${LOG[*]} "[MSG] MKG was run with the following options: $@"
     ${LOG[*]} "% ----------------------------------------------------------- %"
 
-    check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
-               "VBoxManage" "curl" "grep" "lsblk" "awk" \
+    check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" \
+               "xorriso" "VBoxManage" "curl" "grep" "lsblk" "awk" \
                "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
 
     if ! which uuid >/dev/null 2>&1 \
@@ -2765,7 +2787,8 @@ main() {
     then
         export SHARE_ROOT
         export SHARED_DIR
-        "${VERBOSE}" && ${LOG[*]} "[MSG] Trying to mount ${VM} to ${SHARE_ROOT_DIR}"
+        "${VERBOSE}" \
+            && ${LOG[*]} "[MSG] Trying to mount ${VM} to ${SHARE_ROOT_DIR}"
         if "${NO_RUN}"
         then
             mount_shared_dir_daemon
@@ -2782,13 +2805,16 @@ main() {
                 ${LOG[*]} "[MSG] atd service was tested OK (Openrc)."
             else
                 ${LOG[*]} "[WAR] It does not seem that you are running Openrc."
-                ${LOG[*]} "[WAR] You may have to check atd manually and restart later."
+                ${LOG[*]} "[WAR] You may have to check atd manually and restart \
+later."
             fi
-            ${LOG[*]} "[MSG] Virtual VDI disk will be mounted in 15 minutes from now"
+            ${LOG[*]} "[MSG] Virtual VDI disk will be mounted in 15 minutes \
+from now"
             ${LOG[*]} "[MSG] under directory ${SHARED_ROOT_DIR}"
             ${LOG[*]} "[MSG] with permissions ${SHARE_ROOT}."
 
-            echo 'nohup /bin/bash -c "mount_shared_dir_daemon" &' | at now '+ 15 minutes'
+            echo 'nohup /bin/bash -c "mount_shared_dir_daemon" &' \
+                | at now '+ 15 minutes'
             if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
         fi
     fi
