@@ -869,7 +869,7 @@ run_docker_container() {
     fi
 
     # Every minute, check if the above container is still running.
-    sleep 120
+    sleep 300
     while docker inspect ${DOCKER_ID} | grep -q '"Running": true'
     do
         sleep 60
@@ -2684,13 +2684,18 @@ main() {
     if grep -q 'pull=true' <<< "$@"
     then
         git config user.email root@docker.container
-	git config user.name "docker container"
+        git config user.name "docker container"
         git pull
         if [ $? = 0 ]
         then
             logger -s "[MSG] Updated local repository."
+            export CLI_PULL=$(sed -r 's/(.*)pull=true(.*)/\1\2/g' <<< "$@")
+            logger -s "[INF] Restarting with command line:"
+            logger -s "[INF] ${CLI_PULL}"
+
             # Respawn script with fresh code ans same options.
-            exec "./mkg" $(sed '/pull=true/d' "$@")
+            exec "./mkg" ${CLI_PULL}
+            exit $?
         else
             logger -s "[ERR] Could not pull from repository."
             logger -s "[MSG] Continuing with current HEAD."
@@ -2805,8 +2810,8 @@ main() {
                 ${LOG[*]} "[MSG] atd service was tested OK (Openrc)."
             else
                 ${LOG[*]} "[WAR] It does not seem that you are running Openrc."
-                ${LOG[*]} "[WAR] You may have to check atd manually and restart \
-later."
+                ${LOG[*]} "[WAR] You may have to check atd manually and \
+restart later."
             fi
             ${LOG[*]} "[MSG] Virtual VDI disk will be mounted in 15 minutes \
 from now"
@@ -2878,9 +2883,9 @@ clonezilla image..."
 
         # this second ISO image is the "restore" one: from clonezilla image
         # to target disk.
-        # Now replacing the older "save" (from virtual disk to clonezilla image)
-        # config file by the opposite "restore" one (from clonezilla image
-        # to target disk)
+        # Now replacing the older "save" (from virtual disk to
+        # clonezilla image) config file by the opposite "restore" one
+        # (from clonezilla image to target disk)
 
         cp ${verb} -f clonezilla/restoredisk/isolinux.cfg ISOFILES/syslinux
 
@@ -2888,9 +2893,9 @@ clonezilla image..."
         then
             ${LOG[*]} "[MSG] Done."
             [ -f "${ISO_OUTPUT}" ] \
-                && ${LOG[*]} "[MSG] ISO install medium was created here:\
+                && ${LOG[*]} "[MSG] ISO install medium was created here: \
                        ${ISO_OUTPUT}"  \
-                    || ${LOG[*]} "[ERR] ISO install medium failed to be created."
+                || ${LOG[*]} "[ERR] ISO install medium failed to be created."
         else
             ${LOG[*]} "[ERR] ISO install medium failed to be created!"
             exit 1
@@ -2935,7 +2940,8 @@ clonezilla image..."
         [ -n "${EMAIL_PASSWD}" ] \
             && [ -n "${EMAIL}" ] \
             && [ -n "${SMTP_URL}" ] \
-            && ${LOG[*]} <<< $(send_mail 2>&1 |xargs echo '[INF] Sending mail: ')
+            && ${LOG[*]} <<< $(send_mail 2>&1 \
+                                   | xargs echo '[INF] Sending mail: ')
     fi
 
     ${LOG[*]} "[MSG] Gentoo building process ended."
