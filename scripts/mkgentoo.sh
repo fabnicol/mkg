@@ -867,20 +867,23 @@ run_docker_container() {
 
     # Every minute, check if the above container is still running.
 
+    sleep 300
     while docker inspect ${DOCKER_ID} | grep -q '"Running": true'
     do
         sleep 60
+        ${LOG[*]} "[MSG] Container running."
     done
 
     ! "${CREATE_ISO}" && return 0
 
     # Once stopped, check if ISO was created and fetch it back.
-    # For this it is necessary to restart.
+    # For this it is
+    necessary to restart.
 
     if docker start ${DOCKER_ID} \
             && docker exec ${DOCKER_ID} test -f "${ISO_OUTPUT}"
     then
-        if docker cp  ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
+        if docker cp ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
         then
             ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} was retrieved \
 from Docker image."
@@ -2679,6 +2682,7 @@ main() {
 
             # Respawn script with fresh code ans same options.
             exec "./mkg" ${CLI_PULL}
+            exit $?
         else
             logger -s "[ERR] Could not pull from repository."
             logger -s "[MSG] Continuing with current HEAD."
