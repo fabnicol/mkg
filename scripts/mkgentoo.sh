@@ -2680,6 +2680,10 @@ with VirtualBox guest additions."
 ## @ingroup createInstaller
 
 main() {
+    source scripts/utils.sh
+    source scripts/run_mount_shared_dir.sh
+
+    check_tool logger git
 
     if grep -q 'pull=true' <<< "$@"
     then
@@ -2694,16 +2698,13 @@ main() {
             logger -s "[INF] ${CLI_PULL}"
 
             # Respawn script with fresh code ans same options.
-            exec "./mkg" ${CLI_PULL}
+            "./mkg" ${CLI_PULL}
             exit $?
         else
             logger -s "[ERR] Could not pull from repository."
             logger -s "[MSG] Continuing with current HEAD."
         fi
     fi
-
-    source scripts/utils.sh
-    source scripts/run_mount_shared_dir.sh
 
     # Using a temporary writable array A so that
     # ARR will not be writable later on
