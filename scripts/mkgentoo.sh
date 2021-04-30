@@ -2680,6 +2680,9 @@ with VirtualBox guest additions."
 ## @ingroup createInstaller
 
 main() {
+
+    SRCPATH=$(dirname $(realpath "$0"))
+
     source scripts/utils.sh
     source scripts/run_mount_shared_dir.sh
 
@@ -2766,8 +2769,8 @@ main() {
     test_cli_pre
     for ((i=0; i<ARRAY_LENGTH; i++)); do test_cli $i; done
     test_cli_post
-    cd ${VMPATH}
 
+    cd "${SRCPATH}"
     source scripts/fetch_functions.sh
     source scripts/build_virtualbox.sh
 
