@@ -708,7 +708,7 @@ from_device or from_vm may be specified on commandline."
 
     "${CREATE_ISO}" && ISOVM="${VM}".$(date +%F-%H-%M-%S)"_ISO"
 
-    "${FROM_VM}" && [ ! -f "${VM}.vdi" ] \
+    "${FROM_VM}" && [ ! -f "${VMPATH}/${VM}.vdi" ] \
         && { ${LOG[*]} "[ERR] Virtual machine \
 disk ${VMPATH}/${VM}.vdi was not found"
              exit 1; }
