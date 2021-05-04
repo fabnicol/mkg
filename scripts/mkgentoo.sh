@@ -877,8 +877,7 @@ run_docker_container() {
     ! "${CREATE_ISO}" && return 0
 
     # Once stopped, check if ISO was created and fetch it back.
-    # For this it is
-    necessary to restart.
+    # For this it is necessary to restart.
 
     if docker start ${DOCKER_ID} \
             && docker exec ${DOCKER_ID} test -f "${ISO_OUTPUT}"
