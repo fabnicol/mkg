@@ -104,12 +104,13 @@ partition() {
            mkpart primary 1 3 \
            name 1 grub \
            set 1 bios_grub on \
-           mkpart primary 3 131\
+           mkpart primary 3 $((3 + ${EFI_SIZE})) \
            name 2 boot \
-           mkpart primary 131 643 \
+           mkpart primary $((3 + ${EFI_SIZE})) $((3 + ${EFI_SIZE} + ${SWAP_SIZE})) \
            name 3 swap \
-           mkpart primary 643 -1 \
+           mkpart primary $((3 + ${EFI_SIZE} + ${SWAP_SIZE})) -1 \
            set 2 boot on"
+
     res0=$?
     sync
     sleep 10
