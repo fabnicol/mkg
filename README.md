@@ -1,8 +1,10 @@
-#### Dependencies
+### MKG, an automated Gentoo installer
 
 For MKG installation and guidelines, please refer to the **companion Wiki**:   
 
 https://github.com/fabnicol/mkg/wiki
+
+#### Dependencies
 
 More specifically for dependencies:
 
