@@ -1,4 +1,4 @@
-.TH "fetch_functions.sh" 3 "Sun Mar 21 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "fetch_functions.sh" 3 "Sat May 8 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -41,6 +41,10 @@ fetch_functions.sh
 .RI "\fBfetch_stage3\fP ()"
 .br
 .RI "Downloads a fresh stage3 Gentoo archive\&. "
+.ti -1c
+.RI "\fBfetch_docker_image\fP ()"
+.br
+.RI "Download and uncompress an automated Github Actions release of a compressed Docker image to run MKG within\&. "
 .in -1c
 .SS "Variables"
 
@@ -59,13 +63,13 @@ fetch_functions.sh
 .PP
 Either download clonezilla ISO file and caches it OR uncaches it\&. 
 .PP
-Definition at line 128 of file fetch_functions\&.sh\&.
+Definition at line 172 of file fetch_functions\&.sh\&.
 .SS "fetch_clonezilla_iso ()"
 
 .PP
 Download clonezilla ISO file and caches it\&. 
 .PP
-Definition at line 101 of file fetch_functions\&.sh\&.
+Definition at line 119 of file fetch_functions\&.sh\&.
 .SS "fetch_clonezilla_with_virtualbox ()"
 
 .PP
@@ -73,12 +77,35 @@ Download automatic output of Github Actions at fabnicol/clonezila_with_virtualbo
 .PP
 \fBNote\fP
 .RS 4
-URL is: GITHUB_RELEASE_PATH/WORKFLOW_TAG 
+URL is: GITHUB_RELEASE_PATH/releases/download/WORKFLOW_TAG 
 .RE
 .PP
 
 .PP
-Definition at line 261 of file fetch_functions\&.sh\&.
+Definition at line 314 of file fetch_functions\&.sh\&.
+.SS "fetch_docker_image ()"
+
+.PP
+Download and uncompress an automated Github Actions release of a compressed Docker image to run MKG within\&. 
+.PD 0
+
+.IP "\(bu" 2
+Download from https://github.com/fabnicol/ mkg_docker_image/releases/latest 
+.IP "\(bu" 2
+Uncompress using xz -d\&. 
+.IP "\(bu" 2
+Load into docker\&. 
+.PP
+\fBReturn values\fP
+.RS 4
+\fIID\fP of loaded image\&. 
+.RE
+.PP
+
+.PP
+
+.PP
+Definition at line 494 of file fetch_functions\&.sh\&.
 .SS "fetch_gentoo_install_iso ()"
 
 .PP
@@ -97,7 +124,7 @@ Downloads Gentoo install CD\&. Caches it as ${ISO}
 .PP
 
 .PP
-Definition at line 301 of file fetch_functions\&.sh\&.
+Definition at line 354 of file fetch_functions\&.sh\&.
 .SS "fetch_preprocessed_gentoo_install ()"
 
 .PP
@@ -110,7 +137,7 @@ URL is: GITHUB_RELEASE_PATH2/WORKFLOW_TAG2
 .PP
 
 .PP
-Definition at line 220 of file fetch_functions\&.sh\&.
+Definition at line 275 of file fetch_functions\&.sh\&.
 .SS "fetch_process_clonezilla_iso ()"
 
 .PP
@@ -143,23 +170,23 @@ Copy resolv\&.conf to unsquashed filesystem\&.
 .PP
 
 .PP
-Definition at line 169 of file fetch_functions\&.sh\&.
+Definition at line 213 of file fetch_functions\&.sh\&.
 .SS "fetch_stage3 ()"
 
 .PP
 Downloads a fresh stage3 Gentoo archive\&. Caches it as ${STAGE3} 
 .PP
-Definition at line 349 of file fetch_functions\&.sh\&.
+Definition at line 402 of file fetch_functions\&.sh\&.
 .SH "Variable Documentation"
 .PP 
 .SS "Exported String CLONEZILLACD = '${clonezilla_iso}'"
 
 .PP
-Definition at line 115 of file fetch_functions\&.sh\&.
+Definition at line 159 of file fetch_functions\&.sh\&.
 .SS "Exported String LIVECD = ${\fBISO\fP}"
 
 .PP
-Definition at line 85 of file fetch_functions\&.sh\&.
+Definition at line 103 of file fetch_functions\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for mkg from the source code\&.

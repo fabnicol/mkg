@@ -1,29 +1,22 @@
 \hypertarget{group__auxiliary_functions}{}\doxysection{Auxiliary functions to check}
 \label{group__auxiliary_functions}\index{Auxiliary functions to check@{Auxiliary functions to check}}
-
-
-lines, files, devices and burn disk.  
-
-
 \doxysubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-declare i \mbox{\hyperlink{utils_8sh_a1eff9a1c5942c362f2838b7d69848255}{A\+R\+R\+A\+Y\+\_\+\+L\+E\+N\+G\+TH}} \mbox{\hyperlink{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}{create\+\_\+options\+\_\+array}} ()
+declare \mbox{\hyperlink{mkgentoo_8sh_a3d227b4f2eb105a85a4e07d5f92094cf}{i}} \mbox{\hyperlink{utils_8sh_a1eff9a1c5942c362f2838b7d69848255}{ARRAY\+\_\+\+LENGTH}} \mbox{\hyperlink{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}{create\+\_\+options\+\_\+array}} ()
 \begin{DoxyCompactList}\small\item\em Read file {\bfseries{options}} into a temporary array A which will contain command line specifications. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}{check\+\_\+md5sum}} (filename)
-\begin{DoxyCompactList}\small\item\em Check md5sums in file M\+D5\+S\+U\+MS. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga70900c9c46939d6381db66e4216b33b4}{test\+\_\+numeric}} (number)
 \begin{DoxyCompactList}\small\item\em Test whether the input value is numeric. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__auxiliary_functions_gad3c2bc1a09d31ccc6f3130b9329b4690}{test\+\_\+\+U\+RL}} (Internet)
-\begin{DoxyCompactList}\small\item\em Test whether the input value is a valid U\+RL. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_gad3c2bc1a09d31ccc6f3130b9329b4690}{test\+\_\+\+URL}} (Internet)
+\begin{DoxyCompactList}\small\item\em Test whether the input value is a valid URL. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga132042cf80f0610ddde0fdb6fc234a45}{send\+\_\+mail}} ()
-\begin{DoxyCompactList}\small\item\em Send an email to \$\+E\+M\+A\+IL at \$\+S\+M\+T\+P\+\_\+\+U\+RL to warn about end of processing. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{group__auxiliary_functions_ga38ca6200b4d28d4ea8fcadb531533519}{recreate\+\_\+live\+C\+D\+\_\+\+I\+SO}} (dir)
-\begin{DoxyCompactList}\small\item\em Create I\+SO of live\+CD out of directory. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Send an email to \$\+EMAIL at \$\+SMTP\+\_\+\+URL to warn about end of processing. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__auxiliary_functions_ga38ca6200b4d28d4ea8fcadb531533519}{recreate\+\_\+live\+CD\+\_\+\+ISO}} (dir)
+\begin{DoxyCompactList}\small\item\em Create ISO of live\+CD out of directory. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}{burn\+\_\+iso}} ()
-\begin{DoxyCompactList}\small\item\em Burn Gentoo clonezilla installer to D\+VD using {\bfseries{cdrecord}}. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Burn Gentoo clonezilla installer to DVD using {\bfseries{cdrecord}}. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_gaa521664c8068dda803d73ecb07b9d04e}{create\+\_\+install\+\_\+ext\+\_\+device}} ()
-\begin{DoxyCompactList}\small\item\em Create U\+S\+B-\/stick (or any external device) Gentoo clonezilla installer. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Create USB-\/stick (or any external device) Gentoo clonezilla installer. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_ga6778bbe343952d56347e2eb540e65bec}{check\+\_\+dir}} ()
 \begin{DoxyCompactList}\small\item\em Checks existence of directories. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_gaf79cae8ae0bba296925e9cb0e14e466b}{check\+\_\+file}} ()
@@ -37,13 +30,11 @@ declare i \mbox{\hyperlink{utils_8sh_a1eff9a1c5942c362f2838b7d69848255}{A\+R\+R\
 \mbox{\hyperlink{group__auxiliary_functions_gaff07c1d29d6d6a540c726948254a1764}{cleanup}} ()
 \begin{DoxyCompactList}\small\item\em Clean up all temporary files and directpries (except for Virtual\+Box build) \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__auxiliary_functions_gab259926667a3920549a7bb236fbb7ad1}{bind\+\_\+filesystem}} (root)
-\begin{DoxyCompactList}\small\item\em Bind-\/mounts the host live filesystem (proc/sys/dev/run) to a future chrooted O\+S-\/like tree of similar nature. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Bind-\/mounts the host live filesystem (proc/sys/dev/run) to a future chrooted OS-\/like tree of similar nature. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
 lines, files, devices and burn disk. 
-
-
 
 \doxysubsection{Function Documentation}
 \mbox{\Hypertarget{group__auxiliary_functions_gab259926667a3920549a7bb236fbb7ad1}\label{group__auxiliary_functions_gab259926667a3920549a7bb236fbb7ad1}} 
@@ -54,7 +45,7 @@ lines, files, devices and burn disk.
 
 
 
-Bind-\/mounts the host live filesystem (proc/sys/dev/run) to a future chrooted O\+S-\/like tree of similar nature. 
+Bind-\/mounts the host live filesystem (proc/sys/dev/run) to a future chrooted OS-\/like tree of similar nature. 
 
 
 \begin{DoxyParams}{Parameters}
@@ -63,7 +54,7 @@ Bind-\/mounts the host live filesystem (proc/sys/dev/run) to a future chrooted O
 \end{DoxyParams}
 
 
-Definition at line 520 of file utils.\+sh.
+Definition at line 505 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}\label{group__auxiliary_functions_ga37ccab4be14da0e5c11e2e176e48f36a}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!burn\_iso@{burn\_iso}}
@@ -73,7 +64,7 @@ Definition at line 520 of file utils.\+sh.
 
 
 
-Burn Gentoo clonezilla installer to D\+VD using {\bfseries{cdrecord}}. 
+Burn Gentoo clonezilla installer to DVD using {\bfseries{cdrecord}}. 
 
 \begin{DoxyNote}{Note}
 {\bfseries{cdrecord}} should have been installed beforehand 
@@ -85,7 +76,7 @@ Burn Gentoo clonezilla installer to D\+VD using {\bfseries{cdrecord}}.
 \end{DoxyRetVals}
 
 
-Definition at line 310 of file utils.\+sh.
+Definition at line 294 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_ga6778bbe343952d56347e2eb540e65bec}\label{group__auxiliary_functions_ga6778bbe343952d56347e2eb540e65bec}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!check\_dir@{check\_dir}}
@@ -112,7 +103,7 @@ Paths should be separated by spaces and quoted.
 \end{DoxyRetVals}
 
 
-Definition at line 388 of file utils.\+sh.
+Definition at line 372 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_gaf79cae8ae0bba296925e9cb0e14e466b}\label{group__auxiliary_functions_gaf79cae8ae0bba296925e9cb0e14e466b}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!check\_file@{check\_file}}
@@ -141,7 +132,7 @@ Paths should be separated by spaces and quoted.
 \end{DoxyRetVals}
 
 
-Definition at line 409 of file utils.\+sh.
+Definition at line 393 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_gaac542e607b5e918f64c42081f88c228f}\label{group__auxiliary_functions_gaac542e607b5e918f64c42081f88c228f}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!check\_files@{check\_files}}
@@ -168,31 +159,7 @@ Paths should be separated by spaces and quoted.
 \end{DoxyRetVals}
 
 
-Definition at line 429 of file utils.\+sh.
-
-\mbox{\Hypertarget{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}\label{group__auxiliary_functions_ga913689f9801eab383c4187327367e870}} 
-\index{Auxiliary functions to check@{Auxiliary functions to check}!check\_md5sum@{check\_md5sum}}
-\index{check\_md5sum@{check\_md5sum}!Auxiliary functions to check@{Auxiliary functions to check}}
-\doxysubsubsection{\texorpdfstring{check\_md5sum()}{check\_md5sum()}}
-{\footnotesize\ttfamily check\+\_\+md5sum (\begin{DoxyParamCaption}\item[{filename}]{ }\end{DoxyParamCaption})}
-
-
-
-Check md5sums in file M\+D5\+S\+U\+MS. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em filename} & Local name of file to be checked for md5sum. \\
-\hline
-\end{DoxyParams}
-
-\begin{DoxyRetVals}{Return values}
-{\em Return} & 0 on success otherwise -\/1 on exit \\
-\hline
-\end{DoxyRetVals}
-
-
-Definition at line 93 of file utils.\+sh.
+Definition at line 413 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_ga00a42c03a3293fb36712737e7b558d11}\label{group__auxiliary_functions_ga00a42c03a3293fb36712737e7b558d11}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!check\_tool@{check\_tool}}
@@ -219,7 +186,7 @@ Paths should be separated by spaces and quoted.
 \end{DoxyRetVals}
 
 
-Definition at line 449 of file utils.\+sh.
+Definition at line 433 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_gaff07c1d29d6d6a540c726948254a1764}\label{group__auxiliary_functions_gaff07c1d29d6d6a540c726948254a1764}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!cleanup@{cleanup}}
@@ -234,14 +201,16 @@ Clean up all temporary files and directpries (except for Virtual\+Box build)
 Needs
 \begin{DoxyCode}{0}
 \DoxyCodeLine{CLEANUP=\textcolor{keyword}{true} }
+
 \end{DoxyCode}
 . If
 \begin{DoxyCode}{0}
 \DoxyCodeLine{FULL\_CLEANUP=\textcolor{keyword}{true}}
-\end{DoxyCode}
- then erase I\+SO files with names containing {\bfseries{clonezilla}}, {\bfseries{install}} or {\bfseries{downloaded}} names. 
 
-Definition at line 491 of file utils.\+sh.
+\end{DoxyCode}
+ then erase ISO files with names containing {\bfseries{clonezilla}}, {\bfseries{install}} or {\bfseries{downloaded}} names. 
+
+Definition at line 475 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_gaa521664c8068dda803d73ecb07b9d04e}\label{group__auxiliary_functions_gaa521664c8068dda803d73ecb07b9d04e}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!create\_install\_ext\_device@{create\_install\_ext\_device}}
@@ -251,10 +220,10 @@ Definition at line 491 of file utils.\+sh.
 
 
 
-Create U\+S\+B-\/stick (or any external device) Gentoo clonezilla installer. 
+Create USB-\/stick (or any external device) Gentoo clonezilla installer. 
 
 \begin{DoxyWarning}{Warning}
-Use with care, check your E\+X\+T\+\_\+\+D\+E\+V\+I\+CE variable. 
+Use with care, check your EXT\+\_\+\+DEVICE variable. 
 \end{DoxyWarning}
 
 \begin{DoxyRetVals}{Return values}
@@ -263,7 +232,7 @@ Use with care, check your E\+X\+T\+\_\+\+D\+E\+V\+I\+CE variable.
 \end{DoxyRetVals}
 
 
-Definition at line 360 of file utils.\+sh.
+Definition at line 344 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}\label{group__auxiliary_functions_gaca1ddf007bdcce3b29c42e0c5dc41717}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!create\_options\_array@{create\_options\_array}}
@@ -275,7 +244,7 @@ Definition at line 360 of file utils.\+sh.
 
 Read file {\bfseries{options}} into a temporary array A which will contain command line specifications. 
 
-Later on A initializes the read-\/only array \mbox{\hyperlink{group__create_installer_ga2b36d9209dbee6df3e60d878f3e51005}{A\+RR}} 
+Later on A initializes the read-\/only array \mbox{\hyperlink{group__create_installer_ga2b36d9209dbee6df3e60d878f3e51005}{ARR}} 
 
 Definition at line 71 of file utils.\+sh.
 
@@ -306,17 +275,17 @@ Command success is presumed to be identified by \$? == 0.
 \end{DoxyRetVals}
 
 
-Definition at line 470 of file utils.\+sh.
+Definition at line 454 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_ga38ca6200b4d28d4ea8fcadb531533519}\label{group__auxiliary_functions_ga38ca6200b4d28d4ea8fcadb531533519}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}}
 \index{recreate\_liveCD\_ISO@{recreate\_liveCD\_ISO}!Auxiliary functions to check@{Auxiliary functions to check}}
 \doxysubsubsection{\texorpdfstring{recreate\_liveCD\_ISO()}{recreate\_liveCD\_ISO()}}
-{\footnotesize\ttfamily recreate\+\_\+live\+C\+D\+\_\+\+I\+SO (\begin{DoxyParamCaption}\item[{dir}]{ }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily recreate\+\_\+live\+CD\+\_\+\+ISO (\begin{DoxyParamCaption}\item[{dir}]{ }\end{DoxyParamCaption})}
 
 
 
-Create I\+SO of live\+CD out of directory. 
+Create ISO of live\+CD out of directory. 
 
 
 \begin{DoxyParams}{Parameters}
@@ -331,7 +300,7 @@ An alternative xorriso solution could be considered
 \end{DoxyNote}
 
 
-Definition at line 271 of file utils.\+sh.
+Definition at line 255 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_ga132042cf80f0610ddde0fdb6fc234a45}\label{group__auxiliary_functions_ga132042cf80f0610ddde0fdb6fc234a45}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!send\_mail@{send\_mail}}
@@ -341,17 +310,17 @@ Definition at line 271 of file utils.\+sh.
 
 
 
-Send an email to \$\+E\+M\+A\+IL at \$\+S\+M\+T\+P\+\_\+\+U\+RL to warn about end of processing. 
+Send an email to \$\+EMAIL at \$\+SMTP\+\_\+\+URL to warn about end of processing. 
 
 \begin{DoxyWarning}{Warning}
-Email password is entered in clear using \$\+E\+M\+A\+I\+L\+\_\+\+P\+A\+S\+S\+WD which is not safe if mkg is run on any other platform than the user\textquotesingle{}s own. Use with care in a private context. 
+Email password is entered in clear using \$\+EMAIL\+\_\+\+PASSWD which is not safe if mkg is run on any other platform than the user\textquotesingle{}s own. Use with care in a private context. 
 \end{DoxyWarning}
 \begin{DoxyReturn}{Returns}
 Return value of `curl' command. 
 \end{DoxyReturn}
 
 
-Definition at line 133 of file utils.\+sh.
+Definition at line 117 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_ga70900c9c46939d6381db66e4216b33b4}\label{group__auxiliary_functions_ga70900c9c46939d6381db66e4216b33b4}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!test\_numeric@{test\_numeric}}
@@ -373,21 +342,21 @@ grep value against input string
 \end{DoxyReturn}
 
 
-Definition at line 109 of file utils.\+sh.
+Definition at line 93 of file utils.\+sh.
 
 \mbox{\Hypertarget{group__auxiliary_functions_gad3c2bc1a09d31ccc6f3130b9329b4690}\label{group__auxiliary_functions_gad3c2bc1a09d31ccc6f3130b9329b4690}} 
 \index{Auxiliary functions to check@{Auxiliary functions to check}!test\_URL@{test\_URL}}
 \index{test\_URL@{test\_URL}!Auxiliary functions to check@{Auxiliary functions to check}}
 \doxysubsubsection{\texorpdfstring{test\_URL()}{test\_URL()}}
-{\footnotesize\ttfamily test\+\_\+\+U\+RL (\begin{DoxyParamCaption}\item[{Internet}]{ }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily test\+\_\+\+URL (\begin{DoxyParamCaption}\item[{Internet}]{ }\end{DoxyParamCaption})}
 
 
 
-Test whether the input value is a valid U\+RL. 
+Test whether the input value is a valid URL. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em Internet} & U\+RL \\
+{\em Internet} & URL \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
@@ -395,5 +364,5 @@ grep value against input string
 \end{DoxyReturn}
 
 
-Definition at line 119 of file utils.\+sh.
+Definition at line 103 of file utils.\+sh.
 

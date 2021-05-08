@@ -189,7 +189,7 @@ In particular, the following command line options will be ignored:
 .P
 .PD
 .br
-\f[C]processor, rootpasswd, stage3, vm_keyboard, vm_language.\f[R]
+\f[C]processor, rootpasswd, stage3, vm_keymap, vm_language.\f[R]
 .PD 0
 .P
 .PD
@@ -599,6 +599,15 @@ T}@T{
 b
 T}
 T{
+efi_size
+T}@T{
+Size of EFI partition in MiB.
+T}@T{
+[ 512 ]
+T}@T{
+n
+T}
+T{
 elist
 T}@T{
 File containing a list of Gentoo ebuilds to add to the VM on top of
@@ -996,6 +1005,15 @@ T}@T{
 s
 T}
 T{
+pull
+T}@T{
+Invoke `git pull' in mkg local repository on startup.
+T}@T{
+[ false ]
+T}@T{
+b
+T}
+T{
 quiet_mode
 T}@T{
 Silence output except for the most severe errors.
@@ -1079,6 +1097,15 @@ T}@T{
 [ stage3.tar.xz ]
 T}@T{
 f
+T}
+T{
+swap_size
+T}@T{
+Size of swap partition in MiB.
+T}@T{
+[ 1024 ]
+T}@T{
+n
 T}
 T{
 test_emerge

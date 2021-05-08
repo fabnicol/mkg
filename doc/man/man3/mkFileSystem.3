@@ -1,9 +1,8 @@
-.TH "mkFileSystem" 3 "Sun Mar 21 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "mkFileSystem" 3 "Sat May 8 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-mkFileSystem \- and emerge software\&.  
-
+mkFileSystem \- Create Gentoo linux filesystem on VM disk
 .SH SYNOPSIS
 .br
 .PP
@@ -42,8 +41,6 @@ mkFileSystem \- and emerge software\&.
 .SH "Detailed Description"
 .PP 
 and emerge software\&. 
-
-
 .SH "Function Documentation"
 .PP 
 .SS "adjust_environment ()"
@@ -102,7 +99,7 @@ Build kernel and initramfs\&. Log into kernel\&.log\&.
 .PP
 
 .PP
-Definition at line 204 of file mkvm_chroot\&.sh\&.
+Definition at line 243 of file mkvm_chroot\&.sh\&.
 .SS "finalize ()"
 
 .PP
@@ -118,7 +115,7 @@ Write zeros as much as possible to prepare for compacting\&.
 .PP
 
 .PP
-Definition at line 311 of file mkvm\&.sh\&.
+Definition at line 316 of file mkvm\&.sh\&.
 .SS "global_config ()"
 
 .PD 0
@@ -149,7 +146,7 @@ Fix \fBsddm\fP startup keyboard issue using \fC setxkbmap\fP
 .PP
 
 .PP
-Definition at line 350 of file mkvm_chroot\&.sh\&.
+Definition at line 389 of file mkvm_chroot\&.sh\&.
 .SS "install_software ()"
 
 .PD 0
@@ -166,14 +163,14 @@ Optionaly download and build RStudio
 .PP
 \fBTodo\fP
 .RS 4
-Add a script to build R dependencies 
+Add a script to build R dependencies
 .RE
 .PP
 
 .PP
 
 .PP
-Definition at line 265 of file mkvm_chroot\&.sh\&.
+Definition at line 304 of file mkvm_chroot\&.sh\&.
 .SS "install_stage3 ()"
 
 .PD 0
@@ -195,7 +192,7 @@ On success, create empty file \fBpartition\fP
 .PP
 
 .PP
-Definition at line 180 of file mkvm\&.sh\&.
+Definition at line 181 of file mkvm\&.sh\&.
 .SS "partition ()"
 
 .PP

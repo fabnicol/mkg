@@ -35,7 +35,7 @@ This preprocessed ISO has build parameter presets. It builds the full desktop.<b
 In particular, the following command line options will be ignored:<br />
 <code>bios, cflags, clonezilla_install, debug_mode, elist, emirrors,</code><br />
 <code>kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd,</code><br />
-<code>processor, rootpasswd, stage3, vm_keyboard, vm_language.</code><br />
+<code>processor, rootpasswd, stage3, vm_keymap, vm_language.</code><br />
 To disable this behavior you can add <code>use_mkg_workflow=false</code><br />
 to command line. You will need to do so if you do not use OS build presets.</p>
 <p><strong>Options:</strong></p>
@@ -236,250 +236,262 @@ Some options are incompatible, e.g. <code>test_only</code> and <code>use_mkg_wo
 <td style="text-align: center;">b</td>
 </tr>
 <tr class="odd">
+<td style="text-align: center;">efi_size</td>
+<td style="text-align: left;">Size of EFI partition in MiB.</td>
+<td style="text-align: center;">[ 512 ]</td>
+<td style="text-align: center;">n</td>
+</tr>
+<tr class="even">
 <td style="text-align: center;">elist</td>
 <td style="text-align: left;">File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the ‘elist’.accept_keywords and ‘elist’.use files</td>
 <td style="text-align: center;">[ ebuilds.list ]</td>
 <td style="text-align: center;">f</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">email</td>
 <td style="text-align: left;">Email address to send a warning to upon build completion. Note: you will have to accept so-called <em>insecure software</em> with some providers. It is not insecure if you are using your private PC throughout.</td>
 <td style="text-align: center;">[ ]</td>
 <td style="text-align: center;">e</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">email_passwd</td>
 <td style="text-align: left;">Email password</td>
 <td style="text-align: center;">[ ]</td>
 <td style="text-align: center;">s:email</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">emirrors</td>
 <td style="text-align: left;">Mirror sites for downloading ebuilds</td>
 <td style="text-align: center;">[ path2 ]</td>
 <td style="text-align: center;">u</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">ext_device</td>
 <td style="text-align: left;">Create Gentoo OS on external device. Argument is either a device label (e.g. sdb, hdb), or a mountpoint directory (if mounted), or a few consecutive letters of the vendor name (e.g. ‘Samsu’, ‘PNY’ or ‘Kingst’), if there is just one such. Requires <em>hot_install</em> on commandline.</td>
 <td style="text-align: center;">[ ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">force</td>
 <td style="text-align: left;">Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">from_device</td>
 <td style="text-align: left;">Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b:ext_device</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">from_iso</td>
 <td style="text-align: left;">Do not generate Gentoo but use the bootable ISO given on commandline.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">from_vm</td>
 <td style="text-align: left;">Do not generate Gentoo but use the VM. Boolean.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">full_cleanup</td>
 <td style="text-align: left;">Remove virtual disk, archives and ISO files on clean-up</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">github_release_path</td>
 <td style="text-align: left;">URL to Github Release of clonezilla_with_virtualbox.iso</td>
 <td style="text-align: center;">[ path3 ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">github_release_path2</td>
 <td style="text-align: left;">URL to Github Release of preprocessed_gentoo_install.iso</td>
 <td style="text-align: center;">[ path4 ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">gui</td>
 <td style="text-align: left;">Binary: true corresponds to VBoxManage startvm … –type=gui, false to –type=headless</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">help</td>
 <td style="text-align: left;">This help</td>
 <td style="text-align: center;">[ ]</td>
 <td style="text-align: center;"></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">hot_install</td>
 <td style="text-align: left;">Intall to Gentoo attached device (like /dev/sdb) possibly mounted (like /media/USER/567EAF). To be used with <em>ext_device=…</em></td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b:ext_device</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">htmlpage</td>
 <td style="text-align: left;">Create HTML help page</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">hwvirtex</td>
 <td style="text-align: left;">Activate HWVIRTEX: on/off</td>
 <td style="text-align: center;">[ on ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">interactive</td>
 <td style="text-align: left;">Allow interaction with user. This may cause deadlock if process is detached from the console (<em>nohup</em> or other methods)</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">ioapic</td>
 <td style="text-align: left;">IOAPIC parameter: on or off</td>
 <td style="text-align: center;">[ on ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">kernel_config</td>
 <td style="text-align: left;">Use a custom kernel config file</td>
 <td style="text-align: center;">[ .config ]</td>
 <td style="text-align: center;">f</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">livecd</td>
 <td style="text-align: left;">Path to the live CD that will start the VM</td>
 <td style="text-align: center;">[ gentoo.iso ]</td>
 <td style="text-align: center;">f</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">logging</td>
 <td style="text-align: left;">Activate logging</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">manpage</td>
 <td style="text-align: left;">Create manpage mkg.1</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">mem</td>
 <td style="text-align: left;">VM RAM memory in MiB</td>
 <td style="text-align: center;">[ 8000 ]</td>
 <td style="text-align: center;">n</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">minimal</td>
 <td style="text-align: left;">Remove <em>libreoffice</em> and <em>data science tools</em> from default list of installed software. Boolean.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">minimal_size</td>
 <td style="text-align: left;">Remove kernel sources to minimize packaging. Not advised for personal use but OK for deployment and distribution.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">mirror</td>
 <td style="text-align: left;">Mirror site for downloading of stage3 tarball</td>
 <td style="text-align: center;">[ path2 ]</td>
 <td style="text-align: center;">u</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">ncpus</td>
 <td style="text-align: left;">Number of VM CPUs. By default the third of available threads.</td>
 <td style="text-align: center;">[ count ]</td>
 <td style="text-align: center;">n</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">no_run</td>
 <td style="text-align: left;">If using <strong>share_root=‘r’ or ‘w’</strong>, do not run the virtual machine but use the VDI disk corresponding to vm=… Otherwise start 15 minutes later.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">nonroot_user</td>
 <td style="text-align: left;">Non-root user</td>
 <td style="text-align: center;">[ fab ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">pae</td>
 <td style="text-align: left;">Activate PAE: on/off</td>
 <td style="text-align: center;">[ on ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">paravirtprovider</td>
 <td style="text-align: left;">Virtualization interface: kvm for GNU/Linux, may be tweaked (see VirtualBox documentation)</td>
 <td style="text-align: center;">[ kvm ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">passwd</td>
 <td style="text-align: left;">User password</td>
 <td style="text-align: center;">[ _user2021_ ]</td>
 <td style="text-align: center;">s:vm</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">pdfpage</td>
 <td style="text-align: left;">Create PDF help page</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">plot</td>
 <td style="text-align: left;">Plot VDI disk size using GNUPlot</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">plot_color</td>
 <td style="text-align: left;">Plot line color between simple quotes (e.g: ‘cyan’,‘red’ etc.)</td>
 <td style="text-align: center;">[ ‘cyan’ ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">plot_pause</td>
 <td style="text-align: left;">Number of seconds of plot display per minute of processing. Maximum 50.</td>
 <td style="text-align: center;">[ 5 ]</td>
 <td style="text-align: center;">n</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">plot_period</td>
 <td style="text-align: left;">Number of minutes elapsed between two successive plots</td>
 <td style="text-align: center;">[ 10 ]</td>
 <td style="text-align: center;">n</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">plot_position</td>
 <td style="text-align: left;">Plot position of on monitor screen (top-left angle) in pixels e.g ‘0,0’ or ‘500,500’</td>
 <td style="text-align: center;">[ ‘0,0’ ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">plot_span</td>
 <td style="text-align: left;">Number of minutes of virtual disk processing to be plotted, back in time</td>
 <td style="text-align: center;">[ 1200 ]</td>
 <td style="text-align: center;">n</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">processor</td>
 <td style="text-align: left;">Processor type</td>
 <td style="text-align: center;">[ amd64 ]</td>
 <td style="text-align: center;">s</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">pull</td>
+<td style="text-align: left;">Invoke ‘git pull’ in mkg local repository on startup.</td>
+<td style="text-align: center;">[ false ]</td>
+<td style="text-align: center;">b</td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">quiet_mode</td>
@@ -536,114 +548,120 @@ Some options are incompatible, e.g. <code>test_only</code> and <code>use_mkg_wo
 <td style="text-align: center;">f</td>
 </tr>
 <tr class="odd">
+<td style="text-align: center;">swap_size</td>
+<td style="text-align: left;">Size of swap partition in MiB.</td>
+<td style="text-align: center;">[ 1024 ]</td>
+<td style="text-align: center;">n</td>
+</tr>
+<tr class="even">
 <td style="text-align: center;">test_emerge</td>
 <td style="text-align: left;">Test whether emerge will be able to install packages in the VM before starting it.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">test_only</td>
 <td style="text-align: left;">Only test if portage will be able to install packages. Do not create a virtual machine.</td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">timezone</td>
 <td style="text-align: left;">Set timezone. See /usr/share/zoneinfo for formats.</td>
 <td style="text-align: center;">[ US/Eastern ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">usbehci</td>
 <td style="text-align: left;">Activate USB2 driver: on/off</td>
 <td style="text-align: center;">[ off ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">usbxhci</td>
 <td style="text-align: left;">Activate USB3 driver: on/off. Note: if on, needs extension pack.</td>
 <td style="text-align: center;">[ off ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">use_bsdtar</td>
 <td style="text-align: left;">Use ‘bsdtar’ (from libarchive) to extract CloneZilla ISO files if creating an ISO installer.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">use_clonezilla_workflow</td>
 <td style="text-align: left;">Use Github Actions workflow to add virtualbox guest additions to CloneZilla ISO.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">use_mkg_workflow</td>
 <td style="text-align: left;">Use Github Actions workflow to preprocess minimal Gentoo ISO by adding MKG scripts inside the squashfs filesystem.</td>
 <td style="text-align: center;">[ true ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">use_qemu</td>
 <td style="text-align: left;">Use qemu instead of guestfish for installing Gentoo to block device with <strong>hot_install</strong></td>
 <td style="text-align: center;">[ false ]</td>
 <td style="text-align: center;">b</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">vbox_version</td>
 <td style="text-align: left;">Virtualbox version</td>
 <td style="text-align: center;">[ 6.1.16 ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">vbox_version_full</td>
 <td style="text-align: left;">Virtualbox full version</td>
 <td style="text-align: center;">[ 6.1.16 ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">vbpath</td>
 <td style="text-align: left;">Path to VirtualBox directory</td>
 <td style="text-align: center;">[ /usr/bin ]</td>
 <td style="text-align: center;">d</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">vm</td>
 <td style="text-align: left;">Virtual Machine name. Unless ‘force=true’ is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name.</td>
 <td style="text-align: center;">[ Gentoo ]</td>
 <td style="text-align: center;">vm</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">vm_keymap</td>
 <td style="text-align: left;">Add support for non-US English keymaps. Use values in /usr/share/keymaps, e.g. fr, de, us.</td>
 <td style="text-align: center;">[ us ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">vm_language</td>
 <td style="text-align: left;">Add support for non-US English language as a default. Use standard abbreviations. Must be at least 5 characters: e.g. fr_FR, de_DE, fr_FR.utf8</td>
 <td style="text-align: center;">[ en_US.utf8 ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">vmpath</td>
 <td style="text-align: left;">Path to VM base directory</td>
 <td style="text-align: center;">[ $PWD ]</td>
 <td style="text-align: center;">d</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">vtxvpid</td>
 <td style="text-align: left;">Activate VTXVPID: on/off</td>
 <td style="text-align: center;">[ on ]</td>
 <td style="text-align: center;">o</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: center;">workflow_tag</td>
 <td style="text-align: left;">Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by Github Actions</td>
 <td style="text-align: center;">[ v1.8 ]</td>
 <td style="text-align: center;">s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: center;">workflow_tag2</td>
 <td style="text-align: left;">Tag version (vX.Y) of the release of file preprocessed_gentoo_install.iso by Github Actions (MKG site)</td>
 <td style="text-align: center;">[ release-master or release-gnome ]</td>
