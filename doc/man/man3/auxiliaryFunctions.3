@@ -1,4 +1,4 @@
-.TH "auxiliaryFunctions" 3 "Tue Mar 23 2021" "Version 1.0" "mkg" \" -*- nroff -*-
+.TH "auxiliaryFunctions" 3 "Sat May 8 2021" "Version 1.0" "mkg" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -10,13 +10,9 @@ auxiliaryFunctions \- Auxiliary functions to check
 
 .in +1c
 .ti -1c
-.RI "declare i \fBARRAY_LENGTH\fP \fBcreate_options_array\fP ()"
+.RI "declare \fBi\fP \fBARRAY_LENGTH\fP \fBcreate_options_array\fP ()"
 .br
 .RI "Read file \fBoptions\fP into a temporary array A which will contain command line specifications\&. "
-.ti -1c
-.RI "\fBcheck_md5sum\fP (filename)"
-.br
-.RI "Check md5sums in file MD5SUMS\&. "
 .ti -1c
 .RI "\fBtest_numeric\fP (number)"
 .br
@@ -87,7 +83,7 @@ Bind-mounts the host live filesystem (proc/sys/dev/run) to a future chrooted OS-
 .PP
 
 .PP
-Definition at line 520 of file utils\&.sh\&.
+Definition at line 503 of file utils\&.sh\&.
 .SS "burn_iso ()"
 
 .PP
@@ -105,7 +101,7 @@ Burn Gentoo clonezilla installer to DVD using \fBcdrecord\fP\&.
 .PP
 
 .PP
-Definition at line 310 of file utils\&.sh\&.
+Definition at line 294 of file utils\&.sh\&.
 .SS "check_dir ()"
 
 .PP
@@ -128,7 +124,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 388 of file utils\&.sh\&.
+Definition at line 372 of file utils\&.sh\&.
 .SS "check_file ()"
 
 .PP
@@ -153,7 +149,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 409 of file utils\&.sh\&.
+Definition at line 393 of file utils\&.sh\&.
 .SS "check_files ()"
 
 .PP
@@ -176,25 +172,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 429 of file utils\&.sh\&.
-.SS "check_md5sum (filename)"
-
-.PP
-Check md5sums in file MD5SUMS\&. 
-.PP
-\fBParameters\fP
-.RS 4
-\fIfilename\fP Local name of file to be checked for md5sum\&. 
-.RE
-.PP
-\fBReturn values\fP
-.RS 4
-\fIReturn\fP 0 on success otherwise -1 on exit 
-.RE
-.PP
-
-.PP
-Definition at line 93 of file utils\&.sh\&.
+Definition at line 413 of file utils\&.sh\&.
 .SS "check_tool ()"
 
 .PP
@@ -217,7 +195,7 @@ Paths should be separated by spaces and quoted\&.
 .PP
 
 .PP
-Definition at line 449 of file utils\&.sh\&.
+Definition at line 432 of file utils\&.sh\&.
 .SS "cleanup ()"
 
 .PP
@@ -237,7 +215,7 @@ FULL_CLEANUP=true
 .PP
  then erase ISO files with names containing \fBclonezilla\fP, \fBinstall\fP or \fBdownloaded\fP names\&. 
 .PP
-Definition at line 491 of file utils\&.sh\&.
+Definition at line 474 of file utils\&.sh\&.
 .SS "create_install_ext_device ()"
 
 .PP
@@ -255,7 +233,7 @@ Use with care, check your EXT_DEVICE variable\&.
 .PP
 
 .PP
-Definition at line 360 of file utils\&.sh\&.
+Definition at line 344 of file utils\&.sh\&.
 .SS "create_options_array ()"
 
 .PP
@@ -286,7 +264,7 @@ Command success is presumed to be identified by $? == 0\&.
 .PP
 
 .PP
-Definition at line 470 of file utils\&.sh\&.
+Definition at line 453 of file utils\&.sh\&.
 .SS "recreate_liveCD_ISO (dir)"
 
 .PP
@@ -309,7 +287,7 @@ An alternative xorriso solution could be considered
 .PP
 
 .PP
-Definition at line 271 of file utils\&.sh\&.
+Definition at line 255 of file utils\&.sh\&.
 .SS "send_mail ()"
 
 .PP
@@ -327,7 +305,7 @@ Return value of `curl' command\&.
 .PP
 
 .PP
-Definition at line 133 of file utils\&.sh\&.
+Definition at line 117 of file utils\&.sh\&.
 .SS "test_numeric (number)"
 
 .PP
@@ -345,7 +323,7 @@ grep value against input string
 .PP
 
 .PP
-Definition at line 109 of file utils\&.sh\&.
+Definition at line 93 of file utils\&.sh\&.
 .SS "test_URL (Internet)"
 
 .PP
@@ -363,7 +341,7 @@ grep value against input string
 .PP
 
 .PP
-Definition at line 119 of file utils\&.sh\&.
+Definition at line 103 of file utils\&.sh\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for mkg from the source code\&.

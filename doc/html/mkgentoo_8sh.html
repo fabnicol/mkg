@@ -109,6 +109,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga9fb02a8000daf0612335a0b6e5f1e815"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__create_installer.html#ga9fb02a8000daf0612335a0b6e5f1e815">test_cli_post</a> ()</td></tr>
 <tr class="memdesc:ga9fb02a8000daf0612335a0b6e5f1e815"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check commanline coherence and incompatibilities.  <a href="group__create_installer.html#ga9fb02a8000daf0612335a0b6e5f1e815">More...</a><br /></td></tr>
 <tr class="separator:ga9fb02a8000daf0612335a0b6e5f1e815"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa08d3655c5c6b948186a7eec4547662d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__create_installer.html#gaa08d3655c5c6b948186a7eec4547662d">run_docker_container</a> ()</td></tr>
+<tr class="memdesc:gaa08d3655c5c6b948186a7eec4547662d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the downloaded Docker image.  <a href="group__create_installer.html#gaa08d3655c5c6b948186a7eec4547662d">More...</a><br /></td></tr>
+<tr class="separator:gaa08d3655c5c6b948186a7eec4547662d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad29a75dbf76ffa08bf28bf4254f234c7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__create_installer.html#gad29a75dbf76ffa08bf28bf4254f234c7">mount_live_cd</a> ()</td></tr>
 <tr class="memdesc:gad29a75dbf76ffa08bf28bf4254f234c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mount Gentoo/Clonezilla live CD and unsquashfs the GNU/linux system.  <a href="group__create_installer.html#gad29a75dbf76ffa08bf28bf4254f234c7">More...</a><br /></td></tr>
 <tr class="separator:gad29a75dbf76ffa08bf28bf4254f234c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,6 +185,8 @@ Variables</h2></td></tr>
 <tr class="memitem:ga7e7a3b0c3b3b454c1546882093442181"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__create_installer.html#ga7e7a3b0c3b3b454c1546882093442181">CREATE_ISO</a> = false</td></tr>
 <tr class="memdesc:ga7e7a3b0c3b3b454c1546882093442181"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom name of ISO output. Default value is false Can be reversed by a name of type filename.iso on command line, previously created and reused to burn or dd to device installer.  <a href="group__create_installer.html#ga7e7a3b0c3b3b454c1546882093442181">More...</a><br /></td></tr>
 <tr class="separator:ga7e7a3b0c3b3b454c1546882093442181"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d227b4f2eb105a85a4e07d5f92094cf"><td class="memItemLeft" align="right" valign="top">Integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mkgentoo_8sh.html#a3d227b4f2eb105a85a4e07d5f92094cf">i</a></td></tr>
+<tr class="separator:a3d227b4f2eb105a85a4e07d5f92094cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99fb68646489d046faa1a0478d7c8e76"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mkgentoo_8sh.html#a99fb68646489d046faa1a0478d7c8e76">LOG</a></td></tr>
 <tr class="separator:a99fb68646489d046faa1a0478d7c8e76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93f04e4165d1e26b707af12275800ef3"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mkgentoo_8sh.html#a93f04e4165d1e26b707af12275800ef3">ISOLINUX_DIR</a> = isolinux</td></tr>
@@ -189,6 +194,8 @@ Variables</h2></td></tr>
 <tr class="separator:a93f04e4165d1e26b707af12275800ef3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1451b50408769582d8f5bd4254fe7b1"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mkgentoo_8sh.html#ad1451b50408769582d8f5bd4254fe7b1">PATH</a> = &quot;${PATH}&quot;:&quot;${VBPATH}&quot;</td></tr>
 <tr class="separator:ad1451b50408769582d8f5bd4254fe7b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2220b9fd371c77096ac523462e23e59c"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mkgentoo_8sh.html#a2220b9fd371c77096ac523462e23e59c">CLI_PULL</a> = $(sed -r 's/(.*)pull=true(.*)/\1\2/g' &lt;&lt;&lt; &quot;$@&quot;)</td></tr>
+<tr class="separator:a2220b9fd371c77096ac523462e23e59c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7819e2a2bcfd919879f667617c393f8f"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mkgentoo_8sh.html#a7819e2a2bcfd919879f667617c393f8f">SHARE_ROOT</a></td></tr>
 <tr class="separator:a7819e2a2bcfd919879f667617c393f8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09ec56f3a9157ee598167ac001281dbb"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mkgentoo_8sh.html#a09ec56f3a9157ee598167ac001281dbb">SHARED_DIR</a></td></tr>
@@ -211,9 +218,9 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
 </div><!-- fragment --> to print a list of possible switches and arguments. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>you should have at least 55 GB of free disk space in the current directory or in vmpath if specified. Boolean values are either 'true' or 'false'. An option no followed by '=' is equivalent to <b>option=true</b>, except for help and a possible ISO file. For example, to build a minimal: distribution,specify <code>minimal</code> or <code> minimal=true</code> on command line. </dd></dl>
 <dl class="section user"><dt><b>Examples</b>:</dt><dd><ul>
-<li>Only create the VM and virtual disk, in debug mode, without R and set new passwords, for a French-language platform. Use 8 cores. <div class="fragment"><div class="line"> mkg vm_language=fr minimal debug_mode ncpus=8</div>
+<li>Only create the VM and virtual disk, in debug mode, without R and set new passwords, for a French-language platform. Use 8 cores. <div class="fragment"><div class="line"> mkg vm_language=fr_FR minimal debug_mode ncpus=8</div>
 <div class="line">nonroot_user=ken passwd=<span class="stringliteral">&#39;util!Hx&amp;32F&#39;</span> rootpasswd=<span class="stringliteral">&#39;Hk_32!_CD&#39;</span> <a class="code" href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a>=<span class="keyword">false</span></div>
-<div class="ttc" id="agroup__auxiliary_functions_html_gaff07c1d29d6d6a540c726948254a1764"><div class="ttname"><a href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a></div><div class="ttdeci">cleanup()</div><div class="ttdoc">Clean up all temporary files and directpries (except for VirtualBox build)</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00491">utils.sh:491</a></div></div>
+<div class="ttc" id="agroup__auxiliary_functions_html_gaff07c1d29d6d6a540c726948254a1764"><div class="ttname"><a href="group__auxiliary_functions.html#gaff07c1d29d6d6a540c726948254a1764">cleanup</a></div><div class="ttdeci">cleanup()</div><div class="ttdoc">Clean up all temporary files and directpries (except for VirtualBox build)</div><div class="ttdef"><b>Definition:</b> <a href="utils_8sh_source.html#l00474">utils.sh:474</a></div></div>
 </div><!-- fragment --> </li>
 <li>Create ISO clonezilla image of Gentoo linux, burn it to DVD, create an installed OS on a USB stick whose model label starts with <em>PNY</em> and finally create a clonezilla installer on another USB stick mounted under <code> /media/ken/AA45E </code> <div class="fragment"><div class="line"> mkgento burn hot_install ext_device=<span class="stringliteral">&quot;PNY&quot;</span> device_installer</div>
 <div class="line">ext_device=<span class="stringliteral">&quot;Sams&quot;</span> my_gentoo_image.iso</div>
@@ -250,7 +257,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
 <dl class="section note"><dt>Note</dt><dd>Uses global variable ${SHARED_ROOT_DIR} </dd></dl>
 <dl class="section see"><dt>See also</dt><dd>Guestfish and qemu websites for security issues. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01774">1774</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01949">1949</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -269,7 +276,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01012">1012</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01188">1188</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -289,7 +296,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
 </div><div class="memdoc">
 <p>Prepare the .bashrc file by exporting the environment this will be placed under /root in the VM </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01147">1147</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01323">1323</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -319,11 +326,43 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
 <dl class="section note"><dt>Note</dt><dd>Uses global variable ${SHARED_ROOT_DIR} </dd></dl>
 <dl class="section see"><dt>See also</dt><dd>Guestfish and qemu websites for security issues. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01875">1875</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02054">2054</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="a2220b9fd371c77096ac523462e23e59c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2220b9fd371c77096ac523462e23e59c">&#9670;&nbsp;</a></span>CLI_PULL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Exported String CLI_PULL = $(sed -r 's/(.*)pull=true(.*)/\1\2/g' &lt;&lt;&lt; &quot;$@&quot;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02708">2708</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+
+</div>
+</div>
+<a id="a3d227b4f2eb105a85a4e07d5f92094cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d227b4f2eb105a85a4e07d5f92094cf">&#9670;&nbsp;</a></span>i</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Integer i</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00223">223</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+
+</div>
+</div>
 <a id="a93f04e4165d1e26b707af12275800ef3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a93f04e4165d1e26b707af12275800ef3">&#9670;&nbsp;</a></span>ISOLINUX_DIR</h2>
 
@@ -339,7 +378,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
 <p>-&mdash; PATCH -&mdash; </p>
 <p>-&mdash; End of patch -&mdash; </p>
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00951">951</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01117">1117</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -355,7 +394,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00288">288</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l00309">309</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -371,7 +410,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01362">1362</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l01538">1538</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -387,7 +426,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02501">2501</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02806">2806</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>
@@ -403,7 +442,7 @@ Usage [3] prints this help, in markdown form if argument 'md' is specified. <br 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02502">2502</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mkgentoo_8sh_source.html#l02807">2807</a> of file <a class="el" href="mkgentoo_8sh_source.html">mkgentoo.sh</a>.</p>
 
 </div>
 </div>

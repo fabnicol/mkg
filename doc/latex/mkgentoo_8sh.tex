@@ -28,6 +28,8 @@ Process options, create Gentoo Virtual\+Box machine and optionally create clonez
 \begin{DoxyCompactList}\small\item\em Analyse commandline. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__create_installer_ga9fb02a8000daf0612335a0b6e5f1e815}{test\+\_\+cli\+\_\+post}} ()
 \begin{DoxyCompactList}\small\item\em Check commanline coherence and incompatibilities. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group__create_installer_gaa08d3655c5c6b948186a7eec4547662d}{run\+\_\+docker\+\_\+container}} ()
+\begin{DoxyCompactList}\small\item\em Run the downloaded Docker image. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{group__create_installer_gad29a75dbf76ffa08bf28bf4254f234c7}{mount\+\_\+live\+\_\+cd}} ()
 \begin{DoxyCompactList}\small\item\em Mount Gentoo/\+Clonezilla live CD and unsquashfs the GNU/linux system. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{mkgentoo_8sh_aa9ed49342581d0210a4e9a75c1cbbbd8}{move\+\_\+auxiliary\+\_\+files}} ()
@@ -80,11 +82,15 @@ Exported String \mbox{\hyperlink{group__create_installer_ga86cf981e617fa62d97802
 \begin{DoxyCompactList}\small\item\em Name of downloaded clonezilla ISO file. \end{DoxyCompactList}\item 
 Exported String \mbox{\hyperlink{group__create_installer_ga7e7a3b0c3b3b454c1546882093442181}{CREATE\+\_\+\+ISO}} = false
 \begin{DoxyCompactList}\small\item\em Custom name of ISO output. Default value is false Can be reversed by a name of type filename.\+iso on command line, previously created and reused to burn or dd to device installer. \end{DoxyCompactList}\item 
+Integer \mbox{\hyperlink{mkgentoo_8sh_a3d227b4f2eb105a85a4e07d5f92094cf}{i}}
+\item 
 Exported String \mbox{\hyperlink{mkgentoo_8sh_a99fb68646489d046faa1a0478d7c8e76}{LOG}}
 \item 
 Exported String \mbox{\hyperlink{mkgentoo_8sh_a93f04e4165d1e26b707af12275800ef3}{ISOLINUX\+\_\+\+DIR}} = isolinux
 \begin{DoxyCompactList}\small\item\em -\/--- PATCH -\/--- \end{DoxyCompactList}\item 
 Exported String \mbox{\hyperlink{mkgentoo_8sh_ad1451b50408769582d8f5bd4254fe7b1}{PATH}} = \char`\"{}\$\{PATH\}\char`\"{}\+:\char`\"{}\$\{VBPATH\}\char`\"{}
+\item 
+Exported String \mbox{\hyperlink{mkgentoo_8sh_a2220b9fd371c77096ac523462e23e59c}{CLI\+\_\+\+PULL}} = \$(sed -\/r \textquotesingle{}s/(.$\ast$)pull=true(.$\ast$)/\textbackslash{}1\textbackslash{}2/g\textquotesingle{} $<$$<$$<$ \char`\"{}\$@\char`\"{})
 \item 
 Exported String \mbox{\hyperlink{mkgentoo_8sh_a7819e2a2bcfd919879f667617c393f8f}{SHARE\+\_\+\+ROOT}}
 \item 
@@ -135,7 +141,7 @@ you should have at least 55 GB of free disk space in the current directory or in
 \begin{DoxyItemize}
 \item Only create the VM and virtual disk, in debug mode, without R and set new passwords, for a French-\/language platform. Use 8 cores. 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{ mkg vm\_language=fr minimal debug\_mode ncpus=8}
+\DoxyCodeLine{ mkg vm\_language=fr\_FR minimal debug\_mode ncpus=8}
 \DoxyCodeLine{nonroot\_user=ken passwd=\textcolor{stringliteral}{'util!Hx\&32F'} rootpasswd=\textcolor{stringliteral}{'Hk\_32!\_CD'} \mbox{\hyperlink{group__auxiliary_functions_gaff07c1d29d6d6a540c726948254a1764}{cleanup}}=\textcolor{keyword}{false}}
 
 \end{DoxyCode}
@@ -177,7 +183,7 @@ Guestfish and qemu websites for security issues.
 \end{DoxySeeAlso}
 
 
-Definition at line 1774 of file mkgentoo.\+sh.
+Definition at line 1949 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{mkgentoo_8sh_aa9ed49342581d0210a4e9a75c1cbbbd8}\label{mkgentoo_8sh_aa9ed49342581d0210a4e9a75c1cbbbd8}} 
 \index{mkgentoo.sh@{mkgentoo.sh}!move\_auxiliary\_files@{move\_auxiliary\_files}}
@@ -187,7 +193,7 @@ Definition at line 1774 of file mkgentoo.\+sh.
 
 
 
-Definition at line 1012 of file mkgentoo.\+sh.
+Definition at line 1188 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{mkgentoo_8sh_adaa4d5a23086fbb45c4ca4bf0f91424b}\label{mkgentoo_8sh_adaa4d5a23086fbb45c4ca4bf0f91424b}} 
 \index{mkgentoo.sh@{mkgentoo.sh}!prepare\_bash\_rc@{prepare\_bash\_rc}}
@@ -197,7 +203,7 @@ Definition at line 1012 of file mkgentoo.\+sh.
 
 Prepare the .bashrc file by exporting the environment this will be placed under /root in the VM 
 
-Definition at line 1147 of file mkgentoo.\+sh.
+Definition at line 1323 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{mkgentoo_8sh_ae37b15ad2bed3118284a51eb4712dbe0}\label{mkgentoo_8sh_ae37b15ad2bed3118284a51eb4712dbe0}} 
 \index{mkgentoo.sh@{mkgentoo.sh}!unmount\_vdi@{unmount\_vdi}}
@@ -222,11 +228,31 @@ Guestfish and qemu websites for security issues.
 \end{DoxySeeAlso}
 
 
-Definition at line 1875 of file mkgentoo.\+sh.
+Definition at line 2054 of file mkgentoo.\+sh.
 
 
 
 \doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{mkgentoo_8sh_a2220b9fd371c77096ac523462e23e59c}\label{mkgentoo_8sh_a2220b9fd371c77096ac523462e23e59c}} 
+\index{mkgentoo.sh@{mkgentoo.sh}!CLI\_PULL@{CLI\_PULL}}
+\index{CLI\_PULL@{CLI\_PULL}!mkgentoo.sh@{mkgentoo.sh}}
+\doxysubsubsection{\texorpdfstring{CLI\_PULL}{CLI\_PULL}}
+{\footnotesize\ttfamily Exported String CLI\+\_\+\+PULL = \$(sed -\/r \textquotesingle{}s/(.$\ast$)pull=true(.$\ast$)/\textbackslash{}1\textbackslash{}2/g\textquotesingle{} $<$$<$$<$ \char`\"{}\$@\char`\"{})}
+
+
+
+Definition at line 2708 of file mkgentoo.\+sh.
+
+\mbox{\Hypertarget{mkgentoo_8sh_a3d227b4f2eb105a85a4e07d5f92094cf}\label{mkgentoo_8sh_a3d227b4f2eb105a85a4e07d5f92094cf}} 
+\index{mkgentoo.sh@{mkgentoo.sh}!i@{i}}
+\index{i@{i}!mkgentoo.sh@{mkgentoo.sh}}
+\doxysubsubsection{\texorpdfstring{i}{i}}
+{\footnotesize\ttfamily Integer i}
+
+
+
+Definition at line 223 of file mkgentoo.\+sh.
+
 \mbox{\Hypertarget{mkgentoo_8sh_a93f04e4165d1e26b707af12275800ef3}\label{mkgentoo_8sh_a93f04e4165d1e26b707af12275800ef3}} 
 \index{mkgentoo.sh@{mkgentoo.sh}!ISOLINUX\_DIR@{ISOLINUX\_DIR}}
 \index{ISOLINUX\_DIR@{ISOLINUX\_DIR}!mkgentoo.sh@{mkgentoo.sh}}
@@ -239,7 +265,7 @@ Definition at line 1875 of file mkgentoo.\+sh.
 
 -\/--- End of patch -\/--- 
 
-Definition at line 951 of file mkgentoo.\+sh.
+Definition at line 1117 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{mkgentoo_8sh_a99fb68646489d046faa1a0478d7c8e76}\label{mkgentoo_8sh_a99fb68646489d046faa1a0478d7c8e76}} 
 \index{mkgentoo.sh@{mkgentoo.sh}!LOG@{LOG}}
@@ -249,7 +275,7 @@ Definition at line 951 of file mkgentoo.\+sh.
 
 
 
-Definition at line 288 of file mkgentoo.\+sh.
+Definition at line 309 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{mkgentoo_8sh_ad1451b50408769582d8f5bd4254fe7b1}\label{mkgentoo_8sh_ad1451b50408769582d8f5bd4254fe7b1}} 
 \index{mkgentoo.sh@{mkgentoo.sh}!PATH@{PATH}}
@@ -259,7 +285,7 @@ Definition at line 288 of file mkgentoo.\+sh.
 
 
 
-Definition at line 1362 of file mkgentoo.\+sh.
+Definition at line 1538 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{mkgentoo_8sh_a7819e2a2bcfd919879f667617c393f8f}\label{mkgentoo_8sh_a7819e2a2bcfd919879f667617c393f8f}} 
 \index{mkgentoo.sh@{mkgentoo.sh}!SHARE\_ROOT@{SHARE\_ROOT}}
@@ -269,7 +295,7 @@ Definition at line 1362 of file mkgentoo.\+sh.
 
 
 
-Definition at line 2501 of file mkgentoo.\+sh.
+Definition at line 2806 of file mkgentoo.\+sh.
 
 \mbox{\Hypertarget{mkgentoo_8sh_a09ec56f3a9157ee598167ac001281dbb}\label{mkgentoo_8sh_a09ec56f3a9157ee598167ac001281dbb}} 
 \index{mkgentoo.sh@{mkgentoo.sh}!SHARED\_DIR@{SHARED\_DIR}}
@@ -279,5 +305,5 @@ Definition at line 2501 of file mkgentoo.\+sh.
 
 
 
-Definition at line 2502 of file mkgentoo.\+sh.
+Definition at line 2807 of file mkgentoo.\+sh.
 

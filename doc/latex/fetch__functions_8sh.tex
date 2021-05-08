@@ -18,7 +18,9 @@
 \mbox{\hyperlink{fetch__functions_8sh_a747eb6a6a3e3fce1becde116190e868f}{fetch\+\_\+livecd}} ()
 \begin{DoxyCompactList}\small\item\em Downloads Gentoo install CD. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{fetch__functions_8sh_aeea237ee4e4e714889c00f67211ddb2b}{fetch\+\_\+stage3}} ()
-\begin{DoxyCompactList}\small\item\em Downloads a fresh stage3 Gentoo archive. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Downloads a fresh stage3 Gentoo archive. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{fetch__functions_8sh_ab026a1bb13a1fdab94e7ef5274b41eb0}{fetch\+\_\+docker\+\_\+image}} ()
+\begin{DoxyCompactList}\small\item\em Download and uncompress an automated Github Actions release of a compressed Docker image to run MKG within. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
@@ -41,7 +43,7 @@ Either download clonezilla ISO file and caches it OR uncaches it.
 
 
 
-Definition at line 128 of file fetch\+\_\+functions.\+sh.
+Definition at line 172 of file fetch\+\_\+functions.\+sh.
 
 \mbox{\Hypertarget{fetch__functions_8sh_ae1918429f97793a7d5ff449988d57ebd}\label{fetch__functions_8sh_ae1918429f97793a7d5ff449988d57ebd}} 
 \index{fetch\_functions.sh@{fetch\_functions.sh}!fetch\_clonezilla\_iso@{fetch\_clonezilla\_iso}}
@@ -55,7 +57,7 @@ Download clonezilla ISO file and caches it.
 
 
 
-Definition at line 101 of file fetch\+\_\+functions.\+sh.
+Definition at line 119 of file fetch\+\_\+functions.\+sh.
 
 \mbox{\Hypertarget{fetch__functions_8sh_ade8328225ffd2dd0c30aa6895637361e}\label{fetch__functions_8sh_ade8328225ffd2dd0c30aa6895637361e}} 
 \index{fetch\_functions.sh@{fetch\_functions.sh}!fetch\_clonezilla\_with\_virtualbox@{fetch\_clonezilla\_with\_virtualbox}}
@@ -68,11 +70,32 @@ Definition at line 101 of file fetch\+\_\+functions.\+sh.
 Download automatic output of Github Actions at fabnicol/clonezila\+\_\+with\+\_\+virtualbox.\+Github. 
 
 \begin{DoxyNote}{Note}
-URL is\+: GITHUB\+\_\+\+RELEASE\+\_\+\+PATH/\+WORKFLOW\+\_\+\+TAG 
+URL is\+: GITHUB\+\_\+\+RELEASE\+\_\+\+PATH/releases/download/\+WORKFLOW\+\_\+\+TAG 
 \end{DoxyNote}
 
 
-Definition at line 261 of file fetch\+\_\+functions.\+sh.
+Definition at line 314 of file fetch\+\_\+functions.\+sh.
+
+\mbox{\Hypertarget{fetch__functions_8sh_ab026a1bb13a1fdab94e7ef5274b41eb0}\label{fetch__functions_8sh_ab026a1bb13a1fdab94e7ef5274b41eb0}} 
+\index{fetch\_functions.sh@{fetch\_functions.sh}!fetch\_docker\_image@{fetch\_docker\_image}}
+\index{fetch\_docker\_image@{fetch\_docker\_image}!fetch\_functions.sh@{fetch\_functions.sh}}
+\doxysubsubsection{\texorpdfstring{fetch\_docker\_image()}{fetch\_docker\_image()}}
+{\footnotesize\ttfamily fetch\+\_\+docker\+\_\+image (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Download and uncompress an automated Github Actions release of a compressed Docker image to run MKG within. 
+
+\begin{DoxyItemize}
+\item Download from \href{https://github.com/fabnicol/}{\texttt{ https\+://github.\+com/fabnicol/}} mkg\+\_\+docker\+\_\+image/releases/latest \item Uncompress using xz -\/d. \item Load into docker. 
+\begin{DoxyRetVals}{Return values}
+{\em ID} & of loaded image. \\
+\hline
+\end{DoxyRetVals}
+\end{DoxyItemize}
+
+
+Definition at line 494 of file fetch\+\_\+functions.\+sh.
 
 \mbox{\Hypertarget{fetch__functions_8sh_a30dd5a4bfe7845ae1717ec4b142c10e6}\label{fetch__functions_8sh_a30dd5a4bfe7845ae1717ec4b142c10e6}} 
 \index{fetch\_functions.sh@{fetch\_functions.sh}!fetch\_gentoo\_install\_iso@{fetch\_gentoo\_install\_iso}}
@@ -105,7 +128,7 @@ Caches it as \$\{ISO\}
 \end{DoxyRetVals}
 
 
-Definition at line 301 of file fetch\+\_\+functions.\+sh.
+Definition at line 354 of file fetch\+\_\+functions.\+sh.
 
 \mbox{\Hypertarget{fetch__functions_8sh_a2143c1a03381a2f72f986fb5f30b0656}\label{fetch__functions_8sh_a2143c1a03381a2f72f986fb5f30b0656}} 
 \index{fetch\_functions.sh@{fetch\_functions.sh}!fetch\_preprocessed\_gentoo\_install@{fetch\_preprocessed\_gentoo\_install}}
@@ -122,7 +145,7 @@ URL is\+: GITHUB\+\_\+\+RELEASE\+\_\+\+PATH2/\+WORKFLOW\+\_\+\+TAG2
 \end{DoxyNote}
 
 
-Definition at line 220 of file fetch\+\_\+functions.\+sh.
+Definition at line 275 of file fetch\+\_\+functions.\+sh.
 
 \mbox{\Hypertarget{fetch__functions_8sh_a996431f89efbe6441611e593254e487f}\label{fetch__functions_8sh_a996431f89efbe6441611e593254e487f}} 
 \index{fetch\_functions.sh@{fetch\_functions.sh}!fetch\_process\_clonezilla\_iso@{fetch\_process\_clonezilla\_iso}}
@@ -143,7 +166,7 @@ Download clonezilla ISO file and process it.
 \end{DoxyItemize}
 
 
-Definition at line 169 of file fetch\+\_\+functions.\+sh.
+Definition at line 213 of file fetch\+\_\+functions.\+sh.
 
 \mbox{\Hypertarget{fetch__functions_8sh_aeea237ee4e4e714889c00f67211ddb2b}\label{fetch__functions_8sh_aeea237ee4e4e714889c00f67211ddb2b}} 
 \index{fetch\_functions.sh@{fetch\_functions.sh}!fetch\_stage3@{fetch\_stage3}}
@@ -157,7 +180,7 @@ Downloads a fresh stage3 Gentoo archive.
 
 Caches it as \$\{STAGE3\} 
 
-Definition at line 349 of file fetch\+\_\+functions.\+sh.
+Definition at line 402 of file fetch\+\_\+functions.\+sh.
 
 
 
@@ -170,7 +193,7 @@ Definition at line 349 of file fetch\+\_\+functions.\+sh.
 
 
 
-Definition at line 115 of file fetch\+\_\+functions.\+sh.
+Definition at line 159 of file fetch\+\_\+functions.\+sh.
 
 \mbox{\Hypertarget{fetch__functions_8sh_a060afc2d4febc5e904b82d131fbc8f3e}\label{fetch__functions_8sh_a060afc2d4febc5e904b82d131fbc8f3e}} 
 \index{fetch\_functions.sh@{fetch\_functions.sh}!LIVECD@{LIVECD}}
@@ -180,5 +203,5 @@ Definition at line 115 of file fetch\+\_\+functions.\+sh.
 
 
 
-Definition at line 85 of file fetch\+\_\+functions.\+sh.
+Definition at line 103 of file fetch\+\_\+functions.\+sh.
 
