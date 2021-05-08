@@ -879,20 +879,30 @@ run_docker_container() {
     # Once stopped, check if ISO was created and fetch it back.
     # For this it is necessary to restart.
 
-    if docker start ${DOCKER_ID} \
-            && docker exec ${DOCKER_ID} test -f "${ISO_OUTPUT}"
+    if docker start ${DOCKER_ID}
     then
-        if docker cp ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
+        if  docker exec ${DOCKER_ID} test -f "${ISO_OUTPUT}"
         then
-            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} was retrieved \
+            if docker cp ${DOCKER_ID}:/mkg/"${ISO_OUTPUT}" .
+            then
+                ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} was retrieved \
 from Docker image."
-        else
-            ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} could not \
+                docker stop ${DOCKER_ID}
+                exit 0
+            else
+                ${LOG[*]} "[MSG] CloneZilla installer ${ISO_OUTPUT} could not \
 be retrieved from Docker image. Check manually."
+                docker stop ${DOCKER_ID}
+                exit 3
+            fi
+        else
+            ${LOG[*]} "[ERR] Could not find file ${ISO_OUTPUT}"
+            docker stop ${DOCKER_ID}
+            exit 2
         fi
     else
-        ${LOG[*]} "[ERR] Dockerized process failed to create ISO installer."
-        return 1
+        ${LOG[*]} "[ERR] Dockerized process failed to create ISO installer (startup)."
+        exit 1
     fi
 }
 
