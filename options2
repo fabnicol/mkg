@@ -113,7 +113,7 @@
      "vm_language"        "Add support for non-US English language as a default. Use standard abbreviations. Must be at least 5 characters: e.g. fr_FR, de_DE, fr_FR.utf8"  "en_US.utf8"         "s"
      "vmpath"             "Path to VM base directory"                                                                         "$PWD"     "d"
      "vtxvpid"            "Activate VTXVPID: on/off"                                                                          "on"       "o"
-     "workflow_tag"       "Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by Github Actions"            "v1.8"     "s"
+     "workflow_tag"       "Tag version (vX.Y) of the release of file clonezilla_with_virtualbox.iso by Github Actions"            "v1.8"     "s"
      "workflow_tag2"      "Tag version (vX.Y) of the release of file preprocessed_gentoo_install.iso by Github Actions (MKG site)"  "release-master"  "s"
     
     
