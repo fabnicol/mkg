@@ -175,6 +175,15 @@ echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
 echo "to command line. You will need to do so if you do not use OS build \
 presets.  "
 echo "  "
+echo "GUI mode and background runs  "
+echo "  "
+echo "To run in the background, either add \`gui=false &\` to your command line  "
+echo "or, if you want to keep a VirtualBox GUI and not run in headless mode,  "
+echo "first launch in the foreground then use \`bg %n\` (where n is the  "
+echo "corresponding shell job shown in the output of the \`jobs\` command).  "
+echo "Starting MKG in the background with \`&\` and \`gui=true\`  "
+echo "(default value) will result in a crash.  "
+echo "  "
 echo "**Options:**  "
 echo "  "
 echo "Boolean values are either \`true\` or \`false\`. For example, to build  "
@@ -196,7 +205,7 @@ echo "      \`compact minimal minimal_size=false use_mkg_workflow=false \
 gui=false elist=myebuilds\` \  "
 echo "        \`email=my.name@gmail.com email_passwd='mypasswd' &\`  "
 echo "\`# nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &\`  "
-echo "\'# ./mkg dockerize minimal use_mkg_workflow=false ncpus=5 mem=10000 \
+echo "\`# ./mkg dockerize minimal use_mkg_workflow=false ncpus=5 mem=10000 \
 gentoo.iso\`  "
 echo "  "
 echo "  "
@@ -254,25 +263,38 @@ help_() {
 
 manpage() {
     check_tool pandoc
+    rm -f mkg.1
     help_md | pandoc -o mkg.1 && sed -i -E 's/(.PP|.PD$)/\1\n.br/' mkg.1
 }
 
 ## @fn htmlpage()
-## @brief Print help to html page
+## @brief Print help to html page.
 ## @ingroup createInstaller
 
 htmlpage() {
     check_tool pandoc
+    rm -f mkg.html
     help_md | pandoc -o mkg.html
 }
 
 ## @fn pdfpage()
-## @brief Print help to pdf page
+## @brief Print help to pdf page.
 ## @ingroup createInstaller
 
 pdfpage() {
     check_tool pandoc
+    rm mkg.pdf
     help_md | pandoc -V margin-right=0.75cm -V margin-left=0.75cm -o mkg.pdf
+}
+
+## @fn allpages()
+## @brief Print man page, html page and pdf page.
+## @ingroup createInstaller
+
+allpages() {
+    manpage
+    htmlpage
+    pdfpage
 }
 
 # ---------------------------------------------------------------------------- #
@@ -2660,13 +2682,6 @@ build presets [Y]:" rep
     checksums
     "${TEST_ONLY}" && exit 0
 
-    if ! "${USE_CLONEZILLA_WORKFLOW}" && "${CREATE_ISO}"
-    then
-        ${LOG[*]} "[MSG] Creating custom Gentoo install ISO \
-with VirtualBox guest additions."
-        add_guest_additions_to_clonezilla_iso
-    fi
-
     ${LOG[*]} "[INF] Creating VM"
     if ! create_vm "${VM}"
     then
@@ -2743,6 +2758,11 @@ main() {
     then
         create_options_array options
 	    pdfpage
+	    exit 0
+    elif grep -q 'allpages' <<< "$@"
+    then
+        create_options_array options
+	    allpages
 	    exit 0
     elif grep -q 'disconnect' <<< "$@"
     then
