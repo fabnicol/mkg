@@ -2295,9 +2295,9 @@ kernel="\$(apt-cache  search ^linux-image-[5-9]\.[0-9]+.*generic   \
 | head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
 modules="\$(apt-cache search ^linux-modules-[5-9]\.[0-9]+.*generic \
 | head -n1 | grep -v unsigned |  cut -f 1 -d' ')"
-apt install -qy "\${headers}"
-apt install -qy "\${kernel}"
-apt install -qy "\${modules}"
+apt install --reinstall -qy "\${headers}"
+apt install --reinstall -qy "\${kernel}"
+apt install --reinstall -qy "\${modules}"
 apt install -qy build-essential gcc <<< "N"
 apt install -qy virtualbox virtualbox-modules virtualbox-dkms
 apt install -qy virtualbox-guest-additions-iso
@@ -2311,9 +2311,6 @@ umount /mnt
 apt autoremove -y -q
 exit
 EOF
-
-    #  apt remove -y -q "\${headers}" build-essential gcc
-    #  virtualbox-guest-additions-iso virtualbox
 
     chmod +x squashfs-root/update_clonezilla.sh
 
