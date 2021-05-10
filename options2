@@ -40,7 +40,7 @@
      "download"           "Download install ISO image from Gentoo mirror. Boolean."                                               "true" "b"
      "download_arch"      "Download and install stage3 archive to virtual disk. Booelan."                                         "true" "b"
      "download_clonezilla""Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean" "true" "b"
-     "download_clonezilla_path" "Download the following CloneZilla ISO"         "https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download" "u"
+     "download_clonezilla_path" "Download the following CloneZilla ISO"         "https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative_testing/20210505-hirsute/clonezilla-live-20210505-hirsute-amd64.iso/download" "u"
      "download_only"      "Only download the Gentoo minimal install ISO and stage3 archive of the day, then exit."               "false" "b"
      "efi_size"           "Size of EFI partition in MiB."                                                                          "512" "n"
      "elist"              "File containing a list of Gentoo ebuilds to add to the VM on top of stage3. Note: if the default value is not used, adjust the names of the 'elist'.accept_keywords and 'elist'.use files" "ebuilds.list" "f"
@@ -117,7 +117,7 @@
      "workflow_tag2"      "Tag version (vX.Y) of the release of file preprocessed_gentoo_install.iso by Github Actions (MKG site)"  "release-master"  "s"
     
     
-# **path1:**  https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative/20200703-focal/clonezilla-live-20200703-focal-amd64.iso/download    
+# **path1:**  https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative_testing/20210505-hirsute/clonezilla-live-20210505-hirsute-amd64.iso/download    
 # **path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           
 # **path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox
 # **path4:**  https://github.com/fabnicol/mkg/releases/download
