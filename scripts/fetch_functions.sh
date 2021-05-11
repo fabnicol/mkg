@@ -367,8 +367,7 @@ fetch_livecd() {
     fi
     if "${DOWNLOAD_CLONEZILLA}"
     then
-        fetch_clonezilla_iso
-        "${CLONEZILLA_INSTALL}" && ISO="${CLONEZILLACD}"
+        "${CLONEZILLA_INSTALL}" && fetch_clonezilla_iso && ISO="${CLONEZILLACD}"
     else
         if ! ${USE_CLONEZILLA_WORKFLOW}
 	    then
