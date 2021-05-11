@@ -175,7 +175,7 @@ echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
 echo "to command line. You will need to do so if you do not use OS build \
 presets.  "
 echo "  "
-echo "GUI mode and background runs  "
+echo "**GUI mode and background runs**  "
 echo "  "
 echo "To run in the background, either add \`gui=false &\` to your command line  "
 echo "or, if you want to keep a VirtualBox GUI and not run in headless mode,  "
@@ -2957,7 +2957,7 @@ clonezilla image..."
     if "${CLEANUP}"
     then
         ${LOG[*]} <<< $(cleanup 2>&1 | xargs echo '[INF] Cleaning up.')
-	cleanup
+    	cleanup
     fi
 
     # send wake-up call
