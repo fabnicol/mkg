@@ -2672,13 +2672,6 @@ generate_Gentoo() {
     checksums
     "${TEST_ONLY}" && exit 0
 
-    if ! "${USE_CLONEZILLA_WORKFLOW}" && "${CREATE_ISO}"
-    then
-        ${LOG[*]} "[MSG] Creating custom Gentoo install ISO \
-with VirtualBox guest additions."
-        add_guest_additions_to_clonezilla_iso
-    fi
-
     ${LOG[*]} "[INF] Creating VM"
     if ! create_vm "${VM}"
     then
