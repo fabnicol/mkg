@@ -217,9 +217,25 @@ adjust_environment() {
 
     # Fallback
 
-    [ -z "${KEYMAP_FOUND}" ] && KEYMAP_FOUND="us"
+    if [ -z "${KEYMAP_FOUND}" ]
+    then
+        KEYMAP_FOUND="us"
+        echo "Did not find keymap ${VM_KEYMAP} is /usr/share/keymaps." > env.log
+        echo "Falling back on us" >> env.log
+    fi
 
     echo "keymap=${KEYMAP_FOUND}" >>  /etc/conf.d/keymaps
+
+    # GDM keyboard layout and X11 fallback
+
+    mkdir -p /etc/X11/xorg.conf.d/
+    pushd /etc/X11/xorg.conf.d/
+    echo 'Section "InputClass"'                  > 00-keyboard.conf
+    echo 'Identifier "system-keyboard"'         >> 00-keyboard.conf
+    echo 'MatchIsKeyboard "on"'                 >> 00-keyboard.conf
+    echo "Option \"XkbLayout\" ${KEYMAP_FOUND}" >> 00-keyboard.conf
+    echo 'EndSection'                           >> 00-keyboard.conf
+    popd
 
     sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
     echo "${TIMEZONE}" > /etc/timezone
