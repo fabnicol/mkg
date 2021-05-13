@@ -219,9 +219,10 @@ adjust_environment() {
 
     if [ -z "${KEYMAP_FOUND}" ]
     then
-        KEYMAP_FOUND="us"
-        echo "Did not find keymap ${VM_KEYMAP} is /usr/share/keymaps." > env.log
+        echo "Did not find keymap ${VM_KEYMAP} in /usr/share/keymaps." > env.log
         echo "Falling back on us" >> env.log
+        VM_KEYMAP="us"
+        KEYMAP_FOUND=us.map.gz
     fi
 
     echo "keymap=${KEYMAP_FOUND}" >>  /etc/conf.d/keymaps
@@ -230,11 +231,11 @@ adjust_environment() {
 
     mkdir -p /etc/X11/xorg.conf.d/
     pushd /etc/X11/xorg.conf.d/
-    echo 'Section "InputClass"'                  > 00-keyboard.conf
-    echo 'Identifier "system-keyboard"'         >> 00-keyboard.conf
-    echo 'MatchIsKeyboard "on"'                 >> 00-keyboard.conf
-    echo "Option \"XkbLayout\" ${KEYMAP_FOUND}" >> 00-keyboard.conf
-    echo 'EndSection'                           >> 00-keyboard.conf
+    echo 'Section "InputClass"'                         > 00-keyboard.conf
+    echo -e '\tIdentifier "system-keyboard"'           >> 00-keyboard.conf
+    echo -e '\tMatchIsKeyboard "on"'                   >> 00-keyboard.conf
+    echo -e "\tOption \"XkbLayout\" \"${VM_KEYMAP}\""  >> 00-keyboard.conf
+    echo 'EndSection'                                  >> 00-keyboard.conf
     popd
 
     sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
