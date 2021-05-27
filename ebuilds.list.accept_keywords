@@ -4,4 +4,5 @@ dev-lang/R  ~amd64
 >=sys-apps/sysvinit-2.98 ~amd64
 >=x11-apps/xinit-1.4.1 ~amd64
 >=x11-base/xorg-server-1.20.10 ~amd64
+>=dev-lang/perl-5.30.3 ~amd64
 
