@@ -1028,6 +1028,8 @@ then
     echo "[ERR] Could not sync portage tree."
     exit 6
 fi
+echo "[INF] Cleaning up perl..."
+perl-cleaner --reallyall
 echo "[INF] Updating cmake..."
 USE='-qt5' emerge -1 -q cmake
 if [ \$? != 0 ]
