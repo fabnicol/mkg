@@ -395,11 +395,15 @@ get_options() {
 
 test_cli_pre() {
 
-    { [ "${VERBOSE}" = "true" ] || [ "${DEBUG_MODE}" = "true" ]; } \
-        && [ "${QUIET_MODE}" = "true" ] \
-        && { ${LOG[*]} "[ERR] You cannot have 'quiet' and verbose modes at \
+    if [ "${VERBOSE}" = "true" ] || [ "${DEBUG_MODE}" = "true" ]
+    then
+        if  [ "${QUIET_MODE}" = "true" ]
+        then
+            ${LOG[*]} "[ERR] You cannot have 'quiet' and verbose modes at \
 the same time"
-             exit 1; }
+            exit 1
+        fi
+    fi
 
     # Configuration tests
 
@@ -642,6 +646,18 @@ for ${sw}"
 
 test_cli_post() {
 
+    if [ -n "${CHECK_VBOX_VERSION}" ]
+    then
+        if [ "${CHECK_VBOX_VERSION}" != "${VBOX_VERSION}" ]
+        then
+            ${LOG[*]} "[ERR] Reference VirtualBox version is ${VBOX_VERSION}"
+            ${LOG[*]} "      which is different from host platform version \
+${CHECK_VBOX_VERSION}"
+            ${LOG[*]} "[ERR] Please install version ${VBOX_VERSION} on host."
+            exit 1
+        fi
+    fi
+
     # use FORCE on mounting VM with qemu
     # just to avoid time stamps
 
@@ -856,6 +872,12 @@ share_root, test_emerge, use_clonezilla_workflow=false"
 this regular expression: [a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*"
 }
 
+check_docker_container_vbox_version() {
+
+    VBoxManage --version | tail -1 | cut -f 1 -d'_'
+
+}
+
 ## @fn run_docker_container()
 ## @brief Run the downloaded Docker image.
 ## @details
@@ -869,7 +891,9 @@ run_docker_container() {
     check_tool docker
 
     need_root
-    local cli=$(sed -r 's/(.*)dockerize(.*)/\1 \2/' <<< "$@")
+    local cli=$(sed -r \
+       "s/(.*)dockerize(.*)/\1 \2 \
+check_vbox_version=$(check_docker_container_vbox_version)/" <<< "$@")
     ${LOG[*]} "[INF] Starting container with command line: "
     ${LOG[*]} "[MSG] ${cli}"
 
