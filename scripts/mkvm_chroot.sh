@@ -69,6 +69,9 @@ adjust_environment() {
         return 1
     fi
 
+    echo "[INF] Cleaning up perl..."
+    perl-cleaner --reallyall
+    
     # One needs to build cmake without the qt5 USE value first,
     # otherwise dependencies cannot be resolved.
 

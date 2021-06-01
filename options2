@@ -24,7 +24,7 @@
      "burn"               "Burn to optical disc. Boolean."                                                                       "false" "b"
      "cdrecord"           "cdrecord full path. Automatically determined if left unspecified."                    "`which cdrecord`" "f:burn"
      "cflags"             "GCC CFLAGS options for ebuilds"                                                         "[-march=native,-O2]" "s"
-     "check_vbox_version" "Check that VirtualBox version within a container is the same as in the host platform" "" "s"
+     "check_vbox_version" "Check that VirtualBox version within a container is the same as in the host platform" "dep" "s"
      "cleanup"            "Clean up archives, temporary images and virtual machine after successful completion. Boolean."         "true" "b"
      "clonezilla_install" "Use the CloneZilla live CD instead of the official Gentoo minimal install CD. May be more robust for headless install, owing to a VB bug requiring artificial keyboard input (see doc)."  "false" "b"
      "cloning_method"     "Method used by hot_install ext_device=... to intall Gentoo to disk. One of: 'guestfish' or 'qemu'" "guestfish" "s:ext_device"

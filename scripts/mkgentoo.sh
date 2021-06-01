@@ -646,7 +646,7 @@ for ${sw}"
 
 test_cli_post() {
 
-    if [ -n "${CHECK_VBOX_VERSION}" ]
+    if [ -n "${CHECK_VBOX_VERSION}" ] && [ "${CHECK_VBOX_VERSION}" != "dep" ]
     then
         if [ "${CHECK_VBOX_VERSION}" != "${VBOX_VERSION}" ]
         then
@@ -1052,6 +1052,10 @@ then
     echo "[ERR] Could not sync portage tree."
     exit 6
 fi
+echo "[INF] Cleaning up perl..."
+emerge --unmerge dev-lang/perl
+emerge dev-lang/perl
+perl-cleaner --reallyall
 echo "[INF] Updating cmake..."
 USE='-qt5' emerge -1 -q cmake
 if [ \$? != 0 ]
