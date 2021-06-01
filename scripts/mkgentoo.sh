@@ -654,6 +654,7 @@ test_cli_post() {
             ${LOG[*]} "      which is different from host platform version \
 ${CHECK_VBOX_VERSION}"
             ${LOG[*]} "[ERR] Please install version ${VBOX_VERSION} on host."
+            ${LOG[*]} "[ERR] Exiting..."
             exit 1
         fi
     fi
