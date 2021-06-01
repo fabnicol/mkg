@@ -7,7 +7,7 @@ app-editors/emacs gtk
 app-text/xmlto text
 >=dev-libs/folks-0.14.0 eds
 dev-libs/gjs -sysprof
->=dev-libs/libgdata-0.17.12 gnome-online-accounts
+>=dev-libs/libgdata-0.17.12 gnome-online-accounts vala
 >=dev-libs/libical-3.0.9 vala
 >=dev-libs/libpcre2-10.35 pcre16
 >=dev-libs/libpeas-1.26.0-r100 gtk
