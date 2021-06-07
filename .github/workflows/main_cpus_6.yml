@@ -1,0 +1,76 @@
+name: Gentoo.mkg.builder
+
+on:
+  push:
+    branches: 
+    - master 
+    - gnome
+  pull_request:
+    branches: 
+    - master 
+    - gnome
+  schedule:
+  - cron: "0 2 * * 1-5"
+  
+  workflow_dispatch:
+
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: update 
+        run: |
+             sudo apt update 
+             sudo apt install uuid dos2unix libarchive-tools
+             sudo apt install squashfs-tools curl mkisofs cdrecord util-linux xorriso xz-utils
+             sudo apt install virtualbox    
+      
+      - name: run
+        run: |
+          sudo ./mkg test_only cleanup=false use_mkg_workflow=false ncpus=6 mem=15000
+
+      - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true # default: false
+          tag_name: release-gnome-6 # tag name to delete
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Assets
+        run: |
+            set -x
+            assets=()
+            for asset in checksums.txt latest-install-amd64-minimal.txt latest-stage3-amd64.txt downloaded.iso; do
+            assets+=("-a" "$asset")
+            done
+            tag_name="release-gnome-6"
+            hub release create  "${assets[@]}" \
+            -m "Release $tag_name" \
+            -m "This release was automatically created by the Git Actions workflow corresponding to directory .github in the repository." \
+            -m "The output are the references of the latest stage3 archive and minimal Gentoo install ISO that were tested OK for portage dependencies." \
+            -m "File **downloaded.iso** is the custom MKG install ISO built from these references, to be used in a VirtualBox machine." \
+            -m "To create an updated Gentoo distribution, start a Gentoo 64-bit machine with the following specifications:" \
+            -m "  - 8GB of virtual RAM" \
+            -m "  - a new VDI SATA disk of at least 55 GB" \
+            -m "  - downloaded.iso as an attached IDE optical disk as live CD" \
+            -m "  - non-EFI bootloader." \
+            -m "Once the build is completed, the VM will shut down automatically." \
+            -m "You can then clone the VDI disk into a functional Gentoo block device /dev/sdX using **guestfish**, **qemu** or:" \
+            -m "     #  ./mkg from_vm vm=name_of_your_VB_machine hot_install ext_device=sdX" \
+            -m "Alternatively, you can create an install ISO and a CloneZilla installer medium /dev/sdX by running:" \
+            -m "     # ./mkg from_vm vm=name_of_your_VB_machine device_installer ext_device=sdX gentoo.iso"  \
+            -m "You can also perform this step manually by starting another Gentoo 64-bit machine with the following specifications:" \
+            -m "  - 4 GB of virtual RAM" \
+            -m "  - the VDI disk already used in the above procedure attached as a SATA device" \
+            -m "  - **clonezilla_with_virtualbox.iso** downloaded from the companion Github project [clonezila_with_virtualbox](https://github.com/fabnicol/clonezilla_with_virtualbox/releases) and attached as an IDE device as live CD" \
+            -m "  - non-EFI bootloader." \
+            -m "This new machine will shut down automatically and the ISOFILES directory will contain the CloneZilla image." \
+            -m "You can then use this image with a CloneZilla CD to install Gentoo onto any adequate device." \
+            "$tag_name"
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

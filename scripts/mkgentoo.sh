@@ -873,10 +873,14 @@ run_docker_container() {
     # Experimental, undocumented environment variable
     # DOCKER_RUN_OPTS
 
-    DOCKER_ID=$(docker run  ${DOCKER_RUN_OPTS} -dit --privileged \
-           -v /dev/cdrom:/dev/cdrom -v /dev/sr0:/dev/sr0  -v /dev/log:/dev/log \
+    DOCKER_ID=$(docker run \
+                  --memory ${MEM}m \
+                  --cpus ${NCPUS} ${DOCKER_RUN_OPTS} \
+                  -dit --privileged \
+                  -v /dev/cdrom:/dev/cdrom -v /dev/sr0:/dev/sr0 \
+		  -v /dev/log:/dev/log \
                   --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
-		  ${cli})
+	          ${cli})
 
     if_fails $? "[ERR] Could not start container mygentoo:${WORKFLOW_TAG2}"
     if [ -z "${DOCKER_ID}" ]
