@@ -1,4 +1,4 @@
-name: Gentoo.mkg.builder.1
+name: mkg_builder_1
 
 on:
   push:
