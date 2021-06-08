@@ -65,7 +65,7 @@
      "kernel_config"      "Use a custom kernel config file"                                                                    ".config" "f"
      "livecd"             "Path to the live CD that will start the VM"                                                      "gentoo.iso" "f"
      "manpage"            "Create manpage mkg.1"                                                                                 "false" "b"       
-     "mem"                "VM RAM memory in MiB"                                                                            "8000"       "n"
+     "mem"                "VM RAM memory in MiB. To activate this option, add use_mkg_workflow=false"                             "8000" "n"
      "minimal"            "Remove *libreoffice* and *data science tools* from default list of installed software. Boolean."      "false" "b"
      "minimal_size"       "Remove kernel sources to minimize packaging. Not advised for personal use but OK for deployment and distribution." "true" "b"
      "mirror"             "Mirror site for downloading of stage3 tarball"              "http://gentoo.mirrors.ovh.net/gentoo-distfiles/" "u"
