@@ -34,10 +34,19 @@ by the workflow. It will be downloaded from the MKG Github release section.<br /
 This preprocessed ISO has build parameter presets. It builds the full desktop.<br />
 In particular, the following command line options will be ignored:<br />
 <code>bios, cflags, clonezilla_install, debug_mode, elist, emirrors,</code><br />
-<code>kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd,</code><br />
+<code>kernel_config, mem, minimal, minimal_size, nonroot_user, passwd,</code><br />
 <code>processor, rootpasswd, stage3, vm_keymap, vm_language.</code><br />
+You can however use <code>ncpus</code> with values 1 to 6 included.<br />
+Memory will be automatically allocated depending on <code>ncpus</code> value.<br />
 To disable this behavior you can add <code>use_mkg_workflow=false</code><br />
 to command line. You will need to do so if you do not use OS build presets.</p>
+<p><strong>GUI mode and background runs</strong></p>
+<p>To run in the background, either add <code>gui=false &amp;</code> to your command line<br />
+or, if you want to keep a VirtualBox GUI and not run in headless mode,<br />
+first launch in the foreground then use <code>bg %n</code> (where n is the<br />
+corresponding shell job shown in the output of the <code>jobs</code> command).<br />
+Starting MKG in the background with <code>&amp;</code> and <code>gui=true</code><br />
+(default value) will result in a crash.</p>
 <p><strong>Options:</strong></p>
 <p>Boolean values are either <code>true</code> or <code>false</code>. For example, to build<br />
 a minimal distribution, add to command line:<br />
@@ -49,7 +58,7 @@ or simply: <code>minimal</code> as <code>true</code> can be omitted (unlike <cod
 <code># ./mkg download_arch=false download=false download_clonezilla=false</code>   <code>custom_clonezilla=clonezilla_cached.iso use_mkg_workflow=false nonroot_user=phil</code><br />
 <code># nohup ./mkg plot plot_color=red plot_period=10 plot_pause=7</code>   <code>compact minimal minimal_size=false use_mkg_workflow=false gui=false elist=myebuilds</code>   <code>email=my.name@gmail.com email_passwd='mypasswd' &amp;</code><br />
 <code># nohup ./mkg gui=false from_device=sdc gentoo_backup.iso &amp;</code><br />
-'# ./mkg dockerize minimal use_mkg_workflow=false ncpus=5 mem=10000 gentoo.iso`</p>
+<code># ./mkg dockerize minimal use_mkg_workflow=false ncpus=5 mem=10000 gentoo.iso</code></p>
 <p><strong>Type Conventions:</strong><br />
 b: true/false Boolean<br />
 o: on/off Boolean<br />
@@ -381,7 +390,7 @@ Some options are incompatible, e.g. <code>test_only</code> and <code>use_mkg_wo
 </tr>
 <tr class="odd">
 <td style="text-align: center;">mem</td>
-<td style="text-align: left;">VM RAM memory in MiB</td>
+<td style="text-align: left;">VM RAM memory in MiB. To activate this option, add use_mkg_workflow=false</td>
 <td style="text-align: center;">[ 8000 ]</td>
 <td style="text-align: center;">n</td>
 </tr>
@@ -657,8 +666,8 @@ Some options are incompatible, e.g. <code>test_only</code> and <code>use_mkg_wo
 </tr>
 <tr class="odd">
 <td style="text-align: center;">workflow_tag</td>
-<td style="text-align: left;">Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by Github Actions</td>
-<td style="text-align: center;">[ v1.8 ]</td>
+<td style="text-align: left;">Tag version (vX.Y) of the release of file clonezilla_with_virtualbox.iso by Github Actions</td>
+<td style="text-align: center;">[ v2.0 ]</td>
 <td style="text-align: center;">s</td>
 </tr>
 <tr class="even">

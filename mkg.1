@@ -184,12 +184,23 @@ In particular, the following command line options will be ignored:
 .P
 .PD
 .br
-\f[C]kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd,\f[R]
+\f[C]kernel_config, mem, minimal, minimal_size, nonroot_user, passwd,\f[R]
 .PD 0
 .P
 .PD
 .br
 \f[C]processor, rootpasswd, stage3, vm_keymap, vm_language.\f[R]
+.PD 0
+.P
+.PD
+.br
+You can however use \f[C]ncpus\f[R] with values 1 to 6 included.
+.PD 0
+.P
+.PD
+.br
+Memory will be automatically allocated depending on \f[C]ncpus\f[R]
+value.
 .PD 0
 .P
 .PD
@@ -201,6 +212,39 @@ To disable this behavior you can add \f[C]use_mkg_workflow=false\f[R]
 .br
 to command line.
 You will need to do so if you do not use OS build presets.
+.PP
+.br
+\f[B]GUI mode and background runs\f[R]
+.PP
+.br
+To run in the background, either add \f[C]gui=false &\f[R] to your
+command line
+.PD 0
+.P
+.PD
+.br
+or, if you want to keep a VirtualBox GUI and not run in headless mode,
+.PD 0
+.P
+.PD
+.br
+first launch in the foreground then use \f[C]bg %n\f[R] (where n is the
+.PD 0
+.P
+.PD
+.br
+corresponding shell job shown in the output of the \f[C]jobs\f[R]
+command).
+.PD 0
+.P
+.PD
+.br
+Starting MKG in the background with \f[C]&\f[R] and \f[C]gui=true\f[R]
+.PD 0
+.P
+.PD
+.br
+(default value) will result in a crash.
 .PP
 .br
 \f[B]Options:\f[R]
@@ -261,8 +305,7 @@ or simply: \f[C]minimal\f[R] as \f[C]true\f[R] can be omitted (unlike
 .P
 .PD
 .br
-\[aq]# ./mkg dockerize minimal use_mkg_workflow=false ncpus=5 mem=10000
-gentoo.iso\[ga]
+\f[C]# ./mkg dockerize minimal use_mkg_workflow=false ncpus=5 mem=10000 gentoo.iso\f[R]
 .PP
 .br
 \f[B]Type Conventions:\f[R]
@@ -836,7 +879,8 @@ T}
 T{
 mem
 T}@T{
-VM RAM memory in MiB
+VM RAM memory in MiB.
+To activate this option, add use_mkg_workflow=false
 T}@T{
 [ 8000 ]
 T}@T{
@@ -1276,10 +1320,10 @@ T}
 T{
 workflow_tag
 T}@T{
-Tag version (vX.Y) of the release of file clonezilla_with_virtualbox by
-Github Actions
+Tag version (vX.Y) of the release of file clonezilla_with_virtualbox.iso
+by Github Actions
 T}@T{
-[ v1.8 ]
+[ v2.0 ]
 T}@T{
 s
 T}
