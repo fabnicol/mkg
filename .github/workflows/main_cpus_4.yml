@@ -54,7 +54,8 @@ jobs:
             -m "The output are the references of the latest stage3 archive and minimal Gentoo install ISO that were tested OK for portage dependencies." \
             -m "File **downloaded.iso** is the custom MKG install ISO built from these references, to be used in a VirtualBox machine." \
             -m "To create an updated Gentoo distribution, start a Gentoo 64-bit machine with the following specifications:" \
-            -m "  - 8GB of virtual RAM" \
+            -m "  - 14GB of virtual RAM" \
+            -m "  - 4 CPU cores" \            
             -m "  - a new VDI SATA disk of at least 55 GB" \
             -m "  - downloaded.iso as an attached IDE optical disk as live CD" \
             -m "  - non-EFI bootloader." \
