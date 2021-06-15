@@ -409,34 +409,38 @@ the same time"
 
     # Check VirtualBox version
 
-    declare -r vbox_version="$(VBoxManage -v)"
-
-    if [ $? = 0 ]
+    if [ "${BUILD_VIRTUALBOX}" = "false" ]
     then
-        [ "${VERBOSE}" = "true" ] && ${LOG[*]} "[MSG] VirtualBox version: ${vbox_version}"
+        declare -r vbox_version="$(VBoxManage -v)"
 
-        declare -i version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< ${vbox_version})
-        declare -i version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
-                                       <<< ${vbox_version})
-        declare -i version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/' \
-                                       <<< ${vbox_version})
-        if [ ${version_major} -lt 6 ] || [ ${version_minor} -lt 1 ] \
-               || [ ${version_index} -lt 10 ]
+        if [ $? = 0 ]
         then
-            ${LOG[*]} "[ERR] VirtualBox must be at least version 6.1.10"
-            ${LOG[*]} "[ERR] Please update and reinstall"
-            do_exit=true
+            [ "${VERBOSE}" = "true" ] && ${LOG[*]} "[MSG] VirtualBox version: ${vbox_version}"
+
+            declare -i version_major=$(sed -E 's/([0-9]+)\..*/\1/' <<< ${vbox_version})
+            declare -i version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
+                                           <<< ${vbox_version})
+            declare -i version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/' \
+                                           <<< ${vbox_version})
+            if [ ${version_major} -lt 6 ] || [ ${version_minor} -lt 1 ] \
+                   || [ ${version_index} -lt 10 ]
+            then
+                ${LOG[*]} "[ERR] VirtualBox must be at least version 6.1.10"
+                ${LOG[*]} "[ERR] Please update and reinstall"
+                do_exit=true
+            else
+                ${LOG[*]} "[MSG] Found adequate VirtualBox version."
+            fi
         else
-            ${LOG[*]} "[MSG] Found adequate VirtualBox version."
-        fi
-    else
-        # Balking out of version control.
-        ${LOG[*]} "[ERR] Could not check VirtualBox version with user rights."
-        ${LOG[*]} "[ERR] It is the user's responsability to check that \
+            # Balking out of version control.
+
+            ${LOG[*]} "[ERR] Could not check VirtualBox version with user rights."
+            ${LOG[*]} "[ERR] It is the user's responsability to check that \
 VirtualBox version is at least 6.1.10."
-        ${LOG[*]} "[WAR] This may be caused by the fact that you are not an active"
-        ${LOG[*]} "      member of group vboxusers. Run 'sudo usermod -a -G vboxusers'"
-        ${LOG[*]} "      then log out and log in again."
+            ${LOG[*]} "[WAR] This may be caused by the fact that you are not an active"
+            ${LOG[*]} "      member of group vboxusers. Run 'sudo usermod -a -G vboxusers'"
+            ${LOG[*]} "      then log out and log in again."
+        fi
     fi
 
     #--- do_exit:
@@ -2779,8 +2783,8 @@ main() {
     ${LOG[*]} "% ----------------------------------------------------------- %"
 
     check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
-               "VBoxManage" "curl" "grep" "lsblk" "awk" \
-               "mkisofs" "rsync" "xz" "VBoxManage" "dos2unix"
+               "curl" "grep" "lsblk" "awk" \
+               "mkisofs" "rsync" "xz" "dos2unix"
 
     if ! which uuid >/dev/null 2>&1 \
            && ! which uuidgen >/dev/null 2>&1
@@ -2795,7 +2799,17 @@ main() {
 
     cd "${SCRPATH}"
     source scripts/fetch_functions.sh
-    source scripts/build_virtualbox.sh
+
+    # optional VirtualBox build
+
+    if [ "${BUILD_VIRTUALBOX}" = "true" ]
+    then
+        source scripts/build_virtualbox.sh
+        build_virtualbox
+        exit 0
+    else
+        check_tool "VBoxManage"
+    fi
 
     # containerization first
 
