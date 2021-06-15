@@ -1,4 +1,4 @@
-name: mkg_builder_1
+name: mkg_builder_3
 
 on:
   push:
@@ -31,12 +31,12 @@ jobs:
       
       - name: run
         run: |
-          sudo ./mkg test_only cleanup=false ncpus=1 mem=8000 use_mkg_workflow=false
+          sudo ./mkg test_only cleanup=false ncpus=3 mem=12000 use_mkg_workflow=false
 
       - uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
           delete_release: true # default: false
-          tag_name: release-master-1 # tag name to delete
+          tag_name: release-master-3 # tag name to delete
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -47,14 +47,14 @@ jobs:
             for asset in checksums.txt latest-install-amd64-minimal.txt latest-stage3-amd64.txt downloaded.iso; do
             assets+=("-a" "$asset")
             done
-            tag_name="release-master-1"
+            tag_name="release-master-3"
             hub release create  "${assets[@]}" \
             -m "Release $tag_name" \
             -m "This release was automatically created by the Git Actions workflow corresponding to directory .github in the repository." \
             -m "The output are the references of the latest stage3 archive and minimal Gentoo install ISO that were tested OK for portage dependencies." \
             -m "File **downloaded.iso** is the custom MKG install ISO built from these references, to be used in a VirtualBox machine." \
             -m "To create an updated Gentoo distribution, start a Gentoo 64-bit machine with the following specifications:" \
-            -m "  - 1 CPU core and 8GB of virtual RAM" \
+            -m "  - 3 CPU cores and 12GB of virtual RAM" \
             -m "  - a new VDI SATA disk of at least 55 GB" \
             -m "  - downloaded.iso as an attached IDE optical disk as live CD" \
             -m "  - non-EFI bootloader." \
