@@ -231,10 +231,14 @@ adjust_environment() {
 
 build_kernel() {
 
+    [ -d /usr/src/linux ] && rm -rf /usr/src/linux
+    
     # Building the kernel
 
     emerge gentoo-sources sys-kernel/genkernel pciutils \
         | tee kernel.log
+
+    eselect kernel set 1
 
     # Now mount the new boot partition
 

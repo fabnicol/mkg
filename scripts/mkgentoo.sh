@@ -169,7 +169,7 @@ echo "This preprocessed ISO has build parameter presets. It builds the full \
 desktop.  "
 echo "In particular, the following command line options will be ignored:  "
 echo "\`bios, cflags, clonezilla_install, debug_mode, elist, emirrors, \`  "
-echo "\`kernel_config, minimal, minimal_size, ncpus, nonroot_user, passwd,\`  "
+echo "\`kernel_config, minimal, minimal_size, nonroot_user, passwd,\`  "
 echo "\`processor, rootpasswd, stage3, vm_keymap, vm_language.\`  "
 echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
 echo "to command line. You will need to do so if you do not use OS build \
