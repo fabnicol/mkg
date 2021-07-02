@@ -10,7 +10,7 @@ on:
     - master 
     - gnome
   schedule:
-  - cron: "0 2 * * 1-5"
+    - cron: "0 2 * * 1-6"
   
   workflow_dispatch:
 
