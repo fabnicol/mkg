@@ -3,11 +3,9 @@ name: Gentoo.mkg.builder.5
 on:
   push:
     branches: 
-    - master 
     - gnome
   pull_request:
     branches: 
-    - master 
     - gnome
   schedule:
     - cron: "0 2 * * 1-6"
