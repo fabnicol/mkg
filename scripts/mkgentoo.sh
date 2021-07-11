@@ -1092,6 +1092,8 @@ then
     echo "[ERR] Could not merge portage."
     exit 7
 fi
+# solving circular dep.
+USE=-harfbuzz emerge -1 media-libs/freetype
 ## ---- PATCH ----
 #
 # This is temporarily necessary while display-manager is not

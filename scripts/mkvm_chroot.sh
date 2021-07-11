@@ -120,6 +120,10 @@ adjust_environment() {
        /etc/portage/package.accept_keywords/ \
         |  tee emerge.build
 
+    # solving circular dep.
+    
+    USE=-harfbuzz emerge -1 media-libs/freetype
+    
     # add logger. However it will not be usable for now,
     # this is why we are using custom logs and tee's.
 
