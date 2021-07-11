@@ -408,18 +408,20 @@ fetch_stage3() {
     local verb2=""
     ! "${VERBOSE}" && verb1="-s"
     "${VERBOSE}" && verb2="-v"
-    if "${DOWNLOAD_ARCH}" && [ "${STAGE_TAG}" != "latest" ]
+    if "${DOWNLOAD_ARCH}"
     then
-        ${LOG[*]} "[INF] Cleaning up stage3 data..."
-        for file in latest-stage3*.txt*
-        do
-            [ -f "${file}" ] && rm ${verb2} -f "${file}"
-        done
-        ${LOG[*]} "[INF] Downloading stage3 data..."
-        ${LOG[*]} <<< "$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/\
+        if [ "${STAGE_TAG}" != "latest" ]
+           ${LOG[*]} "[INF] Cleaning up stage3 data..."
+           for file in latest-stage3*.txt*
+           do
+               [ -f "${file}" ] && rm ${verb2} -f "${file}"
+           done
+           ${LOG[*]} "[INF] Downloading stage3 data..."
+           ${LOG[*]} <<< "$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/\
 latest-stage3-${PROCESSOR}.txt ${verb1} 2>&1 | xargs echo '[INF]')"
-        if_fails $? "[ERR] Could not download stage3 from mirrors: \
+           if_fails $? "[ERR] Could not download stage3 from mirrors: \
 ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
+        fi
     else
         check_file latest-stage3-${PROCESSOR}.txt \
             "[ERR] No stage 3 download information available!" \
