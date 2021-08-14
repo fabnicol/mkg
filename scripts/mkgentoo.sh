@@ -1058,10 +1058,10 @@ fi
 echo "[INF] Cleaning up perl..."
 emerge --unmerge dev-lang/perl
 emerge dev-lang/perl
-emerge dev-libs/libpcre
-perl-cleaner --reallyall
-echo "[INF] Updating cmake..."
+perl-cleaner --all  --dont-delete-leftovers
+
 USE='-qt5' emerge -1 -q cmake
+
 if [ \$? != 0 ]
 then
     echo "emerge cmake failed!"
