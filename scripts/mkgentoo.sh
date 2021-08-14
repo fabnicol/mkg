@@ -1056,8 +1056,10 @@ then
     exit 6
 fi
 echo "[INF] Cleaning up perl..."
-emerge --unmerge dev-lang/perl
-emerge dev-lang/perl
+
+emerge -1 dev-lang/perl
+
+echo "[INF] Updating cmake..."
 USE='-qt5' emerge -1 -q cmake
 
 if [ \$? != 0 ]
