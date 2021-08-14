@@ -1058,8 +1058,6 @@ fi
 echo "[INF] Cleaning up perl..."
 emerge --unmerge dev-lang/perl
 emerge dev-lang/perl
-perl-cleaner --dont-delete-leftovers
-
 USE='-qt5' emerge -1 -q cmake
 
 if [ \$? != 0 ]
