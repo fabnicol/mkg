@@ -1058,6 +1058,8 @@ fi
 echo "[INF] Cleaning up perl..."
 
 emerge -1 dev-lang/perl
+emerge --depclean 
+perl-cleaner --all
 
 echo "[INF] Updating cmake..."
 USE='-qt5' emerge -1 -q cmake
