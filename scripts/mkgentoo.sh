@@ -1055,12 +1055,10 @@ then
     echo "[ERR] Could not sync portage tree."
     exit 6
 fi
-echo "[INF] Cleaning up perl..."
-emerge --unmerge dev-lang/perl
-emerge dev-lang/perl
-perl-cleaner --reallyall
+emerge dev-libs/pcre
 echo "[INF] Updating cmake..."
 USE='-qt5' emerge -1 -q cmake
+
 if [ \$? != 0 ]
 then
     echo "emerge cmake failed!"
