@@ -18,7 +18,7 @@ dev-libs/openssl bindist
 >=dev-texlive/texlive-latex-2020 xetex
 >=kde-frameworks/kitemmodels-5.74.0 qml
 >=kde-frameworks/prison-5.77.0 qml
->=media-libs/harfbuzz-2.6.7 icu
+>=media-libs/harfbuzz-2.6.7 icu -truetype
 >=media-libs/gd-2.3.0 png
 >=media-libs/mesa-20.0.8 wayland
 >=media-video/vlc-3.0.11.1 vorbis ogg
