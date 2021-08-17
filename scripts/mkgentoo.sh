@@ -1055,10 +1055,9 @@ then
     echo "[ERR] Could not sync portage tree."
     exit 6
 fi
+emerge -1 dev-libs/libpcre
 emerge app-portage/gentoolkit
 revdep-rebuild -i
-emerge @preserved-rebuild
-emerge -1 dev-libs/libpcre
 echo "[INF] Updating cmake..."
 USE='-qt5' emerge -1 -q cmake
 

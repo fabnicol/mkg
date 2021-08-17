@@ -5,6 +5,5 @@ dev-lang/R  ~amd64
 >=x11-apps/xinit-1.4.1 ~amd64
 >=x11-base/xorg-server-1.20.10 ~amd64
 =dev-lang/perl-5.32.1 ~amd64
-=sys-kernel/gentoo-sources-5.12.10 ~amd64
-=sys-kernel/gentoo-sources-5.13.1  ~amd64
+=sys-kernel/gentoo-sources-5.13.9  ~amd64
 
