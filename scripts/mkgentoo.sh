@@ -1049,8 +1049,14 @@ no-source-code bh-luxi"' >> ${m_conf}
 # Note: escaped \${...} are variables
 # in the subordinate environment. Non-escaped dollar
 # variables are host variables.
+# Note2: Things would be simpler if stage3 packages
+# tagged as latest were always in sync with the portage
+# tree. As this occasionally falls short of reality, we
+# had to add (in August 2O21) extra package merges wrt
+# the official guide procedure.
+
 echo "[INF] Merging portage tree..."
-if ! emerge-webrsync >/dev/null 2>&1
+if ! emerge --sync >/dev/null 2>&1
 then
     echo "[ERR] Could not sync portage tree."
     exit 6
@@ -1059,6 +1065,11 @@ fi
 # The following are for occasional cases
 # in which stage3 packages have diverged from sync
 # force-rebuild of pcre is necessary (case of version bump)
+# because otherwise wget/curl have a pcre linking issue
+# out of the box, so portage no longer works.
+# Same with nghttp2. Perl then has to be updated and cleaned
+# otherwise world update conflicts ensue.
+
 emerge dev-libs/libpcre dev-libs/libpcre2
 emerge net-libs/nghttp2
 emerge net-misc/curl
@@ -1069,6 +1080,7 @@ emerge app-portage/gentoolkit
 revdep-rebuild -i
 echo "[INF] Cleaning up perl..."
 perl-cleaner --reallyall
+
 # One needs to build cmake without the qt5 USE value first,
 # otherwise dependencies cannot be resolved.
 
@@ -1102,8 +1114,6 @@ local profile=\$(eselect --color=no --brief profile list \
 
 eselect profile set \${profile}
 
-# solving circular dep.
-
 emerge -uD app-admin/sysklogd
 # other core sysapps to be merged first. LZ4 is a kernel
 # dependency for newer linux kernels.
@@ -1116,9 +1126,24 @@ then
    return 1
 fi
 
-emerge -u sys-libs/glibc
+# Force rebuild glibc
+# so that gcc updates can be built (stub-32.h dep).
+emerge sys-libs/glibc
+
+# These two are needed for freetype/harfbuzz builds
+emerge sys-libs/libcap-ng
+emerge media-libs/libpng
+
+# Solve circular dep between freetype and harfbuzz
+
+USE="-harfbuzz" emerge media-libs/freetype
+
+# Force rebuilds also needed further down
+emerge dev-libs/elfutils
+emerge app-arch/zstd
 
 # There is one perl module that needs glibc, so retry cleaning
+# after rebuild of glibc
 perl-cleaner --all
 
 ## ---- PATCH ----
@@ -1130,8 +1155,6 @@ perl-cleaner --all
 emerge -q --unmerge sys-apps/sysvinit
 
 ## ---- End of patch ----
-emerge media-libs/libpng
-USE="-harfbuzz" emerge media-libs/freetype
 
 emerge -uDN --with-bdeps=y @world
 [ $? != 0 ] && {
@@ -1139,11 +1162,18 @@ emerge -uDN --with-bdeps=y @world
     return 1; }
 
 emerge -q -u sys-apps/sysvinit
-emerge -u sys-devel/gcc
+
+# Note: gcc update is part of @world build
 
 emerge -u --config sys-libs/timezone-data
 emerge sys-kernel/linux-firmware
 emerge -u dos2unix
+
+# There is a elusive, occasional block betwen
+# shadow and man-pages. Making sure that this
+# does not arise here.
+emerge -1 -u sys-apps/shadow
+
 chown root \${ELIST}
 chmod +rw \${ELIST}
 dos2unix \${ELIST}
