@@ -71,7 +71,7 @@ adjust_environment() {
 
     echo "[INF] Cleaning up perl..."
     perl-cleaner --reallyall
-    
+
     # One needs to build cmake without the qt5 USE value first,
     # otherwise dependencies cannot be resolved.
 
@@ -92,7 +92,7 @@ adjust_environment() {
         return 1
     fi
 
-    emerge -1 -u sys-app/portage
+    emerge -1 -u sys-apps/portage
 
     # select profile (most recent plasma desktop)
 
@@ -121,9 +121,9 @@ adjust_environment() {
         |  tee emerge.build
 
     # solving circular dep.
-    
+
     USE=-harfbuzz emerge -1 media-libs/freetype
-    
+
     # add logger. However it will not be usable for now,
     # this is why we are using custom logs and tee's.
 

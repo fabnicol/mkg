@@ -1055,60 +1055,101 @@ then
     echo "[ERR] Could not sync portage tree."
     exit 6
 fi
-emerge -1 dev-libs/libpcre
+
+# The following are for occasional cases
+# in which stage3 packages have diverged from sync
+# force-rebuild of pcre is necessary (case of version bump)
+emerge dev-libs/libpcre dev-libs/libpcre2
+emerge net-libs/nghttp2
+emerge net-misc/curl
+emerge -u net/misc/wget
+emerge -u dev-lang/perl
+
 emerge app-portage/gentoolkit
 revdep-rebuild -i
-echo "[INF] Updating cmake..."
-USE='-qt5' emerge -1 -q cmake
+echo "[INF] Cleaning up perl..."
+perl-cleaner --reallyall
+# One needs to build cmake without the qt5 USE value first,
+# otherwise dependencies cannot be resolved.
 
-if [ \$? != 0 ]
-then
-    echo "emerge cmake failed!"
-    exit 8
-fi
-# There is an intractable circular dependency that
-# can be broken by pre-emerging python
-echo "[INF] Updating python. Please wait..."
-USE="-sqlite -bluetooth" emerge -1 -q dev-lang/python
+USE='-qt5' emerge -1 cmake
 if [ $? != 0 ]
 then
-    echo "[ERR] Could not update python."
+    echo "emerge cmake failed!" | tee -a emerge.build
+    return 1
 fi
-echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
-locale-gen
-eselect locale set 1 > /dev/null 2>&1
-env-update
-source /etc/profile
-prof=\$(eselect --color=no --brief profile list \
-                   | grep desktop \
-                   | grep plasma \
-                   | grep \${PROCESSOR} \
-                   | grep -v systemd \
-                   | head -n 1 | xargs)
-echo "[MSG] Using profile=\${prof}"
-eselect profile set \${prof}
-if ! emerge -1 -u sys-apps/portage
+
+# There is an intractable circular dependency that
+# can be broken by pre-emerging python
+
+USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
+if [ $? != 0 ]
 then
-    echo "[ERR] Could not merge portage."
-    exit 7
+    echo "emerge python failed!" | tee -a emerge.build
+    return 1
 fi
+
+emerge -1 -u sys-apps/portage
+
+# select profile (most recent plasma desktop)
+
+local profile=\$(eselect --color=no --brief profile list \
+                    | grep desktop \
+                    | grep plasma \
+                    | grep \${PROCESSOR} \
+                    | grep -v systemd \
+                    | head -n 1)
+
+eselect profile set \${profile}
+
 # solving circular dep.
+
+emerge -uD app-admin/sysklogd
+# other core sysapps to be merged first. LZ4 is a kernel
+# dependency for newer linux kernels.
+
+emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
+
+if [ $? != 0 ]
+then
+   echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
+   return 1
+fi
+
+emerge -u sys-libs/glibc
+
+# There is one perl module that needs glibc, so retry cleaning
+perl-cleaner --all
+
 ## ---- PATCH ----
 #
 # This is temporarily necessary while display-manager is not
 # stabilized in the portage tree (March 2021)
 # NOTE: should be retrieved later on
+
 emerge -q --unmerge sys-apps/sysvinit
-emerge -q sys-apps/sysvinit
+
 ## ---- End of patch ----
-echo "[INF] Testing update of world set..."
-if ! emerge --pretend -uDN @world
-then
-    echo "[ERR] Could not pass test of @world update"
-    exit 2
-fi
-echo "[INF] Testing whether packages may be merged..."
-if ! emerge --pretend -uDN $(grep -v '#' "${ELIST}" | xargs)
+emerge media-libs/libpng
+USE="-harfbuzz" emerge media-libs/freetype
+
+emerge -uDN --with-bdeps=y @world
+[ $? != 0 ] && {
+    echo "[ERR] emerge @world failed!"
+    return 1; }
+
+emerge -q -u sys-apps/sysvinit
+emerge -u sys-devel/gcc
+
+emerge -u --config sys-libs/timezone-data
+emerge sys-kernel/linux-firmware
+emerge -u dos2unix
+chown root \${ELIST}
+chmod +rw \${ELIST}
+dos2unix \${ELIST}
+
+local packages=`grep -E -v '(^\s*$|^\s*#.*$)' "\${ELIST}"`
+if ! emerge --pretend -uDN --with-bdeps=y \$(grep -v '#' "${ELIST}" | xargs)
 then
    echo "[ERR] Could not emerge packages"
    exit 3

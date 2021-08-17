@@ -2,6 +2,7 @@ app-arch/p7zip -kde -wxwidgets
 app-editors/emacs athena Xaw3d
 >=app-crypt/gcr-3.36 gtk
 >=app-text/ghostscript-gpl-9.52-r1 cups
+app-text/poppler nss
 >=app-text/texlive-core-2020 xetex
 app-text/xmlto text
 >=dev-lang/python-2.7.18-r1:2.7 sqlite
@@ -18,7 +19,8 @@ dev-libs/openssl bindist
 >=dev-texlive/texlive-latex-2020 xetex
 >=kde-frameworks/kitemmodels-5.74.0 qml
 >=kde-frameworks/prison-5.77.0 qml
->=media-libs/harfbuzz-2.6.7 -icu 
+>=media-libs/freetype-2.10.4 harfbuzz
+>=media-libs/harfbuzz-2.6.7 icu
 >=media-libs/gd-2.3.0 png
 >=media-libs/mesa-20.0.8 wayland
 >=media-video/vlc-3.0.11.1 vorbis ogg
@@ -30,4 +32,3 @@ sys-auth/polkit  introspection nls pam
 >=sys-cluster/openmpi-2.0.4 threads cxx
 >=sys-libs/zlib-1.2.11-r2 minizip
 >=virtual/mpi-2.0-r4 threads cxx
->=media-libs/freetype-2.10.4 -harfbuzz
