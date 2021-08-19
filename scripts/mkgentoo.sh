@@ -1249,7 +1249,7 @@ fi
 
 # Force rebuild glibc
 # so that gcc updates can be built (stub-32.h dep).
-emerge sys-libs/glibc
+#emerge sys-libs/glibc
 
 # These two are needed for freetype/harfbuzz builds
 emerge sys-libs/libcap-ng
@@ -1277,12 +1277,12 @@ emerge -q --unmerge sys-apps/sysvinit
 
 ## ---- End of patch ----
 
-emerge -uDN --with-bdeps=y --keep-going @world
-emerge -uDN --with-bdeps=y @world
+#emerge -uDN --with-bdeps=y --keep-going @world
+#emerge -uDN --with-bdeps=y @world
 
-[ $? != 0 ] && {
-    echo "[ERR] emerge @world failed!"
-    return 1; }
+#[ $? != 0 ] && {
+#    echo "[ERR] emerge @world failed!"
+#    return 1; }
 
 emerge -q -u --keep-going sys-apps/sysvinit
 
@@ -1309,13 +1309,9 @@ fi
 
 if [ $? !=0 ]
 then
-   # once again
-   then
-      echo "[ERR] Could not emerge packages"
-      exit 3
-   fi
-fi
-exit 0
+    echo "[ERR] Could not emerge packages"
+    exit 3
+xit 0
 EOF
 
     chmod +x portage_test.sh
