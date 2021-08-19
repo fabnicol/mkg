@@ -111,7 +111,6 @@ latest-install-${PROCESSOR}-minimal.txt | sed -E 's/iso.*$/iso/' )"
     fi
 }
 
-
 ## @fn fetch_clonezilla_iso()
 ## @brief Download clonezilla ISO file and caches it.
 ## @ingroup fetchFunctions
@@ -409,7 +408,7 @@ fetch_stage3() {
     local verb2=""
     ! "${VERBOSE}" && verb1="-s"
     "${VERBOSE}" && verb2="-v"
-    if "${DOWNLOAD_ARCH}"
+    if "${DOWNLOAD_ARCH}" && [ "${STAGE_TAG}" != "latest" ]
     then
         ${LOG[*]} "[INF] Cleaning up stage3 data..."
         for file in latest-stage3*.txt*
@@ -427,8 +426,17 @@ ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
             "[ERR] Rerun with download_arch=true"
     fi
 
-    local current=$(cat latest-stage3-${PROCESSOR}.txt | \
+    local current
+
+    if [ "${STAGE_TAG}" = "latest" ]
+    then
+      current=$(cat latest-stage3-${PROCESSOR}.txt | \
                         grep "stage3-${PROCESSOR}".*.tar.xz | cut -f 1 -d' ')
+    else
+      # Form is: 20210815T170549Z/stage3-amd64-20210815T170549Z.tar.xz
+
+      current="${STAGE_TAG}/stage3-${PROCESSOR}-openrc-${STAGE_TAG}.tar.xz"
+    fi
 
     if "${DOWNLOAD_ARCH}"
     then

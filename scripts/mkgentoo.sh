@@ -986,222 +986,11 @@ mount_live_cd() {
     cd "${ROOT_LIVE}"
 }
 
-test_emerge_step() {
 
-    if "${CLONEZILLA_INSTALL}"
-    then
-        echo "[ERR] Clonezilla install does not support \
-pre-test of package merging"
-        return 0
-    fi
-
-    prepare_chroot
-
-    cd "${VMPATH}"
-    if_fails $? "[ERR] Could not cd to root directory."
-
-    move_auxiliary_files "mnt2/squashfs-root"
-    chown root ${ELIST}
-    chmod +rw ${ELIST}
-    dos2unix -q ${ELIST}
-
-    cd mnt2/squashfs-root
-    if_fails $? "[ERR] Could not cd to squashfs-root"
-
-    tar xpJf "${STAGE3}" --xattrs-include='*.*' --numeric-owner
-
-    prepare_bash_rc
-
-    mkdir --parents etc/portage/repos.conf
-    cp usr/share/portage/config/repos.conf etc/portage/repos.conf/gentoo.conf
-    cp ${verb} --dereference /etc/resolv.conf etc/
-    m_conf="etc/portage/make.conf"
-    ${LOG[*]} "[MSG] Using CFLAGS=${CFLAGS}"
-    sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS=\"${CFLAGS} -pipe\"/g"  ${m_conf}
-    echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
-    echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
-    sed  -i 's/USE=".*"//g'    ${m_conf}
-    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
-elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
-    echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
-    echo 'ACCEPT_LICENSE="-* @FREE MPEG-4 linux-fw-redistributable \
-no-source-code bh-luxi"' >> ${m_conf}
-    if [ "${BIOS}" = "true" ]
-    then
-        echo 'GRUB_PLATFORMS="i386-pc"' >> ${m_conf}
-    else
-        echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
-    fi
-    echo 'VIDEO_CARDS="nouveau intel"'   >> ${m_conf}
-    echo 'INPUT_DEVICES="evdev synaptics"' >> ${m_conf}
-    mkdir -p etc/portage/package.accept_keywords
-    mkdir -p etc/portage/package.use
-    cp -f "${ELIST}.accept_keywords" \
-       etc/portage/package.accept_keywords/
-    cp -f "${ELIST}.use"  etc/portage/package.use/
-    cp -f "${ELIST}.accept_keywords" \
-       etc/portage/package.accept_keywords/
-
-    bind_filesystem "."
-
-    cat > portage_test.sh << EOF
-#!/bin/bash
-# Note: escaped \${...} are variables
-# in the subordinate environment. Non-escaped dollar
-# variables are host variables.
-# Note2: Things would be simpler if stage3 packages
-# tagged as latest were always in sync with the portage
-# tree. As this occasionally falls short of reality, we
-# had to add (in August 2O21) extra package merges wrt
-# the official guide procedure.
-
-echo "[INF] Merging portage tree..."
-if ! emerge --sync >/dev/null 2>&1
-then
-    echo "[ERR] Could not sync portage tree."
-    exit 6
-fi
-
-# The following are for occasional cases
-# in which stage3 packages have diverged from sync
-# force-rebuild of pcre is necessary (case of version bump)
-# because otherwise wget/curl have a pcre linking issue
-# out of the box, so portage no longer works.
-# Same with nghttp2. Perl then has to be updated and cleaned
-# otherwise world update conflicts ensue.
-
-emerge dev-libs/libpcre dev-libs/libpcre2
-emerge net-libs/nghttp2
-emerge net-misc/curl
-emerge -u net/misc/wget
-emerge -u dev-lang/perl
-
-emerge app-portage/gentoolkit
-revdep-rebuild -i
-echo "[INF] Cleaning up perl..."
-perl-cleaner --reallyall
-
-# One needs to build cmake without the qt5 USE value first,
-# otherwise dependencies cannot be resolved.
-
-USE='-qt5' emerge -1 cmake
-if [ $? != 0 ]
-then
-    echo "emerge cmake failed!" | tee -a emerge.build
-    return 1
-fi
-
-# There is an intractable circular dependency that
-# can be broken by pre-emerging python
-
-USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
-if [ $? != 0 ]
-then
-    echo "emerge python failed!" | tee -a emerge.build
-    return 1
-fi
-
-emerge -1 -u sys-apps/portage
-
-# select profile (most recent plasma desktop)
-
-local profile=\$(eselect --color=no --brief profile list \
-                    | grep desktop \
-                    | grep plasma \
-                    | grep \${PROCESSOR} \
-                    | grep -v systemd \
-                    | head -n 1)
-
-eselect profile set \${profile}
-
-emerge -uD app-admin/sysklogd
-# other core sysapps to be merged first. LZ4 is a kernel
-# dependency for newer linux kernels.
-
-emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
-
-if [ $? != 0 ]
-then
-   echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
-   return 1
-fi
-
-# Force rebuild glibc
-# so that gcc updates can be built (stub-32.h dep).
-emerge sys-libs/glibc
-
-# These two are needed for freetype/harfbuzz builds
-emerge sys-libs/libcap-ng
-emerge media-libs/libpng
-
-# Solve circular dep between freetype and harfbuzz
-
-USE="-harfbuzz" emerge media-libs/freetype
-
-# Force rebuilds also needed further down
-emerge dev-libs/elfutils
-emerge app-arch/zstd
-
-# There is one perl module that needs glibc, so retry cleaning
-# after rebuild of glibc
-perl-cleaner --all
-
-## ---- PATCH ----
-#
-# This is temporarily necessary while display-manager is not
-# stabilized in the portage tree (March 2021)
-# NOTE: should be retrieved later on
-
-emerge -q --unmerge sys-apps/sysvinit
-
-## ---- End of patch ----
-
-emerge -uDN --with-bdeps=y @world
-[ $? != 0 ] && {
-    echo "[ERR] emerge @world failed!"
-    return 1; }
-
-emerge -q -u sys-apps/sysvinit
-
-# Note: gcc update is part of @world build
-
-emerge -u --config sys-libs/timezone-data
-emerge sys-kernel/linux-firmware
-emerge -u dos2unix
-
-# There is a elusive, occasional block betwen
-# shadow and man-pages. Making sure that this
-# does not arise here.
-emerge -1 -u sys-apps/shadow
-
-chown root \${ELIST}
-chmod +rw \${ELIST}
-dos2unix \${ELIST}
-
-local packages=`grep -E -v '(^\s*$|^\s*#.*$)' "\${ELIST}"`
-if ! emerge --pretend -uDN --with-bdeps=y \$(grep -v '#' "${ELIST}" | xargs)
-then
-   echo "[ERR] Could not emerge packages"
-   exit 3
-fi
-exit 0
-EOF
-
-    chmod +x portage_test.sh
-    chroot . /bin/bash portage_test.sh
-    if [ $? != 0 ]
-    then
-        ${LOG[*]} "[ERR] Virtual machine should not be able to merge packages." \
-             "[ERR] Check files ebuilds.list.accept_keywords, ebuilds.list.use" \
-             "      and ebuilds.list.complete or minimal using messages from" \
-             "      calls to emerge."
-        remove_chroot
-        exit 1
-    fi
-    ${LOG[*]} "[MSG] Portage tests were passed."
-    remove_chroot
-    return 0
-}
+## @fn prepare_chroot()
+## @brief Mount the minimal install under mnt, rsync to mnt2.
+## @note  live CD is mounted under $VMPATH/mnt and rsync'd to $VMPATH/mnt2
+## @ingroup createInstaller
 
 prepare_chroot() {
 
@@ -1304,6 +1093,245 @@ ${ROOT_LIVE}/squashfs-root\      Please see to this manually.\
 
     ${LOG[*]} <<< $(rm -rf mnt2 2>&1 \
                         | xargs echo "[INF] Removing mount directory")
+}
+
+# ----------------------------------------------------------------------------
+# TESTS
+#
+
+## @fn test_emerge_step()
+## @brief Test whether portage operations in mkvm_chroot.sh will succeed.
+## @note  In rare cases, latest pointer from Gentoo mirror may be obsolete
+##        and trigger very long runs. Extra checks have been added to face
+##        such cases which may look redundant or useless but are not in these
+##        cases (Aug. 2021).
+## @ingroup createInstaller
+
+test_emerge_step() {
+
+    if "${CLONEZILLA_INSTALL}"
+    then
+        echo "[ERR] Clonezilla install does not support \
+pre-test of package merging"
+        return 0
+    fi
+
+    prepare_chroot
+
+    cd "${VMPATH}"
+    if_fails $? "[ERR] Could not cd to root directory."
+
+    move_auxiliary_files "mnt2/squashfs-root"
+    chown root ${ELIST}
+    chmod +rw ${ELIST}
+    dos2unix -q ${ELIST}
+
+    cd mnt2/squashfs-root
+    if_fails $? "[ERR] Could not cd to squashfs-root"
+
+    tar xpJf "${STAGE3}" --xattrs-include='*.*' --numeric-owner
+
+    prepare_bash_rc
+
+    mkdir --parents etc/portage/repos.conf
+    cp usr/share/portage/config/repos.conf etc/portage/repos.conf/gentoo.conf
+    cp ${verb} --dereference /etc/resolv.conf etc/
+    m_conf="etc/portage/make.conf"
+    ${LOG[*]} "[MSG] Using CFLAGS=${CFLAGS}"
+    sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS=\"${CFLAGS} -pipe\"/g"  ${m_conf}
+    echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
+    echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
+    sed  -i 's/USE=".*"//g'    ${m_conf}
+    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
+elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
+    echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
+    echo 'ACCEPT_LICENSE="-* @FREE MPEG-4 linux-fw-redistributable \
+no-source-code bh-luxi"' >> ${m_conf}
+    if [ "${BIOS}" = "true" ]
+    then
+        echo 'GRUB_PLATFORMS="i386-pc"' >> ${m_conf}
+    else
+        echo 'GRUB_PLATFORMS="efi-64"' >> ${m_conf}
+    fi
+    echo 'VIDEO_CARDS="nouveau intel"'   >> ${m_conf}
+    echo 'INPUT_DEVICES="evdev synaptics"' >> ${m_conf}
+    mkdir -p etc/portage/package.accept_keywords
+    mkdir -p etc/portage/package.use
+    cp -f "${ELIST}.accept_keywords" \
+       etc/portage/package.accept_keywords/
+    cp -f "${ELIST}.use"  etc/portage/package.use/
+    cp -f "${ELIST}.accept_keywords" \
+       etc/portage/package.accept_keywords/
+
+    bind_filesystem "."
+
+    cat > portage_test.sh << EOF
+#!/bin/bash
+# Note: escaped \${...} are variables
+# in the subordinate environment. Non-escaped dollar
+# variables are host variables.
+# Note2: Things would be simpler if stage3 packages
+# tagged as latest were always in sync with the portage
+# tree. As this occasionally falls short of reality, we
+# had to add (in August 2O21) extra package merges wrt
+# the official guide procedure.
+
+echo "[INF] Merging portage tree..."
+if ! emerge-webrsync >/dev/null 2>&1
+then
+    echo "[ERR] Could not sync portage tree."
+    exit 6
+fi
+
+# The following are for occasional cases
+# in which stage3 packages have diverged from sync
+# force-rebuild of pcre is necessary (case of version bump)
+# because otherwise wget/curl have a pcre linking issue
+# out of the box, so portage no longer works.
+# Same with nghttp2. Perl then has to be updated and cleaned
+# otherwise world update conflicts ensue.
+
+emerge dev-libs/libpcre dev-libs/libpcre2
+emerge net-libs/nghttp2
+emerge net-misc/curl
+emerge -u net/misc/wget
+emerge -u dev-lang/perl
+
+emerge app-portage/gentoolkit
+revdep-rebuild -i
+echo "[INF] Cleaning up perl..."
+perl-cleaner --reallyall
+
+# One needs to build cmake without the qt5 USE value first,
+# otherwise dependencies cannot be resolved.
+
+USE='-qt5' emerge -1 cmake
+if [ $? != 0 ]
+then
+    echo "emerge cmake failed!" | tee -a emerge.build
+    return 1
+fi
+
+# There is an intractable circular dependency that
+# can be broken by pre-emerging python
+
+USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
+if [ $? != 0 ]
+then
+    echo "emerge python failed!" | tee -a emerge.build
+    return 1
+fi
+
+emerge -1 -u sys-apps/portage
+
+# select profile (most recent plasma desktop)
+
+local profile=\$(eselect --color=no --brief profile list \
+                    | grep desktop \
+                    | grep plasma \
+                    | grep \${PROCESSOR} \
+                    | grep -v systemd \
+                    | head -n 1)
+
+eselect profile set \${profile}
+
+emerge -uD app-admin/sysklogd
+# other core sysapps to be merged first. LZ4 is a kernel
+# dependency for newer linux kernels.
+
+emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
+
+if [ $? != 0 ]
+then
+   echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
+   return 1
+fi
+
+# Force rebuild glibc
+# so that gcc updates can be built (stub-32.h dep).
+emerge sys-libs/glibc
+
+# These two are needed for freetype/harfbuzz builds
+emerge sys-libs/libcap-ng
+emerge media-libs/libpng
+
+# Solve circular dep between freetype and harfbuzz
+
+USE="-harfbuzz" emerge media-libs/freetype
+
+# Force rebuilds also needed further down
+emerge dev-libs/elfutils
+emerge app-arch/zstd
+
+# There is one perl module that needs glibc, so retry cleaning
+# after rebuild of glibc
+perl-cleaner --all
+
+## ---- PATCH ----
+#
+# This is temporarily necessary while display-manager is not
+# stabilized in the portage tree (March 2021)
+# NOTE: should be retrieved later on
+
+emerge -q --unmerge sys-apps/sysvinit
+
+## ---- End of patch ----
+
+emerge -uDN --with-bdeps=y --keep-going @world
+emerge -uDN --with-bdeps=y @world
+
+[ $? != 0 ] && {
+    echo "[ERR] emerge @world failed!"
+    return 1; }
+
+emerge -q -u --keep-going sys-apps/sysvinit
+
+# Note: gcc update is part of @world build
+
+emerge -u --config sys-libs/timezone-data
+emerge sys-kernel/linux-firmware
+emerge -u dos2unix
+
+# There is a elusive, occasional block betwen
+# shadow and man-pages. Making sure that this
+# does not arise here.
+emerge -1 -u sys-apps/shadow
+
+chown root \${ELIST}
+chmod +rw \${ELIST}
+dos2unix \${ELIST}
+
+emerge --pretend -uDN --keep-going --with-bdeps=y \$(grep -v '#' "${ELIST}" | xargs)
+if [ $? !=0 ]
+then
+    emerge --pretend -uDN --with-bdeps=y \$(grep -v '#' "${ELIST}" | xargs)
+fi
+
+if [ $? !=0 ]
+then
+   # once again
+   then
+      echo "[ERR] Could not emerge packages"
+      exit 3
+   fi
+fi
+exit 0
+EOF
+
+    chmod +x portage_test.sh
+    chroot . /bin/bash portage_test.sh
+    if [ $? != 0 ]
+    then
+        ${LOG[*]} "[ERR] Virtual machine should not be able to merge packages." \
+             "[ERR] Check files ebuilds.list.accept_keywords, ebuilds.list.use" \
+             "      and ebuilds.list.complete or minimal using messages from" \
+             "      calls to emerge."
+        remove_chroot
+        exit 1
+    fi
+    ${LOG[*]} "[MSG] Portage tests were passed."
+    remove_chroot
+    return 0
 }
 
 

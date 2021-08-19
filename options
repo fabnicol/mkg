@@ -95,6 +95,7 @@
      "size"               "Dynamic disc size"                                                                                    "55000" "n"
      "smtp_url"           "SMTP URL of email provider for end-of-job warning. Default: gmail SMTP"          "smtps://smtp.gmail.com:465" "u"
      "stage3"             "Path to stage3 archive"                                                                       "stage3.tar.xz" "f"
+     "stage_tag"          "Exceptional stage3 tag when not using latest stage3 pointer."                                        "latest" "s"
      "swap_size"          "Size of swap partition in MiB."                                                                        "1024" "n"
      "test_emerge"        "Test whether emerge will be able to install packages in the VM before starting it."                    "false" "b"
      "test_only"          "Only test if portage will be able to install packages. Do not create a virtual machine."              "false" "b"

@@ -8,33 +8,36 @@ fetch_clonezilla_iso(119,3772
 cache_uncache_clonezilla_iso(172,5528
 fetch_process_clonezilla_iso(213,6802
 fetch_preprocessed_gentoo_install(275,8708
-fetch_clonezilla_with_virtualbox(314,10068
-fetch_livecd(354,11424
-fetch_stage3(402,12748
-fetch_docker_image(494,16449
+fetch_clonezilla_with_virtualbox(314,10086
+fetch_livecd(354,11442
+fetch_stage3(403,12762
+fetch_docker_image(495,16463
 
-mkgentoo.sh,322
+mkgentoo.sh,424
 declare -x ISO=105,3725
-help_(247,9641
-manpage(255,9805
-htmlpage(265,10013
-pdfpage(275,10183
-allpages(285,10409
-validate_option(302,10803
-get_options(315,11017
-test_cli_pre(387,12912
-test_cli(480,15902
-test_cli_post(634,20873
-run_docker_container(858,28747
-mount_live_cd(934,31101
-test_emerge_step(953,31596
+help_(256,10130
+manpage(264,10294
+htmlpage(274,10502
+pdfpage(284,10672
+allpages(294,10898
+validate_option(311,11292
+get_options(324,11506
+test_cli_pre(396,13401
+test_cli(495,16591
+test_cli_post(649,21562
+check_docker_container_vbox_version(878,29625
+run_docker_container(892,30028
+mount_live_cd(970,32451
+prepare_chroot(995,33137
+remove_chroot(1074,35550
+test_emerge_step(1110,36763
 
 mkvm_chroot.sh,123
 adjust_environment(40,1743
-build_kernel(229,7425
-install_software(290,8998
-global_config(375,11410
-finalize(474,14023
+build_kernel(236,7571
+install_software(301,9226
+global_config(386,11638
+finalize(485,14251
 
 mkvm.sh,67
 setup_network(29,1068
