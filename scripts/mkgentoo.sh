@@ -1311,7 +1311,8 @@ if [ $? != 0 ]
 then
     echo "[ERR] Could not emerge packages"
     exit 3
-xit 0
+fi
+exit 0
 EOF
 
     chmod +x portage_test.sh
