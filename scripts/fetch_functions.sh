@@ -410,7 +410,7 @@ fetch_stage3() {
     "${VERBOSE}" && verb2="-v"
     if "${DOWNLOAD_ARCH}"
     then
-        if [ "${STAGE_TAG}" != "latest" ]
+        if [ "${STAGE_TAG}" = "latest" ]
         then
            ${LOG[*]} "[INF] Cleaning up stage3 data..."
            for file in latest-stage3*.txt*
