@@ -1302,12 +1302,12 @@ chmod +rw \${ELIST}
 dos2unix \${ELIST}
 
 emerge --pretend -uDN --keep-going --with-bdeps=y \$(grep -v '#' "${ELIST}" | xargs)
-if [ $? !=0 ]
+if [ $? != 0 ]
 then
     emerge --pretend -uDN --with-bdeps=y \$(grep -v '#' "${ELIST}" | xargs)
 fi
 
-if [ $? !=0 ]
+if [ $? != 0 ]
 then
    # once again
    then
