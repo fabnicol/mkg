@@ -403,7 +403,7 @@ fetch_stage3() {
 
     # Fetching stage3 tarball
 
-    local CACHED_STAGE3="stage3-${PROCESSOR}.tar.xz"
+    local CACHED_STAGE3="stage3-${PROCESSOR}-openrc.tar.xz"
     local verb1=""
     local verb2=""
     ! "${VERBOSE}" && verb1="-s"
@@ -419,12 +419,12 @@ fetch_stage3() {
            done
            ${LOG[*]} "[INF] Downloading stage3 data..."
            ${LOG[*]} <<< "$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/\
-latest-stage3-${PROCESSOR}.txt ${verb1} 2>&1 | xargs echo '[INF]')"
+latest-stage3-${PROCESSOR}-openrc.txt ${verb1} 2>&1 | xargs echo '[INF]')"
            if_fails $? "[ERR] Could not download stage3 from mirrors: \
-${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
+${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}-openrc.txt"
         fi
     else
-        check_file latest-stage3-${PROCESSOR}.txt \
+        check_file latest-stage3-${PROCESSOR}-openrc.txt \
             "[ERR] No stage 3 download information available!" \
             "[ERR] Rerun with download_arch=true"
     fi
@@ -433,10 +433,10 @@ ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
 
     if [ "${STAGE_TAG}" = "latest" ]
     then
-      current=$(cat latest-stage3-${PROCESSOR}.txt | \
-                        grep "stage3-${PROCESSOR}".*.tar.xz | cut -f 1 -d' ')
+      current=$(cat latest-stage3-${PROCESSOR}-openrc.txt | \
+                        grep "stage3-${PROCESSOR}-openrc".*.tar.xz | cut -f 1 -d' ')
     else
-      # Form is: 20210815T170549Z/stage3-amd64-20210815T170549Z.tar.xz
+      # Form is: 20210815T170549Z/stage3-amd64-openrc-20210815T170549Z.tar.xz
 
       current="${STAGE_TAG}/stage3-${PROCESSOR}-openrc-${STAGE_TAG}.tar.xz"
     fi
@@ -444,7 +444,7 @@ ${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}.txt"
     if "${DOWNLOAD_ARCH}"
     then
         ${LOG[*]} "[INF] Cleaning up stage3 archives(s)..."
-        for file in "stage3-${PROCESSOR}"-*tar.xz*
+        for file in "stage3-${PROCESSOR}"-openrc-*tar.xz*
         do
             [ -f ${file} ] && rm ${verb2} -f "${file}"
         done
