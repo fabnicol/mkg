@@ -1216,7 +1216,7 @@ fi
 # can be broken by pre-emerging python
 
 USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
-if [ $? != 0 ]
+if [ \$? != 0 ]
 then
     echo "emerge python failed!" | tee -a emerge.build
     return 1
@@ -1241,7 +1241,7 @@ emerge -uD app-admin/sysklogd
 
 emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
 
-if [ $? != 0 ]
+if [ \$? != 0 ]
 then
    echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
    return 1
@@ -1249,7 +1249,7 @@ fi
 
 # Force rebuild glibc
 # so that gcc updates can be built (stub-32.h dep).
-#emerge sys-libs/glibc
+emerge sys-libs/glibc
 
 # These two are needed for freetype/harfbuzz builds
 emerge sys-libs/libcap-ng
@@ -1278,7 +1278,7 @@ emerge -q --unmerge sys-apps/sysvinit
 ## ---- End of patch ----
 
 #emerge -uDN --with-bdeps=y --keep-going @world
-#emerge -uDN --with-bdeps=y @world
+emerge --pretend -uDN --with-bdeps=y @world
 
 #[ $? != 0 ] && {
 #    echo "[ERR] emerge @world failed!"
@@ -1307,7 +1307,7 @@ then
     emerge --pretend -uDN --with-bdeps=y \$(grep -v '#' "${ELIST}" | xargs)
 fi
 
-if [ $? != 0 ]
+if [ \$? != 0 ]
 then
     echo "[ERR] Could not emerge packages"
     exit 3
