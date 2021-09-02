@@ -94,12 +94,31 @@ adjust_environment() {
 
     # select profile (most recent plasma desktop)
 
-    local profile=$(eselect --color=no --brief profile list \
-                        | grep desktop \
-                        | grep gnome \
-                        | grep ${PROCESSOR} \
-                        | grep -v systemd \
-                        | head -n 1)
+    local profile
+    if [ "${STAGE3_TAG}" = "openrc" ]
+    then
+        profile=$(eselect --color=no --brief profile list \
+                      | grep desktop \
+                      | grep gnome \
+                      | grep ${PROCESSOR} \
+                      | grep -v systemd \
+                      | head -n 1)
+    elif [ "${STAGE3_TAG}" = "systemd" ]
+    then
+        profile=$(eselect --color=no --brief profile list \
+                      | grep desktop \
+                      | grep gnome \
+                      | grep ${PROCESSOR} \
+                      | grep systemd \
+                      | head -n 1)
+    elif [ "${STAGE3_TAG}" = "hardened" ]
+    then
+        profile=$(eselect --color=no --brief profile list \
+                      | grep hardened \
+                      | grep gnome \
+                      | grep ${PROCESSOR} \
+                      | head -n 1)
+    fi # Other values have been ruled out on launch.
 
     eselect profile set ${profile}
 
@@ -126,8 +145,14 @@ adjust_environment() {
     # this is why we are using custom logs and tee's.
 
     emerge -uD app-admin/sysklogd
-    rc-update add sysklogd default
-    rc-service sysklogd start
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+        rc-update add sysklogd default
+        rc-service sysklogd start
+    else
+        systemctl enable sysklogd
+        systemctl start sysklogd
+    fi
 
     # other core sysapps to be merged first. LZ4 is a kernel
     # dependency for newer linux kernels.
@@ -171,7 +196,12 @@ adjust_environment() {
     cd /etc/init.d || exit 2
     ln -s net.lo net.${iface}
     cd - || exit 2
-    rc-update add net.${iface} default
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+        rc-update add net.${iface} default
+    else
+        systemctl enable net.${iface}
+    fi
 
     # Localization: we now generate all locales.
 
@@ -417,22 +447,45 @@ global_config() {
                 /etc/conf.d/display-manager | tee -a gdm.log
 
     #--- Services
-
-    rc-update add cronie default
-    rc-update add display-manager default
-    rc-update add dbus default
-    rc-update add elogind boot
-    rc-update add keymaps boot
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+        rc-update add cronie default
+        rc-update add display-manager default
+        rc-update add dbus default
+        rc-update add elogind boot
+        rc-update add keymaps boot
+    else
+        systemctl enable cronie default
+        systemctl enable display-manager default
+        systemctl enable dbus default
+        systemctl enable elogind boot
+        systemctl enable keymaps boot
+    fi
 
     #--- Networkmanager
 
     for x in /etc/runlevels/default/net.*
     do
-        rc-update del $(basename $x) default
-        rc-service --ifstarted $(basename $x) stop
+        if [ "${STAGE3_TAG}" != "systemd" ]
+        then
+            rc-update del $(basename $x) default
+            rc-service --ifstarted $(basename $x) stop
+        else
+            systemctl disable $(basename $x)
+            systemctl stop $(basename $x)
+        fi
     done
-    rc-update del dhcpcd default
-    rc-update add NetworkManager default
+
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+
+        rc-update del dhcpcd default
+        rc-update add NetworkManager default
+    else
+        systemctl disable dhcpcd
+        systemctl enable NetworkManager
+    fi
+
 
     #--- groups and sudo
 
@@ -469,6 +522,11 @@ global_config() {
     then
         echo "[ERR] Could not install grub" | tee -a grub.log
         exit 1
+    fi
+
+    if [ "${STAGE3_TAG}" = "systemd" ]
+    then
+        echo 'GRUB_CMDLINE_LINUX="init=/lib/systemd/systemd"' >> /etc/default/grub
     fi
 
     grub-mkconfig -o /boot/grub/grub.cfg

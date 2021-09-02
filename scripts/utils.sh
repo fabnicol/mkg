@@ -202,20 +202,22 @@ get_device() {
             then
                 if "${INTERACTIVE}"
                 then
-                    read -p "[WAR] Please confirm there is no error and you wish \
-to create an installer with device /dev/${res}, vendor name $1. Reply with \
-uppercase Y to continue: " reply
+                    read -p "[WAR] Please confirm there is no error and you \
+wish to create an installer with device /dev/${res}, vendor name $1. \
+Reply with uppercase Y to continue: " reply
                     if [ "${reply}" = "Y" ]
                     then
                         get_device "${res}"
                     else
                         exit 0
                     fi
+                else
+                    get_device "${res}"
                 fi
             else
-            ${LOG[*]} "[ERR] $1 is neither a mountpoint nor a \
+                ${LOG[*]} "[ERR] $1 is neither a mountpoint nor a \
 block device"
-            exit 1
+                exit 1
             fi
         fi
     fi
@@ -357,8 +359,7 @@ create_install_ext_device() {
     is_block_device "/dev/${EXT_DEVICE}"
     ${LOG[*]} "[INF] Creating install device under \
 /dev/${EXT_DEVICE}"
-    dd if="${ISO_OUTPUT}" of="/dev/${EXT_DEVICE}" bs=4M status=progress
-    sync
+    dd if="${ISO_OUTPUT}" of="/dev/${EXT_DEVICE}" bs=4M status=progress && sync
     if_fails $? "[ERR] Could not install device ${EXT_DEVICE}"
 }
 

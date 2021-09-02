@@ -856,6 +856,10 @@ share_root, test_emerge, use_clonezilla_workflow=false"
     if_fails $? "[ERR] vm_language must have at least 5 characters and follow \
 this regular expression: [a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*"
 
+    grep -q -E '(openrc|hardened|systemd)' <<< "${STAGE3_TAG}"
+    if_fails $? "[ERR] stage3_tag must be: openrc [default], hardened or \
+systemd."
+
 }
 
 ## @fn run_docker_container()
@@ -2811,8 +2815,8 @@ main() {
     ${LOG[*]} "[MSG] MKG was run with the following options: $@"
     ${LOG[*]} "% ----------------------------------------------------------- %"
 
-    check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" "xorriso" \
-               "curl" "grep" "lsblk" "awk" \
+    check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" \
+               "xorriso" "curl" "grep" "lsblk" "awk" \
                "mkisofs" "rsync" "xz" "dos2unix"
 
     if ! which uuid >/dev/null 2>&1 \
@@ -2862,7 +2866,8 @@ main() {
     then
         export SHARE_ROOT
         export SHARED_DIR
-        "${VERBOSE}" && ${LOG[*]} "[MSG] Trying to mount ${VM} to ${SHARE_ROOT_DIR}"
+        "${VERBOSE}" && ${LOG[*]} "[MSG] Trying to mount ${VM} to\
+${SHARE_ROOT_DIR}"
         if "${NO_RUN}"
         then
             mount_shared_dir_daemon
@@ -2879,13 +2884,18 @@ main() {
                 ${LOG[*]} "[MSG] atd service was tested OK (Openrc)."
             else
                 ${LOG[*]} "[WAR] It does not seem that you are running Openrc."
-                ${LOG[*]} "[WAR] You may have to check atd manually and restart later."
+                ${LOG[*]} "[WAR] Currently share_root and share_root_dir are \
+supported for openrc only."
+                ${LOG[*]} "[WAR] You may have to check atd manually and \
+restart later."
             fi
-            ${LOG[*]} "[MSG] Virtual VDI disk will be mounted in 15 minutes from now"
+            ${LOG[*]} "[MSG] Virtual VDI disk will be mounted in 15 minutes \
+from now"
             ${LOG[*]} "[MSG] under directory ${SHARED_ROOT_DIR}"
             ${LOG[*]} "[MSG] with permissions ${SHARE_ROOT}."
 
-            echo 'nohup /bin/bash -c "mount_shared_dir_daemon" &' | at now '+ 15 minutes'
+            echo 'nohup /bin/bash -c "mount_shared_dir_daemon" &' \
+                | at now '+ 15 minutes'
             if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
         fi
     fi
