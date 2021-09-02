@@ -28,6 +28,7 @@ dev-libs/openssl bindist
 net-wireless/wpa_supplicant bindist
 net-misc/openssh bindist
 sys-apps/util-linux caps
+sys-apps/dbus user-session
 sys-auth/polkit  introspection nls pam 
 >=sys-cluster/openmpi-2.0.4 threads cxx
 >=sys-libs/zlib-1.2.11-r2 minizip

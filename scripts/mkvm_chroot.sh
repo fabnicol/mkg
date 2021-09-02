@@ -96,12 +96,34 @@ adjust_environment() {
 
     # select profile (most recent plasma desktop)
 
-    local profile=$(eselect --color=no --brief profile list \
-                        | grep desktop \
-                        | grep plasma \
-                        | grep ${PROCESSOR} \
-                        | grep -v systemd \
-                        | head -n 1)
+    local profile
+    if [ "${STAGE3_TAG}" = "openrc" ]
+    then
+        profile=$(eselect --color=no --brief profile list \
+                      | grep desktop \
+                      | grep plasma \
+                      | grep ${PROCESSOR} \
+                      | grep -v systemd \
+                      | head -n 1)
+    elif [ "${STAGE3_TAG}" = "systemd" ]
+    then
+        profile=$(eselect --color=no --brief profile list \
+                      | grep desktop \
+                      | grep plasma \
+                      | grep ${PROCESSOR} \
+                      | grep systemd \
+                      | head -n 1)
+        emerge -q --deselect sys-apps/openrc
+        emerge -q --deselect sys-apps/sysvinit
+
+    elif [ "${STAGE3_TAG}" = "hardened" ]
+    then
+        profile=$(eselect --color=no --brief profile list \
+                      | grep hardened \
+                      | grep plasma \
+                      | grep ${PROCESSOR} \
+                      | head -n 1)
+    fi # Other values have been ruled out on launch.
 
     eselect profile set ${profile}
 
@@ -127,53 +149,73 @@ adjust_environment() {
     # add logger. However it will not be usable for now,
     # this is why we are using custom logs and tee's.
 
-    emerge -uD app-admin/sysklogd
-    rc-update add sysklogd default
-    rc-service sysklogd start
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+        emerge -uD app-admin/sysklogd
+        # pcmciautils and netifrc depend on sysvinit hence openrc
+        emerge -u sys-apps/pcmciautils
+        emerge -u net-misc/netifrc
+        rc-update add sysklogd default
+        rc-service sysklogd start
+    fi
 
     # other core sysapps to be merged first. LZ4 is a kernel
     # dependency for newer linux kernels.
 
-    emerge -u net/misc/wget
-    emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
-
-    if [ $? != 0 ]
+    if  emerge -u net-misc/wget
     then
-       echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
-       return 1
+        echo "[ERR] emerge wget failed!" | tee -a emerge.build
+        return 1
     fi
+
+    emerge -u app-arch/lz4
 
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours
     # as syslogd is not yet there we tee a custom build log
     # emerging gcc and glibc is mainly for CFLAGS changes.
 
-    emerge sys-devel/gcc
-    emerge sys-libs/glibc
+    if  emerge sys-devel/gcc
+    then
+        echo "[ERR] emerge gcc failed!" | tee -a emerge.build
+        return 1
+    fi
+
+    if emerge sys-libs/glibc
+    then
+        echo "[ERR] emerge glibc failed!" | tee -a emerge.build
+        return 1
+    fi
+
     ## ---- PATCH ----
     #
     # This is temporarily necessary while display-manager is not
     # stabilized in the portage tree (March 2021)
     # NOTE: should be retrieved later on
 
-    emerge -q --unmerge sys-apps/sysvinit | tee -a emerge.build
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+      emerge -q --unmerge sys-apps/sysvinit | tee -a emerge.build
+    fi
 
     ## ---- End of patch ----
 
-    emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
-    [ $? != 0 ] && {
-        echo "[ERR] emerge @world failed!"  | tee -a emerge.build
-        return 1; }
+      emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
 
-    emerge -q -u sys-apps/sysvinit
+    if [ $? != 0 ]
+    then
+        echo "[ERR] emerge @world failed!"  | tee -a emerge.build
+        return 1
+    fi
+
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+      emerge -q -u sys-apps/sysvinit
+    fi
 
     # Networking in the new environment
 
     echo hostname=${NONROOT_USER}pc > /etc/conf.d/hostname
-    cd /etc/init.d || exit 2
-    ln -s net.lo net.${iface}
-    cd - || exit 2
-    rc-update add net.${iface} default
 
     # Localization: we now generate all locales.
 
@@ -216,10 +258,15 @@ adjust_environment() {
 
     echo "keymap=${KEYMAP_FOUND}" >  /etc/conf.d/keymaps
 
-    sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
-    echo "${TIMEZONE}" > /etc/timezone
-
-    emerge -u --config sys-libs/timezone-data | tee -a emerge.build
+    if [ "${STAGE3_TAG}" = "systemd" ]
+    then
+          ln -sf ../usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+    else
+          echo "${TIMEZONE}" > /etc/timezone
+          emerge -u --config sys-libs/timezone-data | tee -a emerge.build
+          # systemd does not usually use hwclock
+          sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
+    fi
 
     env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 }
@@ -236,7 +283,7 @@ adjust_environment() {
 build_kernel() {
 
     [ -d /usr/src/linux ] && rm -rf /usr/src/linux
-    
+
     # Building the kernel
 
     emerge gentoo-sources sys-kernel/genkernel pciutils \
@@ -398,10 +445,6 @@ global_config() {
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
         /etc/conf.d/display-manager | tee -a sddm.log
 
-    # SDDM language config now is no longer under /etc/sddm.conf
-    echo '[X11]' >> /etc/sddm.conf.d/sddm.conf
-    echo 'DisplayCommand=/etc/sddm/scripts/Xsetup' >> /etc/sddm.conf.d/sddm.conf
-
     # Numlock now set to 'on' on startup
     sed -i 's/Numlock=.*/Numlock=on/' /usr/share/sddm/sddm.conf.d/00default.conf
 
@@ -409,21 +452,39 @@ global_config() {
 
     #--- Services
 
-    rc-update add cronie default
-    rc-update add display-manager default
-    rc-update add dbus default
-    rc-update add elogind boot
-    rc-update add keymaps boot
+    if [ "${STAGE3_TAG}" = "systemd" ]
+    then
+        systemctl enable cronie.service
+        systemctl enable sddm.service
+    else
+        # SDDM language config now is no longer under /etc/sddm.conf
+        echo '[X11]' >> /etc/sddm.conf.d/sddm.conf
+        echo 'DisplayCommand=/etc/sddm/scripts/Xsetup' >> /etc/sddm.conf.d/sddm.conf
+        rc-update add cronie default
+        rc-update add display-manager default
+        rc-update add dbus default
+        rc-update add elogind boot
+        rc-update add keymaps boot
+    fi
 
     #--- Networkmanager
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+        for x in /etc/runlevels/default/net.*
+        do
+            rc-update del $(basename $x) default
+            rc-service --ifstarted $(basename $x) stop
+        done
+    fi
 
-    for x in /etc/runlevels/default/net.*
-    do
-        rc-update del $(basename $x) default
-        rc-service --ifstarted $(basename $x) stop
-    done
-    rc-update del dhcpcd default
-    rc-update add NetworkManager default
+    if [ "${STAGE3_TAG}" = "systemd" ]
+    then
+        systemctl disable dhcpcd
+        systemctl enable NetworkManager
+    else
+        rc-update del dhcpcd default
+        rc-update add NetworkManager default
+    fi
 
     #--- groups and sudo
 
@@ -460,6 +521,11 @@ global_config() {
     then
         echo "[ERR] Could not install grub" | tee -a grub.log
         exit 1
+    fi
+
+    if [ "${STAGE3_TAG}" = "systemd" ]
+    then
+        echo 'GRUB_CMDLINE_LINUX="init=/lib/systemd/systemd"' >> /etc/default/grub
     fi
 
     grub-mkconfig -o /boot/grub/grub.cfg

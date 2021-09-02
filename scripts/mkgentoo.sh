@@ -873,6 +873,11 @@ share_root, test_emerge, use_clonezilla_workflow=false"
 
     if_fails $? "[ERR] vm_language must have at least 5 characters and follow \
 this regular expression: [a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*"
+
+    grep -q -E '(openrc|hardened|systemd)' <<< "${STAGE3_TAG}"
+    if_fails $? "[ERR] stage3_tag must be: openrc [default], hardened or \
+systemd."
+
 }
 
 check_docker_container_vbox_version() {

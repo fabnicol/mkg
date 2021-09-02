@@ -403,48 +403,38 @@ fetch_stage3() {
 
     # Fetching stage3 tarball
 
-    local CACHED_STAGE3="stage3-${PROCESSOR}-openrc.tar.xz"
+    local CACHED_STAGE3="stage3-${PROCESSOR}-${STAGE3_TAG}.tar.xz"
     local verb1=""
     local verb2=""
     ! "${VERBOSE}" && verb1="-s"
     "${VERBOSE}" && verb2="-v"
     if "${DOWNLOAD_ARCH}"
     then
-        if [ "${STAGE_TAG}" = "latest" ]
-        then
-           ${LOG[*]} "[INF] Cleaning up stage3 data..."
-           for file in latest-stage3*.txt*
-           do
-               [ -f "${file}" ] && rm ${verb2} -f "${file}"
-           done
-           ${LOG[*]} "[INF] Downloading stage3 data..."
-           ${LOG[*]} <<< "$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/\
-latest-stage3-${PROCESSOR}-openrc.txt ${verb1} 2>&1 | xargs echo '[INF]')"
-           if_fails $? "[ERR] Could not download stage3 from mirrors: \
-${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}-openrc.txt"
-        fi
+        ${LOG[*]} "[INF] Cleaning up stage3 data..."
+        for file in latest-stage3*.txt*
+        do
+            [ -f "${file}" ] && rm ${verb2} -f "${file}"
+        done
+        ${LOG[*]} "[INF] Downloading stage3 data..."
+        ${LOG[*]} <<< "$(curl -L -O ${MIRROR}/releases/${PROCESSOR}/autobuilds/\
+latest-stage3-${PROCESSOR}-${STAGE3_TAG}.txt ${verb1} 2>&1 | xargs echo '[INF]')"
+        if_fails $? "[ERR] Could not download stage3 from mirrors: \
+${MIRROR}/releases/${PROCESSOR}/autobuilds/latest-stage3-${PROCESSOR}-${STAGE3_TAG}.txt"
     else
-        check_file latest-stage3-${PROCESSOR}-openrc.txt \
-            "[ERR] No stage 3 download information available!" \
-            "[ERR] Rerun with download_arch=true"
+        check_file latest-stage3-${PROCESSOR}-${STAGE3_TAG}.txt \
+                   "[ERR] No stage 3 download information available!" \
+                   "[ERR] Rerun with download_arch=true"
     fi
 
     local current
 
-    if [ "${STAGE_TAG}" = "latest" ]
-    then
-      current=$(cat latest-stage3-${PROCESSOR}-openrc.txt | \
-                        grep "stage3-${PROCESSOR}-openrc".*.tar.xz | cut -f 1 -d' ')
-    else
-      # Form is: 20210815T170549Z/stage3-amd64-openrc-20210815T170549Z.tar.xz
-
-      current="${STAGE_TAG}/stage3-${PROCESSOR}-openrc-${STAGE_TAG}.tar.xz"
-    fi
+    current=$(cat latest-stage3-${PROCESSOR}-${STAGE3_TAG}.txt | \
+                        grep "stage3-${PROCESSOR}-${STAGE3_TAG}".*.tar.xz | cut -f 1 -d' ')
 
     if "${DOWNLOAD_ARCH}"
     then
         ${LOG[*]} "[INF] Cleaning up stage3 archives(s)..."
-        for file in "stage3-${PROCESSOR}"-openrc-*tar.xz*
+        for file in "stage3-${PROCESSOR}"-${STAGE3_TAG}-*tar.xz*
         do
             [ -f ${file} ] && rm ${verb2} -f "${file}"
         done

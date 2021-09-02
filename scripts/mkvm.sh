@@ -235,8 +235,14 @@ install_stage3() {
     sed  -i 's/USE=".*"//g'    ${m_conf}
 
     # -bindist is requested by internationalization in kde-apps-meta.
-    echo 'USE="-gtk -gnome bindist qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
+    if [ "${STAGE3_TAG}" = "systemd" ]
+    then
+        echo 'USE="-gtk -gnome bindist qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
+-elogind -consolekit systemd mpi dbus X nls"' >>  ${m_conf}
+    else
+        echo 'USE="-gtk -gnome bindist qt4 qt5 kde dvd alsa cdr -bindist networkmanager  \
 elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
+    fi
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
     # note linux-fw-redistributable no-source-code for genkernel
