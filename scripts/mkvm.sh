@@ -233,8 +233,14 @@ install_stage3() {
 
     echo "L10N=\"${VM_LANGUAGE::2} en\""    >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
-    echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist networkmanager \
+    if [ "${STAGE3_TAG}" = "systemd" ]
+    then
+        echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist networkmanager \
+-elogind -consolekit systemd mpi dbus X nls"' >>  ${m_conf}
+    else
+        echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist networkmanager \
 elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
+    fi
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
     # note linux-fw-redistributable no-source-code for genkernel
