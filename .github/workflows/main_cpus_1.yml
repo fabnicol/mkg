@@ -1,3 +1,5 @@
+name: mkg_builder_1_gnome
+
 on:
   push:
     branches: 
