@@ -1,14 +1,16 @@
-name: mkg_builder_1
+name: mkg_builder_1_gnome
 
 on:
   push:
     branches: 
-    - gnome
+    - gnome 
+    
   pull_request:
     branches: 
-    - gnome
+    - gnome 
+    
   schedule:
-    - cron: "0 2 * * 1-6"
+  - cron: "0 2 * * 1-5"
   
   workflow_dispatch:
 
