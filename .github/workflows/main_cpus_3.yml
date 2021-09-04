@@ -1,16 +1,16 @@
-name: Gentoo.mkg.builder.3
+name: mkg_builder_3_gnome
 
 on:
   push:
     branches: 
-    - master 
-    - gnome
+    - gnome 
+    
   pull_request:
     branches: 
-    - master 
-    - gnome
+    - gnome 
+    
   schedule:
-    - cron: "0 2 * * 1-6"
+  - cron: "0 2 * * 1-5"
   
   workflow_dispatch:
 
