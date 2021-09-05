@@ -273,9 +273,13 @@ adjust_environment() {
     popd
 
     sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
-    echo "${TIMEZONE}" > /etc/timezone
-
-    emerge -u --config sys-libs/timezone-data | tee -a emerge.build
+    if [ "${STAGE3_TAG}" = "systemd" ]
+    then
+        ln -sf ../usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+    else
+        echo "${TIMEZONE}" > /etc/timezone
+        emerge -u --config sys-libs/timezone-data | tee -a emerge.build
+    fi
 
     # endof Gnome-specific
 
@@ -447,45 +451,35 @@ global_config() {
                 /etc/conf.d/display-manager | tee -a gdm.log
 
     #--- Services
-    if [ "${STAGE3_TAG}" != "systemd" ]
+    if [ "${STAGE3_TAG}" = "systemd" ]
     then
+        systemctl enable cronie.service
+        systemctl enable gdm.service
+        systemctl enable dbus
+    else
         rc-update add cronie default
         rc-update add display-manager default
         rc-update add dbus default
         rc-update add elogind boot
         rc-update add keymaps boot
-    else
-        systemctl enable cronie default
-        systemctl enable display-manager default
-        systemctl enable dbus default
-        systemctl enable elogind boot
-        systemctl enable keymaps boot
     fi
 
     #--- Networkmanager
 
     for x in /etc/runlevels/default/net.*
     do
-        if [ "${STAGE3_TAG}" != "systemd" ]
-        then
             rc-update del $(basename $x) default
             rc-service --ifstarted $(basename $x) stop
-        else
-            systemctl disable $(basename $x)
-            systemctl stop $(basename $x)
-        fi
     done
 
-    if [ "${STAGE3_TAG}" != "systemd" ]
+    if [ "${STAGE3_TAG}" = "systemd" ]
     then
-
-        rc-update del dhcpcd default
-        rc-update add NetworkManager default
-    else
         systemctl disable dhcpcd
         systemctl enable NetworkManager
+    else
+        rc-update del dhcpcd default
+        rc-update add NetworkManager default
     fi
-
 
     #--- groups and sudo
 
