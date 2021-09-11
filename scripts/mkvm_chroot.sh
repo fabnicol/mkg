@@ -144,27 +144,24 @@ adjust_environment() {
     # add logger. However it will not be usable for now,
     # this is why we are using custom logs and tee's.
 
-    emerge -uD app-admin/sysklogd
     if [ "${STAGE3_TAG}" != "systemd" ]
     then
+        emerge -uD app-admin/sysklogd
+        emerge -u sys-apps/pcmciautils
         rc-update add sysklogd default
         rc-service sysklogd start
-    else
-        systemctl enable sysklogd
-        systemctl start sysklogd
     fi
 
     # other core sysapps to be merged first. LZ4 is a kernel
     # dependency for newer linux kernels.
 
-    emerge -u net/misc/wget
-    emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
-
-    if [ $? != 0 ]
+    if emerge -u net/misc/wget
     then
        echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
        return 1
     fi
+
+    emerge -u app-arch/lz4 net-misc/netifrc
 
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours
@@ -173,22 +170,32 @@ adjust_environment() {
 
     emerge sys-devel/gcc
     emerge sys-libs/glibc
+
     ## ---- PATCH ----
     #
     # This is temporarily necessary while display-manager is not
     # stabilized in the portage tree (March 2021)
     # NOTE: should be retrieved later on
 
-    emerge -q --unmerge sys-apps/sysvinit | tee -a emerge.build
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+      emerge -q --unmerge sys-apps/sysvinit | tee -a emerge.build
+    fi
 
     ## ---- End of patch ----
 
     emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
-    [ $? != 0 ] && {
-        echo "[ERR] emerge @world failed!"  | tee -a emerge.build
-        return 1; }
 
-    emerge -q -u sys-apps/sysvinit
+    if [ $? != 0 ]
+    then
+        echo "[ERR] emerge @world failed!"  | tee -a emerge.build
+        return 1
+    fi
+
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+      emerge -q -u sys-apps/sysvinit
+    fi
 
     # Networking in the new environment
 
