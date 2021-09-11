@@ -453,7 +453,6 @@ global_config() {
     then
         systemctl enable cronie.service
         systemctl enable gdm.service
-        systemctl enable dbus
     else
         rc-update add cronie default
         rc-update add display-manager default
@@ -463,12 +462,14 @@ global_config() {
     fi
 
     #--- Networkmanager
-
-    for x in /etc/runlevels/default/net.*
-    do
+    if [ "${STAGE3_TAG}" != "systemd" ]
+    then
+        for x in /etc/runlevels/default/net.*
+        do
             rc-update del $(basename $x) default
             rc-service --ifstarted $(basename $x) stop
-    done
+        done
+    fi
 
     if [ "${STAGE3_TAG}" = "systemd" ]
     then
