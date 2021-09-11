@@ -4,16 +4,16 @@ build_virtualbox(30,1042
 
 fetch_functions.sh,308
 fetch_gentoo_install_iso(29,979
-fetch_clonezilla_iso(119,3772
-cache_uncache_clonezilla_iso(172,5528
-fetch_process_clonezilla_iso(213,6802
-fetch_preprocessed_gentoo_install(275,8708
-fetch_clonezilla_with_virtualbox(314,10086
-fetch_livecd(354,11442
-fetch_stage3(403,12762
-fetch_docker_image(495,16463
+fetch_clonezilla_iso(118,3771
+cache_uncache_clonezilla_iso(171,5527
+fetch_process_clonezilla_iso(212,6801
+fetch_preprocessed_gentoo_install(274,8707
+fetch_clonezilla_with_virtualbox(313,10085
+fetch_livecd(353,11441
+fetch_stage3(402,12761
+fetch_docker_image(496,16587
 
-mkgentoo.sh,424
+mkgentoo.sh,425
 declare -x ISO=105,3725
 help_(256,10130
 manpage(264,10294
@@ -25,19 +25,19 @@ get_options(324,11506
 test_cli_pre(396,13401
 test_cli(495,16591
 test_cli_post(649,21562
-check_docker_container_vbox_version(878,29625
-run_docker_container(892,30028
-mount_live_cd(970,32451
-prepare_chroot(995,33137
-remove_chroot(1074,35550
-test_emerge_step(1110,36763
+check_docker_container_vbox_version(883,29775
+run_docker_container(897,30178
+mount_live_cd(975,32601
+prepare_chroot(1000,33287
+remove_chroot(1079,35700
+test_emerge_step(1115,36913
 
-mkvm_chroot.sh,123
+mkvm_chroot.sh,124
 adjust_environment(40,1743
-build_kernel(236,7571
-install_software(301,9226
-global_config(386,11638
-finalize(485,14251
+build_kernel(283,8896
+install_software(348,10547
+global_config(433,12959
+finalize(551,16105
 
 mkvm.sh,67
 setup_network(29,1068
@@ -57,17 +57,17 @@ find_device_by_vendor(142,4642
 is_block_device(156,5031
 get_mountpoint(168,5334
 get_device(188,5984
-test_cdrecord(237,7599
-recreate_liveCD_ISO(255,8133
-burn_iso(294,9306
-create_install_ext_device(344,10702
-check_dir(372,11618
-check_file(393,12195
-check_files(413,12659
-check_tool(432,13139
-if_fails(453,13744
-cleanup(474,14260
-bind_filesystem(503,15135
-unbind_filesystem(521,15556
-checksums(554,16194
-need_root(568,16678
+test_cdrecord(239,7660
+recreate_liveCD_ISO(257,8194
+burn_iso(296,9367
+create_install_ext_device(346,10763
+check_dir(373,11678
+check_file(394,12255
+check_files(414,12719
+check_tool(433,13199
+if_fails(454,13804
+cleanup(475,14320
+bind_filesystem(504,15195
+unbind_filesystem(522,15616
+checksums(555,16254
+need_root(569,16738

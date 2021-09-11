@@ -2367,7 +2367,7 @@ create_device_system() {
 
 # ---------------------------------------------------------------------------- #
 # CloneZilla processing
-#
+
 
 ## @fn clonezilla_to_iso()
 ## @brief Create Gentoo linux clonezilla ISO installer out of a clonezilla
