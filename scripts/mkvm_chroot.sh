@@ -147,7 +147,7 @@ adjust_environment() {
     if [ "${STAGE3_TAG}" != "systemd" ]
     then
         emerge -uD app-admin/sysklogd
-        emerge -u sys-apps/pcmciautils
+        emerge -u sys-apps/pcmciautils net-misc/netifrc
         rc-update add sysklogd default
         rc-service sysklogd start
     fi
@@ -161,7 +161,7 @@ adjust_environment() {
        return 1
     fi
 
-    emerge -u app-arch/lz4 net-misc/netifrc
+    emerge -u app-arch/lz4
 
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours
@@ -200,15 +200,6 @@ adjust_environment() {
     # Networking in the new environment
 
     echo hostname=${NONROOT_USER}pc > /etc/conf.d/hostname
-    cd /etc/init.d || exit 2
-    ln -s net.lo net.${iface}
-    cd - || exit 2
-    if [ "${STAGE3_TAG}" != "systemd" ]
-    then
-        rc-update add net.${iface} default
-    else
-        systemctl enable net.${iface}
-    fi
 
     # Localization: we now generate all locales.
 
@@ -279,13 +270,13 @@ adjust_environment() {
     echo 'EndSection'                                  >> 00-keyboard.conf
     popd
 
-    sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
     if [ "${STAGE3_TAG}" = "systemd" ]
     then
         ln -sf ../usr/share/zoneinfo/${TIMEZONE} /etc/localtime
     else
         echo "${TIMEZONE}" > /etc/timezone
         emerge -u --config sys-libs/timezone-data | tee -a emerge.build
+        sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
     fi
 
     # endof Gnome-specific
