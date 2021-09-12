@@ -155,7 +155,7 @@ adjust_environment() {
     # other core sysapps to be merged first. LZ4 is a kernel
     # dependency for newer linux kernels.
 
-    if emerge -u net/misc/wget
+    if ! emerge -u net/misc/wget
     then
        echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
        return 1
