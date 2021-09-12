@@ -162,7 +162,7 @@ adjust_environment() {
     # other core sysapps to be merged first. LZ4 is a kernel
     # dependency for newer linux kernels.
 
-    if  emerge -u net-misc/wget
+    if  ! emerge -u net-misc/wget
     then
         echo "[ERR] emerge wget failed!" | tee -a emerge.build
         return 1
@@ -175,13 +175,13 @@ adjust_environment() {
     # as syslogd is not yet there we tee a custom build log
     # emerging gcc and glibc is mainly for CFLAGS changes.
 
-    if  emerge sys-devel/gcc
+    if  ! emerge sys-devel/gcc
     then
         echo "[ERR] emerge gcc failed!" | tee -a emerge.build
         return 1
     fi
 
-    if emerge sys-libs/glibc
+    if ! emerge sys-libs/glibc
     then
         echo "[ERR] emerge glibc failed!" | tee -a emerge.build
         return 1
