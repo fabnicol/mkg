@@ -602,7 +602,7 @@ global_config
 [ $? = 0 ] || res=$((res | 8))
 finalize
 [ $? = 0 ] || res=$((res | 16))
-echo "[MSG] Exiting with code: ${res}" 2>&1 | tee res.log
+echo "[MSG] Virtual Gentoo build exited with code: ${res}" 2>&1 | tee res.log
 exit ${res}
 
 # note: return code will be 0 if all went smoothly

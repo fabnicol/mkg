@@ -40,10 +40,4 @@ if_fails $?  \
 logger -s "[MSG] Mountpoint clean."
 
 mount_vdi "${SHARE_ROOT}"
-
-if "${EXITCODE}"
-then
-    ${LOG[*]} "[MSG] Virtual machine exit code is: " $(cat "${SHARE_ROOT}/res.log")
-    unmount_vdi
-fi
 }
