@@ -348,6 +348,7 @@ create_install_ext_device() {
     # Test whether EXT_DEVICE is a mountpoint or a block device label
 
     EXT_DEVICE=$(get_device ${EXT_DEVICE})
+    "${VERBOSE}" && ${LOG[*]} "[MSG] Found ext_device=${EXT_DEVICE}"
 
     if [ -z "${EXT_DEVICE}" ]
     then

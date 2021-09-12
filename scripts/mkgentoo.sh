@@ -625,13 +625,14 @@ for ${sw}"
 
     # Post processing of arguments in list form [a,b...]
 
-   if [ "${!V::1}" = "[" ]
-   then
+   if [ "${!V::2}" = "'[" ]
+    then
        local w="${!V}"
-       local V1="${w:1:(${#w}-2)}"
-       V1=$(sed 's/,/ /g' <<< ${V1})
-       eval "${V}"=\"${V1}\"
-   fi
+       local V1="${w:2:(${#w}-4)}"
+        V1=$(sed 's/,/ /g' <<< ${V1})
+        eval "${V}"=\"${V1}\"
+       [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} ${V}=\"${!V}\"
+    fi
 
    [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} "[MSG] Export: ${V}=\"${!V}\""
 
@@ -660,7 +661,29 @@ ${CHECK_VBOX_VERSION}"
         fi
     fi
 
-    "${EXITCODE}" && SHARE_ROOT="r" && mkdir -p "${SHARE_ROOT}"
+    if "${DOCKERIZE}" && "${EXITCODE}"
+    then
+        ${LOG[*]} "[ERR] Dockerized build is not supported \
+with exitcode set on."
+        exit 1
+    fi
+
+    if "${EXITCODE}"
+    then
+        SHARE_ROOT="r"
+        mkdir -p "${SHARE_ROOT}"
+        INTERACTIVE=false
+        FROM_VM=false
+        FROM_ISO=false
+        PLOT=false
+        CREATE_ISO=false
+        DOWNLOAD=false
+        DOWNLOAD_CLONEZILLA=false
+        DEVICE_INSTALLER=false
+        EXT_DEVICE=""
+        HOT_INSTALL=false
+        POSTPONE_QEMU=false
+    fi
 
     # use FORCE on mounting VM with qemu
     # just to avoid time stamps
@@ -2187,11 +2210,17 @@ to ${SHARED_ROOT_DIR} boot directory."
             continue
         fi
 
-        exit 0
+        if "${EXITCODE}"
+        then
+           return 0
+        else
+           exit 0
+        fi
     done
 
     "[ERR] Failed to connect virtual disk ${VM}.vdi to loop device \
 /dev/nbd${j}. Check that the VM is not running."
+
     exit 1
 }
 
@@ -2948,8 +2977,11 @@ main() {
 
     if [ -n "${VM}" ] && ! "${FROM_VM}" && ! "${FROM_DEVICE}" && ! "${FROM_ISO}"
     then
-        generate_Gentoo
-        if_fails $? "[ERR] Could not create the OS virtual disk."
+        if ! "${NO_RUN}"
+        then
+            generate_Gentoo
+            if_fails $? "[ERR] Could not create the OS virtual disk."
+        fi
     fi
 
     # Process the virtual disk into a clonezilla image
@@ -3075,11 +3107,16 @@ clonezilla image..."
         export SHARED_DIR
         "${VERBOSE}" \
             && ${LOG[*]} "[MSG] Trying to mount ${VM} to ${SHARE_ROOT_DIR}"
-        if "${NO_RUN}"
+        if ! "${POSTPONE_QEMU}"
         then
             mount_shared_dir_daemon
             if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
-            exit 0
+            if "${EXITCODE}"
+            then
+                ${LOG[*]} $(cat "${SHARED_DIR}/res.log")
+                unmount_vdi
+            fi
+            exit 1
         else
             check_tool at
             ${LOG[*]} "[WAR] You should have a functional 'atd' service"
