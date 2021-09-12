@@ -93,7 +93,6 @@
 ## @endcode
 ## @defgroup createInstaller Create Gentoo linux image and installer.
 
-
 # ---------------------------------------------------------------------------- #
 # Global declarations
 #
@@ -356,9 +355,9 @@ get_options() {
             if  grep -q "\.iso"  <<< "$1"
             then
                 ISO_OUTPUT="$1"
-                CREATE_ISO=true
+                  CREATE_ISO=true
             else
-                if validate_option "$1"
+                 if validate_option "$1"
                 then
                     declare -u VAR="$1"
                     eval "${VAR}"=true
@@ -661,6 +660,8 @@ ${CHECK_VBOX_VERSION}"
         fi
     fi
 
+    "${EXITCODE}" && SHARE_ROOT="r" && mkdir -p "${SHARE_ROOT}"
+
     # use FORCE on mounting VM with qemu
     # just to avoid time stamps
 
@@ -962,7 +963,6 @@ be retrieved from Docker image. Check manually."
     fi
 }
 
-
 # ---------------------------------------------------------------------------- #
 # SQUASHFS/UNSQUASHFS operations
 #
@@ -990,7 +990,6 @@ mount_live_cd() {
     fi
     cd "${ROOT_LIVE}"
 }
-
 
 ## @fn prepare_chroot()
 ## @brief Mount the minimal install under mnt, rsync to mnt2.
@@ -1074,7 +1073,6 @@ stage3 archive are cached in the directory after prior downloads"
     cd "${VMPATH}"
     if_fails $? "[ERR] Could not cd to root directory"
 }
-
 
 remove_chroot() {
 
@@ -1336,7 +1334,6 @@ EOF
     return 0
 }
 
-
 ## @fn move_auxiliary_files()
 ## @private
 
@@ -1469,7 +1466,6 @@ make_boot_from_livecd() {
     "${CLEANUP}" && remove_chroot
     return 0
 }
-
 
 ## @fn prepare_bash_rc()
 ## Prepare the .bashrc file by exporting the environment
@@ -1880,7 +1876,6 @@ sending keyboard scancode")
 ## @details Customizable suing options:
 ##          plot_color, plot_period, plot_position, plot_pause, plot_span
 ## @ingroup createInstaller
-
 
 log_loop() {
 
@@ -2368,7 +2363,6 @@ create_device_system() {
 # ---------------------------------------------------------------------------- #
 # CloneZilla processing
 
-
 ## @fn clonezilla_to_iso()
 ## @brief Create Gentoo linux clonezilla ISO installer out of a clonezilla
 ## directory structure and an clonezilla image.
@@ -2658,7 +2652,6 @@ EOF
     return 0
 }
 
-
 ## @fn prepare_for_iso_vm()
 ## @details Short version of #add_guest_additions_to_clonezilla_iso when
 ## the ISO has already been pre-authored.
@@ -2914,7 +2907,6 @@ main() {
     ${LOG[*]} "[MSG] MKG was run with the following options: $@"
     ${LOG[*]} "% ----------------------------------------------------------- %"
 
-
     check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" \
                "xorriso" "curl" "grep" "lsblk" "awk" \
                "mkisofs" "rsync" "xz" "dos2unix"
@@ -2950,47 +2942,6 @@ main() {
         fetch_docker_image
         run_docker_container "$@"
         exit 0
-    fi
-
-    # if Gentoo has already been built into an ISO image or on an external
-    # device skip generating it; otherwise go and build the Gentoo virtual
-    # machine
-
-    # Delayed daemonized script for mounting VDI disk to ${SHARED_DIR}
-    if [ "${SHARE_ROOT}" != "dep" ]
-    then
-        export SHARE_ROOT
-        export SHARED_DIR
-        "${VERBOSE}" \
-            && ${LOG[*]} "[MSG] Trying to mount ${VM} to ${SHARE_ROOT_DIR}"
-        if "${NO_RUN}"
-        then
-            mount_shared_dir_daemon
-            if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
-            exit 0
-        else
-            check_tool at
-            ${LOG[*]} "[WAR] You should have a functional 'atd' service"
-            ${LOG[*]} "[WAR] Operation will not work otherwise/"
-            if which rc-service
-            then
-                rc-service restart atd
-                if_fails $? "[ERR] Could not restart atd service (Openrc)"
-                ${LOG[*]} "[MSG] atd service was tested OK (Openrc)."
-            else
-                ${LOG[*]} "[WAR] It does not seem that you are running Openrc."
-                ${LOG[*]} "[WAR] You may have to check atd manually and \
-restart later."
-            fi
-            ${LOG[*]} "[MSG] Virtual VDI disk will be mounted in 15 minutes \
-from now"
-            ${LOG[*]} "[MSG] under directory ${SHARED_ROOT_DIR}"
-            ${LOG[*]} "[MSG] with permissions ${SHARE_ROOT}."
-
-            echo 'nohup /bin/bash -c "mount_shared_dir_daemon" &' \
-                | at now '+ 15 minutes'
-            if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
-        fi
     fi
 
     # You can bypass generation by setting vm= on commandline
@@ -3111,6 +3062,47 @@ clonezilla image..."
             && [ -n "${SMTP_URL}" ] \
             && ${LOG[*]} <<< $(send_mail 2>&1 \
                                    | xargs echo '[INF] Sending mail: ')
+    fi
+
+    # if Gentoo has already been built into an ISO image or on an external
+    # device skip generating it; otherwise go and build the Gentoo virtual
+    # machine
+
+    # Delayed daemonized script for mounting VDI disk to ${SHARED_DIR}
+    if [ "${SHARE_ROOT}" != "dep" ]
+    then
+        export SHARE_ROOT
+        export SHARED_DIR
+        "${VERBOSE}" \
+            && ${LOG[*]} "[MSG] Trying to mount ${VM} to ${SHARE_ROOT_DIR}"
+        if "${NO_RUN}"
+        then
+            mount_shared_dir_daemon
+            if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
+            exit 0
+        else
+            check_tool at
+            ${LOG[*]} "[WAR] You should have a functional 'atd' service"
+            ${LOG[*]} "[WAR] Operation will not work otherwise/"
+            if which rc-service
+            then
+                rc-service restart atd
+                if_fails $? "[ERR] Could not restart atd service (Openrc)"
+                ${LOG[*]} "[MSG] atd service was tested OK (Openrc)."
+            else
+                ${LOG[*]} "[WAR] It does not seem that you are running Openrc."
+                ${LOG[*]} "[WAR] You may have to check atd manually and \
+restart later."
+            fi
+            ${LOG[*]} "[MSG] Virtual VDI disk will be mounted in 15 minutes \
+from now"
+            ${LOG[*]} "[MSG] under directory ${SHARED_ROOT_DIR}"
+            ${LOG[*]} "[MSG] with permissions ${SHARE_ROOT}."
+
+            echo 'nohup /bin/bash -c "mount_shared_dir_daemon" &' \
+                | at now '+ 15 minutes'
+            if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
+        fi
     fi
 
     ${LOG[*]} "[MSG] Gentoo building process ended."

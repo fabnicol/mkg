@@ -38,5 +38,12 @@ mkdir -p "${SHARED_ROOT_DIR}"
 if_fails $?  \
          "[ERR] Could not recreate ${SHARED_ROOT_DIR}"
 logger -s "[MSG] Mountpoint clean."
+
 mount_vdi "${SHARE_ROOT}"
+
+if "${EXITCODE}"
+then
+    ${LOG[*]} "[MSG] Virtual machine exit code is: " $(cat "${SHARE_ROOT}/res.log")
+    unmount_vdi
+fi
 }
