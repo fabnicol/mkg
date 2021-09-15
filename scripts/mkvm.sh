@@ -192,7 +192,7 @@ install_stage3() {
        "${ELIST}.use" \
        mkvm_chroot.sh \
        "${KERNEL_CONFIG}"  /mnt/gentoo/
-»    cp -vf .bashrc /mnt/gentoo/bashrc_temp
+    cp -vf .bashrc /mnt/gentoo/bashrc_temp
 
     # cd to target OS and extract stage3 archive
 
