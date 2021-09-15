@@ -647,7 +647,11 @@ test_cli_post() {
     # use FORCE on mounting VM with qemu
     # just to avoid time stamps
 
-    [ -n "${SHARE_ROOT}" ] && [ "${SHARE_ROOT}" != "dep" ] && FORCE=true
+    if [ -n "${SHARE_ROOT}" ]
+    then
+      [ "${SHARE_ROOT}" != "dep" ] && FORCE=true
+      ([ "${SHARE_ROOT}" = "r" ] || [ "${SHARE_ROOT}" = "w" ]) && NO_RUN=true
+    fi
 
     if "${DOCKERIZE}" && "${EXITCODE}"
     then
