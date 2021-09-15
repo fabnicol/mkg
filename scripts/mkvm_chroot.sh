@@ -69,6 +69,8 @@ adjust_environment() {
         return 1
     fi
 
+    perl-cleaner --reallyall
+
     # One needs to build cmake without the qt5 USE value first,
     # otherwise dependencies cannot be resolved.
 
@@ -90,7 +92,7 @@ adjust_environment() {
         return 1
     fi
 
-    emerge -1 -u sys-app/portage
+    emerge -1 -u sys-apps/portage
 
     # select profile (most recent plasma desktop)
 
@@ -157,7 +159,7 @@ adjust_environment() {
     # other core sysapps to be merged first. LZ4 is a kernel
     # dependency for newer linux kernels.
 
-    if ! emerge -u net/misc/wget
+    if ! emerge -u net-misc/wget
     then
        echo "[ERR] emerge netifrs/pcmiautils failed!" | tee -a emerge.build
        return 1
