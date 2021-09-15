@@ -47,6 +47,8 @@
      "email"              "Email address to send a warning to upon build completion. Note: you will have to accept so-called *insecure software* with some providers. It is not insecure if you are using your private PC throughout."  "" "e"
      "email_passwd"       "Email password"                                                                                      "" "s:email"
      "emirrors"           "Mirror sites for downloading ebuilds"                                                                 "path2" "u"
+     "exitcode"           "Print virtual machine final exit code (0 on success)"                                                 "false" "b"
+
      "ext_device"         "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb, hdb), or a mountpoint directory (if mounted), or a few consecutive letters of the vendor name (e.g. 'Samsu', 'PNY' or 'Kingst'), if there is just one such. Requires *hot_install* on commandline."    "" "s"
      "force"              "Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running." "false" "b"
      "from_device"        "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean."  "false" "b:ext_device"
@@ -83,6 +85,8 @@
      "plot_period"        "Number of minutes elapsed between two successive plots"                                                  "10" "n"
      "plot_position"      "Plot position of on monitor screen (top-left angle) in pixels e.g '0,0' or '500,500'"                 "'0,0'" "s"
      "plot_span"          "Number of minutes of virtual disk processing to be plotted, back in time"                              "1200" "n"
+     "postpone_qemu"             "If using **share_root='r' or 'w'**, do not run the virtual machine but use the VDI disk corresponding to vm=... Otherwise start 15 minutes later."   "false"  "b"
+
      "processor"          "Processor type"                                                                                       "amd64" "s"
      "pull"               "Invoke 'git pull' in  mkg local repository on startup."                                               "false" "b"
      "quiet_mode"         "Silence output except for the most severe errors."                                                    "false" "b"

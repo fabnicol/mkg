@@ -111,6 +111,8 @@ adjust_environment() {
                       | grep ${PROCESSOR} \
                       | grep systemd \
                       | head -n 1)
+        emerge -q --deselect sys-apps/openrc
+        emerge -q --deselect sys-apps/sysvinit
     elif [ "${STAGE3_TAG}" = "hardened" ]
     then
         profile=$(eselect --color=no --brief profile list \
@@ -168,8 +170,17 @@ adjust_environment() {
     # as syslogd is not yet there we tee a custom build log
     # emerging gcc and glibc is mainly for CFLAGS changes.
 
-    emerge sys-devel/gcc
-    emerge sys-libs/glibc
+    if  ! emerge sys-devel/gcc
+    then
+        echo "[ERR] emerge gcc failed!" | tee -a emerge.build
+        return 1
+    fi
+
+    if ! emerge sys-libs/glibc
+    then
+        echo "[ERR] emerge glibc failed!" | tee -a emerge.build
+        return 1
+    fi
 
     ## ---- PATCH ----
     #
@@ -596,7 +607,7 @@ global_config
 [ $? = 0 ] || res=$((res | 8))
 finalize
 [ $? = 0 ] || res=$((res | 16))
-echo "[MSG] Exiting with code: ${res}" 2>&1 | tee res.log
+echo "[MSG] Virtual Gentoo build exited with code: ${res}" 2>&1 | tee res.log
 exit ${res}
 
 # note: return code will be 0 if all went smoothly
