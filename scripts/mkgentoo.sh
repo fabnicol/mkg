@@ -1036,11 +1036,11 @@ pre-test of package merging"
     echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
     echo "LINGUAS=\"${VM_LANGUAGE} en\"" >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
-    echo 'USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
-elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
+    echo "USE=\"-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
+elogind -consolekit -systemd mpi dbus X nls\"" >>  ${m_conf}
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
-    echo 'ACCEPT_LICENSE="-* @FREE linux-fw-redistributable no-source-code \
-bh-luxi"' >> ${m_conf}
+    echo "ACCEPT_LICENSE=\"-* @FREE linux-fw-redistributable no-source-code \
+bh-luxi\"" >> ${m_conf}
     if [ "${BIOS}" = "true" ]
     then
         echo 'GRUB_PLATFORMS="i386-pc"' >> ${m_conf}
