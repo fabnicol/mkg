@@ -666,22 +666,10 @@ ${CHECK_VBOX_VERSION}"
     # use FORCE on mounting VM with qemu
     # just to avoid time stamps
 
-    if [ -n "${SHARE_ROOT}" ]
-    then
-      [ "${SHARE_ROOT}" != "dep" ] && FORCE=true
-      ([ "${SHARE_ROOT}" = "r" ] || [ "${SHARE_ROOT}" = "w" ]) && NO_RUN=true
-    fi
-
-    if "${DOCKERIZE}" && "${EXITCODE}"
-    then
-        ${LOG[*]} "[ERR] Dockerized build is not supported \
-with exitcode set on."
-        exit 1
-    fi
-
-    if "${EXITCODE}"
+  if "${EXITCODE}"
     then
         SHARE_ROOT="r"
+        FORCE=true
         mkdir -p "${SHARE_ROOT}"
         INTERACTIVE=false
         FROM_VM=false
@@ -694,6 +682,17 @@ with exitcode set on."
         EXT_DEVICE=""
         HOT_INSTALL=false
         POSTPONE_QEMU=false
+    elif [ -n "${SHARE_ROOT}" ]
+    then
+        [ "${SHARE_ROOT}" != "dep" ] && FORCE=true
+        ([ "${SHARE_ROOT}" = "r" ] || [ "${SHARE_ROOT}" = "w" ]) && NO_RUN=true
+    fi
+
+    if "${DOCKERIZE}" && "${EXITCODE}"
+    then
+        ${LOG[*]} "[ERR] Dockerized build is not supported \
+with exitcode set on."
+        exit 1
     fi
 
     # Tests existence of GNUPlot on system
@@ -2219,10 +2218,13 @@ to ${SHARED_ROOT_DIR} boot directory."
 
         if "${EXITCODE}"
         then
-           return 0
+           cat "${SHARED_ROOT_DIR}/res.log" | ${LOG[*]}
+           unmount_vdi
+           return $?
         else
            exit 0
         fi
+
     done
 
     "[ERR] Failed to connect virtual disk ${VM}.vdi to loop device \
