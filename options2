@@ -37,7 +37,7 @@
      "disable_checksum"   "Disable checkum verification after downloads. Boolean."                                          "false" "b"
      "disconnect"         "Unmount guest virtual disk from host."                                                                 "true" "b"
      "dockerize"          "Use a pre-built Docker image to run MKG into. Incompatible with e.g. 'gui', 'hot_install', 'plot', 'test_emerge'" "false" "b"
-     "docker_image_path" "URL to ../'workflow_tag2'/mygentoo-'workflow_tag2'.tar.xz"                                          "https://github.com/fabnicol/mkg_docker_image/releases/download" "s:workflow_tag2"          
+     "docker_image_path" "URL to ../'workflow_tag2'/mygentoo-'workflow_tag2'.tar.xz"                                          "https://github.com/fabnicol/mkg_docker_image/releases/download" "s:workflow_tag2"
      "download"           "Download install ISO image from Gentoo mirror. Boolean."                                               "true" "b"
      "download_arch"      "Download and install stage3 archive to virtual disk. Booelan."                                         "true" "b"
      "download_clonezilla""Refresh CloneZilla ISO download. An ISO file must have been downloaded to create the recovery image of the Gentoo platform once the virtual machine has ended its job. Boolean" "true" "b"
@@ -56,17 +56,17 @@
      "from_vm"            "Do not generate Gentoo but use the VM. Boolean."                                                      "false" "b"
      "full_cleanup"       "Remove virtual disk, archives and ISO files on clean-up"                                              "false" "b"
      "github_release_path" "URL to Github Release of clonezilla_with_virtualbox.iso" "https://github.com/fabnicol/clonezilla_with_virtualbox" "s"
-     "github_release_path2" "URL to Github Release of preprocessed_gentoo_install.iso" "https://github.com/fabnicol/mkg/releases/download" "s"     
+     "github_release_path2" "URL to Github Release of preprocessed_gentoo_install.iso" "https://github.com/fabnicol/mkg/releases/download" "s"
      "gui"                "Binary: true corresponds to VBoxManage startvm ... --type=gui, false to --type=headless"               "true" "b"
      "help"               "This help"                                                                                                ""  ""
      "hot_install"        "Intall to Gentoo attached device (like /dev/sdb) possibly mounted (like /media/USER/567EAF). To be used with *ext_device=...*" "false" "b:ext_device"
-     "htmlpage"           "Create HTML help page"                                                                                "false" "b"     
+     "htmlpage"           "Create HTML help page"                                                                                "false" "b"
      "hwvirtex"           "Activate HWVIRTEX: on/off"                                                                               "on" "o"
      "interactive"        "Allow interaction with user. This may cause deadlock if process is detached from the console (*nohup* or other methods)" "true" "b"
      "ioapic"             "IOAPIC parameter: on or off"                                                                             "on" "o"
      "kernel_config"      "Use a custom kernel config file"                                                                    ".config" "f"
      "livecd"             "Path to the live CD that will start the VM"                                                      "gentoo.iso" "f"
-     "manpage"            "Create manpage mkg.1"                                                                                 "false" "b"       
+     "manpage"            "Create manpage mkg.1"                                                                                 "false" "b"
      "mem"                "VM RAM memory in MiB"                                                                            "8000"       "n"
      "minimal"            "Remove *libreoffice* and *data science tools* from default list of installed software. Boolean."      "false" "b"
      "minimal_size"       "Remove kernel sources to minimize packaging. Not advised for personal use but OK for deployment and distribution." "true" "b"
@@ -79,7 +79,7 @@
      "passwd"             "User password"                                                                                "_user2021_" "s"
      "pdfpage"            "Create PDF help page"                                                                                 "false" "b"
      "plot"               "Plot VDI disk size using GNUPlot"                                                                     "false" "b"
-     "plot_color"         "Plot line color between simple quotes (e.g: 'cyan','red' etc.)"                                      "'cyan'" "s" 
+     "plot_color"         "Plot line color between simple quotes (e.g: 'cyan','red' etc.)"                                      "'cyan'" "s"
      "plot_pause"         "Number of seconds of plot display per minute of processing. Maximum 50."                                  "5" "n"
      "plot_period"        "Number of minutes elapsed between two successive plots"                                                  "10" "n"
      "plot_position"      "Plot position of on monitor screen (top-left angle) in pixels e.g '0,0' or '500,500'"                 "'0,0'" "s"
@@ -94,7 +94,7 @@
      "rtcuseutc"          "Use UTC as time reference: on/off"                                                                    "on"    "o"
      "scsi_address"       "In case of several optical disc burners, specify the SCSI address as x,y,z"                             "dep" "s"
      "shared_dir"         "Host mount point for guest virtual disk filesystem"                                                    "/vdi" "s"
-     "share_root"          "Mount guest virtual disk to host folder **shared_folder**. Argument is 'w' to enable write I/O otherwise read-only mode is assumed. May raise security issues, see Wiki." "dep" "s:shared_dir"              
+     "share_root"          "Mount guest virtual disk to host folder **shared_folder**. Argument is 'w' to enable write I/O or read-mode 'r'. May raise security issues, see Wiki." "dep" "s:shared_dir"
      "size"               "Dynamic disc size"                                                                                    "55000" "n"
      "smtp_url"           "SMTP URL of email provider for end-of-job warning. Default: gmail SMTP"          "smtps://smtp.gmail.com:465" "u"
      "stage3"             "Path to stage3 archive"                                                                       "stage3.tar.xz" "f"
@@ -108,22 +108,22 @@
      "use_bsdtar"         "Use 'bsdtar' (from libarchive) to extract CloneZilla ISO files if creating an ISO installer."          "true" "b"
      "use_clonezilla_workflow" "Use Github Actions workflow to add virtualbox guest additions to CloneZilla ISO."                 "true" "b"
      "use_mkg_workflow" "Use Github Actions workflow to preprocess minimal Gentoo ISO by adding MKG scripts inside the squashfs filesystem."  "true" "b"
-     "use_qemu"           "Use qemu instead of guestfish for installing Gentoo to block device with **hot_install**"             "false" "b" 
+     "use_qemu"           "Use qemu instead of guestfish for installing Gentoo to block device with **hot_install**"             "false" "b"
      "vbox_version"       "Virtualbox version"                                                                                "6.1.20"   "s"
      "vbox_version_full"  "Virtualbox full version"                                                                           "6.1.20"  "s"
      "vbpath"             "Path to VirtualBox directory"                                                                      "/usr/bin" "d"
      "vm"                 "Virtual Machine name. Unless 'force=true' is used, a time stamp will be appended to avoid registry issues with prior VMs of the same name."  "Gentoo" "vm"
-     "vm_keymap"          "Add support for non-US English keymaps. Use values in /usr/share/keymaps, e.g. fr, de, us."             "us"  "s" 
+     "vm_keymap"          "Add support for non-US English keymaps. Use values in /usr/share/keymaps, e.g. fr, de, us."             "us"  "s"
      "vm_language"        "Add support for non-US English language as a default. Use standard abbreviations. Must be at least 5 characters: e.g. fr_FR, de_DE, fr_FR.utf8"  "en_US.utf8"         "s"
      "vmpath"             "Path to VM base directory"                                                                         "$PWD"     "d"
      "vtxvpid"            "Activate VTXVPID: on/off"                                                                          "on"       "o"
      "workflow_tag"       "Tag version (vX.Y) of the release of file clonezilla_with_virtualbox.iso by Github Actions"            "v2.0"     "s"
      "workflow_tag2"      "Tag version (vX.Y) of the release of file preprocessed_gentoo_install.iso by Github Actions (MKG site)"  "release-master"  "s"
-    
-    
-# **path1:**  https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative_testing/20210505-hirsute/clonezilla-live-20210505-hirsute-amd64.iso/download    
-# **path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           
+
+
+# **path1:**  https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative_testing/20210505-hirsute/clonezilla-live-20210505-hirsute-amd64.iso/download
+# **path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/
 # **path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox
 # **path4:**  https://github.com/fabnicol/mkg/releases/download
 # **path5**   https://github.com/fabnicol/mkg_docker_image/releases/download
-# **count:**  $((`nproc --all`/3))  
+# **count:**  $((`nproc --all`/3))

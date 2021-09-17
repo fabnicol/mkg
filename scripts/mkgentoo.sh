@@ -168,8 +168,10 @@ echo "This preprocessed ISO has build parameter presets. It builds the full \
 desktop.  "
 echo "In particular, the following command line options will be ignored:  "
 echo "\`bios, cflags, clonezilla_install, debug_mode, elist, emirrors, \`  "
-echo "\`kernel_config, minimal, minimal_size, nonroot_user, passwd,\`  "
+echo "\`kernel_config, mem, minimal, minimal_size, nonroot_user, passwd,\`  "
 echo "\`processor, rootpasswd, stage3, vm_keymap, vm_language.\`  "
+echo "You can however use \`ncpus\` with values 1 to 6 included.  "
+echo "Memory will be automatically allocated depending on \`ncpus\` value.  "
 echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
 echo "to command line. You will need to do so if you do not use OS build \
 presets.  "
@@ -661,6 +663,15 @@ ${CHECK_VBOX_VERSION}"
         fi
     fi
 
+    # use FORCE on mounting VM with qemu
+    # just to avoid time stamps
+
+    if [ -n "${SHARE_ROOT}" ]
+    then
+      [ "${SHARE_ROOT}" != "dep" ] && FORCE=true
+      ([ "${SHARE_ROOT}" = "r" ] || [ "${SHARE_ROOT}" = "w" ]) && NO_RUN=true
+    fi
+
     if "${DOCKERIZE}" && "${EXITCODE}"
     then
         ${LOG[*]} "[ERR] Dockerized build is not supported \
@@ -684,11 +695,6 @@ with exitcode set on."
         HOT_INSTALL=false
         POSTPONE_QEMU=false
     fi
-
-    # use FORCE on mounting VM with qemu
-    # just to avoid time stamps
-
-    [ -n "${SHARE_ROOT}" ] && [ "${SHARE_ROOT}" != "dep" ] && FORCE=true
 
     # Tests existence of GNUPlot on system
 
@@ -842,6 +848,7 @@ Allowing a 10 second break for second thoughts."
     then
         ${LOG[*]} "Options use_mkg_workflow and test_... are incompatible."
         ${LOG[*]} "Run again with use_mkg_workflow=false test_only test_emerge"
+        exit 1
     fi
 
     ###########################################################################
@@ -1232,7 +1239,7 @@ perl-cleaner --reallyall
 # otherwise dependencies cannot be resolved.
 
 USE='-qt5' emerge -1 cmake
-if [ $? != 0 ]
+if [ \$? != 0 ]
 then
     echo "emerge cmake failed!" | tee -a emerge.build
     return 1
@@ -1328,7 +1335,7 @@ chmod +rw \${ELIST}
 dos2unix \${ELIST}
 
 emerge --pretend -uDN --keep-going --with-bdeps=y \$(grep -v '#' "${ELIST}" | xargs)
-if [ $? != 0 ]
+if [ \$? != 0 ]
 then
     emerge --pretend -uDN --with-bdeps=y \$(grep -v '#' "${ELIST}" | xargs)
 fi

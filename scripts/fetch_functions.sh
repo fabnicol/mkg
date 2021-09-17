@@ -283,13 +283,13 @@ ${LOG[*]} <<< "$(curl -L  ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}-${NCPUS}/\
 downloaded.iso  -o preprocessed_gentoo_install.iso ${verb} 2>&1 | xargs echo '[INF]')"
 
 if_fails $? "[ERR] Could not download preprocessed Gentoo install ISO from URL \
-${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
+${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}-${NCPUS}"
 [ -f checksums.txt ] && rm -f checksums.txt
 ${LOG[*]} <<< "$(curl -L -O ${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}-${NCPUS}/\
 checksums.txt  ${verb} 2>&1 | xargs echo '[INF]')"
 
 if_fails $? "[ERR] Could not download checksums.txt from URL \
-${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}"
+${GITHUB_RELEASE_PATH2}/${WORKFLOW_TAG2}-${NCPUS}"
 
 if ! "${DISABLE_CHECKSUM}"
 then
