@@ -329,6 +329,7 @@ get_options() {
     local LOGGER0="$(which logger)"
     local ECHO="$(which echo)"
     [ -n "${LOGGER0}" ] && LOGGER_VERBOSE_OPTION="-s" || LOGGER0="${ECHO}"
+
     LOG=("${LOGGER0}" "${LOGGER_VERBOSE_OPTION}")
     export LOG
 
@@ -622,19 +623,20 @@ for ${sw}"
 
     # Post processing of arguments in list form [a,b...]
 
-   if [ "${!V::1}" = "[" ]
+   if [ "${!V::2}" = "'[" ]
    then
        local w="${!V}"
-       local V1="${w:1:(${#w}-2)}"
+       local V1="${w:2:(${#w}-4)}"
        V1=$(sed 's/,/ /g' <<< ${V1})
        eval "${V}"=\"${V1}\"
+       [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} ${V}=\"${!V}\"
    fi
 
    [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} "[MSG] Export: ${V}=\"${!V}\""
 
    # exporting is made necessary by usage in companion scripts.
 
-    export "${V}"
+   export "${V}"
 }
 
 ## @fn test_cli_post()
@@ -916,7 +918,7 @@ run_docker_container() {
                   --cpus ${NCPUS} ${DOCKER_RUN_OPTS} \
                   -dit --privileged \
                   -v /dev/cdrom:/dev/cdrom -v /dev/sr0:/dev/sr0 \
-		  -v /dev/log:/dev/log \
+                  -v /dev/log:/dev/log \
                   --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
 	          ${cli})
 
@@ -2865,7 +2867,7 @@ main() {
     for ((i=0; i<ARRAY_LENGTH; i++)); do test_cli $i; done
     test_cli_post
 
-    cd "${SCRPATH}"
+    cd "${SRCPATH}"
     source scripts/fetch_functions.sh
 
     # optional VirtualBox build
