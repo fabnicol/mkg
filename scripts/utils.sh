@@ -134,14 +134,14 @@ list_block_devices() {
     echo  "$(lsblk -a -n -o KNAME | grep -v loop | xargs)"
 }
 
-## @fn find_device_by_vendor()
-## @brief Finds the device label sdX associated to a given vendor
+## @fn find_device_by_model()
+## @brief Finds the device label sdX associated to a given model
 ## @note uses @code lsblk
 ## @ingroup auxiliaryFunctions
 
-find_device_by_vendor() {
+find_device_by_model() {
 
-    echo "$(lsblk -a -n -o KNAME,VENDOR \
+    echo "$(lsblk -a -n -o KNAME,MODEL \
 | grep -v loop | grep -i $1 | cut -f1 -d' ')"
 
 }
@@ -180,7 +180,7 @@ get_mountpoint() {
 
 ## @fn get_device()
 ## @param Either a device KNAME (sdX), or a directory mountpoint
-##        or enough letters of the VENDOR for grep to uniquely
+##        or enough letters of the MODEL for grep to uniquely
 ##        identify it in @code lsblk ouput.
 ## @brief Give device from mount folder input.
 ## @ingroup auxiliaryFunctions
@@ -197,13 +197,13 @@ get_device() {
             res=$(sed -r 's/\/dev\/([a-zA-Z]+)[0-9]+/\1/' <<< "${res}")
             echo "${res}"
         else
-            res=$(find_device_by_vendor "$1")
+            res=$(find_device_by_model "$1")
             if [ -n "${res}" ]
             then
                 if "${INTERACTIVE}"
                 then
                     read -p "[WAR] Please confirm there is no error and you \
-wish to create an installer with device /dev/${res}, vendor name $1. \
+wish to create an installer with device /dev/${res}, model name $1. \
 Reply with uppercase Y to continue: " reply
                     if [ "${reply}" = "Y" ]
                     then
