@@ -240,7 +240,7 @@ install_stage3() {
         echo 'USE="-gtk -gnome bindist qt4 qt5 kde dvd alsa cdr -bindist \
 networkmanager  -elogind -consolekit systemd mpi dbus X nls"' >>  ${m_conf}
     elif [ "${STAGE3_TAG}" = "hardened-openrc" ]
-    thens
+    then
         echo 'USE="-gtk -gnome bindist qt4 qt5 kde dvd alsa cdr -bindist \
 networkmanager  elogind -consolekit -systemd mpi dbus X nls hardened"' \
              >>  ${m_conf}
