@@ -235,11 +235,12 @@ install_stage3() {
     sed  -i 's/USE=".*"//g'    ${m_conf}
     if [ "${STAGE3_TAG}" = "systemd" ]
     then
-        echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist networkmanager \
--elogind -consolekit systemd mpi dbus X nls"' >>  ${m_conf}
-    else
-        echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist networkmanager \
-elogind -consolekit -systemd mpi dbus X nls"' >>  ${m_conf}
+        echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist \
+ networkmanager -elogind -consolekit systemd mpi dbus X nls"' >>  ${m_conf}
+    elif [ "${STAGE3_TAG}" = "hardened-openrc" ]
+    then
+        echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist \
+networkmanager elogind -consolekit -systemd mpi dbus X nls hardened"' >>  ${m_conf}
     fi
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
