@@ -120,7 +120,6 @@ adjust_environment() {
     then
         profile=$(eselect --color=no --brief profile list \
                       | grep hardened \
-                      | grep hardened-openrc \
                       | grep ${PROCESSOR} \
                       | head -n 1)
     fi # Other values have been ruled out on launch.
