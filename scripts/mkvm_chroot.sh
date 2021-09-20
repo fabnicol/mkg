@@ -115,11 +115,10 @@ adjust_environment() {
                       | head -n 1)
         emerge -q --deselect sys-apps/openrc
         emerge -q --deselect sys-apps/sysvinit
-    elif [ "${STAGE3_TAG}" = "hardened" ]
+    elif [ "${STAGE3_TAG}" = "hardened-openrc" ]
     then
         profile=$(eselect --color=no --brief profile list \
                       | grep hardened \
-                      | grep gnome \
                       | grep ${PROCESSOR} \
                       | head -n 1)
     fi # Other values have been ruled out on launch.
