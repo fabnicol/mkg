@@ -352,19 +352,28 @@ get_options() {
                 then
                     ${LOG[*]} "[CLI] Assign: ${VAR}=${!VAR}"
                 fi
+            else
+                if ! grep -q "\.iso$"  <<< "$1"
+                then
+                  ${LOG[*]} "[ERR] Option $1 is not valid"
+                  exit 5
+                fi
             fi
         else
-            if  grep -q "\.iso"  <<< "$1"
+            if  grep -q "\.iso$"  <<< "$1"
             then
                 ISO_OUTPUT="$1"
                   CREATE_ISO=true
             else
-                 if validate_option "$1"
+                if validate_option "$1"
                 then
                     declare -u VAR="$1"
                     eval "${VAR}"=true
                     [ "${VERBOSE}" = "true" ] \
                         && ${LOG[*]} "[CLI] Assign: ${VAR}=true"
+                else
+                    ${LOG[*]} "[ERR] Option $1 is not valid"
+                    exit 5
                 fi
             fi
         fi
