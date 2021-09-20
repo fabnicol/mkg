@@ -240,7 +240,12 @@ install_stage3() {
     elif [ "${STAGE3_TAG}" = "hardened-openrc" ]
     then
         echo 'USE="gtk gtk2 gtk3 gnome -qt4 -qt5 -kde dvd alsa cdr bindist \
-networkmanager elogind -consolekit -systemd mpi dbus X nls hardened"' >>  ${m_conf}
+networkmanager elogind -consolekit -systemd mpi dbus X nls hardened"' \
+              >>  ${m_conf}
+    else
+        echo 'USE="gtk gtk2 gtk3 gnome bindist -qt4 -qt5 -kde dvd alsa cdr \
+bindist networkmanager elogind -consolekit -systemd mpi dbus X nls"' \
+              >>  ${m_conf}
     fi
     echo "GENTOO_MIRRORS=\"${EMIRRORS}\""  >> ${m_conf}
 
