@@ -56,45 +56,7 @@ adjust_environment() {
     echo "/dev/cdrom /mnt/cdrom  auto noauto,user,discard 0 0"   \
          >> /etc/fstab
 
-    source /etc/profile
-
-    # Refresh and rebuild @world frequently emerge complains about
-    # having to be upgraded before anything else.  We shall use
-    # emerge-webrsync as emerge --sync is a bit less robust (rsync
-    # rotation bans...)
-
-    if ! emerge-webrsync
-    then
-        echo "[ERR] emerge-webrsync failed!" | tee emerge.build
-        return 1
-    fi
-
-    perl-cleaner --reallyall
-
-    # One needs to build cmake without the qt5 USE value first,
-    # otherwise dependencies cannot be resolved.
-
-    USE='-qt5' emerge -1 cmake
-    if [ $? != 0 ]
-    then
-        echo "emerge cmake failed!" | tee -a emerge.build
-        return 1
-    fi
-
-    # There is an intractable circular dependency that
-    # can be broken by pre-emerging python
-
-    USE="-sqlite -bluetooth" emerge -1 dev-lang/python \
-        | tee -a emerge.build
-    if [ $? != 0 ]
-    then
-        echo "emerge python failed!" | tee -a emerge.build
-        return 1
-    fi
-
-    emerge -1 -u sys-apps/portage
-
-    # select profile (most recent plasma desktop)
+        # select profile (most recent plasma desktop)
 
     local profile
     if [ "${STAGE3_TAG}" = "openrc" ]
@@ -140,6 +102,67 @@ adjust_environment() {
        /etc/portage/package.accept_keywords/ \
         |  tee emerge.build
 
+    source /etc/profile
+
+    # Refresh and rebuild @world frequently emerge complains about
+    # having to be upgraded before anything else.  We shall use
+    # emerge-webrsync as emerge --sync is a bit less robust (rsync
+    # rotation bans...)
+
+    if ! emerge-webrsync
+    then
+        echo "[ERR] emerge-webrsync failed!" | tee emerge.build
+        return 1
+    fi
+
+    perl-cleaner --reallyall
+
+    # emerging gcc and glibc is mainly for CFLAGS changes and
+    # otherwise for hardened profiles
+
+    if  ! emerge -1 sys-devel/gcc
+    then
+        echo "[ERR] emerge gcc failed!" | tee -a emerge.build
+        return 1
+    fi
+
+    if ! emerge -1 sys-libs/glibc
+    then
+        echo "[ERR] emerge glibc failed!" | tee -a emerge.build
+        return 1
+    fi
+
+    if ! emerge -1 binutils virtual/libc
+    then
+        echo "[ERR] emerge binutils/libc failed!" | tee -a emerge.build
+        return 1
+    fi
+
+    source /etc/profile
+
+    # One needs to build cmake without the qt5 USE value first,
+    # otherwise dependencies cannot be resolved.
+
+    USE='-qt5' emerge -1 cmake
+    if [ $? != 0 ]
+    then
+        echo "emerge cmake failed!" | tee -a emerge.build
+        return 1
+    fi
+
+    # There is an intractable circular dependency that
+    # can be broken by pre-emerging python
+
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python \
+        | tee -a emerge.build
+    if [ $? != 0 ]
+    then
+        echo "emerge python failed!" | tee -a emerge.build
+        return 1
+    fi
+
+    emerge -1 -u sys-apps/portage
+
     # solving circular dep.
 
     USE=-harfbuzz emerge -1 media-libs/freetype
@@ -152,7 +175,6 @@ adjust_environment() {
         emerge -uD app-admin/sysklogd
         emerge -u sys-apps/pcmciautils net-misc/netifrc
         rc-update add sysklogd default
-        rc-service sysklogd start
     fi
 
     # other core sysapps to be merged first. LZ4 is a kernel
@@ -169,19 +191,6 @@ adjust_environment() {
     # Now on to updating @world set. Be patient and wait for about
     # 15-24 hours
     # as syslogd is not yet there we tee a custom build log
-    # emerging gcc and glibc is mainly for CFLAGS changes.
-
-    if  ! emerge sys-devel/gcc
-    then
-        echo "[ERR] emerge gcc failed!" | tee -a emerge.build
-        return 1
-    fi
-
-    if ! emerge sys-libs/glibc
-    then
-        echo "[ERR] emerge glibc failed!" | tee -a emerge.build
-        return 1
-    fi
 
     ## ---- PATCH ----
     #
@@ -298,8 +307,8 @@ adjust_environment() {
 
 ## @fn build_kernel()
 ## @details
-## @li Emerge \b gentoo-sources, \b genkernel, \b pciutils and
-##     \b linux-firmware
+## @li Emerge \b [gentoo|hardened]-sources, \b genkernel,
+##     \b pciutils and \b linux-firmware
 ## @li Mount /dev/sda2 to /boot/
 ## @li Build kernel and initramfs. Log into kernel.log.
 ## @retval  -1 on error.
@@ -311,8 +320,14 @@ build_kernel() {
 
     # Building the kernel
 
-    emerge gentoo-sources sys-kernel/genkernel pciutils \
-        | tee kernel.log
+    if [ "${STAGE3_TAG}" = "hardened-openrc" ]
+    then
+      emerge hardened-sources | tee kernel.log
+    else
+      emerge gentoo-sources   | tee kernel.log
+    fi
+
+    emerge sys-kernel/genkernel pciutils | tee kernel.log
 
     eselect kernel set 1
 
@@ -568,7 +583,12 @@ finalize() {
 
     if "${MINIMAL_SIZE}"
     then
-        emerge --unmerge gentoo-sources  2>&1 | tee -a log_uninstall.log
+        if [ "${STAGE3_TAG}" = "hardened-openrc" ]
+        then
+            emerge --unmerge hardened-sources  2>&1 | tee -a log_uninstall.log
+        else
+            emerge --unmerge gentoo-sources  2>&1 | tee -a log_uninstall.log
+        fi
         rm -rf /usr/src/linux/*               | tee -a log_uninstall.log
         rm -rf /var/cache/distfiles/*
     else
