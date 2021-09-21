@@ -41,6 +41,7 @@ sys-apps/util-linux caps
 sys-apps/dbus user-session
 sys-auth/polkit  introspection nls pam
 >=sys-cluster/openmpi-2.0.4 threads cxx
+sys-devel/gcc fortran
 >=sys-libs/zlib-1.2.11-r2 minizip
 >=virtual/mpi-2.0-r4 threads cxx
 >=virtual/libusb-1-r2 udev
