@@ -307,7 +307,7 @@ adjust_environment() {
 
 ## @fn build_kernel()
 ## @details
-## @li Emerge \b [gentoo|hardened]-sources, \b genkernel,
+## @li Emerge \b gentoo-sources, \b genkernel,
 ##     \b pciutils and \b linux-firmware
 ## @li Mount /dev/sda2 to /boot/
 ## @li Build kernel and initramfs. Log into kernel.log.
@@ -320,12 +320,7 @@ build_kernel() {
 
     # Building the kernel
 
-    if [ "${STAGE3_TAG}" = "hardened-openrc" ]
-    then
-      emerge hardened-sources | tee kernel.log
-    else
-      emerge gentoo-sources   | tee kernel.log
-    fi
+    emerge gentoo-sources   | tee kernel.log
 
     emerge sys-kernel/genkernel pciutils | tee kernel.log
 
@@ -583,12 +578,7 @@ finalize() {
 
     if "${MINIMAL_SIZE}"
     then
-        if [ "${STAGE3_TAG}" = "hardened-openrc" ]
-        then
-            emerge --unmerge hardened-sources  2>&1 | tee -a log_uninstall.log
-        else
-            emerge --unmerge gentoo-sources  2>&1 | tee -a log_uninstall.log
-        fi
+        emerge --unmerge gentoo-sources  2>&1 | tee -a log_uninstall.log
         rm -rf /usr/src/linux/*               | tee -a log_uninstall.log
         rm -rf /var/cache/distfiles/*
     else
