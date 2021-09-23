@@ -207,6 +207,14 @@ adjust_environment() {
 
     emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
 
+    # Second try
+
+    if [ $? != 0 ]
+    then
+        echo "[ERR] emerge @world failed! Retrying..."  | tee -a emerge.build
+        emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
+    fi
+
     if [ $? != 0 ]
     then
         echo "[ERR] emerge @world failed!"  | tee -a emerge.build
