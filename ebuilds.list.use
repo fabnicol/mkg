@@ -38,6 +38,7 @@ media-libs/clutter gtk
 >=media-video/vlc-3.0.11.1 vorbis ogg
 >=net-fs/samba-4.13.9-r2 client
 sys-apps/util-linux caps
+sys-apps/dbus user-session
 sys-auth/polkit  introspection nls pam
 >=sys-cluster/openmpi-2.0.4 threads cxx
 sys-devel/gcc fortran
