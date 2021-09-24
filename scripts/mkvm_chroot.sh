@@ -96,11 +96,11 @@ adjust_environment() {
         | tee emerge.build
 
     cp -vf "${ELIST}.use" /etc/portage/package.use/ \
-        |  tee emerge.build
+        |  tee -a emerge.build
 
     cp -vf "${ELIST}.accept_keywords" \
        /etc/portage/package.accept_keywords/ \
-        |  tee emerge.build
+        |  tee -a emerge.build
 
     source /etc/profile
 
@@ -111,11 +111,12 @@ adjust_environment() {
 
     if ! emerge-webrsync
     then
-        echo "[ERR] emerge-webrsync failed!" | tee emerge.build
+        echo "[ERR] emerge-webrsync failed!" | tee -a emerge.build
         return 1
     fi
 
-    perl-cleaner --reallyall
+    perl-cleaner --reallyall | tee -a emerge.build
+
 
     # emerging gcc and glibc is mainly for CFLAGS changes and
     # otherwise for hardened profiles
@@ -330,7 +331,7 @@ build_kernel() {
 
     emerge gentoo-sources   | tee kernel.log
 
-    emerge sys-kernel/genkernel pciutils | tee kernel.log
+    emerge sys-kernel/genkernel pciutils | tee -a kernel.log
 
     eselect kernel set 1
 
@@ -416,7 +417,7 @@ install_software() {
         | tee -a log_install_software.log
     local res_install=$?
 
-    emerge -u gdm
+    emerge -u gdm | tee -a log_install_software.log
 
     if [ "${res_install}" != "0" ]
     then
