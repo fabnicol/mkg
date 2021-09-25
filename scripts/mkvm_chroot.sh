@@ -385,10 +385,18 @@ install_software() {
         res_install=$?
     fi
 
-    if [ $? != 0 ]
+    if [ "${res_install}" != "0" ]
     then
 	# one more chance, who knows
-	emerge --resume | tee -a log_install_software.log
+        emerge --resume | tee -a log_install_software.log
+        res_install=$?
+    fi
+
+    if [ "${res_install}" != "0" ]
+    then
+        echo "[ERR] Main package build step failed" \
+             | tee -a log_install_software.log
+        return 1
     fi
 
     # do not assume true/false unlike in mkgentoo.sh
@@ -411,13 +419,6 @@ install_software() {
 
     env-update
     source /etc/profile
-
-    if [ "${res_install}" != "0" ]
-    then
-        echo "[ERR] Main package build step failed" \
-             | tee -a log_install_software.log
-        return 1
-    fi
 }
 
 ## @fn global_config()
@@ -594,6 +595,9 @@ finalize() {
 
 # Normally a non-op
 source .bashrc
+
+# without pipefail, piping to tee would mask failures
+set -o pipefail
 
 declare -i res=0
 adjust_environment
