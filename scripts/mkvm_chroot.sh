@@ -426,9 +426,13 @@ install_software() {
 
     if [ "${res_install}" != "0" ]
     then
-	# one more chance, who knows
+    	# one more chance, who knows
 	    emerge --resume | tee -a log_install_software.log
-    else
+        res_install=$?
+    fi
+
+    if [ "${res_install}" != "0" ]
+    then
         echo "[ERR] Main package build step failed" \
              | tee -a log_install_software.log
         return 1
