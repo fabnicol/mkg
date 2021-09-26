@@ -142,8 +142,8 @@ echo "current directory or in vmpath if specified.  "
 echo "  "
 echo "Arguments with white space (like \`cflags=\"-O2 -march=...\"\`) \
 should be  "
-echo "written in list form with commas and no spaces: \
-\`cflags=[-O2,-march=...]\`  "
+echo "written in list form with commas and no spaces, enclosed within single  "
+echo "quotes: \`cflags=\'[-O2,-march=...]\'\`  "
 echo "The same holds for paths with white space.  "
 echo "  "
 echo "As of March, 2021, part of the build is performed  "
@@ -170,7 +170,7 @@ desktop.  "
 echo "In particular, the following command line options will be ignored:  "
 echo "\`bios, cflags, clonezilla_install, debug_mode, elist, emirrors, \`  "
 echo "\`kernel_config, mem, minimal, minimal_size, nonroot_user, passwd,\`  "
-echo "\`processor, rootpasswd, stage3, vm_keymap, vm_language.\`  "
+echo "\`processor, rootpasswd, stage3_tag, vm_keymap, vm_language.\`  "
 echo "You can however use \`ncpus\` with values 1 to 6 included.  "
 echo "Memory will be automatically allocated depending on \`ncpus\` value.  "
 echo "To disable this behavior you can add \`use_mkg_workflow=false\`  "
@@ -241,14 +241,13 @@ for ((i=0; i<ARRAY_LENGTH; i++)); do
 done
 echo "  "
 echo "  "
-echo "**path1:**  https://sourceforge.net/projects/clonezilla/files/\
-clonezilla_live_alternative/20200703-focal/\
-clonezilla-live-20200703-focal-amd64.iso/download  "
-echo "**path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/           "
+echo "**path1** https://sourceforge.net/projects/clonezilla/files/clonezilla_live_alternative_testing/20210505-hirsute/clonezilla-live-20210505-hirsute-amd64.iso/download  "
+echo "**path2:**  http://gentoo.mirrors.ovh.net/gentoo-distfiles/  "
 echo "**path3:**  https://github.com/fabnicol/clonezilla_with_virtualbox  "
 echo "**path4:**  https://github.com/fabnicol/mkg/releases/download  "
 echo "**count:** nproc --all / 3  "
 }
+
 
 ## @fn help_()
 ## @brief Print usage to stdout
