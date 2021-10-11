@@ -70,7 +70,7 @@
      "minimal"            "Remove *libreoffice* and *data science tools* from default list of installed software. Boolean."      "false" "b"
      "minimal_size"       "Remove kernel sources to minimize packaging. Not advised for personal use but OK for deployment and distribution." "true" "b"
      "mirror"             "Mirror site for downloading of stage3 tarball"              "http://gentoo.mirrors.ovh.net/gentoo-distfiles/" "u"
-     "ncpus"              "Number of VM CPUs. By default the third of available threads."                                        "$((`nproc --all`/3))" "n"
+     "ncpus"              "Number of VM CPUs. By default the third of available threads. You should not configure virtual machines to use more CPU cores than are available physically. This includes real cores, with no hyperthreads."  "$((`nproc --all`/3))" "n"
      "no_run"             "Thwart VM generation, only perform other operations (if valid)."   "false"  "b"
      "nonroot_user"       "Non-root user"                                                                                          "fab" "s"
      "pae"                "Activate PAE: on/off"                                                                                   "on"  "o"
