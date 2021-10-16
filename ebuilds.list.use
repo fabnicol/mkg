@@ -5,6 +5,7 @@ app-editors/emacs gtk
 >=app-i18n/ibus-1.5.22 gtk
 >=app-text/ghostscript-gpl-9.52-r1 cups
 >=app-text/poppler-21.07.0 cairo nss
+app-text/texlive-core xetex
 app-text/xmlto text
 >=dev-libs/folks-0.14.0 eds
 dev-libs/gjs -sysprof
