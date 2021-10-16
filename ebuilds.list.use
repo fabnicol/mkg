@@ -4,7 +4,8 @@ app-arch/p7zip -kde -wxwidgets
 app-editors/emacs gtk
 >=app-i18n/ibus-1.5.22 gtk
 >=app-text/ghostscript-gpl-9.52-r1 cups
->=app-text/poppler-21.07.0 cairo
+>=app-text/poppler-21.07.0 cairo nss
+app-text/texlive-core xetex
 app-text/xmlto text
 >=dev-libs/folks-0.14.0 eds
 dev-libs/gjs -sysprof
@@ -20,6 +21,9 @@ dev-libs/gjs -sysprof
 >=dev-lang/python-2.7.18-r1:2.7 sqlite
 >=dev-qt/qtcore-5.15.2-r3 icu
 >=dev-qt/qtgui-5.15.2-r2 jpeg egl
+>=dev-qt/qtprintsupport-5.15.2-r1 cups
+>=dev-qt/qtwebengine-5.15.2_p20210824-r1 widgets
+>=dev-qt/qtwebchannel-5.15.2-r1 qml
 >=gnome-base/gvfs-1.48.1-r1 udisks cdda
 >=gnome-extra/evolution-data-server-3.36.5 gtk vala
 kde-frameworks/kitemmodels qml
