@@ -419,6 +419,7 @@ install_software() {
 
     env-update
     source /etc/profile
+    return ${res_install}
 }
 
 ## @fn global_config()
