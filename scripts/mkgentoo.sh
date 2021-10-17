@@ -2446,20 +2446,20 @@ creation directory"
     then
         local isofile="$1"
         declare -i iso_disk_size=$(du -k "${isofile}" | cut -f1)
-        declare -i nb_2GB_chunks=iso_disk_size/2000000
-        declare -i remainder=iso_disk_size%2000000
-        [ ${remainder} != 0 ] && nb_2GB_chunks=nb_2GB_chunks+1
-        local prefix="${isofile:1:(${#isofile}-4)}"
-        if split --numeric-suffixes=1 --suffix-length=1 -n ${nb_2GB_chunks} \
+        declare -i nb_2GiB_chunks=iso_disk_size/2147483648
+        declare -i remainder=iso_disk_size%2147483648
+        [ ${remainder} != 0 ] && nb_2GiB_chunks=nb_2GB_chunks+1
+        local prefix="${isofile:0:(${#isofile}-5)}"
+        if split --numeric-suffixes=1 --suffix-length=1 -n ${nb_2GiB_chunks} \
               "$1" ${prefix}
         then
-            ${LOG[*]} "[MSG] ISO file ${isofile} was cut into ${nb_2GB_chunks} parts."
+            ${LOG[*]} "[MSG] ISO file ${isofile} was cut into ${nb_2GiB_chunks} parts."
         else
             ${LOG[*]} "[MSG] ISO file ${isofile} could not be cut \
-      into ${nb_GB_chunks} parts."
+      into ${nb_GiB_chunks} parts."
         fi
         declare -i i
-        for ((i=1; i<=nb_2GB_chunks; i++))
+        for ((i=1; i<=nb_2GiB_chunks; i++))
         do
             mv ${prefix}${i} ${prefix}_${i}.iso
         done
