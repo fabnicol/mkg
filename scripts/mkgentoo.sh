@@ -2449,7 +2449,7 @@ creation directory"
         declare -i nb_2GiB_chunks=iso_disk_size/2147483648
         declare -i remainder=iso_disk_size%2147483648
         [ ${remainder} != 0 ] && nb_2GiB_chunks=nb_2GiB_chunks+1
-        local prefix="${isofile:0:(${#isofile}-5)}"
+        local prefix="${isofile:0:(${#isofile}-4)}"
         if split --numeric-suffixes=1 --suffix-length=1 -n ${nb_2GiB_chunks} \
               "$1" ${prefix}
         then
