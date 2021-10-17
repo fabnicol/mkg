@@ -635,12 +635,12 @@ for ${sw}"
     # Post processing of arguments in list form [a,b...]
 
    if [ "${!V::2}" = "'[" ]
-    then
+   then
        local w="${!V}"
        local V1="${w:2:(${#w}-4)}"
-        V1=$(sed 's/,/ /g' <<< ${V1})
-        eval "${V}"=\"${V1}\"
-    fi
+       V1=$(sed 's/,/ /g' <<< ${V1})
+       eval "${V}"=\"${V1}\"
+   fi
 
    [ "${DEBUG_MODE}" = "true" ] && ${LOG[*]} "[MSG] Export: ${V}=\"${!V}\""
 
@@ -2441,6 +2441,29 @@ clonezilla_to_iso() {
 
     if_fails $? "[ERR] Could not create ISO image from ISO package \
 creation directory"
+
+    if "${CUT_ISO}"
+    then
+        local isofile="$1"
+        declare -i iso_disk_size=$(du -k "${isofile}" | cut -f1)
+        declare -i nb_2GB_chunks=iso_disk_size/2000000
+        declare -i remainder=iso_disk_size%2000000
+        [ ${remainder} != 0 ] && nb_2GB_chunks=nb_2GB_chunks+1
+        local prefix="${isofile:1:(${#isofile}-4})"
+        if split --numeric-suffixes=1 --suffix-length=1 -n ${nb_2GB_chunks} \
+              "$1" ${prefix}
+        then
+            ${LOG[*]} "[MSG] ISO file ${isofile} was cut into ${nb_2GB_chunks} parts."
+        else
+            ${LOG[*]} "[MSG] ISO file ${isofile} could not be cut \
+      into ${nb_GB_chunks} parts."
+        fi
+        declare -i i
+        for ((i=1; i<=nb_2GB_chunks; i++))
+        do
+            mv ${prefix}${i} ${prefix}_${i}.iso
+        done
+    fi
     return 0
 }
 

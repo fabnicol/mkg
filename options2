@@ -33,6 +33,7 @@
      "CRAN_REPOS"	  "CRAN repository URL for downloading extra R packages"                           "https://cloud.r-project.org" "s"
      "create_squashfs"    "(Re)create the squashfs filesystem. Boolean."                                                          "true" "b"
      "custom_clonezilla"  "Use this previously created custom CloneZilla ISO with added VirtualBox and guest additions."          "dep"  "s"
+     "cut_iso"            "Cut ISO files created for Gentoo installers into 2GB chunks" "false" "b"
      "device_installer"   "Create Gentoo clone installer on external device. **ext_device** value must be specified." "false" "b:ext_device"
      "disable_checksum"   "Disable checkum verification after downloads. Boolean."                                          "false" "b"
      "disconnect"         "Unmount guest virtual disk from host."                                                                 "true" "b"

@@ -464,6 +464,7 @@ global_config() {
         systemctl enable sddm.service
     else
         # SDDM language config now is no longer under /etc/sddm.conf
+        mkdir /etc/sddm.conf.d/
         echo '[X11]' >> /etc/sddm.conf.d/sddm.conf
         echo 'DisplayCommand=/etc/sddm/scripts/Xsetup' >> /etc/sddm.conf.d/sddm.conf
         rc-update add cronie default
