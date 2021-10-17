@@ -2352,6 +2352,29 @@ clonezilla_to_iso() {
 
     if_fails $? "[ERR] Could not create ISO image from ISO package \
 creation directory"
+
+    if "${CUT_ISO}"
+    then
+        local isofile="$1"
+        declare -i iso_disk_size=$(du -b "${isofile}" | cut -f1)
+        declare -i nb_2GiB_chunks=iso_disk_size/2147483648
+        declare -i remainder=iso_disk_size%2147483648
+        [ ${remainder} != 0 ] && nb_2GiB_chunks=nb_2GiB_chunks+1
+        local prefix="${isofile:0:(${#isofile}-4)}"
+        if split --numeric-suffixes=1 --suffix-length=1 -n ${nb_2GiB_chunks} \
+              "$1" ${prefix}
+        then
+            ${LOG[*]} "[MSG] ISO file ${isofile} was cut into ${nb_2GiB_chunks} parts."
+        else
+            ${LOG[*]} "[MSG] ISO file ${isofile} could not be cut \
+      into ${nb_GiB_chunks} parts."
+        fi
+        declare -i i
+        for ((i=1; i<=nb_2GiB_chunks; i++))
+        do
+            mv ${prefix}${i} ${prefix}_${i}.iso
+        done
+    fi
     return 0
 }
 
