@@ -310,7 +310,7 @@ build_kernel() {
 
     # kernel config issue here
 
-    make syncconfig  # replaces silentoldconfig as of 4.19
+    make olddefconfig  # uses defaults for new config params.
     make -s -j${NCPUS}   2>&1 | tee -a  kernel.log
     make modules_install 2>&1 | tee -a  kernel.log
     make install         2>&1 | tee -a  kernel.log
