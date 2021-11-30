@@ -2864,7 +2864,7 @@ main() {
 
     check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" \
                "xorriso" "curl" "grep" "lsblk" "awk" \
-               "mkisofs" "rsync" "xz" "dos2unix"
+               "mkisofs" "rsync" "xz" "dos2unix" "b2sum" "sha512sum"
 
     if ! which uuid >/dev/null 2>&1 \
            && ! which uuidgen >/dev/null 2>&1
@@ -2998,10 +2998,19 @@ clonezilla image..."
        burn_iso
     fi
 
+    if "${SUMS}"
+    then
+        b2sum     "${ISO_OUTPUT}"  > "SUMS_${ISO_OUTPUT}"
+        sha512sum "${ISO_OUTPUT}" >> "SUMS_${ISO_OUTPUT}"
+    fi
+
     # optional ISO splitting
     
     if "${CUT_ISO}"
     then
+        b2sum     "${ISO_OUTPUT}"  > "SUMS_${ISO_OUTPUT}"
+        sha512sum "${ISO_OUTPUT}" >> "SUMS_${ISO_OUTPUT}"
+
         declare -i iso_disk_size=$(du -b "${ISO_OUTPUT}" | cut -f1)
         declare -i nb_2GiB_chunks=iso_disk_size/2147483648
         declare -i remainder=iso_disk_size%2147483648
@@ -3013,7 +3022,7 @@ clonezilla image..."
             ${LOG[*]} "[MSG] ISO file ${ISO_OUTPUT} was cut into ${nb_2GiB_chunks} parts."
         else
             ${LOG[*]} "[MSG] ISO file ${ISO_OUTPUT} could not be cut \
-      into ${nb_GiB_chunks} parts."
+            into ${nb_GiB_chunks} parts."
         fi
         declare -i i
         for ((i=1; i<=nb_2GiB_chunks; i++))
