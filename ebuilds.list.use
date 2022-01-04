@@ -28,6 +28,7 @@ dev-libs/gjs -sysprof
 >=gnome-extra/evolution-data-server-3.36.5 gtk vala
 kde-frameworks/kitemmodels qml
 kde-frameworks/prison qml
+>=kde-frameworks/sonnet-5.88.0 qml
 media-libs/clutter-gtk gtk
 media-libs/clutter gtk
 >=media-libs/gegl-0.4.26-r1 raw cairo
