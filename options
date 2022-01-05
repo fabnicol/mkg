@@ -35,7 +35,7 @@
      "custom_clonezilla"   "Use this previously created custom CloneZilla ISO with added VirtualBox and guest additions."       "dep"    "s"
      "cut_iso"            "Cut ISO files created for Gentoo installers into 2GB chunks and calls *sums*" "false" "b"
      "device_installer"   "Create Gentoo clone installer on external device.  **ext_device** value must be specified."             ""    ""
-     "disable_checksum"  "Disable checkum verification after downloads. Boolean."                                           "false" "b"
+     "disable_checksum"  "Disable checksum verification after downloads. Boolean."                                           "false" "b"
      "disconnect"         "Unmount guest virtual disk from host."                             "true" "b"
      "dockerize"          "Use a pre-built Docker image to run MKG into. Incompatible with e.g. 'gui', 'hot_install', 'plot', 'test_emerge'"    "false" "b"
      "docker_image_path" "URL to ../'workflow_tag2'/mygentoo-'workflow_tag2'.tar.xz"                                          "path5" "s:workflow_tag2"          
