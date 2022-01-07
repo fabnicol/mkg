@@ -3072,17 +3072,13 @@ clonezilla image..."
 
     if "${SUMS}"
     then
-        b2sum     "${ISO_OUTPUT}"  > "SUMS_${ISO_OUTPUT}"
-        sha512sum "${ISO_OUTPUT}" >> "SUMS_${ISO_OUTPUT}"
+        sums
     fi
 
     # optional ISO splitting
     
     if "${CUT_ISO}"
     then
-        b2sum     "${ISO_OUTPUT}"  > "SUMS_${ISO_OUTPUT}"
-        sha512sum "${ISO_OUTPUT}" >> "SUMS_${ISO_OUTPUT}"
-
         declare -i iso_disk_size=$(du -b "${ISO_OUTPUT}" | cut -f1)
         declare -i nb_2GiB_chunks=iso_disk_size/2147483648
         declare -i remainder=iso_disk_size%2147483648
