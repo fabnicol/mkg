@@ -2850,7 +2850,7 @@ build presets [Y]:" rep
         make_boot_from_livecd
     fi
 
-    checksums
+    checksums_cd
     "${TEST_ONLY}" && exit 0
 
     ${LOG[*]} "[INF] Creating VM"
@@ -3072,7 +3072,7 @@ clonezilla image..."
 
     if "${SUMS}"
     then
-        sums
+        checksums_iso
     fi
 
     # optional ISO splitting
