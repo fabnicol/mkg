@@ -2850,7 +2850,7 @@ build presets [Y]:" rep
         make_boot_from_livecd
     fi
 
-    checksums_cd
+    checksums_livecd
     "${TEST_ONLY}" && exit 0
 
     ${LOG[*]} "[INF] Creating VM"
