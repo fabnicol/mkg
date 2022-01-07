@@ -553,7 +553,7 @@ unbind_filesystem() {
     fi
 }
 
-checksums() {
+checksums_livecd() {
 
     if [ -f "${VMPATH}/${LIVECD}" ]
     then
@@ -565,6 +565,11 @@ checksums() {
     else
         echo "[ERR] Workflow failed to create file ${VMPATH}/${LIVECD}."
     fi
+}
+
+checksums_iso() {
+    echo "b2sum:" $(b2sum     "${ISO_OUTPUT}")  > "SUMS_${ISO_OUTPUT}"
+    echo "sha512sum" $(sha512sum "${ISO_OUTPUT}") >> "SUMS_${ISO_OUTPUT}"
 }
 
 need_root() {
