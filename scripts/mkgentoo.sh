@@ -914,6 +914,8 @@ this regular expression: [a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*"
     if_fails $? "[ERR] stage3_tag must be: openrc [default], hardened or \
 systemd."
 
+    "${CUT_ISO}" && SUMS=true
+
 }
 
 check_docker_container_vbox_version() {
