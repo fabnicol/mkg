@@ -898,6 +898,12 @@ this regular expression: [a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*"
     if_fails $? "[ERR] stage3_tag must be: openrc [default], hardened or \
 systemd."
 
+    "${CUT_ISO}" && SUMS=true
+    # Is STDOUT associated with a terminal?
+    # This deals with nohup and redirection cases in relation to whether
+    # we can ask user about deciding on options.
+
+    [ -t 1] && INTERACTIVE=true || INTERACTIVE=false
 }
 
 ## @fn run_docker_container()
