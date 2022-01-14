@@ -706,38 +706,6 @@ with exitcode set on."
 
     unset PLOT
 
-    # ruling out incompatible options
-
-    # You should always reply to security requests unless you want the process
-    # in the background or not associated with a console.
-
-    # Is STDOUT associated with a terminal?
-    # This deals with nohup and redirection cases in relation to whether
-    # we can ask user about deciding on options.
-
-    [ -t 1] && INTERACTIVE=true || INTERACTIVE=false
-
-
-    if "${GUI}"
-    then
-        if ! "${INTERACTIVE}"
-        then
-            ${LOG[*]} "[WAR] Unless you want the process to run \
-in the background, user interaction is allowed by default. \
-Resetting *interactive* to *true*."
-            INTERACTIVE=true
-        fi
-    else
-        # forcing INTERACTIVE as false only for background jobs.
-
-        case $(ps -o stat= -p $$) in
-            *+*) echo "[MSG] Running in foreground with interactive=${INTERACTIVE}."               ;;
-            *) echo "[MSG] Running in background in non-interactive mode."
-               INTERACTIVE=false
-               ;;
-        esac
-    fi
-
     "${DOWNLOAD}" && ! "${CREATE_SQUASHFS}" \
         && { ${LOG[*]} "[ERR][CLI] You cannot set \
 create_squashfs=false with download=true"
@@ -782,6 +750,42 @@ from_device or from_vm may be specified on commandline."
         && { ${LOG[*]} "[ERR] Virtual machine \
 disk ${VMPATH}/${VM}.vdi was not found"
              exit 1; }
+
+    # ruling out incompatible options
+
+    # You should always reply to security requests unless you want the process
+    # in the background or not associated with a console.
+
+    # Is STDOUT associated with a terminal?
+    # This deals with nohup and redirection cases in relation to whether
+    # we can ask user about deciding on options.
+
+    if "${GUI}"
+    then
+        if "${INTERACTIVE}"
+        then
+           ! [ -t 1 ] && INTERACTIVE=false
+        elif [ -t 1 ]
+        then
+            ${LOG[*]} "[WAR] Unless you want the process to run \
+in the background or without a console, user interaction is allowed by default.\
+Resetting *interactive* to *true*."
+            INTERACTIVE=true
+        fi
+    else
+        # forcing INTERACTIVE as false only for background jobs.
+
+        case $(ps -o stat= -p $$) in
+            *+*) echo "[MSG] Running in foreground with interactive=${INTERACTIVE}."
+               ;;
+            *) echo "[MSG] Running in background in non-interactive mode."
+               INTERACTIVE=false
+               ;;
+        esac
+
+        # or when not attached to console (nohup, redirection)
+        ! [ -t 1 ] && INTERACTIVE=false
+    fi
 
     if [ -n "${EMAIL}" ] && [ -z "${EMAIL_PASSWD}" ]
     then
