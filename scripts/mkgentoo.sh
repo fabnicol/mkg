@@ -916,6 +916,12 @@ systemd."
 
     "${CUT_ISO}" && SUMS=true
 
+    # Is STDOUT associated with a terminal?
+    # This deals with nohup and redirection cases in relation to wether
+    # we can ask user about deciding on options
+
+    [ -t 1] && INTERACTIVE=true || INTERACTIVE=false
+
 }
 
 check_docker_container_vbox_version() {
