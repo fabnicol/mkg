@@ -708,9 +708,15 @@ with exitcode set on."
 
     # ruling out incompatible options
 
-    # GUI and INTERACTIVE are linked options.
     # You should always reply to security requests unless you want the process
-    # in the background
+    # in the background or not associated with a console.
+
+    # Is STDOUT associated with a terminal?
+    # This deals with nohup and redirection cases in relation to whether
+    # we can ask user about deciding on options.
+
+    [ -t 1] && INTERACTIVE=true || INTERACTIVE=false
+
 
     if "${GUI}"
     then
@@ -897,11 +903,6 @@ this regular expression: [a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*"
 systemd."
 
     "${CUT_ISO}" && SUMS=true
-    # Is STDOUT associated with a terminal?
-    # This deals with nohup and redirection cases in relation to whether
-    # we can ask user about deciding on options.
-
-    [ -t 1] && INTERACTIVE=true || INTERACTIVE=false
 }
 
 ## @fn run_docker_container()
