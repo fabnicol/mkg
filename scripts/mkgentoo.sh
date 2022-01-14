@@ -183,8 +183,6 @@ echo "To run in the background, either add \`gui=false &\` to your command line 
 echo "or, if you want to keep a VirtualBox GUI and not run in headless mode,  "
 echo "first launch in the foreground then use \`bg %n\` (where n is the  "
 echo "corresponding shell job shown in the output of the \`jobs\` command).  "
-echo "Starting MKG in the background with \`&\` and \`gui=true\`  "
-echo "(default value) will result in a crash.  "
 echo "  "
 echo "**Options:**  "
 echo "  "
