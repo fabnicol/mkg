@@ -935,7 +935,7 @@ systemd."
 
 check_docker_container_vbox_version() {
 
-   echo "${VBOX_VERSION}" | tail -1 | grep -o -E '[0-9]+\.[0-9]+\.[0-9]{1,2}'
+   VBoxManage --version | tail -1 | grep -o -E '[0-9]+\.[0-9]+\.[0-9]{1,2}'
 }
 
 ## @fn run_docker_container()
