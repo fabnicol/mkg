@@ -111,6 +111,19 @@ declare -x ISO="downloaded.iso"
 
 declare -x CREATE_ISO=false
 
+## @var VBOX_VERSION
+## @brief Version of VirtualBox
+## @ingroup createInstaller
+
+declare -r VBOX_VERSION="$(VBoxManage -v)"
+
+declare -i -x VERSION_MAJOR=$(sed -E 's/([0-9]+)\..*/\1/' \
+                               <<< ${VBOX_VERSION})
+declare -i -x VERSION_MINOR=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
+                               <<< ${VBOX_VERSION})
+declare -i -x VERSION_INDEX=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/'\
+                               <<< ${VBOX_VERSION})
+
 # ---------------------------------------------------------------------------- #
 # Helper functions
 #
@@ -418,21 +431,14 @@ the same time"
     # Check VirtualBox version
     if [ "${BUILD_VIRTUALBOX}" = "false" ]
     then
-        declare -r vbox_version="$(VBoxManage -v)"
 
         if [ $? = 0 ]
         then
             [ "${VERBOSE}" = "true" ] \
-                && ${LOG[*]} "[MSG] VirtualBox version: ${vbox_version}"
+                && ${LOG[*]} "[MSG] VirtualBox version: ${VBOX_VERSION}"
 
-            declare -i version_major=$(sed -E 's/([0-9]+)\..*/\1/' \
-                                           <<< ${vbox_version})
-            declare -i version_minor=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
-                                           <<< ${vbox_version})
-            declare -i version_index=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/'\
-                                           <<< ${vbox_version})
-            if [ ${version_major} -lt 6 ] || [ ${version_minor} -lt 1 ] \
-                   || [ ${version_index} -lt 10 ]
+            if [ ${VERSION_MAJOR} -lt 6 ] || [ ${VERSION_MINOR} -lt 1 ] \
+                   || [ ${VERSION_INDEX} -lt 10 ]
             then
                 ${LOG[*]} "[ERR] VirtualBox must be at least version 6.1.10"
                 ${LOG[*]} "[ERR] Please update and reinstall"
@@ -654,14 +660,16 @@ for ${sw}"
 
 test_cli_post() {
 
+    local vbox_version="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_INDEX}"
+
     if [ -n "${CHECK_VBOX_VERSION}" ] && [ "${CHECK_VBOX_VERSION}" != "dep" ]
     then
-        if [ "${CHECK_VBOX_VERSION}" != "${VBOX_VERSION}" ]
+        if [ "${CHECK_VBOX_VERSION}" != "${vbox_version}" ]
         then
-            ${LOG[*]} "[ERR] Reference VirtualBox version is ${VBOX_VERSION}"
-            ${LOG[*]} "      which is different from host platform version \
+            ${LOG[*]} "[ERR] Host VirtualBox version is ${vbox_version}"
+            ${LOG[*]} "      which is different from guest platform version \
 ${CHECK_VBOX_VERSION}"
-            ${LOG[*]} "[ERR] Please install version ${VBOX_VERSION} on host."
+            ${LOG[*]} "[ERR] Please install version ${CHECK_VBOX_VERSION} on host."
             ${LOG[*]} "[ERR] Exiting..."
             exit 1
         fi
@@ -927,8 +935,7 @@ systemd."
 
 check_docker_container_vbox_version() {
 
-    VBoxManage --version | tail -1 | cut -f 1 -d'_'
-
+   echo "${VBOX_VERSION}" | tail -1 | grep -o -E '[0-9]+\.[0-9]+\.[0-9]{1,2}'
 }
 
 ## @fn run_docker_container()
@@ -2889,7 +2896,7 @@ main() {
 
     check_tool logger git
 
-    if grep -q 'pull=true' <<< "$@"
+    if grep -q 'pull' <<< "$@" && ! grep -q 'pull=false' <<< "$@"
     then
         git config user.email root@docker.container
         git config user.name "docker container"
@@ -2897,7 +2904,7 @@ main() {
         if [ $? = 0 ]
         then
             logger -s "[MSG] Updated local repository."
-            export CLI_PULL=$(sed -r 's/(.*)pull=true(.*)/\1\2/g' <<< "$@")
+            export CLI_PULL=$(sed -r 's/(.*)pull(=true|)(.*)/\1\3/g' <<< "$@")
             logger -s "[INF] Restarting with command line:"
             logger -s "[INF] ${CLI_PULL}"
 
