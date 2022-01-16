@@ -1,4 +1,4 @@
-#!/bi/bash
+#!/bin/bash
 
 ##
 # Copyright (c) 2020-2021 Fabrice Nicol <fabrnicol@gmail.com>
@@ -429,6 +429,7 @@ the same time"
     local do_exit=false
 
     # Check VirtualBox version
+
     if [ "${BUILD_VIRTUALBOX}" = "false" ]
     then
 
@@ -960,10 +961,14 @@ check_vbox_version=$(check_docker_container_vbox_version)/" <<< "$@")
     # Experimental, undocumented environment variable
     # DOCKER_RUN_OPTS
 
-    local DOCKER_ID=$(docker run  ${DOCKER_RUN_OPTS} -dit --privileged \
-           -v /dev/cdrom:/dev/cdrom -v /dev/sr0:/dev/sr0  -v /dev/log:/dev/log \
+    DOCKER_ID=$(docker run \
+                  --memory ${MEM}m \
+                  --cpus ${NCPUS} ${DOCKER_RUN_OPTS} \
+                  -dit --privileged \
+                  -v /dev/cdrom:/dev/cdrom -v /dev/sr0:/dev/sr0 \
+                  -v /dev/log:/dev/log \
                   --device /dev/vboxdrv:/dev/vboxdrv mygentoo:${WORKFLOW_TAG2} \
-		  ${cli})
+	          ${cli})
 
     if_fails $? "[ERR] Could not start container mygentoo:${WORKFLOW_TAG2}"
     if [ -z "${DOCKER_ID}" ]
@@ -975,6 +980,7 @@ check_vbox_version=$(check_docker_container_vbox_version)/" <<< "$@")
     fi
 
     # Every minute, check if the above container is still running.
+
     sleep 300
     while docker inspect ${DOCKER_ID} | grep -q '"Running": true'
     do
@@ -2817,9 +2823,8 @@ generate_Gentoo() {
         ${LOG[*]} "      bios, cflags, clonezilla_install, debug_mode, elist"
         ${LOG[*]} "      emirrors, gui, kernel_config, minimal, minimal_size"
         ${LOG[*]} "      ncpus, nonroot_user, passwd, processor, rootpasswd"
-        ${LOG[*]} "      stage3, vm_keyboard, vm_language"
-        ${LOG[*]} "[MSG] In particular, all build-specific parameters \
-will be set."
+        ${LOG[*]} "      stage3, vm_keymap, vm_language"
+        ${LOG[*]} "[MSG] In particular, all build-specific parameters will be set."
         ${LOG[*]} "[MSG] If you need to specify these parameters, run again"
         ${LOG[*]} "      with use_mkg_workflow=false."
         ${LOG[*]} "[MSG] You can however fix the following command line items:"
@@ -2970,7 +2975,7 @@ main() {
 
     check_tool "tar" "sed" "mksquashfs" "mountpoint" "findmnt" "rsync" \
                "xorriso" "curl" "grep" "lsblk" "awk" \
-               "mkisofs" "rsync" "xz" "dos2unix"
+               "mkisofs" "rsync" "xz" "dos2unix" "b2sum" "sha512sum"
 
     if ! which uuid >/dev/null 2>&1 \
            && ! which uuidgen >/dev/null 2>&1
@@ -2985,6 +2990,7 @@ main() {
 
     cd "${SRCPATH}"
     source scripts/fetch_functions.sh
+
     # optional VirtualBox build
 
     if [ "${BUILD_VIRTUALBOX}" = "true" ]
@@ -3004,6 +3010,11 @@ main() {
         run_docker_container "$@"
         exit 0
     fi
+
+    # optional VirtualBox build
+
+    "${BUILD_VIRTUALBOX}" && { build_virtualbox; exit 0; }
+
 
     # You can bypass generation by setting vm= on commandline
 
