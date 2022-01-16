@@ -909,6 +909,11 @@ systemd."
     "${CUT_ISO}" && SUMS=true
 }
 
+check_docker_container_vbox_version() {
+
+    VBoxManage --version | tail -1 | grep -o -E '[0-9]+\.[0-9]+\.[0-9]{1,2}'
+}
+
 ## @fn run_docker_container()
 ## @brief Run the downloaded Docker image.
 ## @details
