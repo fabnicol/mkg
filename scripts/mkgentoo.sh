@@ -2882,6 +2882,35 @@ build presets [Y]:" rep
     fi
 }
 
+git_checkout() {
+
+    local branch="$1"
+    shift
+    logger -s "[INF] Checking out branch: ${branch}"
+
+    if git checkout "${branch}"  &&
+        [ "${branch}" = "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" ]
+    then
+        logger -s "[MSG] Branch is now ${branch}"
+    else
+        logger -s "[ERR] Could not checkout branch ${branch}"
+        exit 30
+    fi
+
+    logger -s "[INF] Restarting with command line:"
+    logger -s "[INF] $@"
+
+    # Respawn script with fresh code and same options.
+
+    ./mkg "$@"
+    local res=$?
+
+    [ "${branch}" = "master" ] && git checkout gnome || git checkout master
+    logger -s "[INF] Checking out branch: $(git rev-parse \
+--abbrev-ref HEAD 2>/dev/null)"
+    exit ${res}
+}
+
 # ---------------------------------------------------------------------------- #
 # Core program
 #
@@ -2893,6 +2922,24 @@ build presets [Y]:" rep
 ## @ingroup createInstaller
 
 main() {
+
+    local GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+
+    local CLI_BRANCH=$(sed -E 's/(.*)branch(=gnome|=master)(.*)/\1\3/g' <<< "$@")
+
+    if [ "${GIT_BRANCH}" = "master" ]
+    then
+        if grep -q 'branch=gnome' <<< "$@"
+        then
+            git_checkout "gnome" ${CLI_BRANCH}
+        fi
+    elif [ "${GIT_BRANCH}" = "gnome" ]
+    then
+        if grep -q 'branch=master' <<< "$@"
+        then
+            git_checkout "master" ${CLI_BRANCH}
+        fi
+    fi
 
     SRCPATH=$(dirname $(realpath "$0"))
 
@@ -2913,7 +2960,7 @@ main() {
             logger -s "[INF] Restarting with command line:"
             logger -s "[INF] ${CLI_PULL}"
 
-            # Respawn script with fresh code ans same options.
+            # Respawn script with fresh code and same options.
             "./mkg" ${CLI_PULL}
             exit $?
         else
