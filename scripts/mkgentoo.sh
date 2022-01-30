@@ -2826,6 +2826,24 @@ generate_Gentoo() {
 
 main() {
 
+    local GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+
+    local CLI_BRANCH=$(sed -E 's/(.*)branch(=gnome|=plasma)(.*)/\1\3/g' <<< "$@")
+
+    if [ "${GIT_BRANCH}" = "master" ]
+    then
+        if grep -q 'branch=gnome' <<< "$@"
+        then
+            git_checkout "gnome" ${CLI_BRANCH}
+        fi
+    elif [ "${GIT_BRANCH}" = "gnome" ]
+    then
+        if grep -q 'branch=plasma' <<< "$@"
+        then
+            git_checkout "master" ${CLI_BRANCH}
+        fi
+    fi
+
     SRCPATH=$(dirname $(realpath "$0"))
     source scripts/utils.sh
     source scripts/run_mount_shared_dir.sh
