@@ -229,6 +229,8 @@ echo "   "
 echo "   "
 echo " | Option | Description | Default value | Type |  "
 echo " |:------:|:------------|:-------------:|:----:|  "
+echo -e "| branch \t| Specify plasma or gnome desktop \t| [ Current git branch ] | s |"
+
 declare -i i
 for ((i=0; i<ARRAY_LENGTH; i++)); do
     declare -i sw=i*4       # no spaces!
