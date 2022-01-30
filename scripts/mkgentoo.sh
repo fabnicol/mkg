@@ -241,6 +241,8 @@ echo "   "
 echo "   "
 echo " | Option | Description | Default value | Type |  "
 echo " |:------:|:------------|:-------------:|:----:|  "
+echo -e "| branch \t| Specify plasma or gnome desktop \t| [ Current git branch ] | s |"
+
 declare -i i
 for ((i=0; i<ARRAY_LENGTH; i++)); do
     declare -i sw=i*4       # no spaces!
@@ -2925,7 +2927,7 @@ main() {
 
     local GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 
-    local CLI_BRANCH=$(sed -E 's/(.*)branch(=gnome|=master)(.*)/\1\3/g' <<< "$@")
+    local CLI_BRANCH=$(sed -E 's/(.*)branch(=gnome|=plasma)(.*)/\1\3/g' <<< "$@")
 
     if [ "${GIT_BRANCH}" = "master" ]
     then
@@ -2935,7 +2937,7 @@ main() {
         fi
     elif [ "${GIT_BRANCH}" = "gnome" ]
     then
-        if grep -q 'branch=master' <<< "$@"
+        if grep -q 'branch=plasma' <<< "$@"
         then
             git_checkout "master" ${CLI_BRANCH}
         fi
