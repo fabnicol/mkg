@@ -2708,6 +2708,35 @@ Unmount it and remove it manually then restart."
         fi
 }
 
+git_checkout() {
+
+    local branch="$1"
+    shift
+    logger -s "[INF] Checking out branch: ${branch}"
+
+    if git checkout "${branch}"  &&
+            [ "${branch}" = "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" ]
+    then
+        logger -s "[MSG] Branch is now ${branch}"
+    else
+        logger -s "[ERR] Could not checkout branch ${branch}"
+        exit 30
+    fi
+
+    logger -s "[INF] Restarting with command line:"
+    logger -s "[INF] $@"
+
+    # Respawn script with fresh code and same options.
+
+    ./mkg "$@"
+    local res=$?
+
+    [ "${branch}" = "master" ] && git checkout gnome || git checkout master
+    logger -s "[INF] Checking out branch: $(git rev-parse \
+--abbrev-ref HEAD 2>/dev/null)"
+    exit ${res}
+}
+
 # -----------------------------------------------------------------------------#
 # Global build launcher
 #
