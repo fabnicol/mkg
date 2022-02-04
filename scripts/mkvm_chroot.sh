@@ -44,9 +44,9 @@ adjust_environment() {
     local uuid2=$(blkid | grep sda2 | cut -f2 -d' ')
     local uuid3=$(blkid | grep sda3 | cut -f2 -d' ')
     local uuid4=$(blkid | grep sda4 | cut -f2 -d' ')
-    echo "Partition /dev/sda2 with ${uuid2}" | tee partition_log
-    echo "Partition /dev/sda3 with ${uuid3}" | tee -a partition_log
-    echo "Partition /dev/sda4 with ${uuid4}" | tee -a partition_log
+    echo "Partition /dev/sda2 with ${uuid2}" | tee -a log
+    echo "Partition /dev/sda3 with ${uuid3}" | tee -a log
+    echo "Partition /dev/sda4 with ${uuid4}" | tee -a log
     echo "${uuid2} /boot           vfat defaults            0 2" \
          >  /etc/fstab
     echo "${uuid3} none            swap sw                  0 0" \
@@ -65,7 +65,7 @@ adjust_environment() {
 
     if ! emerge-webrsync
     then
-        echo "[ERR] emerge-webrsync failed!" | tee emerge.build
+        echo "[ERR] emerge-webrsync failed!" | tee -a log
         return 1
     fi
 
@@ -78,17 +78,17 @@ adjust_environment() {
     USE='-qt5' emerge -1 cmake
     if [ $? != 0 ]
     then
-        echo "emerge cmake failed!" | tee -a emerge.build
+        echo "emerge cmake failed!" | tee -a log
         return 1
     fi
 
     # There is an intractable circular dependency that
     # can be broken by pre-emerging python
 
-    USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a emerge.build
+    USE="-sqlite -bluetooth" emerge -1 dev-lang/python | tee -a log
     if [ $? != 0 ]
     then
-        echo "emerge python failed!" | tee -a emerge.build
+        echo "emerge python failed!" | tee -a log
         return 1
     fi
 
@@ -132,14 +132,14 @@ adjust_environment() {
     mkdir -p /etc/portage/package.use
     cp -vf "${ELIST}.accept_keywords" \
        /etc/portage/package.accept_keywords/ \
-        | tee emerge.build
+        | tee -a log
 
     cp -vf "${ELIST}.use" /etc/portage/package.use/ \
-        |  tee emerge.build
+        |  tee -a log
 
     cp -vf "${ELIST}.accept_keywords" \
        /etc/portage/package.accept_keywords/ \
-        |  tee emerge.build
+        |  tee -a log
 
     # solving circular dep.
 
@@ -163,7 +163,7 @@ adjust_environment() {
 
     if  ! emerge -u net-misc/wget
     then
-        echo "[ERR] emerge wget failed!" | tee -a emerge.build
+        echo "[ERR] emerge wget failed!" | tee -a log
         return 1
     fi
 
@@ -176,13 +176,13 @@ adjust_environment() {
 
     if  ! emerge sys-devel/gcc
     then
-        echo "[ERR] emerge gcc failed!" | tee -a emerge.build
+        echo "[ERR] emerge gcc failed!" | tee -a log
         return 1
     fi
 
     if ! emerge sys-libs/glibc
     then
-        echo "[ERR] emerge glibc failed!" | tee -a emerge.build
+        echo "[ERR] emerge glibc failed!" | tee -a log
         return 1
     fi
 
@@ -194,22 +194,22 @@ adjust_environment() {
 
     if [ "${STAGE3_TAG}" != "systemd" ]
     then
-      emerge -q --unmerge sys-apps/sysvinit | tee -a emerge.build
+      emerge -q --unmerge sys-apps/sysvinit | tee -a log
     fi
 
     ## ---- End of patch ----
 
-      emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
+      emerge -uDN --with-bdeps=y @world 2>&1 | tee -a log
 
     if [ $? != 0 ]
     then
-        echo "[ERR] emerge @world failed! Retrying..."  | tee -a emerge.build
-        emerge -uDN --with-bdeps=y @world 2>&1 | tee -a emerge.build
+        echo "[ERR] emerge @world failed! Retrying..."  | tee -a log
+        emerge -uDN --with-bdeps=y @world 2>&1 | tee -a log
     fi
 
     if [ $? != 0 ]
     then
-        echo "[ERR] emerge @world failed!"  | tee -a emerge.build
+        echo "[ERR] emerge @world failed!"  | tee -a log
         return 1
     fi
 
@@ -224,7 +224,7 @@ adjust_environment() {
 
     # Localization: we now generate all locales.
 
-    locale-gen -A -j ${NCPUS} | tee -a emerge.build
+    locale-gen -A -j ${NCPUS} | tee -a log
 
     # Note: VM_LANGUAGE must be at least 5 characters, like fr_FR, fr_BE etc.
 
@@ -268,7 +268,7 @@ adjust_environment() {
           ln -sf ../usr/share/zoneinfo/${TIMEZONE} /etc/localtime
     else
           echo "${TIMEZONE}" > /etc/timezone
-          emerge -u --config sys-libs/timezone-data | tee -a emerge.build
+          emerge -u --config sys-libs/timezone-data | tee -a log
           # systemd does not usually use hwclock
           sed -i 's/clock=.*/clock="local"/' /etc/conf.d/hwclock
     fi
@@ -281,7 +281,7 @@ adjust_environment() {
 ## @li Emerge \b gentoo-sources, \b genkernel, \b pciutils and
 ##     \b linux-firmware
 ## @li Mount /dev/sda2 to /boot/
-## @li Build kernel and initramfs. Log into kernel.log.
+## @li Build kernel and initramfs.
 ## @retval  -1 on error.
 ## @ingroup mkFileSystem
 
@@ -292,7 +292,7 @@ build_kernel() {
     # Building the kernel
 
     emerge gentoo-sources sys-kernel/genkernel pciutils \
-        | tee kernel.log
+        | tee -a log
 
     eselect kernel set 1
 
@@ -304,39 +304,39 @@ build_kernel() {
 
     if [ "$PWD" != "/usr/src/linux" ]
     then
-        echo "[ERR] Could not cd to /usr/src/linux" | tee -a kernel.log
+        echo "[ERR] Could not cd to /usr/src/linux" | tee -a log
         exit 2
     fi
 
     # kernel config issue here
 
     make olddefconfig  # uses defaults for new config params.
-    make -s -j${NCPUS}   2>&1 | tee -a  kernel.log
-    make modules_install 2>&1 | tee -a  kernel.log
-    make install         2>&1 | tee -a  kernel.log
+    make -s -j${NCPUS}   2>&1 | tee -a  log
+    make modules_install 2>&1 | tee -a  log
+    make install         2>&1 | tee -a  log
     if  [ $? != 0 ]
     then
-        echo "[ERR] Kernel building failed!" | tee -a kernel.log
+        echo "[ERR] Kernel building failed!" | tee -a log
         return 1
     fi
 
-    genkernel --install initramfs     | tee -a kernel.log
-    emerge sys-kernel/linux-firmware  | tee -a kernel.log
+    genkernel --install initramfs     | tee -a log
+    emerge sys-kernel/linux-firmware  | tee -a log
     make clean
 
     if [ -f /boot/vmlinuz* ]
     then
-        echo "[MSG] Kernel was built" | tee -a kernel.log
+        echo "[MSG] Kernel was built" | tee -a log
     else
-        echo "[ERR] Kernel compilation failed!"  | tee -a  kernel.log
+        echo "[ERR] Kernel compilation failed!"  | tee -a  log
         return 1
     fi
 
     if [ -f /boot/initr*.img ]
     then
-        echo "[MSG] initramfs was built" | tee -a  kernel.log
+        echo "[MSG] initramfs was built" | tee -a  log
     else
-        echo "[ERR] initramfs compilation failed!" | tee -a  kernel.log
+        echo "[ERR] initramfs compilation failed!" | tee -a  log
         return 1
     fi
 }
@@ -356,7 +356,7 @@ install_software() {
     # caused by Windows editing
 
     cd / || exit 2
-    emerge -u dos2unix  | tee log_install_software.log
+    emerge -u dos2unix  | tee -a log
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
@@ -375,27 +375,27 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN --with-bdeps=y --keep-going ${packages}  2>&1 \
-    | tee -a log_install_software.log
+    | tee -a log
     local res_install=$?
 
     if [ "${res_install}" != "0" ]
     then
 	    # one more chance, who knows
-	    emerge --resume | tee -a log_install_software.log
+	    emerge --resume | tee -a log
         res_install=$?
     fi
 
     if [ "${res_install}" != "0" ]
     then
 	# one more chance, who knows
-        emerge --resume | tee -a log_install_software.log
+        emerge --resume | tee -a log
         res_install=$?
     fi
 
     if [ "${res_install}" != "0" ]
     then
         echo "[ERR] Main package build step failed" \
-             | tee -a log_install_software.log
+             | tee -a log
         return 1
     fi
 
@@ -411,7 +411,7 @@ install_software() {
             echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
 'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" \
              > libs.R
-            Rscript libs.R 2>&1 | tee Rlibs.log
+            Rscript libs.R 2>&1 | tee -a log
         fi
     fi
 
@@ -441,15 +441,15 @@ global_config() {
     # Configuration --- sddm
 
     echo "#!/bin/sh"               > /usr/share/sddm/scripts/Xsetup \
-        | tee -a sddm.log
+        | tee -a log
 
     # only the first two letters are reliable here.
     echo "setxkbmap ${VM_KEYMAP::2},us" >> /usr/share/sddm/scripts/Xsetup \
-        | tee -a sddm.log
+        | tee -a log
 
     chmod a+x /usr/share/sddm/scripts/Xsetup
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
-        /etc/conf.d/display-manager | tee -a sddm.log
+        /etc/conf.d/display-manager | tee -a log
 
     # Numlock now set to 'on' on startup
     sed -i 's/Numlock=.*/Numlock=on/' /usr/share/sddm/sddm.conf.d/00default.conf
@@ -500,7 +500,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not useradd user ${NONROOT_USER}" | tee useradd.log
+        echo "[ERR] Could not useradd user ${NONROOT_USER}" | tee -a log
     fi
 
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
@@ -511,7 +511,7 @@ global_config() {
 
     if ! which grub-mkconfig
     then
-        echo "[ERR] Did not find grub!" | tee grub.log
+        echo "[ERR] Did not find grub!" | tee -a log
         return 3
     fi
 
@@ -526,7 +526,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not install grub" | tee -a grub.log
+        echo "[ERR] Could not install grub" | tee -a log
         exit 1
     fi
 
@@ -539,7 +539,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not configure grub" | tee -a grub.log
+        echo "[ERR] Could not configure grub" | tee -a log
         exit 1
     fi
 
@@ -562,23 +562,23 @@ finalize() {
     # freeing up some disk space
 
     echo "Cleaning up a bit aggressively before cloning..." \
-        | tee log_uninstall.log
+        | tee -a log
 
     # MINIMAL_SIZE should only be set for packaging purposes.
     # and avoided for personal use
 
     if "${MINIMAL_SIZE}"
     then
-        emerge --unmerge gentoo-sources  2>&1 | tee -a log_uninstall.log
-        rm -rf /usr/src/linux/*               | tee -a log_uninstall.log
+        emerge --unmerge gentoo-sources  2>&1 | tee -a log
+        rm -rf /usr/src/linux/*               | tee -a log
         rm -rf /var/cache/distfiles/*
     else
-        eclean -d packages 2>&1 | tee -a log_uninstall.log
+        eclean -d packages 2>&1 | tee -a log
     fi
 
     # kernel sources will have to be reinstalled by user if necessary
 
-    emerge --depclean 2>&1 | tee -a log_uninstall.log
+    emerge --depclean 2>&1 | tee -a log
     rm -rf /var/tmp/*
     rm /tmp/*
 
@@ -612,7 +612,7 @@ global_config
 [ $? = 0 ] || res=$((res | 8))
 finalize
 [ $? = 0 ] || res=$((res | 16))
-echo "[MSG] Virtual Gentoo build exited with code: ${res}" 2>&1 | tee res.log
+echo "[MSG] Virtual Gentoo build exited with code: ${res}" 2>&1 | tee -a log
 exit ${res}
 
 # note: return code will be 0 if all went smoothly
