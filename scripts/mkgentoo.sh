@@ -2929,8 +2929,6 @@ main() {
 
     local CLI_BRANCH=$(sed -E 's/(.*)branch(=gnome|=plasma)(.*)/\1\3/g' <<< "$@")
 
-    echo "--> ${CLI_BRANCH}"
-
     if [ "${GIT_BRANCH}" = "master" ]
     then
         if grep -q 'branch=gnome' <<< "$@"
