@@ -584,7 +584,7 @@ finalize() {
 
     # Final steps: cleaning up
 
-    if [ "${DEBUG_MODE}" = "false" ]
+    if [ "${DEBUG_MODE}" = "false" ] && [ "${res_run}" = "0" ]
     then
         rm -rf /var/log/*
         find . -maxdepth 1 -type f -delete
@@ -601,19 +601,19 @@ source .bashrc
 # without pipefail, piping to tee would mask failures
 set -o pipefail
 
-declare -i res=0
+declare -i res_run=0
 adjust_environment
-[ $? = 0 ] || res=1
+[ $? = 0 ] || res_run=1
 build_kernel
-[ $? = 0 ] || res=$((res | 2))
+[ $? = 0 ] || res_run=$((res_run | 2))
 install_software
-[ $? = 0 ] || res=$((res | 4))
+[ $? = 0 ] || res_run=$((res_run | 4))
 global_config
-[ $? = 0 ] || res=$((res | 8))
+[ $? = 0 ] || res_run=$((res_run | 8))
 finalize
-[ $? = 0 ] || res=$((res | 16))
-echo "[MSG] Virtual Gentoo build exited with code: ${res}" 2>&1 | tee -a log
-exit ${res}
+[ $? = 0 ] || res_run=$((res_run | 16))
+echo "[MSG] Virtual Gentoo build exited with code: ${res_run}" 2>&1 | tee -a log
+exit ${res_run}
 
 # note: return code will be 0 if all went smoothly
 # otherwise:
