@@ -772,7 +772,20 @@ disk ${VMPATH}/${VM}.vdi was not found"
             ${LOG[*]} "[WAR] Unless you want the process to run \
 in the background or without a console, user interaction is allowed by default.\
 Resetting *interactive* to *true*."
-            INTERACTIVE=true
+
+            case $(ps -o stat= -p $$) in
+              *+*) echo "[MSG] Running in foreground with"\
+                        " interactive=true."
+                   INTERACTIVE=true
+
+               ;;
+              *) echo "[MSG] Running in background in non-interactive mode."
+               ;;
+            esac
+
+            # or when not attached to console (nohup, redirection)
+            ! [ -t 1 ] && INTERACTIVE=false
+
         fi
     else
         # forcing INTERACTIVE as false only for background jobs.
@@ -909,6 +922,14 @@ this regular expression: [a-z]{2}_[A-Z]{2}\.?[@_.a-zA-Z0-9]*"
 systemd."
 
     "${CUT_ISO}" && SUMS=true
+
+    # If called by nohup, then request INTERACTIVE=false and GUI=false
+
+    # if [ "$PPID" = "1" ]
+    # then
+    #     INTERACTIVE=false
+    #     GUI=false
+    # fi
 }
 
 check_docker_container_vbox_version() {
