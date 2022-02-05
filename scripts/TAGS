@@ -13,52 +13,56 @@ fetch_livecd(353,11459
 fetch_stage3(402,12779
 fetch_docker_image(496,16605
 
-mkgentoo.sh,1041
-declare -x ISO=104,3723
-help_(253,10205
-manpage(261,10369
-htmlpage(271,10577
-pdfpage(281,10747
-allpages(291,10973
-validate_option(308,11367
-get_options(321,11581
-test_cli_pre(402,13777
-test_cli(501,16967
-test_cli_post(655,21939
-check_docker_container_vbox_version(930,31277
-run_docker_container(944,31680
-mount_live_cd(1021,34102
-prepare_chroot(1045,34787
-remove_chroot(1123,37199
-test_emerge_step(1159,38412
-move_auxiliary_files(1386,44749
-make_boot_from_livecd(1447,47123
-prepare_bash_rc(1520,49306
-test_vm_running(1553,50217
-deep_clean(1563,50464
-delete_vm(1620,52531
-create_vm(1733,56674
-log_loop(1926,64239
-create_iso_vm(2002,66627
-mount_vdi(2145,72441
-unmount_vdi(2259,75560
-clone_vm_to_device(2348,77923
-create_device_system(2401,79607
-clonezilla_to_iso(2430,80520
-add_guest_additions_to_clonezilla_iso(2481,82218
-bind_mount_clonezilla_iso(2549,84461
-unmount_clonezilla_iso(2598,85713
-clonezilla_device_to_image(2620,86397
-prepare_for_iso_vm(2722,89384
-generate_Gentoo(2804,91968
-main(2885,94834
+mkgentoo.sh,1160
+declare -x ISO=104,3724
+declare -i -x VERSION_MINOR=122,4281
+declare -i -x VERSION_INDEX=124,4401
+help_md(136,4800
+help_(268,10783
+manpage(276,10947
+htmlpage(286,11155
+pdfpage(296,11325
+allpages(306,11551
+validate_option(323,11945
+get_options(336,12159
+test_cli_pre(417,14355
+test_cli(510,17071
+test_cli_post(664,22043
+check_docker_container_vbox_version(939,31379
+run_docker_container(952,31805
+mount_live_cd(1034,34347
+prepare_chroot(1058,35032
+remove_chroot(1136,37444
+test_emerge_step(1172,38657
+move_auxiliary_files(1399,44994
+make_boot_from_livecd(1460,47368
+prepare_bash_rc(1533,49551
+test_vm_running(1566,50462
+deep_clean(1576,50709
+delete_vm(1633,52776
+create_vm(1746,56919
+log_loop(1939,64484
+create_iso_vm(2015,66872
+mount_vdi(2158,72686
+unmount_vdi(2272,75805
+clone_vm_to_device(2361,78168
+create_device_system(2414,79852
+clonezilla_to_iso(2443,80765
+add_guest_additions_to_clonezilla_iso(2494,82463
+bind_mount_clonezilla_iso(2562,84706
+unmount_clonezilla_iso(2611,85958
+clonezilla_device_to_image(2633,86642
+prepare_for_iso_vm(2735,89629
+generate_Gentoo(2817,92213
+git_checkout(2887,94737
+main(2926,95798
 
 mkvm_chroot.sh,124
 adjust_environment(40,1743
-build_kernel(288,9054
-install_software(353,10708
-global_config(439,13181
-finalize(558,16359
+build_kernel(288,8865
+install_software(353,10438
+global_config(439,12806
+finalize(558,15952
 
 mkvm.sh,67
 setup_network(29,1068

@@ -20,6 +20,7 @@
      "verbose"            "Increase verbosity"                                                                                   "false" "b"
      "bios"               "Type of bootloader: BIOS or EFI (default) "                                                           "false" "b"
      "blank"              "Blank rewritable optical disk before burning installation image."                                     "false" "b"
+     "branch"             "Checkout branch plasma or gnome before running MKG."                                         "plasma" "s"
      "build_virtualbox"   "Download code source and automatically build virtualbox and tools. Yields VirtualBox and vbox-img executables under main directory and subdirectory virtualbox with the build, including documentation."                                   "false" "b"
      "burn"               "Burn to optical disc. Boolean."                                                                       "false" "b"
      "cdrecord"           "cdrecord full path. Automatically determined if left unspecified."                    "`which cdrecord`" "f:burn"
