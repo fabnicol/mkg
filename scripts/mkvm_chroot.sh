@@ -44,9 +44,9 @@ adjust_environment() {
     local uuid2=$(blkid | grep sda2 | cut -f2 -d' ')
     local uuid3=$(blkid | grep sda3 | cut -f2 -d' ')
     local uuid4=$(blkid | grep sda4 | cut -f2 -d' ')
-    echo "Partition /dev/sda2 with ${uuid2}" | tee partition_log
-    echo "Partition /dev/sda3 with ${uuid3}" | tee -a partition_log
-    echo "Partition /dev/sda4 with ${uuid4}" | tee -a partition_log
+    echo "Partition /dev/sda2 with ${uuid2}" | tee log
+    echo "Partition /dev/sda3 with ${uuid3}" | tee -a log
+    echo "Partition /dev/sda4 with ${uuid4}" | tee -a log
     echo "${uuid2} /boot           vfat defaults            0 2" \
          >  /etc/fstab
     echo "${uuid3} none            swap sw                  0 0" \
@@ -281,8 +281,8 @@ adjust_environment() {
 
     if [ -z "${KEYMAP_FOUND}" ]
     then
-        echo "Did not find keymap ${VM_KEYMAP} in /usr/share/keymaps." > env.log
-        echo "Falling back on us" >> env.log
+        echo "Did not find keymap ${VM_KEYMAP} in /usr/share/keymaps." > log
+        echo "Falling back on us" >> log
         VM_KEYMAP="us"
         KEYMAP_FOUND=us.map.gz
     fi
@@ -319,7 +319,7 @@ adjust_environment() {
 ## @li Emerge \b gentoo-sources, \b genkernel,
 ##     \b pciutils and \b linux-firmware
 ## @li Mount /dev/sda2 to /boot/
-## @li Build kernel and initramfs. Log into kernel.log.
+## @li Build kernel and initramfs. Log into log.
 ## @retval  -1 on error.
 ## @ingroup mkFileSystem
 
@@ -329,9 +329,9 @@ build_kernel() {
 
     # Building the kernel
 
-    emerge gentoo-sources   | tee kernel.log
+    emerge gentoo-sources   | tee -a log
 
-    emerge sys-kernel/genkernel pciutils | tee -a kernel.log
+    emerge sys-kernel/genkernel pciutils | tee -a log
 
     eselect kernel set 1
 
@@ -343,39 +343,39 @@ build_kernel() {
 
     if [ "$PWD" != "/usr/src/linux" ]
     then
-        echo "[ERR] Could not cd to /usr/src/linux" | tee -a kernel.log
+        echo "[ERR] Could not cd to /usr/src/linux" | tee -a log
         exit 2
     fi
 
     # kernel config issue here
 
     make olddefconfig # uses defaults for new config params.
-    make -s -j${NCPUS}   2>&1 | tee -a  kernel.log
-    make modules_install 2>&1 | tee -a  kernel.log
-    make install         2>&1 | tee -a  kernel.log
+    make -s -j${NCPUS}   2>&1 | tee -a  log
+    make modules_install 2>&1 | tee -a  log
+    make install         2>&1 | tee -a  log
     if  [ $? != 0 ]
     then
-        echo "[ERR] Kernel building failed!" | tee -a kernel.log
+        echo "[ERR] Kernel building failed!" | tee -a log
         return 1
     fi
 
-    genkernel --install initramfs     | tee -a kernel.log
-    emerge sys-kernel/linux-firmware  | tee -a kernel.log
+    genkernel --install initramfs     | tee -a log
+    emerge sys-kernel/linux-firmware  | tee -a log
     make clean
 
     if [ -f /boot/vmlinuz* ]
     then
-        echo "[MSG] Kernel was built" | tee -a kernel.log
+        echo "[MSG] Kernel was built" | tee -a log
     else
-        echo "[ERR] Kernel compilation failed!"  | tee -a  kernel.log
+        echo "[ERR] Kernel compilation failed!"  | tee -a  log
         return 1
     fi
 
     if [ -f /boot/initr*.img ]
     then
-        echo "[MSG] initramfs was built" | tee -a  kernel.log
+        echo "[MSG] initramfs was built" | tee -a  log
     else
-        echo "[ERR] initramfs compilation failed!" | tee -a  kernel.log
+        echo "[ERR] initramfs compilation failed!" | tee -a  log
         return 1
     fi
 }
@@ -395,7 +395,7 @@ install_software() {
     # caused by Windows editing
 
     cd / || exit 2
-    emerge -u dos2unix  | tee log_install_software.log
+    emerge -u dos2unix  | tee -a log
     chown root ${ELIST}
     chmod +rw ${ELIST}
     dos2unix ${ELIST}
@@ -414,31 +414,31 @@ install_software() {
     # do not quote `packages' variable!
 
     emerge -uDN --with-bdeps=y --keep-going ${packages}  2>&1 \
-        | tee -a log_install_software.log
+        | tee -a log
     local res_install=$?
 
     if [ "${res_install}" != "0" ]
     then
 	    # one more chance, who knows
-  	    emerge --resume | tee -a log_install_software.log
+  	    emerge --resume | tee -a log
         res_install=$?
     fi
 
     if [ "${res_install}" != "0" ]
     then
     	# one more chance, who knows
-	    emerge --resume | tee -a log_install_software.log
+	    emerge --resume | tee -a log
         res_install=$?
     fi
 
     if [ "${res_install}" != "0" ]
     then
         echo "[ERR] Main package build step failed" \
-             | tee -a log_install_software.log
+             | tee -a log
         return 1
     fi
 
-    emerge -u gdm | tee -a log_install_software.log
+    emerge -u gdm | tee -a log
 
     # do not use \ to continue line below:
 
@@ -451,7 +451,7 @@ install_software() {
             echo "install.packages(c('data.table', 'dplyr', 'ggplot2',
 'bit64', 'devtools', 'rmarkdown'), repos=\"${CRAN_REPOS}\")" \
              > libs.R
-            Rscript libs.R 2>&1 | tee Rlibs.log
+            Rscript libs.R 2>&1 | tee -a log
         fi
     fi
 
@@ -479,7 +479,7 @@ install_software() {
 global_config() {
 
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="gdm"/' \
-                /etc/conf.d/display-manager | tee -a gdm.log
+                /etc/conf.d/display-manager | tee -a log
 
     #--- Services
     if [ "${STAGE3_TAG}" = "systemd" ]
@@ -520,7 +520,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not useradd user ${NONROOT_USER}" | tee useradd.log
+        echo "[ERR] Could not useradd user ${NONROOT_USER}" | tee -a log
     fi
 
     echo "${NONROOT_USER}     ALL=(ALL:ALL) ALL" >> /etc/sudoers
@@ -531,7 +531,7 @@ global_config() {
 
     if ! which grub-mkconfig
     then
-        echo "[ERR] Did not find grub!" | tee grub.log
+        echo "[ERR] Did not find grub!" | tee -a log
         return 3
     fi
 
@@ -546,7 +546,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not install grub" | tee -a grub.log
+        echo "[ERR] Could not install grub" | tee -a log
         exit 1
     fi
 
@@ -559,7 +559,7 @@ global_config() {
 
     if [ $? != 0 ]
     then
-        echo "[ERR] Could not configure grub" | tee -a grub.log
+        echo "[ERR] Could not configure grub" | tee -a log
         exit 1
     fi
 
@@ -582,23 +582,23 @@ finalize() {
     # freeing up some disk space
 
     echo "Cleaning up a bit aggressively before cloning..." \
-        | tee log_uninstall.log
+        | tee -a log
 
     # MINIMAL_SIZE should only be set for packaging purposes.
     # and avoided for personal use
 
     if "${MINIMAL_SIZE}"
     then
-        emerge --unmerge gentoo-sources  2>&1 | tee -a log_uninstall.log
-        rm -rf /usr/src/linux/*               | tee -a log_uninstall.log
+        emerge --unmerge gentoo-sources  2>&1 | tee -a log
+        rm -rf /usr/src/linux/*               | tee -a log
         rm -rf /var/cache/distfiles/*
     else
-        eclean -d packages 2>&1 | tee -a log_uninstall.log
+        eclean -d packages 2>&1 | tee -a log
     fi
 
     # kernel sources will have to be reinstalled by user if necessary
 
-    emerge --depclean 2>&1 | tee -a log_uninstall.log
+    emerge --depclean 2>&1 | tee -a log
     rm -rf /var/tmp/*
     rm /tmp/*
 
@@ -632,7 +632,7 @@ global_config
 [ $? = 0 ] || res=$((res | 8))
 finalize
 [ $? = 0 ] || res=$((res | 16))
-echo "[MSG] Virtual Gentoo build exited with code: ${res}" 2>&1 | tee res.log
+echo "[MSG] Virtual Gentoo build exited with code: ${res}" 2>&1 | tee -a log
 exit ${res}
 
 # note: return code will be 0 if all went smoothly
