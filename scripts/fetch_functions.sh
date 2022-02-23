@@ -66,7 +66,7 @@ latest-install-${PROCESSOR}-minimal.txt | sed -E 's/iso.*$/iso/' )"
     then
         curl -L -O "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}" \
              ${verb}
-        curl -L "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}.DIGESTS.asc" \
+        curl -L "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}.DIGESTS" \
              ${verb} -o checksums_install.txt
     else
         ${LOG[*]} "[ERR] Could not download current install iso."
@@ -448,8 +448,8 @@ autobuilds/${current} ${verb1} 2>&1 | xargs echo '[INF]')"
 
         if ! "${DISABLE_CHECKSUM}"
         then
-            ${LOG[*]} "[MSG] Downloading ${current}.DIGESTS.asc"
-            curl -L "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}.DIGESTS.asc" \
+            ${LOG[*]} "[MSG] Downloading ${current}.DIGESTS"
+            curl -L "${MIRROR}/releases/${PROCESSOR}/autobuilds/${current}.DIGESTS" \
                  ${verb1} -o checksums_stage3.txt
             if_fails $? "[ERR] Could not download current install iso."
 
