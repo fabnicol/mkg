@@ -2251,7 +2251,7 @@ to ${SHARED_ROOT_DIR} boot directory."
 
         if "${EXITCODE}"
         then
-           cat "${SHARED_ROOT_DIR}/res.log" | ${LOG[*]}
+           grep "Virtual Gentoo build exited with code.*" "${SHARED_ROOT_DIR}/log" | ${LOG[*]}
            unmount_vdi
            return $?
         else
@@ -3237,7 +3237,7 @@ clonezilla image..."
             if_fails $? "[ERR] Could not launch qemu daemon to mount VDI disk."
             if "${EXITCODE}"
             then
-                ${LOG[*]} $(cat "${SHARED_DIR}/res.log")
+                ${LOG[*]} $(grep "Virtual Gentoo build exited with code.*" "${SHARED_DIR}/log")
                 unmount_vdi
             fi
             exit 1
