@@ -1713,33 +1713,35 @@ create_vm() {
                                --firmware "bios" 2>&1 \
                         | xargs echo "[INF] Adding VM parameters.")
 
-
-    grep -E '^[[:digit:]abcdef]{8} ' <<< $(VBoxManage list hostcpuids) |\
-	while read -r line
-	do
-	    leaf="0x$(echo ${line} | cut -f1 -d' ')"
+    if grep -q 'vendor_id.*Intel' /proc/cpuinfo
+    then
+        grep -E '^[[:digit:]abcdef]{8} ' <<< $(VBoxManage list hostcpuids) |\
+	    while read -r line
+	    do
+	        leaf="0x$(echo ${line} | cut -f1 -d' ')"
             if [[ $leaf -lt 0x0b || $leaf -gt 0x17 ]]
             then
                 ${LOG[*]} <<< $(VBoxManage modifyvm "${1}" --cpuidset ${line} \
 				| xargs echo "[INF] Exporting host CPUID values")
-	    fi
-	done
+	        fi
+	    done
 
-    vendor='GenuineIntel'
-    ascii2hex() { echo -n 0x; od -A n --endian little -t x4 | sed 's/ //g'; }
+        vendor='GenuineIntel'
+        ascii2hex() { echo -n 0x; od -A n --endian little -t x4 | sed 's/ //g'; }
 
-    registers=(ebx edx ecx)
-    for (( i=0; i<${#vendor}; i+=4 )); do
-    register=${registers[$(($i/4))]}
-    value=`echo -n "${vendor:$i:4}" | ascii2hex`
-    # set value to an empty string to reset the CPUID, i.e.
-    # value=""
-        for eax in 00000000 80000000
-        do
-            key=VBoxInternal/CPUM/HostCPUID/${eax}/${register}
-            VBoxManage setextradata "${1}" $key $value
+        registers=(ebx edx ecx)
+        for (( i=0; i<${#vendor}; i+=4 )); do
+            register=${registers[$(($i/4))]}
+            value=`echo -n "${vendor:$i:4}" | ascii2hex`
+            # set value to an empty string to reset the CPUID, i.e.
+            # value=""
+            for eax in 00000000 80000000
+            do
+                key=VBoxInternal/CPUM/HostCPUID/${eax}/${register}
+                VBoxManage setextradata "${1}" $key $value
+            done
         done
-    done
+    fi
 
     # create virtual VDI disk, if it does not exist
 
