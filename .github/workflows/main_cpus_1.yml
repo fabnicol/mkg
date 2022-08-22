@@ -3,11 +3,11 @@ name: mkg_builder_1_gnome
 on:
   push:
     branches: 
-    - gnome 
+    - gnome
     
   pull_request:
     branches: 
-    - gnome 
+    - gnome
     
   schedule:
   - cron: "0 2 * * 1-5"
@@ -31,7 +31,7 @@ jobs:
       
       - name: run
         run: |
-          sudo ./mkg test_only cleanup=false use_mkg_workflow=false ncpus=1 mem=8000
+          sudo ./mkg branch=gnome test_only cleanup=false use_mkg_workflow=false ncpus=1 mem=8000
 
       - uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
