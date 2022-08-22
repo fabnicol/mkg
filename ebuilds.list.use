@@ -26,6 +26,7 @@ dev-libs/gjs -sysprof
 >=dev-qt/qtwebchannel-5.15.2-r1 qml
 >=gnome-base/gvfs-1.48.1-r1 udisks cdda
 >=gnome-extra/evolution-data-server-3.36.5 gtk vala
+>=kde-frameworks/kconfig-5.96.0 qml
 kde-frameworks/kitemmodels qml
 kde-frameworks/prison qml
 >=kde-frameworks/sonnet-5.88.0 qml
