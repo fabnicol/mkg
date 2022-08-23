@@ -52,7 +52,7 @@
      "emirrors"           "Mirror sites for downloading ebuilds"                                                                 "path2" "u"
      "exitcode"           "Print virtual machine final exit code (0 on success)"                                                 "false" "b"
      "ext_device"         "Create Gentoo OS on external device. Argument is either a device label (e.g. sdb, hdb), or a mountpoint directory (if mounted), or a few consecutive letters of the model name (e.g. 'Hitachi HDS5C3020BLE630', 'PNY CS900 960GB' or 'WDC WD30'), if there is just one such. Requires either **device_installer** or **hot_install** on commandline."    "" "s"
-     "force"              "Forcefully creates machine even if others with same same exist. Stops and restarts VBox daemons. Not advised if other VMs are running." "false" "b"
+     "force"              "Forcefully creates machine even if others with same name exist. Stops and restarts VBox daemons. Not advised if other VMs are running." "false" "b"
      "from_device"        "Do not Generate Gentoo but use the external device on which Gentoo was previously installed. Boolean."  "false" "b:ext_device"
      "from_iso"           "Do not generate Gentoo but use the bootable ISO given on commandline."                                "false" "b"
      "from_vm"            "Do not generate Gentoo but use the VM. Boolean."                                                      "false" "b"
