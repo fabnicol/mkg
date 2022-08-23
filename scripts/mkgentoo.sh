@@ -2175,7 +2175,7 @@ to ${SHARED_ROOT_DIR} boot directory."
 
         if "${EXITCODE}"
         then
-           cat "${SHARED_ROOT_DIR}/res.log" | ${LOG[*]}
+           cat "${SHARED_ROOT_DIR}/log" | ${LOG[*]}
            unmount_vdi
            return $?
         else
