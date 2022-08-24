@@ -34,10 +34,12 @@
 
  kate
  kde-apps/dolphin
- konqueror
  konsole
 
 ## PDF-related
  
  okular
 
+## Web
+
+ www-client/firefox-bin

@@ -43,10 +43,9 @@
  
 # Other desktop
 
- app-office/libreoffice
+ app-office/libreoffice-bin
  kate
  kde-apps/dolphin
- konqueror
  konsole
 
 ## PDF-related
@@ -54,3 +53,7 @@
  app-text/texlive
  dev-texlive/texlive-latex
  okular
+
+## Web
+
+ www-client/firefox-bin
