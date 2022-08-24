@@ -37,5 +37,9 @@
  
 # Other desktop
 
- app-office/libreoffice
+ app-office/libreoffice-bin
  app-editors/gedit
+
+## Web
+
+ www-client/firefox-bin

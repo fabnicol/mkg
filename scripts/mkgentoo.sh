@@ -660,20 +660,22 @@ test_cli_post() {
     if "${EXITCODE}"
     then
         SHARE_ROOT="r"
-        FORCE=true
         mkdir -p "${SHARE_ROOT}"
         INTERACTIVE=false
         FROM_VM=false
         FROM_ISO=false
-        PLOT=false
-        CREATE_ISO=false
-        DOWNLOAD=false
-        DOWNLOAD_CLONEZILLA=false
-        DEVICE_INSTALLER=false
-        EXT_DEVICE=""
-        HOT_INSTALL=false
         POSTPONE_QEMU=false
-
+        if "${NO_RUN}"
+        then
+            FORCE=true
+            PLOT=false
+            CREATE_ISO=false
+            DOWNLOAD=false
+            DOWNLOAD_CLONEZILLA=false
+            DEVICE_INSTALLER=false
+            EXT_DEVICE=""
+            HOT_INSTALL=false
+        fi
     elif [ -n "${SHARE_ROOT}" ]
     then
         [ "${SHARE_ROOT}" != "dep" ] && FORCE=true

@@ -29,4 +29,7 @@
  x11-terms/guake
  x11-terms/xterm
 
+# Web
+
+ www-client/firefox-bin
 
