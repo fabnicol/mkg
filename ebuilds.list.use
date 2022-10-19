@@ -30,6 +30,7 @@ dev-libs/gjs -sysprof
 kde-frameworks/kitemmodels qml
 kde-frameworks/prison qml
 >=kde-frameworks/sonnet-5.88.0 qml
+>=kde-plasma/kwin-5.25.5 lock
 media-libs/clutter-gtk gtk
 media-libs/clutter gtk
 >=media-libs/gegl-0.4.26-r1 raw cairo
