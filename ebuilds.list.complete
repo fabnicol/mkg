@@ -29,8 +29,8 @@
  gnome-base/gnome
 
 # X
-
- x11-base/xorg-x11
+ x11-base/xorg-apps
+ x11-base/xorg-fonts
  x11-base/xorg-drivers
  x11-terms/guake
  x11-terms/xterm
