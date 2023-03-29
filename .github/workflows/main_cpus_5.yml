@@ -33,7 +33,7 @@ jobs:
         run: |
           sudo ./mkg test_only cleanup=false ncpus=5 mem=15000 use_mkg_workflow=false
 
-      - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      - uses: dev-drprasad/delete-tag-and-release@v0.2.1
         with:
           delete_release: true # default: false
           tag_name: release-master-5 # tag name to delete
