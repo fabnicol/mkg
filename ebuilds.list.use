@@ -20,7 +20,7 @@ dev-libs/gjs -sysprof
 >=dev-libs/xmlsec-1.2.30 nss
 >=dev-lang/python-2.7.18-r1:2.7 sqlite
 >=dev-qt/qtcore-5.15.2-r3 icu
->=dev-qt/qtgui-5.15.2-r2 jpeg egl
+>=dev-qt/qtgui-5.15.2-r2 jpeg egl accessibility
 >=dev-qt/qtprintsupport-5.15.2-r1 cups
 >=dev-qt/qtwebengine-5.15.2_p20210824-r1 widgets
 >=dev-qt/qtwebchannel-5.15.2-r1 qml
