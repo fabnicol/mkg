@@ -451,6 +451,8 @@ global_config() {
     sed -i 's/DISPLAYMANAGER=".*"/DISPLAYMANAGER="sddm"/' \
         /etc/conf.d/display-manager | tee -a log
 
+    [ -d /usr/share/sddm/sddm.conf.d ] || mkdir /usr/share/sddm/sddm.conf.d/
+    
     # Numlock now set to 'on' on startup
     sed -i 's/Numlock=.*/Numlock=on/' /usr/share/sddm/sddm.conf.d/00default.conf
 
