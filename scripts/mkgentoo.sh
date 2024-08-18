@@ -476,7 +476,8 @@ Run 'sudo usermod -a -G vboxusers'"
         # effectively correcting first pass assignment.
         # This can be done only when cl is entirely parsed.
 
-        CREATE_ISO="false"
+    CREATE_ISO="false"
+    
     fi
     if [ -n "${ISO_OUTPUT}" ]
     then
@@ -495,6 +496,13 @@ Run 'sudo usermod -a -G vboxusers'"
     [ -n "${VM}" ] && [ "${VM}" != "false" ] && [ "${FROM_VM}" != "true" ] \
         && ${LOG[*]} "[MSG] A Virtual machine will be created with name ${VM}"
 
+   # One has to limit NCPU values to 6, the max nbumber of threads of the preprocessed Gentoo install disk
+   
+   if [ "${NCPUS}" -gt  6 ]
+   then
+       NCPUS=6
+   fi
+  
     return 0
 }
 
