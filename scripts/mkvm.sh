@@ -231,7 +231,7 @@ install_stage3() {
     # as the zone tag (-PT, -CA,...) is not necessarily correlated with
     # the zone tag (_BE, _FR, ...) of the LINGUAS locale-like encoding format.
 
-    echo "L10N=\"${VM_LANGUAGE::2} en\""    >> ${m_conf}
+    echo "L10N=\"${VM_LANGUAGE::2} l10n_en-US\""    >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
 
     # -bindist is requested by internationalization in kde-apps-meta.

@@ -498,10 +498,10 @@ Run 'sudo usermod -a -G vboxusers'"
 
    # One has to limit NCPU values to 6, the max nbumber of threads of the preprocessed Gentoo install disk
    
-   if [ "${NCPUS}" -gt  6 ]
-   then
-       NCPUS=6
-   fi
+#   if [ "${NCPUS}" -gt  6 ]
+#   then
+#       NCPUS=6
+#   fi
   
     return 0
 }
@@ -1210,7 +1210,7 @@ pre-test of package merging"
     ${LOG[*]} "[MSG] Using CFLAGS=${CFLAGS}"
     sed  -i "s/COMMON_FLAGS=.*/COMMON_FLAGS=\"${CFLAGS} -pipe\"/g"  ${m_conf}
     echo MAKEOPTS=-j${NCPUS}  >> ${m_conf}
-    echo "L10N=\"${VM_LANGUAGE} en\""    >> ${m_conf}
+    echo "L10N=\"${VM_LANGUAGE} l10n_en-US\""    >> ${m_conf}
     sed  -i 's/USE=".*"//g'    ${m_conf}
     echo "USE=\"-gtk -gnome qt4 qt5 kde dvd alsa cdr bindist networkmanager  \
 elogind -consolekit -systemd mpi dbus X nls\"" >>  ${m_conf}
@@ -1261,13 +1261,7 @@ fi
 # Same with nghttp2. Perl then has to be updated and cleaned
 # otherwise world update conflicts ensue.
 
-emerge dev-libs/libpcre dev-libs/libpcre2
-emerge net-libs/nghttp2
-emerge net-misc/curl
-emerge -u net/misc/wget
-emerge -u dev-lang/perl
-
-emerge app-portage/gentoolkit
+emerge -DN dev-libs/libpcre dev-libs/libpcre2 net-libs/nghttp2 net-misc/curl net/misc/wget dev-lang/perl app-portage/gentoolkit
 revdep-rebuild -i
 echo "[INF] Cleaning up perl..."
 perl-cleaner --reallyall
@@ -1309,7 +1303,7 @@ emerge -uD app-admin/sysklogd
 # other core sysapps to be merged first. LZ4 is a kernel
 # dependency for newer linux kernels.
 
-emerge -u app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
+emerge -uD app-arch/lz4 net-misc/netifrc sys-apps/pcmciautils
 
 if [ \$? != 0 ]
 then
@@ -1319,7 +1313,7 @@ fi
 
 # Force rebuild glibc
 # so that gcc updates can be built (stub-32.h dep).
-emerge sys-libs/glibc
+emerge  sys-libs/glibc
 
 # These two are needed for freetype/harfbuzz builds
 emerge sys-libs/libcap-ng
@@ -1359,7 +1353,7 @@ emerge -q -u --keep-going sys-apps/sysvinit
 # Note: gcc update is part of @world build
 
 emerge -u --config sys-libs/timezone-data
-emerge sys-kernel/linux-firmware
+emerge -uD sys-kernel/linux-firmware
 emerge -u dos2unix
 
 # There is a elusive, occasional block betwen

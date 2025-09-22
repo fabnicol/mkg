@@ -1,4 +1,6 @@
 # System and management
+ app-arch/libarchive
+ app-alternatives/cpio
  app-admin/sudo
  app-admin/sysklogd
  app-portage/eix

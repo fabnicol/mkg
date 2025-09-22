@@ -24,6 +24,8 @@ dev-libs/gjs -sysprof
 >=dev-qt/qtprintsupport-5.15.2-r1 cups
 >=dev-qt/qtwebengine-5.15.2_p20210824-r1 widgets
 >=dev-qt/qtwebchannel-5.15.2-r1 qml
+>=dev-qt/qt5compat-6.9.2 qml
+>=dev-qt/qtbase-6.9.2 wayland libproxy
 >=gnome-base/gvfs-1.48.1-r1 udisks cdda
 >=gnome-extra/evolution-data-server-3.36.5 gtk vala
 >=kde-frameworks/kconfig-5.96.0 qml
