@@ -21,11 +21,12 @@ dev-libs/gjs -sysprof
 >=dev-libs/xmlsec-1.2.30 nss
 >=dev-lang/python-2.7.18-r1:2.7 sqlite
 >=dev-qt/qt5compat-6.9.2 qml icu
-dev-qt/qtbase wayland libproxy icu opengl
+dev-qt/qtbase wayland libproxy icu opengl cups vulkan
 dev-qt/qtcore icu
 dev-qt/qtgui jpeg egl accessibility
-dev-qt/qtmultimedia opengl
+dev-qt/qtmultimedia opengl qml
 dev-qt/qtprintsupport cups
+dev-qt/qtquick3d opengl vulkan
 dev-qt/qttools opengl
 dev-qt/qtwebengine widgets opengl
 dev-qt/qtwebchannel qml
@@ -34,10 +35,13 @@ dev-qt/qtdeclarative opengl
 >=gnome-extra/evolution-data-server-3.36.5 gtk vala
 >=kde-frameworks/kconfig-5.96.0 qml
 kde-frameworks/kitemmodels qml
+kde-frameworks/kidletime wayland
+kde-frameworks/kguiaddons wayland 
 kde-frameworks/kwindowsystem wayland
 kde-frameworks/prison qml
 >=kde-frameworks/sonnet-5.88.0 qml
 >=kde-plasma/kwin-5.25.5 lock
+kde-plasma/kwin-x11 lock
 media-libs/clutter-gtk gtk
 media-libs/clutter gtk
 >=media-libs/gegl-0.4.26-r1 raw cairo
@@ -59,4 +63,6 @@ sys-devel/gcc fortran
 >=sys-libs/zlib-1.2.11-r2 minizip
 >=virtual/mpi-2.0-r4 threads cxx
 >=virtual/libusb-1-r2 udev
+x11-base/xwayland libei
 x11-terms/gnome-terminal nautilus -debug
+
