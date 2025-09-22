@@ -7,6 +7,7 @@ app-editors/emacs gtk
 >=app-text/poppler-21.07.0 qt5 nss
 app-text/texlive-core xetex
 app-text/xmlto text
+app-text/poppler qt6
 >=dev-libs/folks-0.14.0 eds
 dev-libs/gjs -sysprof
 >=x11-libs/gdk-pixbuf-2.42.6 jpeg
@@ -19,17 +20,21 @@ dev-libs/gjs -sysprof
 >=dev-libs/libxml2-2.9.10-r1 icu
 >=dev-libs/xmlsec-1.2.30 nss
 >=dev-lang/python-2.7.18-r1:2.7 sqlite
->=dev-qt/qtcore-5.15.2-r3 icu
->=dev-qt/qtgui-5.15.2-r2 jpeg egl accessibility
->=dev-qt/qtprintsupport-5.15.2-r1 cups
->=dev-qt/qtwebengine-5.15.2_p20210824-r1 widgets
->=dev-qt/qtwebchannel-5.15.2-r1 qml
->=dev-qt/qt5compat-6.9.2 qml
->=dev-qt/qtbase-6.9.2 wayland libproxy
+>=dev-qt/qt5compat-6.9.2 qml icu
+dev-qt/qtbase wayland libproxy icu opengl
+dev-qt/qtcore icu
+dev-qt/qtgui jpeg egl accessibility
+dev-qt/qtmultimedia opengl
+dev-qt/qtprintsupport cups
+dev-qt/qttools opengl
+dev-qt/qtwebengine widgets opengl
+dev-qt/qtwebchannel qml
+dev-qt/qtdeclarative opengl
 >=gnome-base/gvfs-1.48.1-r1 udisks cdda
 >=gnome-extra/evolution-data-server-3.36.5 gtk vala
 >=kde-frameworks/kconfig-5.96.0 qml
 kde-frameworks/kitemmodels qml
+kde-frameworks/kwindowsystem wayland
 kde-frameworks/prison qml
 >=kde-frameworks/sonnet-5.88.0 qml
 >=kde-plasma/kwin-5.25.5 lock
