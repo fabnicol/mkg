@@ -121,7 +121,7 @@ declare -i -x VERSION_MAJOR=$(sed -E 's/([0-9]+)\..*/\1/' \
                                <<< ${VBOX_VERSION})
 declare -i -x VERSION_MINOR=$(sed -E 's/[0-9]+\.([0-9]+)\..*/\1/' \
                                <<< ${VBOX_VERSION})
-declare -i -x VERSION_INDEX=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9][0-9]).*/\1/'\
+declare -i -x VERSION_INDEX=$(sed -E 's/[0-9]+\.[0-9]+\.([0-9]+).*/\1/'\
                                <<< ${VBOX_VERSION})
 
 # ---------------------------------------------------------------------------- #
